@@ -1,0 +1,20 @@
+chmod +x ./run_desarrollo.sh
+chmod +x ./run_produccion.sh
+chmod +x ./init_db_desarrollo.sh
+chmod +x ./env_desarrollo.sh
+
+## Instalar python 3.10
+sudo apt install software-properties-common -y
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt install python3.10 python3.10-venv
+
+## Instalar postgresql 14
+sudo apt -y install gnupg2 wget vim
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt -y update
+sudo apt -y install postgresql-14
+
+python3.10 -m venv venv
+
+chmod +x ./venv/bin/activate
