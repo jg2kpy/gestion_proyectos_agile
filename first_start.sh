@@ -15,6 +15,9 @@ wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-
 sudo apt -y update
 sudo apt -y install postgresql-14
 
+## Requisitos para psycopg2
+sudo apt install gcc build-essential python-dev python3-dev python3.10-dev musl-dev libssl-dev libldap2-dev libsasl2-dev slapd ldap-utils tox lcov valgrind
+
 python3.10 -m venv venv
 
 chmod +x ./venv/bin/activate
