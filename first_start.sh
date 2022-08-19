@@ -8,7 +8,7 @@ chmod +x ./env_desarrollo.sh
 ## Instalar python 3.10
 sudo apt install software-properties-common -y
 sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt install -y python3.10
+sudo apt install -y python3.10 pip
 
 ## Instalar postgresql 14
 sudo apt -y install gnupg2 wget vim

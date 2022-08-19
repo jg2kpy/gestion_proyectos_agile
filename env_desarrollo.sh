@@ -3,7 +3,7 @@
 # Configuracion de Django
 export SECRET_KEY="secret"
 export DEBUG=1
-export DJANGO_ALLOWED_HOSTS="localhost 127.0.0.1"
+export DJANGO_ALLOWED_HOSTS="*"
 
 # Configuracion de DB
 export POSTGRES_NAME="postgres"
