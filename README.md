@@ -1,13 +1,13 @@
 # Sistema de gestión de proyectos con metodologías ágiles: KANBAN + SCRUM
 ## Proyecto de la materia Ingeniería de software II de la FP-UNA.
 
-### Colaboradores:
+### Colaboradores
 * José Luis Junior Gutiérrez Agüero [@jg2kpy](https://github.com/jg2kpy)
 * Manuel René Pauls Toews [@QuisVenator](https://github.com/QuisVenator)
 * Guillermo Pamplona Pardo [@guigapamplona](https://github.com/guigapamplona)
 * Francisco Alejandro Sanabria Zelaya [@frandepy2](https://github.com/frandepy2)
 
-### Requisitos:
+### Requisitos
 * Python 3.10
 * Django 4.1
 * PostgreSQL 14
@@ -43,7 +43,7 @@ Finalmente instalamos las ultimas dependencias, hacemos migraciones y ejecutamos
 $ ./run_desarrollo.sh
 ```
 
-### Docker:
+### Docker
 En caso de querer ejecutar con un Docker debemos clonar el repositorio y construir la imagen:
 ```
 $ docker build -t is2 .
