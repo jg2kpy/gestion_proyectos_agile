@@ -2,7 +2,7 @@
 ## Proyecto de la materia Ingeniería de software II de la FP-UNA.
 
 ### Colaboradores:
-* Junior Gutierrez [@jg2kpy](https://github.com/jg2kpy)
+* José Luis Junior Gutiérrez Agüero [@jg2kpy](https://github.com/jg2kpy)
 * Manuel René Pauls Toews [@QuisVenator](https://github.com/QuisVenator)
 * Guillermo Pamplona Pardo [@guigapamplona](https://github.com/guigapamplona)
 * Francisco Alejandro Sanabria Zelaya [@frandepy2](https://github.com/frandepy2)
