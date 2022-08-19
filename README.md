@@ -24,7 +24,7 @@ $ chmod +x fisrt_start.sh
 
 Ejecutamos el script que instala las primeras dependencias:
 ```
-# ./fisrt_start.sh
+# ./first_start.sh
 ```
 
 Una vez termina ejecutamos el entorno virtual:
