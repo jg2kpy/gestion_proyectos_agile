@@ -41,3 +41,14 @@ Finalmente instalamos las ultimas dependencias, hacemos migraciones y ejecutamos
 ```
 $ ./run_desarrollo.sh
 ```
+
+### Docker:
+En caso de querer ejecutar con un Docker debemos clonar el repositorio y construir la imagen:
+```
+$ docker build -t is2 .
+```
+
+Luego ejecutamos la imagen y seguimos los pasos desde la ejecucion del entorno virtual
+```
+$ docker run is2:latest
+```
