@@ -48,7 +48,7 @@ En caso de querer ejecutar con un Docker debemos clonar el repositorio y constru
 $ docker build -t is2 .
 ```
 
-Luego ejecutamos la imagen y seguimos los pasos desde la ejecucion del entorno virtual
+Luego ejecutamos la imagen y seguimos los pasos desde el inicio de la base de datos
 ```
-$ docker run -it is2:latest
+$ docker run -p 8000:8000 -it is2:latest
 ```
