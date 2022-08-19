@@ -50,5 +50,5 @@ $ docker build -t is2 .
 
 Luego ejecutamos la imagen y seguimos los pasos desde la ejecucion del entorno virtual
 ```
-$ docker run is2:latest
+$ docker run -it is2:latest
 ```
