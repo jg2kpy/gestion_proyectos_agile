@@ -29,7 +29,7 @@ Ejecutamos el script que instala las primeras dependencias:
 
 Una vez termina ejecutamos el entorno virtual:
 ```
-# source ./venv/bin/activate
+$ source ./venv/bin/activate
 ```
 
 Despues iniciamos la base de datos de desarrollo:
@@ -39,5 +39,5 @@ Despues iniciamos la base de datos de desarrollo:
 
 Finalmente instalamos las ultimas dependencias, hacemos migraciones y ejecutamos el software:
 ```
-# ./run_desarrollo.sh
+$ ./run_desarrollo.sh
 ```
