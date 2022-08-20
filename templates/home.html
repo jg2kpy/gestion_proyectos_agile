@@ -1,8 +1,8 @@
 {% load socialaccount %}
 
-<h1>Django Allauth Tutorial</h1>
+<h1>Gestión Proyectos Agile</h1>
 {% if user.is_authenticated %}
-<p>Welcome {{ user.username }} !!!</p>
+<p>Bienvenido {{ user.username }} !!!</p>
 {% else %}
-<a href="{% provider_login_url 'github' %}">Sign Up</a>
+<a href="{% provider_login_url 'github' %}">Ingresar con github</a>
 {% endif %}
