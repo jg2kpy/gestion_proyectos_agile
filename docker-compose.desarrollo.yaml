@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: gpa-db-dev
+    image: postgres:14
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  web:
+    container_name: gpa-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.desarrollo
+    command: python manage.py runserver 0:8000
+    env_file:
+      - .env.desarrollo
+    volumes:
+      - .:/app
+    ports:
+      - "80:8000"
+    depends_on:
+      - db

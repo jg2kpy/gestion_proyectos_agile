@@ -28,7 +28,7 @@ docker rm gpa-dev
 ```
 Correr el servidor en docker (desde el directorio de este archivo):
 ```bash
-docker run -p 80:8000 -v "$(pwd)":/app -it --name gpa-dev gpa-desarrollo
+docker run -p 80:8000 -v "$(pwd)":/app -v "$(pwd)"/postgre-data:/var/lib/postgresql/14/main -it --name gpa-dev gpa-desarrollo
 ```
 
 Con el container corriendo se pueden ejecutar comandos de django desde una segunda terminal con:
