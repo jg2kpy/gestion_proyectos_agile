@@ -22,9 +22,22 @@ Crear la imagen de desarrollo (solo primera ejecución):
 docker build -t gpa-desarrollo -f Dockerfile.desarrollo .
 ```
 
+Si ya se ejecutó una vez el container, este debe ser eliminado con:
+```bash
+docker rm gpa-dev
+```
 Correr el servidor en docker (desde el directorio de este archivo):
 ```bash
-docker run -p 80:8000 -v "$(pwd)":/home/ubuntu/app -it gpa-desarrollo
+docker run -p 80:8000 -v "$(pwd)":/home/ubuntu/app -it --name gpa-dev gpa-desarrollo
+```
+
+Con el container corriendo se pueden ejecutar comandos de django desde una segunda terminal con:
+```bash
+docker exec -it gpa-dev <comando>
+```
+o de forma interactiva con:
+```bash
+docker exec -it gpa-dev bash
 ```
 
 En caso de cambios al archivo `Dockerfile.desarrollo` elimar la imágen con:
