@@ -28,7 +28,7 @@ docker rm gpa-dev
 ```
 Correr el servidor en docker (desde el directorio de este archivo):
 ```bash
-docker run -p 80:8000 -v "$(pwd)":/home/ubuntu/app -it --name gpa-dev gpa-desarrollo
+docker run -p 80:8000 -v "$(pwd)":/app -it --name gpa-dev gpa-desarrollo
 ```
 
 Con el container corriendo se pueden ejecutar comandos de django desde una segunda terminal con:
@@ -55,7 +55,7 @@ docker build -t gpa-produccion -f Dockerfile.produccion .
 Completar el archivo `produccion.sh.example`, cambiar el nombre del archivo a `produccion.sh` 
 y correr el servidor en docker (desde el directorio de este archivo):
 ```bash
-docker run -p 80:8000 -v "$(pwd)":/home/ubuntu/app -it gpa-produccion
+docker run -p 80:8000 -v "$(pwd)":/app -it gpa-produccion
 ```
 
 En caso de cambios al archivo `Dockerfile.produccion` elimar la imágen con:
