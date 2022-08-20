@@ -42,7 +42,7 @@ docker exec -it gpa-dev bash
 
 En caso de cambios al archivo `Dockerfile.desarrollo` elimar la imágen con:
 ```bash
-docker image -rm gpa-desarrollo
+docker image rm gpa-desarrollo
 ```
 y volver a crear la imagen.
 
@@ -60,6 +60,6 @@ docker run -p 80:8000 -v "$(pwd)":/home/ubuntu/app -it gpa-produccion
 
 En caso de cambios al archivo `Dockerfile.produccion` elimar la imágen con:
 ```bash
-docker image -rm gpa-produccion
+docker image rm gpa-produccion
 ```
 y volver a crear la imagen.
