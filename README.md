@@ -8,48 +8,45 @@
 * Francisco Alejandro Sanabria Zelaya [@frandepy2](https://github.com/frandepy2)
 
 ### Requisitos
-* Python 3.10
-* Django 4.1
-* PostgreSQL 14
+* Docker
 
 Clonar el repositorio con el siguente comando:
-
-```
-$ git clone https://github.com/jg2kpy/gestion_proyectos_agile.git
-```
-
-Volvemos ejecutable el script para instalar las primeras dependencias:
-```
-$ chmod +x first_start.sh
+```bash
+git clone https://github.com/jg2kpy/gestion_proyectos_agile.git
 ```
 
-Ejecutamos el script que instala las primeras dependencias:
-```
-# ./first_start.sh
-```
-
-Una vez termina ejecutamos el entorno virtual:
-```
-$ source ./venv/bin/activate
+## Ejecutar
+### Desarrollo
+Crear la imagen de desarrollo (solo primera ejecución):
+```bash
+docker build -t gpa-desarrollo -f Dockerfile.desarrollo.
 ```
 
-Despues iniciamos la base de datos de desarrollo:
-```
-# ./init_db_desarrollo.sh
-```
-
-Finalmente instalamos las ultimas dependencias, hacemos migraciones y ejecutamos el software:
-```
-$ ./run_desarrollo.sh
+Correr el servidor en docker (desde el directorio de este archivo):
+```bash
+docker run -p 80:8000 -v "$(pwd)":/home/ubuntu/app -it gpa-desarrollo
 ```
 
-### Docker
-En caso de querer ejecutar con un Docker debemos clonar el repositorio y construir la imagen:
+En caso de cambios al archivo `Dockerfile.desarrollo` elimar la imágen con:
+```bash
+docker image -rm gpa-desarrollo
 ```
-$ docker build -t is2 .
+y volver a crear la imagen.
+
+### Producción
+Crear la imagen de producción (solo primera ejecución):
+```bash
+docker build -t gpa-produccion -f Dockerfile.produccion.
 ```
 
-Luego ejecutamos la imagen y seguimos los pasos desde el inicio de la base de datos
+Completar el archivo `produccion.sh.example`, cambiar el nombre del archivo a `produccion.sh` 
+y correr el servidor en docker (desde el directorio de este archivo):
+```bash
+docker run -p 80:8000 -v "$(pwd)":/home/ubuntu/app -it gpa-produccion
 ```
-$ docker run -p 8000:8000 -it --name is2 is2:latest
+
+En caso de cambios al archivo `Dockerfile.produccion` elimar la imágen con:
+```bash
+docker image -rm gpa-produccion
 ```
+y volver a crear la imagen.
