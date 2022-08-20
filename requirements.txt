@@ -1,4 +1,5 @@
 Django==4.1
 psycopg2-binary==2.9.3
 django.allauth==0.51.0
+gunicorn==20.1
 tzdata

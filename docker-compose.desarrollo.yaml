@@ -10,7 +10,7 @@ services:
       - .env.desarrollo
     ports:
       - 5432:5432
-  web:
+  app:
     container_name: gpa-dev
     build:
       context: .

@@ -20,5 +20,16 @@ git clone https://github.com/jg2kpy/gestion_proyectos_agile.git
 ### Desarrollo
 Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imagenes y ejecutar los containers automaticamente:
 ```bash
-docker compose -f "docker-compose.desarrollo.yaml" up --build
+docker-compose -f "docker-compose.desarrollo.yaml" up --build
+```
+
+### Produccion
+Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imagenes y ejecutar los containers automaticamente:
+```bash
+docker-compose -f "docker-compose.produccion.yaml" up --build
+```
+
+Para generar los archivos estaticos para NGINX se debe ejecutar
+```bash
+sudo docker exec -it gpa-pro python3 manage.py collectstatic
 ```
