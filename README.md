@@ -9,6 +9,7 @@
 
 ### Requisitos
 * Docker
+* Docker-compose
 
 Clonar el repositorio con el siguente comando:
 ```bash
@@ -17,49 +18,7 @@ git clone https://github.com/jg2kpy/gestion_proyectos_agile.git
 
 ## Ejecutar
 ### Desarrollo
-Crear la imagen de desarrollo (solo primera ejecución):
+Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imagenes y ejecutar los containers automaticamente:
 ```bash
-docker build -t gpa-desarrollo -f Dockerfile.desarrollo .
+docker compose -f "docker-compose.desarrollo.yaml" up --build
 ```
-
-Si ya se ejecutó una vez el container, este debe ser eliminado con:
-```bash
-docker rm gpa-dev
-```
-Correr el servidor en docker (desde el directorio de este archivo):
-```bash
-docker run -p 80:8000 -v "$(pwd)":/app -v "$(pwd)"/postgre-data:/var/lib/postgresql/14/main -it --name gpa-dev gpa-desarrollo
-```
-
-Con el container corriendo se pueden ejecutar comandos de django desde una segunda terminal con:
-```bash
-docker exec -it gpa-dev <comando>
-```
-o de forma interactiva con:
-```bash
-docker exec -it gpa-dev bash
-```
-
-En caso de cambios al archivo `Dockerfile.desarrollo` elimar la imágen con:
-```bash
-docker image rm gpa-desarrollo
-```
-y volver a crear la imagen.
-
-### Producción
-Crear la imagen de producción (solo primera ejecución):
-```bash
-docker build -t gpa-produccion -f Dockerfile.produccion .
-```
-
-Completar el archivo `produccion.sh.example`, cambiar el nombre del archivo a `produccion.sh` 
-y correr el servidor en docker (desde el directorio de este archivo):
-```bash
-docker run -p 80:8000 -v "$(pwd)":/app -it gpa-produccion
-```
-
-En caso de cambios al archivo `Dockerfile.produccion` elimar la imágen con:
-```bash
-docker image rm gpa-produccion
-```
-y volver a crear la imagen.
