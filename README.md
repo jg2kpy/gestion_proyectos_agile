@@ -19,7 +19,7 @@ git clone https://github.com/jg2kpy/gestion_proyectos_agile.git
 ### Desarrollo
 Crear la imagen de desarrollo (solo primera ejecución):
 ```bash
-docker build -t gpa-desarrollo -f Dockerfile.desarrollo.
+docker build -t gpa-desarrollo -f Dockerfile.desarrollo .
 ```
 
 Correr el servidor en docker (desde el directorio de este archivo):
@@ -36,7 +36,7 @@ y volver a crear la imagen.
 ### Producción
 Crear la imagen de producción (solo primera ejecución):
 ```bash
-docker build -t gpa-produccion -f Dockerfile.produccion.
+docker build -t gpa-produccion -f Dockerfile.produccion .
 ```
 
 Completar el archivo `produccion.sh.example`, cambiar el nombre del archivo a `produccion.sh` 
