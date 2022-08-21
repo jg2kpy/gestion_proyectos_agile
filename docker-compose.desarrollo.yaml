@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: gpa-db-dev
+    image: postgres:14
+    volumes:
+      - ./var/data/db:/var/lib/postgresql/data
+    env_file:
+      - .env.desarrollo
+    ports:
+      - 5432:5432
+  app:
+    container_name: gpa-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.desarrollo
+    command: bash -c "python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    env_file:
+      - .env.desarrollo
+    volumes:
+      - .:/app
+    ports:
+      - "80:8000"
+    depends_on:
+      - db

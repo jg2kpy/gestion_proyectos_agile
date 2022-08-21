@@ -1,0 +1,13 @@
+{%load socialaccount%}
+
+<body onload="document.forms['github_login'].submit()">
+
+    <p>Debería ser rediregido a la página de Github en unos segundos, en caso contrario use el botón de abajo.</p>
+
+
+    <form method="post" name="github_login">
+        {% csrf_token %}
+        <button type="submit">Ingresar con Github</button>
+    </form>
+
+</body>

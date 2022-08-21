@@ -1,0 +1,8 @@
+{% load socialaccount %}
+
+<h1>Gestión Proyectos Agile</h1>
+{% if user.is_authenticated %}
+<p>Bienvenido {{ user.username }} !!!</p>
+{% else %}
+<a href="{% provider_login_url 'github' %}">Ingresar con github</a>
+{% endif %}

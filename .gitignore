@@ -1,4 +1,4 @@
-env_produccion.sh
+postgre-data/
 
 # Created by https://www.toptal.com/developers/gitignore/api/django,python,linux,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=django,python,linux,windows
@@ -134,7 +134,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+.env*
 .venv
 env/
 venv/
