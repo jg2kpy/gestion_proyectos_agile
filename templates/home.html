@@ -25,10 +25,10 @@
         <div class="position-absolute top-50 start-50 translate-middle">
             <h1 class="text-center">Gestión Proyectos Agile</h1>
             {% if user.is_authenticated %}
-            {% if user|has_group:"gpa_admin" %}
-            <p>moderator</p>
-            {% endif %}
-            <p>Bienvenido {{ user.username }} !!!</p>
+                <p>Bienvenido {{ user.username }} !!!</p>
+                {% if user|has_group:"gpa_admin" %}
+                <p>moderator</p>
+                {% endif %}
             {% else %}
             <a class="btn btn-dark text-center" href="{% provider_login_url 'github' %}">
                 <i class="material-icons">person </i> Ingresar con Github</a>
