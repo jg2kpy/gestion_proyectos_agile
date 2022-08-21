@@ -3,6 +3,10 @@ postgre-data/
 # Created by https://www.toptal.com/developers/gitignore/api/django,python,linux,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=django,python,linux,windows
 
+### Sphinx ###
+*.rst
+
+
 ### Django ###
 *.log
 *.pot
