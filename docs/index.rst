@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-GPA Documentacion
+GPA Documentación
 =======================================================
 
 .. toctree::
@@ -12,7 +12,7 @@ GPA Documentacion
 
    modules
 
-Indices y Tablas
+Índices y Tablas
 ==================
 
 * :ref:`genindex`
