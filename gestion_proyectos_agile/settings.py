@@ -84,6 +84,10 @@ TEMPLATES = [
 
                 'django.template.context_processors.request',
             ],
+            'libraries':{
+                'has_group': 'gestion_proyectos_agile.templatetags.has_group',
+
+            },
         },
     },
 ]
