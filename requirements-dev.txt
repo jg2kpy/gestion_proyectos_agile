@@ -1,1 +1,2 @@
 sphinx==5.1.1
+sphinx-serve==1.0.1

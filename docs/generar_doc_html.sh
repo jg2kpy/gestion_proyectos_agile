@@ -16,3 +16,5 @@ mv index.rst.temp index.rst
 # ejecutar el api-doc
 sphinx-apidoc -o . ..
 make html
+
+sphinx-serve
