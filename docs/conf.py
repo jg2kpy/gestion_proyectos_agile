@@ -10,7 +10,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
-project = 'Gestion de Proyectos Agiles'
+project = 'Gestión de Proyectos Ágiles'
 copyright = '2022, Guillermo Francisco Junior Rene'
 author = 'Guillermo Francisco Junior Rene'
 release = '0.1.0'
