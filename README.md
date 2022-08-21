@@ -31,5 +31,5 @@ docker-compose -f "docker-compose.produccion.yaml" up --build
 
 Para generar los archivos estaticos para NGINX se debe ejecutar
 ```bash
-sudo docker exec -it gpa-pro python3 manage.py collectstatic
+docker exec -it gpa-pro python3 manage.py collectstatic
 ```
