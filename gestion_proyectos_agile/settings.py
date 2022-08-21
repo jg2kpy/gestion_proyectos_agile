@@ -41,11 +41,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'usuarios',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
 ]
+
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
@@ -80,6 +84,10 @@ TEMPLATES = [
 
                 'django.template.context_processors.request',
             ],
+            'libraries':{
+                'has_group': 'gestion_proyectos_agile.templatetags.has_group',
+
+            },
         },
     },
 ]
