@@ -5,6 +5,9 @@
 # Entrar en el directorio docs
 cd docs
 
+# Borrar Carpeta _build
+rm -rf _build
+
 # Borrar todos los rst excepto index
 mv index.rst index.rst.temp
 rm *.rst
