@@ -18,12 +18,12 @@ git clone https://github.com/jg2kpy/gestion_proyectos_agile.git
 
 ## Ejecutar
 ### Desarrollo
-Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imagenes y ejecutar los containers automaticamente:
+Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imágenes y ejecutar los containers automáticamente:
 ```bash
 docker-compose -f "docker-compose.desarrollo.yaml" up --build
 ```
 
-Para entrar en el container y ejecutar containers manualmente se puede usar:
+Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imágenes y ejecutar los containers automáticamente:
 ```bash
 docker exec -it gpa-dev bash
 ```
@@ -32,7 +32,6 @@ Desde esta consola se pueden ejecutar también todas las pruebas unitarias:
 ```bash
 python3 manage.py test pruebas_unitarias.models.[TESTSUITE]
 ```
-
 
 ### Produccion
 Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imagenes y ejecutar los containers automaticamente:
