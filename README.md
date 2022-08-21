@@ -33,3 +33,11 @@ Para generar los archivos estaticos para NGINX se debe ejecutar
 ```bash
 sudo docker exec -it gpa-pro python3 manage.py collectstatic
 ```
+
+## Documentacion
+Para generar la documentación debe tener el container de desarrollo corriendo y ejecutar el siguiente comando:
+```bash
+docker exec -it gpa-dev bash docs/generar_doc_html.sh
+```
+Ahora la documentación se podrá visualizar ingresando a `localhost:8081` con su navegador preferido.
+Una vez visualizada toda la documentación puede terminar el servidor de documentación con `Ctrl-C`
