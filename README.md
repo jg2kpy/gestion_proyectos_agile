@@ -23,13 +23,19 @@ Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este c
 docker-compose -f "docker-compose.desarrollo.yaml" up --build
 ```
 
+Para entrar en el container y ejecutar containers manualmente se puede usar:
+```bash
+docker exec -it gpa-dev bash
+```
+
+Desde esta consola se pueden ejecutar también todas las pruebas unitarias:
+```bash
+python3 manage.py test pruebas_unitarias.models.[TESTSUITE]
+```
+
+
 ### Produccion
 Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imagenes y ejecutar los containers automaticamente:
 ```bash
 docker-compose -f "docker-compose.produccion.yaml" up --build
-```
-
-Para generar los archivos estaticos para NGINX se debe ejecutar
-```bash
-docker exec -it gpa-pro python3 manage.py collectstatic
 ```

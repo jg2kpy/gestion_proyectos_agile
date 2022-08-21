@@ -50,6 +50,9 @@ class UsuariosTests(TestCase):
                 email='super@user.com', password='foo', is_superuser=False)
 
     def test_crear_primer_admin(self):
+        """
+        Prueba que el primer usuario creado se vuelve admin
+        """
         Usuario = get_user_model()
         Usuario.objects.all().delete()
         self.assertEqual(Usuario.objects.all().count(), 0,
