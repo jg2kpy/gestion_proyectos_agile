@@ -3,16 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Gestion de Proyectos Agiles's documentation!
+GPA Documentacion
 =======================================================
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contenido:
 
    modules
 
-Indices and tables
+Indices y Tablas
 ==================
 
 * :ref:`genindex`
