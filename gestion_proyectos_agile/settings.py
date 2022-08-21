@@ -41,11 +41,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'usuarios',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
 ]
+
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
@@ -67,7 +71,9 @@ ROOT_URLCONF = 'gestion_proyectos_agile.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -86,17 +92,14 @@ WSGI_APPLICATION = 'gestion_proyectos_agile.wsgi.application'
 
 SITE_ID = 1
 
-SOCIALACCOUNT_PROVIDERS = {
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
-    'APP': {
-        'client_id': os.environ.get("GITHUB_CLIENT_ID"),
-        'secret': os.environ.get("GITHUB_SECRET"),
-    },
+SOCIALACCOUNT_PROVIDERS = {
     'github': {
-        'SCOPE': [
-            'user',
-            'email',
-        ],
+        'APP': {
+            'client_id': os.environ.get("GITHUB_CLIENT_ID"),
+            'secret': os.environ.get("GITHUB_SECRET"),
+        },
     }
 }
 

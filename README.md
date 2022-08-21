@@ -23,21 +23,18 @@ Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este c
 docker-compose -f "docker-compose.desarrollo.yaml" up --build
 ```
 
-### Producción
 Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imágenes y ejecutar los containers automáticamente:
+```bash
+docker exec -it gpa-dev bash
+```
+
+Desde esta consola se pueden ejecutar también todas las pruebas unitarias:
+```bash
+python3 manage.py test pruebas_unitarias.models.[TESTSUITE]
+```
+
+### Produccion
+Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imagenes y ejecutar los containers automaticamente:
 ```bash
 docker-compose -f "docker-compose.produccion.yaml" up --build
 ```
-
-Para generar los archivos estáticos para NGINX se debe ejecutar
-```bash
-sudo docker exec -it gpa-pro python3 manage.py collectstatic
-```
-
-## Documentación
-Para generar la documentación debe tener el container de desarrollo corriendo y ejecutar el siguiente comando:
-```bash
-docker exec -it gpa-dev bash docs/generar_doc_html.sh
-```
-Ahora la documentación se podrá visualizar ingresando a `localhost:8081` con su navegador preferido.
-Una vez visualizada toda la documentación puede terminar el servidor de documentación con `Ctrl-C`
