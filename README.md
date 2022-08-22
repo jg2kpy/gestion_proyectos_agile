@@ -23,7 +23,7 @@ Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este c
 docker-compose -f "docker-compose.desarrollo.yaml" up --build
 ```
 
-Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imágenes y ejecutar los containers automáticamente:
+Desde otra instancia de una terminal se puede acceder al container de la aplicacion con este comando:
 ```bash
 docker exec -it gpa-dev bash
 ```
@@ -31,6 +31,17 @@ docker exec -it gpa-dev bash
 Desde esta consola se pueden ejecutar también todas las pruebas unitarias:
 ```bash
 python3 manage.py test pruebas_unitarias.models.[TESTSUITE]
+```
+
+O generar la documentación automatica, que se puede acceder a ella mediante el puerto 8081:
+```bash
+chmod +x ./docs/generar_doc_html.sh
+./docs/generar_doc_html.sh
+```
+
+Se debe ejecutar el script ./delete_migrations.sh si se pasa de trabajar de desarrollo a produccion
+```bash
+./delete_migrations.sh
 ```
 
 ### Produccion
