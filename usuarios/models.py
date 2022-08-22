@@ -13,14 +13,12 @@ class Usuario(AbstractUser):
     """
     Usuario por defecto.
     """
-    username = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=255, unique=True)
+    email = models.EmailField(unique=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 
