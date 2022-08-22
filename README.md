@@ -16,6 +16,9 @@ Clonar el repositorio con el siguente comando:
 git clone https://github.com/jg2kpy/gestion_proyectos_agile.git
 ```
 
+### Configuración
+Antes de ejecutar los containers se debe realizar una copia de .env.example y renombrar a .env.desarrollo o .env.produccion y completar las variables de entorno
+
 ## Ejecutar
 ### Desarrollo
 Ejecutar el docker compose con el archivo docker-compose.desarrollo.yaml, este comando sirve para generar las imágenes y ejecutar los containers automáticamente:
