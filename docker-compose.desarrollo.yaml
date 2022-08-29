@@ -5,7 +5,7 @@ services:
     container_name: gpa-db-dev
     image: postgres:14
     volumes:
-      - ./var/data/db:/var/lib/postgresql/data
+      - ./postgre-data:/var/lib/postgresql/data
     env_file:
       - .env.desarrollo
     ports:
