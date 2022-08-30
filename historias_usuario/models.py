@@ -7,9 +7,15 @@ class EtapaHistoriaUsuario(models.Model):
     """
     Etapas de historias de usuario, cada una se muestra como una columna en el tablero de la historia de usuario correspondiente.
     """
-    nombre = models.CharField(max_length=255, unique=True)
+    nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
     proyecto = models.ForeignKey(Proyecto, related_name='etapasHistoriaUsuario')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['nombre', 'proyecto'],
+                                    name='constraint_etapa_historia_usuario_nombre_proyecto')
+        ]
 
     def __str__(self):
         return self.nombre
@@ -20,10 +26,16 @@ class TipoHistoriaUsusario(models.Model):
     Un tipo de historia de usuario. Cada tipo esta relacionado con un proyecto.
     Se pueden importar en otros proyectos.
     """
-    nombre = models.CharField(max_length=255, unique=True)
+    nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
     proyecto = models.ForeignKey(Proyecto, related_name='tiposHistoriaUsuario')
     etapas = models.ManyToManyField(EtapaHistoriaUsuario, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['nombre', 'proyecto'],
+                                    name='constaint_tipo_historia_usuario_nombre_proyecto')
+        ]
 
     def __str__(self):
         return self.nombre
@@ -48,7 +60,7 @@ class HistoriaUsuario(models.Model):
     Cada historia de usuario representa un trabajo a realizar.
     Debe tener UserPoints (up) y BuisnessValue (bv). Se guarda un historial completo.
     """
-    nombre = models.CharField(max_length=255, unique=True)
+    nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
@@ -61,6 +73,11 @@ class HistoriaUsuario(models.Model):
     usuarioAsignado = models.ForeignKey('Usuario', related_name='usuarioAsignado', blank=True, null=True)
     proyecto = models.ForeignKey(Proyecto, related_name='backlog')
     archivo = models.ManyToManyField(ArchivoAnexo, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['nombre', 'proyecto'], name='constraint_historia_usuario_nombre_proyecto')
+        ]
 
     def __str__(self):
         return self.nombre
