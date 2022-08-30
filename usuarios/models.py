@@ -34,7 +34,7 @@ class Rol(models.Model):
     nombre = models.CharField(max_length=255, unique=True)
     descripcion = models.TextField(blank=True, null=True)
     usuario = models.ManyToManyField(Usuario, blank=True, related_name="roles")
-    proyecto = models.ManyToManyField(Proyecto, null=True)
+    proyecto = models.ManyToManyField(Proyecto)
 
     def __str__(self):
         return self.nombre

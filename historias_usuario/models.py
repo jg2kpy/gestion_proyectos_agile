@@ -66,11 +66,11 @@ class HistoriaUsuario(models.Model):
     sprint = models.ForeignKey(Sprint, related_name='historias', on_delete=models.PROTECT)
     etapa = models.ForeignKey(EtapaHistoriaUsuario, related_name='historias', on_delete=models.PROTECT)
     tipo = models.ForeignKey(TipoHistoriaUsusario, related_name='historias', on_delete=models.PROTECT)
-    versionPrevia = models.ForeignKey('HistoriaUsuario', related_name='versionPrevia',
+    versionPrevia = models.ForeignKey('HistoriaUsuario', related_name='versionSiguiente',
                                       blank=True, null=True, on_delete=models.PROTECT)
     up = models.IntegerField(blank=False)
     bv = models.IntegerField(blank=False)
-    usuarioAsignado = models.ForeignKey('Usuario', related_name='usuarioAsignado',
+    usuarioAsignado = models.ForeignKey('usuarios.Usuario', related_name='usuarioAsignado',
                                         blank=True, null=True, on_delete=models.SET_NULL)
     proyecto = models.ForeignKey(Proyecto, related_name='backlog', on_delete=models.PROTECT)
     archivo = models.ManyToManyField(ArchivoAnexo, blank=True)
@@ -89,7 +89,7 @@ class Comentario(models.Model):
     Comentario en una historia de usuario.
     """
     contenido = models.TextField(blank=True, null=True)
-    usuario = models.ForeignKey('Usuario', related_name='comentarios', null=True, on_delete=models.SET_NULL)
+    usuario = models.ForeignKey('usuarios.Usuario', related_name='comentarios', null=True, on_delete=models.SET_NULL)
     historiaUsuario = models.ForeignKey(HistoriaUsuario, related_name='comentarios', on_delete=models.CASCADE)
 
     def __str__(self):
