@@ -33,7 +33,8 @@ class RolProyecto(models.Model):
     """
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
-    usuario = models.ManyToManyField(Usuario, blank=True, related_name="roles")
+    usuario = models.ManyToManyField(Usuario, blank=True, related_name="roles_proyecto")
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, null=True)
 
     class Meta:
         constraints = [
@@ -50,7 +51,7 @@ class RolSistema(models.Model):
     """
     nombre = models.CharField(max_length=255, unique=True)
     descripcion = models.TextField(blank=True, null=True)
-    usuario = models.ManyToManyField(Usuario, blank=True, related_name="roles")
+    usuario = models.ManyToManyField(Usuario, blank=True, related_name="roles_sistema")
 
     def __str__(self):
         return self.nombre
@@ -86,9 +87,9 @@ def crear_primer_admin(sender, instance, **kwargs):
     Detecta si no existe un administrador en el sistema y en este caso registra como admin al primer usuario en ingresar.
     """
     rol_admin, created = RolSistema.objects.get_or_create(nombre='gpa_admin')
-    if created or Usuario.objects.filter(roles__id=rol_admin.id).count() == 0:
+    if created or Usuario.objects.filter(roles_sistema__id=rol_admin.id).count() == 0:
         if created:
             # Agregar permisos de administrador y descripcion
             pass
 
-        instance.roles.add(rol_admin)
+        instance.roles_sistema.add(rol_admin)
