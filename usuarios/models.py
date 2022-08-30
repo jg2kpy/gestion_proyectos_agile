@@ -5,6 +5,8 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Group
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+
+import proyectos
 from .manager import CustomUserManager
 from django.utils import timezone
 
@@ -31,7 +33,8 @@ class Rol(models.Model):
     """
     nombre = models.CharField(max_length=255, unique=True)
     descripcion = models.TextField(blank=True, null=True)
-    usuario = models.ManyToManyField(Usuario, blank=True)
+    usuario = models.ManyToManyField(Usuario, blank=True, related_name="roles")
+    proyecto = models.ManyToManyField(proyectos.Proyecto, null=True)
 
     def __str__(self):
         return self.nombre
@@ -43,7 +46,7 @@ class Permiso(models.Model):
     """
     nombre = models.CharField(max_length=255, unique=True)
     descripcion = models.TextField(blank=True, null=True)
-    rol = models.ManyToManyField(Rol, blank=True)
+    rol = models.ManyToManyField(Rol, blank=True, related_name='roles')
 
     def __str__(self):
         return self.nombre
@@ -54,10 +57,10 @@ def crear_primer_admin(sender, instance, **kwargs):
     """
     Detecta si no existe un administrador en el sistema y en este caso registra como admin al primer usuario en ingresar.
     """
-    if Usuario.objects.filter(groups__name='gpa_admin').count() == 0:
-        admin_group, created = Group.objects.get_or_create(name='gpa_admin')
+    rol_admin, created = Rol.objects.get_or_create(nombre='gpa_admin', proyecto__isnull=True)
+    if created or Usuario.objects.filter(roles__id=rol_admin.id).count() == 0:
         if created:
-            # Agregar permisos de administrador
+            # Agregar permisos de administrador y descripcion
             pass
 
-        instance.groups.add(admin_group)
+        instance.roles.add(rol_admin)

@@ -10,7 +10,6 @@ class Proyecto(models.Model):
     descripcion = models.TextField(blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
-    rol = models.ManyToManyField('Rol', blank=True)
     usuario = models.ManyToManyField('Usuario', related_name="equipo", blank=True)
     scrumMaster = models.ForeignKey('Usuario', related_name='scrumMaster')
     estado = models.CharField(max_length=255, blank=True, null=True)
