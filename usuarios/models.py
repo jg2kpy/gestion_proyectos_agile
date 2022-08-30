@@ -34,7 +34,7 @@ class Rol(models.Model):
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
     usuario = models.ManyToManyField(Usuario, blank=True, related_name="roles")
-    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, null=True)
 
     class Meta:
         constraints = [
