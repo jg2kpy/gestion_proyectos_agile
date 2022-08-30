@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-import proyectos
+from proyectos.models import Proyecto
 from .manager import CustomUserManager
 from django.utils import timezone
 
@@ -34,7 +34,7 @@ class Rol(models.Model):
     nombre = models.CharField(max_length=255, unique=True)
     descripcion = models.TextField(blank=True, null=True)
     usuario = models.ManyToManyField(Usuario, blank=True, related_name="roles")
-    proyecto = models.ManyToManyField(proyectos.Proyecto, null=True)
+    proyecto = models.ManyToManyField(Proyecto, null=True)
 
     def __str__(self):
         return self.nombre

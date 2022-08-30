@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     'usuarios',
+    'proyectos',
+    'historias_usuario',
 
     'allauth',
     'allauth.account',

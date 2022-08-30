@@ -11,7 +11,7 @@ class Proyecto(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
     usuario = models.ManyToManyField('Usuario', related_name="equipo", blank=True)
-    scrumMaster = models.ForeignKey('Usuario', related_name='scrumMaster')
+    scrumMaster = models.ForeignKey('Usuario', related_name='scrumMaster', on_delete=models.PROTECT)
     estado = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
@@ -25,7 +25,7 @@ class Sprint(models.Model):
     """
     fecha_inicio = models.DateTimeField(blank=True, null=True)
     fecha_fin = models.DateTimeField(blank=True, null=True)
-    proyecto = models.ForeignKey(Proyecto, related_name='sprints')
+    proyecto = models.ForeignKey(Proyecto, related_name='sprints', on_delete=models.PROTECT)
     estado = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
