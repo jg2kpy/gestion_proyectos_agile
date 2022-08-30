@@ -19,11 +19,34 @@ class Usuario(AbstractUser):
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
 
-
     objects = CustomUserManager()
 
     def __str__(self):
         return self.email
+
+
+class Rol(models.Model):
+    """
+    Roles de usuario.
+    """
+    nombre = models.CharField(max_length=255, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+    usuario = models.ManyToManyField(Usuario, blank=True)
+
+    def __str__(self):
+        return self.nombre
+
+
+class Permiso(models.Model):
+    """
+    Permisos de usuario.
+    """
+    nombre = models.CharField(max_length=255, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+    rol = models.ManyToManyField(Rol, blank=True)
+
+    def __str__(self):
+        return self.nombre
 
 
 @receiver(post_save, sender=Usuario)
