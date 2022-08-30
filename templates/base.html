@@ -1,5 +1,5 @@
 {% load static %}
-{% load has_group %}
+{% load tiene_rol_en %}
 {% load socialaccount %}
 <!DOCTYPE html>
 <html lang="es">
@@ -72,6 +72,24 @@
                         </ul>
                     </div>
                 </li>
+
+                <li class="border-top my-3"></li>
+                {% tiene_rol_en user "gpa_admin" "" as es_admin %}
+                {% if es_admin %}
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#admin-collapse" aria-expanded="false">
+                        Administrador
+                    </button>
+                    <div class="collapse" id="admin-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="#" class="link-dark rounded">Usuarios</a></li>
+                            <li><a href="#" class="link-dark rounded">Roles Globales</a></li>
+                            <li><a href="#" class="link-dark rounded">Proyectos</a></li>
+                        </ul>
+                    </div>
+                </li>
+                {% endif %}
                 <li class="border-top my-3"></li>
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
@@ -82,7 +100,7 @@
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                             <li><a href="#" class="link-dark rounded">Perfil</a></li>
                             <li><a href="#" class="link-dark rounded">Configuración</a></li>
-                            <li><a href="#" class="link-dark rounded">Sign out</a></li>
+                            <li><a href="#" class="link-dark rounded">Cerrar sesión</a></li>
                         </ul>
                     </div>
                 </li>
