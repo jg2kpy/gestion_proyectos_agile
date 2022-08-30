@@ -1,4 +1,6 @@
 {% load static %}
+{% load tiene_rol_en %}
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -18,10 +20,12 @@
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <!-- Core theme CSS (includes Bootstrap)-->
     <link rel="stylesheet" href="{% static 'style.css' %}">
-    <script src="https://kit.fontawesome.com/c368f91fe4.js" crossorigin="anonymous"></script>
+    <!-- Material Icons-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
-<body>
+<body style="height:100vh;">
+    {% if user.is_authenticated %}
     <main>
         <div class="flex-shrink-0 p-3 bg-white">
             <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
@@ -68,6 +72,24 @@
                         </ul>
                     </div>
                 </li>
+
+                <li class="border-top my-3"></li>
+                {% tiene_rol_en user "gpa_admin" "" as es_admin %}
+                {% if es_admin %}
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#admin-collapse" aria-expanded="false">
+                        Administrador
+                    </button>
+                    <div class="collapse" id="admin-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="#" class="link-dark rounded">Usuarios</a></li>
+                            <li><a href="#" class="link-dark rounded">Roles Globales</a></li>
+                            <li><a href="#" class="link-dark rounded">Proyectos</a></li>
+                        </ul>
+                    </div>
+                </li>
+                {% endif %}
                 <li class="border-top my-3"></li>
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
@@ -78,7 +100,7 @@
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                             <li><a href="#" class="link-dark rounded">Perfil</a></li>
                             <li><a href="#" class="link-dark rounded">Configuración</a></li>
-                            <li><a href="#" class="link-dark rounded">Sign out</a></li>
+                            <li><a href="#" class="link-dark rounded">Cerrar sesión</a></li>
                         </ul>
                     </div>
                 </li>
@@ -285,12 +307,23 @@
                 maiores
                 beatae ipsum asperiores facere. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum vitae
                 aut
-                ipsa, perspiciatis iste, qui ut blanditiis possimus atque temporibus laborum pariatur! Modi deleniti
-                temporibus totam rem. Perferendis, temporibus beatae!
-            </p>
-        </div>
+            <div class="d-flex p-2 bd-highlight" style="height: 100v;">I'm a flexbox container!</div>
 
+        </div>
     </main>
+    {% else %}
+    <div class="container d-flex align-items-center justify-content-center" style="height: 100%;">
+        <div>
+            <h3>Debe tener sesión iniciada para ver esta página</h3>
+            <div class="container d-flex align-items-center justify-content-center" style="height: 100%;">
+                <a class="btn btn-dark align-text-bottom" href="{% provider_login_url 'github' %}">
+                    <i class="material-icons align-text-bottom">person</i>
+                    Ingresar con Github
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </body>
 
 </html>
