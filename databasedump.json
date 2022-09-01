@@ -24,7 +24,7 @@
         "pk": 3,
         "fields": {
             "nombre": "Member",
-            "descripcion": "Mienbro del proyecto",
+            "descripcion": "Miembro del proyecto",
             "proyecto": null,
             "usuario": []
         }
@@ -108,7 +108,7 @@
         "model": "usuarios.permisoproyecto",
         "pk": 7,
         "fields": {
-            "nombre": "pro_asignarMienbros",
+            "nombre": "pro_asignarMiembros",
             "descripcion": "Agregar miembros al equipo durante su la planificacion/ejecucion del Proyecto",
             "rol": [
                 1
@@ -262,7 +262,7 @@
         "model": "usuarios.permisoproyecto",
         "pk": 21,
         "fields": {
-            "nombre": "pro_eliminarMienbros",
+            "nombre": "pro_eliminarMiembros",
             "descripcion": "Eliminar miembros",
             "rol": [
                 1

@@ -18,28 +18,28 @@
                                 <option value="{{ rol.id }}" name="rol" id="rol">{{ rol}}</option>
                             {% endfor %}
                         </select>
-                        <button type="submit" class="btn btn-success">Agregar mienbro al proyecto</button>
+                        <button type="submit" class="btn btn-success">Agregar miembro al proyecto</button>
                     </form>
                     {{ mensaje }}
                     <br>
-                    <ul>Mienbros:
+                    <ul>Miembros:
                     <br>              
-                    {% for mienbros in proyecto.usuario.all %}
-                        {% obtener_rol_en_proyecto mienbros proyecto.id as rolesActual %}
-                        <li>{{ mienbros.username }} <a class="btn btn-danger" href="{% url 'eliminar_usuario_proyecto' proyecto.id mienbros.username %}">Eliminar Usuario</a>
+                    {% for miembros in proyecto.usuario.all %}
+                        {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
+                        <li>{{ miembros.username }} <a class="btn btn-danger" href="{% url 'eliminar_usuario_proyecto' proyecto.id miembros.username %}">Eliminar Usuario</a>
                             <br>Roles:<br>
                             {% for r in rolesActual %}
-                                {{ r }} <a class="btn btn-warning" href="{% url 'eliminar_rol_usuario' proyecto.id mienbros.username r.id %}">Desasignar rol</a>
+                                {{ r }} <a class="btn btn-warning" href="{% url 'eliminar_rol_usuario' proyecto.id miembros.username r.id %}">Desasignar rol</a>
                                 <br>
                             {% endfor %}
                             
-                            {% tiene_todos_los_roles mienbros proyecto as tiene_todo %}
+                            {% tiene_todos_los_roles miembros proyecto as tiene_todo %}
                             {% if tiene_todo %}
                                 <form action="{% url 'agregar_rol_usuario' %}" method="POST">
                                     {% csrf_token %}
-                                    <input name="usuario_a_cambiar_rol" id="usuario_a_cambiar_rol" hidden value="{{ mienbros.username }}">
+                                    <input name="usuario_a_cambiar_rol" id="usuario_a_cambiar_rol" hidden value="{{ miembros.username }}">
                                     <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
-                                    <select name="roles{{ mienbros.username }}" id="roles{{ mienbros.username }}">
+                                    <select name="roles{{ miembros.username }}" id="roles{{ miembros.username }}">
                                         {% for rol in proyecto.proyecto_rol.all %}
                                             {% if not rol in rolesActual %}
                                                 <option value="{{ rol.id }}" name="rol{{ rol.id }}" id="rol{{ rol.id }}">{{ rol }}</option>
@@ -53,10 +53,10 @@
                     <br><br><br>
                     {% endfor %}</ul>
                 {% else %}
-                <ul>Mienbros:
-                    {% for mienbros in proyecto.usuario.all %}
-                    {% obtener_rol_en_proyecto mienbros proyecto.id as rolesActual %}
-                        <li>{{ mienbros.username }}</li>
+                <ul>Miembros:
+                    {% for miembros in proyecto.usuario.all %}
+                    {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
+                        <li>{{ miembros.username }}</li>
                         <br>Roles:<br>
                             {% for r in rolesActual %}
                                 {{ r }}

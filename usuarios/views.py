@@ -12,7 +12,7 @@ Las vistas relacionadas al package de usuarios
 """
 
 
-def eliminar_mienbro_proyecto(request, proyecto_id, usuario_nombre):
+def eliminar_miembro_proyecto(request, proyecto_id, usuario_nombre):
     """Eliminar miembros de un proyecto
 
     :param request: Solicitud HTTP del cliente
@@ -43,7 +43,7 @@ def eliminar_mienbro_proyecto(request, proyecto_id, usuario_nombre):
     return redirect('home')
 
 
-def agregar_mienbro_proyecto(request):
+def agregar_miembro_proyecto(request):
     """Agregar miembro al proyecto
 
     :param request: Solicitud HTTP del cliente junto con el body con los datos del nombre de usuario id del proyecto e ir del rol
