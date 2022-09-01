@@ -1,5 +1,5 @@
 from django import template
-from usuarios.models import RolSistema, RolProyecto
+from usuarios.models import RolSistema, RolProyecto, Usuario
 
 register = template.Library()
 
@@ -17,3 +17,9 @@ def tiene_rol_en_proyecto(usuario, nombre_rol, proyecto):
     else:
         rol = RolProyecto.objects.get(nombre=nombre_rol, proyecto=proyecto)
     return True if rol in usuario.roles_proyecto.all() else False
+
+
+
+@register.simple_tag
+def obtener_rol_en_proyecto(usuario, proyecto):
+    return usuario.roles_proyecto.filter(proyecto = proyecto)
