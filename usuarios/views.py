@@ -1,3 +1,9 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def perfil(request):
+
+    if request.method == "POST":
+        # reservado para cuando quiere editar su perfil
+        pass
+    return render(request, 'socialaccount/perfil.html')
