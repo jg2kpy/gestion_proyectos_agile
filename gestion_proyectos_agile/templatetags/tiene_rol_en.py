@@ -12,12 +12,14 @@ def tiene_rol_en_sistema(usuario, nombre_rol):
 
 @register.simple_tag
 def tiene_rol_en_proyecto(usuario, nombre_rol, proyecto):
-    if proyecto == "":
-        rol = RolProyecto.objects.get(nombre=nombre_rol, proyecto__isnull=True)
-    else:
-        rol = RolProyecto.objects.get(nombre=nombre_rol, proyecto=proyecto)
-    return True if rol in usuario.roles_proyecto.all() else False
-
+    try:
+        if proyecto == "":
+            rol = RolProyecto.objects.get(nombre=nombre_rol, proyecto__isnull=True)
+        else:
+            rol = RolProyecto.objects.get(nombre=nombre_rol, proyecto=proyecto)
+        return True if rol in usuario.roles_proyecto.all() else False
+    except RolProyecto.DoesNotExist:
+        return False
 
 
 @register.simple_tag
