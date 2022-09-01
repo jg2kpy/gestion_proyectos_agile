@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block contenido %}
+<img src="{{ user.socialaccount_set.all.0.get_avatar_url }}" alt="{{ user.get_full_name }}" width="100" height="100" />
+{% endblock %}
