@@ -1,5 +1,7 @@
 {% block equipo_roles %}
     {% load tiene_rol_en %}
+    <br>
+    <h2>Usuario: {{ user.username }}</h2>
     <h2>Proyectos</h2>
             <ol>
             {% for proyecto in user.equipo.all %}
