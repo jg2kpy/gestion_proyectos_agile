@@ -53,7 +53,13 @@
                 {% else %}
                 <ul>Mienbros:
                     {% for mienbros in proyecto.usuario.all %}
+                    {% obtener_rol_en_proyecto mienbros proyecto.id as rolesActual %}
                         <li>{{ mienbros.username }}</li>
+                        <br>Roles:<br>
+                            {% for r in rolesActual %}
+                                {{ r }}
+                                <br>
+                            {% endfor %}
                     {% endfor %}
                 {% endif %}</ul>
                 </li>
