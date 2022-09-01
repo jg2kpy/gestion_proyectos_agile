@@ -34,10 +34,23 @@
             <ul class="list-unstyled ps-0">
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
-                        data-bs-target="#tablero-collapse" aria-expanded="true">
+                        data-bs-target="#proyecto-collapse" aria-expanded="true">
+                        Proyectos
+                    </button>
+                    <div class="collapse show" id="proyecto-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            {% for proyecto in user.equipo.all %}
+                                <li><a href="#" class="link-dark rounded">{{ proyecto }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#tablero-collapse" aria-expanded="false">
                         Tablero
                     </button>
-                    <div class="collapse show" id="tablero-collapse">
+                    <div class="collapse" id="tablero-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                             <li><a href="#" class="link-dark rounded">US-tipo-1</a></li>
                             <li><a href="#" class="link-dark rounded">US-tipo-2</a></li>
@@ -106,8 +119,24 @@
                 </li>
             </ul>
         </div>
-        <div class="overflow-auto">
-            {% block contenido %}Página vacía{% endblock %}
+        <div>
+            <ol>Proyectos</ol>
+            {% for proyecto in user.equipo.all %}
+                <li>{{ proyecto }}</li>
+                {% tiene_rol_en_proyecto user "Scrum Master" proyecto.id as es_master %}
+                {% if es_master %}
+                    <a class="btn btn-success" href="">+</a>
+                    <p>Mienbros:</p>                    
+                    {% for mienbros in proyecto.usuario.all %}
+                        <ul>{{ mienbros.username }} <a class="btn btn-danger" href="{% url 'eliminar_usuario' proyecto.nombre mienbros.username %}">-</a></ul>
+                    {% endfor %}
+                {% else %}
+                    <p>Mienbros:</p>
+                    {% for mienbros in proyecto.usuario.all %}
+                        <ul>{{ mienbros.username }}</ul>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
         </div>
     </main>
     {% else %}
