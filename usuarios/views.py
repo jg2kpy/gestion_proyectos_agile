@@ -7,8 +7,26 @@ from usuarios.models import RolProyecto, Usuario
 
 # Create your views here.
 
+"""
+Las vistas relacionadas al package de usuarios
+"""
+
 
 def eliminar_mienbro_proyecto(request, proyecto_id, usuario_nombre):
+    """Eliminar miembros de un proyecto
+
+    :param request: Solicitud HTTP del cliente
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto 
+    :type proyecto_id: int
+
+    :param usuario_nombre: Nombre del usuario
+    :type usuario_nombre: string
+
+    :return: Se retorna una respuesta HttpResponse que puede ser un 401 en caso de no tener la autorizacion o retorna a la pagina principal
+    :rtype: HttpResponse
+    """
     if not request.user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
 
@@ -18,8 +36,7 @@ def eliminar_mienbro_proyecto(request, proyecto_id, usuario_nombre):
     usuario_a_eliminar_de_proyecto = Usuario.objects.get(
         username=usuario_nombre)
     proyecto = Proyecto.objects.get(id=proyecto_id)
-    roles = RolProyecto.objects.filter(
-        usuario=usuario_a_eliminar_de_proyecto, proyecto=proyecto_id)
+    roles = RolProyecto.objects.filter(usuario=usuario_a_eliminar_de_proyecto, proyecto=proyecto_id)
     [usuario_a_eliminar_de_proyecto.roles_proyecto.remove(r) for r in roles]
     usuario_a_eliminar_de_proyecto.equipo.remove(proyecto)
 
@@ -27,7 +44,14 @@ def eliminar_mienbro_proyecto(request, proyecto_id, usuario_nombre):
 
 
 def agregar_mienbro_proyecto(request):
+    """Agregar miembro al proyecto
 
+    :param request: Solicitud HTTP del cliente junto con el body con los datos del nombre de usuario id del proyecto e ir del rol
+    :type request: HttpRequest
+
+    :return: Se retorna una respuesta HttpResponse que puede ser un 401 en caso de no tener la autorizacion o retornar a la pagina principal
+    :rtype: HttpResponse
+    """
     if request.method == 'POST':
         if not request.user.is_authenticated:
             return HttpResponse('Usuario no autenticado', status=401)
@@ -57,6 +81,20 @@ def agregar_mienbro_proyecto(request):
 
 
 def eliminar_rol_usuario(request, proyecto_id, usuario_nombre, rol_id):
+    """Eliminar mienbros de un proyecto
+
+    :param request: Solicitud HTTP del cliente
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto 
+    :type proyecto_id: int
+
+    :param usuario_nombre: Nombre del usuario
+    :type usuario_nombre: string
+
+    :return: Se retorna una respuesta HttpResponse que puede ser un 401 en caso de no tener la autorizacion o retorna a la pagina principal
+    :rtype: HttpResponse
+    """
     if not request.user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
 
@@ -64,13 +102,21 @@ def eliminar_rol_usuario(request, proyecto_id, usuario_nombre, rol_id):
         return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
 
     usuario_a_eliminar_rol = Usuario.objects.get(username=usuario_nombre)
-    rol = RolProyecto.objects.get(id = rol_id)
+    rol = RolProyecto.objects.get(id=rol_id)
     usuario_a_eliminar_rol.roles_proyecto.remove(rol)
 
     return redirect('home')
 
-def agregar_rol_usuario(request):
 
+def agregar_rol_usuario(request):
+    """Asignar un rol de proyecto a un usuario
+
+    :param request: Solicitud HTTP del cliente junto con el body con los datos del nombre de usuario, id del proyecto e id del rol
+    :type request: HttpRequest
+
+    :return: Se retorna una respuesta HttpResponse que puede ser un 401 en caso de no tener la autorizacion o retornar a la pagina principal
+    :rtype: HttpResponse
+    """
     if request.method == 'POST':
         if not request.user.is_authenticated:
             return HttpResponse('Usuario no autenticado', status=401)
@@ -85,7 +131,7 @@ def agregar_rol_usuario(request):
 
         try:
             usuario_a_eliminar_rol = Usuario.objects.get(username=usuario_nombre)
-            rol = RolProyecto.objects.get(id = rol_id)
+            rol = RolProyecto.objects.get(id=rol_id)
             usuario_a_eliminar_rol.roles_proyecto.add(rol)
         except Usuario.DoesNotExist:
             return render(request, 'base.html', {'mensaje': 'Usuario no existe, intente de nuevo'})
