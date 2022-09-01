@@ -23,3 +23,7 @@ def tiene_rol_en_proyecto(usuario, nombre_rol, proyecto):
 @register.simple_tag
 def obtener_rol_en_proyecto(usuario, proyecto):
     return usuario.roles_proyecto.filter(proyecto = proyecto)
+
+@register.simple_tag
+def tiene_todos_los_roles(usuario, proyecto):
+    return set(usuario.roles_proyecto.all()) != set(proyecto.proyecto_rol.all())

@@ -31,19 +31,22 @@
                                 <br>
                             {% endfor %}
                             
-                            <form action="{% url 'agregar_rol_usuario' %}" method="POST">
-                                {% csrf_token %}
-                                <input name="usuario_a_cambiar_rol" id="usuario_a_cambiar_rol" hidden value="{{ mienbros.username }}">
-                                <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
-                                <select name="roles{{ mienbros.username }}" id="roles{{ mienbros.username }}">
-                                    {% for rol in proyecto.proyecto_rol.all %}
-                                        {% if not rol in rolesActual %}
-                                            <option value="{{ rol.id }}" name="rol{{ rol.id }}" id="rol{{ rol.id }}">{{ rol }}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                                <button type="submit" class="btn btn-success">Agregar Rol</button>
-                            </form>
+                            {% tiene_todos_los_roles mienbros proyecto as tiene_todo %}
+                            {% if tiene_todo %}
+                                <form action="{% url 'agregar_rol_usuario' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input name="usuario_a_cambiar_rol" id="usuario_a_cambiar_rol" hidden value="{{ mienbros.username }}">
+                                    <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
+                                    <select name="roles{{ mienbros.username }}" id="roles{{ mienbros.username }}">
+                                        {% for rol in proyecto.proyecto_rol.all %}
+                                            {% if not rol in rolesActual %}
+                                                <option value="{{ rol.id }}" name="rol{{ rol.id }}" id="rol{{ rol.id }}">{{ rol }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-success">Agregar Rol</button>
+                                </form>
+                            {% endif %}
                         </li>
                     <br><br><br>
                     {% endfor %}</ul>
