@@ -81,7 +81,7 @@ def agregar_mienbro_proyecto(request):
 
 
 def eliminar_rol_usuario(request, proyecto_id, usuario_nombre, rol_id):
-    """Eliminar mienbros de un proyecto
+    """Desaginar rol de un usuario en un proyecto
 
     :param request: Solicitud HTTP del cliente
     :type request: HttpRequest
@@ -91,6 +91,9 @@ def eliminar_rol_usuario(request, proyecto_id, usuario_nombre, rol_id):
 
     :param usuario_nombre: Nombre del usuario
     :type usuario_nombre: string
+
+    :param rol_id: Id del rol
+    :type rol_id: int
 
     :return: Se retorna una respuesta HttpResponse que puede ser un 401 en caso de no tener la autorizacion o retorna a la pagina principal
     :rtype: HttpResponse

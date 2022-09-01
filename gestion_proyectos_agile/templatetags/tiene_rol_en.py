@@ -38,7 +38,7 @@ def tiene_rol_en_proyecto(usuario, nombre_rol, proyecto):
     :param proyecto: Proyecto donde se verficara si el usuario tiene el rol en este proyecto
     :type proyecto: Proyecto
 
-    :return: Se retorna un valor True si el usuario tiene el rol en el proyecto indicado o Falseen caso contrario
+    :return: Se retorna un valor True si el usuario tiene el rol en el proyecto indicado o False en caso contrario
     :rtype: boolean
     """
     try:
