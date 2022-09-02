@@ -11,7 +11,7 @@
                     
                     <form action="{% url 'agregar_miembro_proyecto' %}" method="POST">
                         {% csrf_token %}
-                        Agregar usuario a {{ proyecto }}:  <input type="text" name="usuario_a_agregar" id="usuario_a_agregar">
+                        Agregar usuario a {{ proyecto }}:  <input type="text" name="usuario_a_agregar" id="usuario_a_agregar" required="">
                         <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
                         <select name="roles_agregar" id="roles_agregar">
                             {% for rol in proyecto.proyecto_rol.all %}
