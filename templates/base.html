@@ -128,8 +128,8 @@
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                         data-bs-target="#account-collapse" aria-expanded="false">
-                        <img src="{{ user.socialaccount_set.all.0.get_avatar_url }}" alt="{{ user.get_full_name }}"
-                            width="30" height="30" class="rounded-circle" style="margin-right: 10px;" />
+                        <img src="{{ user.avatar_url }}" alt="{{ user.get_full_name }}" width="30" height="30"
+                            class="rounded-circle" style="margin-right: 10px;" />
                         Account
                     </button>
                     <div class="collapse" id="account-collapse">

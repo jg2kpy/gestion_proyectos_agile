@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Group
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from allauth.account.signals import user_signed_up
 
 from proyectos.models import Proyecto
 from .manager import CustomUserManager
@@ -15,11 +16,13 @@ class Usuario(AbstractUser):
     """
     Usuario por defecto.
     """
-    username = models.CharField(max_length=255, unique=True)
-    email = models.EmailField(unique=False)
+    email = models.EmailField(unique=True)
+    direccion = models.CharField(max_length=255, blank=True)
+    telefono = models.CharField(max_length=255, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
+    avatar_url = models.URLField(blank=True)
 
     objects = CustomUserManager()
 
@@ -93,3 +96,13 @@ def crear_primer_admin(sender, instance, **kwargs):
             pass
 
         instance.roles_sistema.add(rol_admin)
+
+
+@receiver(user_signed_up)
+def populate_profile(sociallogin, user, **kwargs):
+    if sociallogin.account.provider == 'github':
+        user.github_perfil = sociallogin.account.extra_data['html_url']
+        user.avatar_url = sociallogin.account.extra_data['avatar_url']
+        user.direccion = sociallogin.account.extra_data['location']
+
+    user.save()
