@@ -42,54 +42,90 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-                {% perfil_form %}
-                <!-- <div class="row mb-3">
-                    <div class="col-sm-3">
-                        <h6 class="mb-0">Nombre</h6>
+                <form>
+                    {{ perfil_form.non_field_errors }}
+                    <div class="row mb-3">
+                        {{ perfil_form.first_name.errors }}
+                        <div class="col-sm-3">
+                            <label for="{{ perfil_form.first_name.id_for_label }}">
+                                <h6 class="mb-0">Nombre</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.first_name }}
+                            <!-- <input type="text" class="form-control"
+                                value="{{user.socialaccount_set.all.0.extra_data.name}}"> -->
+                        </div>
                     </div>
-                    <div class="col-sm-9 text-secondary">
-                        <input type="text" class="form-control"
-                            value="{{user.socialaccount_set.all.0.extra_data.name}}">
+                    <div class="row mb-3">
+                        {{ perfil_form.last_name.errors }}
+                        <div class="col-sm-3">
+                            <label for="{{ perfil_form.last_name.id_for_label }}">
+                                <h6 class="mb-0">Apellido</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.last_name }}
+                            <!-- <input type="text" class="form-control"
+                                value="{{user.socialaccount_set.all.0.extra_data.name}}"> -->
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-3">
-                        <h6 class="mb-0">Email</h6>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            {{ perfil_form.email.errors }}
+                            <label for="{{ perfil_form.email.id_for_label }}">
+                                <h6 class="mb-0">Email</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.email }}
+                            <!-- <input type="text" class="form-control" value="{{user.email}}"> -->
+                        </div>
                     </div>
-                    <div class="col-sm-9 text-secondary">
-                        <input type="text" class="form-control" value="{{user.email}}">
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            {{ perfil_form.telefono.errors }}
+                            <label for="{{ perfil_form.telefono.id_for_label }}">
+                                <h6 class="mb-0">Telefono</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.telefono }}
+                            <!-- <input type="text" class="form-control" value="+595 983 738 040"> -->
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-3">
-                        <h6 class="mb-0">Telefono</h6>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            {{ perfil_form.direccion.errors }}
+                            <label for="{{ perfil_form.telefono.id_for_label }}">
+                                <h6 class="mb-0">Dirección</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.direccion }}
+                            <!-- <input type="text" class="form-control" value="calle ejemplo 123"> -->
+                        </div>
                     </div>
-                    <div class="col-sm-9 text-secondary">
-                        <input type="text" class="form-control" value="+595 983 738 040">
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            {{ perfil_form.avatar_url.errors }}
+                            <label for="{{ perfil_form.avatar_url.id_for_label }}">
+                                <h6 class="mb-0">Foto perfil</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.avatar_url }}
+                            <!-- <input type="text" class="form-control" value="Proyect Manager"> -->
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-3">
-                        <h6 class="mb-0">Dirección</h6>
+                    <div class="row">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="button" class="btn btn-primary px-4" value="Guardar">
+                        </div>
                     </div>
-                    <div class="col-sm-9 text-secondary">
-                        <input type="text" class="form-control" value="calle ejemplo 123">
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-3">
-                        <h6 class="mb-0">Cargo</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                        <input type="text" class="form-control" value="Proyect Manager">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-3"></div>
-                    <div class="col-sm-9 text-secondary">
-                        <input type="button" class="btn btn-primary px-4" value="Guardar">
-                    </div>
-                </div> -->
+                </form>
+                <!--  -->
             </div>
         </div>
         <div class="row">
