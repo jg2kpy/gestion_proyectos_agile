@@ -113,6 +113,8 @@
             <h2>{{ rol.nombre }}</h2>
             <p>{{ rol.descripcion }}</p>
             <a href="{% url 'rol_global_list' %}">Volver a <b>Roles Globales</b></a>
+            <a href="{% url 'rol_global_editar' rol.id %}">Editar</a>
+            <a href="{% url 'rol_global_eliminar' rol.id %}">Eliminar</a>
 
             {% endblock %}
         </div>
