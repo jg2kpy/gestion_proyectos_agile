@@ -11,6 +11,9 @@ from usuarios.models import RolProyecto, Usuario
 Las vistas relacionadas al package de usuarios
 """
 
+def get_equipo(request):
+    return render(request, 'equiporoles.html')
+
 
 def eliminar_miembro_proyecto(request):
     """Eliminar miembros de un proyecto
