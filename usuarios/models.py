@@ -15,6 +15,7 @@ from django.utils import timezone
 class Usuario(AbstractUser):
     """
     Usuario por defecto.
+    Similar al usuario de Django, pero con un email en lugar de un username, algunos campos extra y first_name y last_name obligatorios.
     """
     email = models.EmailField(unique=True)
     direccion = models.CharField(max_length=255, blank=True)
@@ -23,6 +24,8 @@ class Usuario(AbstractUser):
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
     avatar_url = models.URLField(blank=True)
+    first_name = models.CharField(null=False, blank=False, max_length=100)
+    last_name = models.CharField(null=False, blank=False, max_length=100)
 
     objects = CustomUserManager()
 

@@ -43,6 +43,7 @@
         <div class="card">
             <div class="card-body">
                 <form action="/perfil/" method="post">
+                    {% csrf_token %}
                     {{ perfil_form.non_field_errors }}
                     <div class="row mb-3">
                         {{ perfil_form.first_name.errors }}
@@ -113,7 +114,7 @@
                     <div class="row">
                         <div class="col-sm-3"></div>
                         <div class="col-sm-9 text-secondary">
-                            <input type="button" class="btn btn-primary px-4" value="Guardar">
+                            <input type="submit" class="btn btn-primary px-4" value="Guardar">
                         </div>
                     </div>
                 </form>

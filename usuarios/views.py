@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.forms import ModelForm
 from .models import Usuario
+from django.http import HttpResponseRedirect
+from django.views.decorators.cache import never_cache
 
 
 class UsuarioForm(ModelForm):
@@ -14,11 +16,16 @@ class UsuarioForm(ModelForm):
             field.widget.attrs.update({'class': 'form-control'})
 
 
+@never_cache
 def perfil(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/")
 
     if request.method == "POST":
-        # reservado para cuando quiere editar su perfil
-        pass
+        form = UsuarioForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/perfil/')
 
     perfil_form = UsuarioForm(instance=request.user)
     return render(request, 'socialaccount/perfil.html', {"perfil_form": perfil_form})
