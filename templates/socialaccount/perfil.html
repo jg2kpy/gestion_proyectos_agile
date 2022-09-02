@@ -42,7 +42,7 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-                <form>
+                <form action="/perfil/" method="post">
                     {{ perfil_form.non_field_errors }}
                     <div class="row mb-3">
                         {{ perfil_form.first_name.errors }}
@@ -53,8 +53,6 @@
                         </div>
                         <div class="col-sm-9 text-secondary">
                             {{ perfil_form.first_name }}
-                            <!-- <input type="text" class="form-control"
-                                value="{{user.socialaccount_set.all.0.extra_data.name}}"> -->
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -66,8 +64,6 @@
                         </div>
                         <div class="col-sm-9 text-secondary">
                             {{ perfil_form.last_name }}
-                            <!-- <input type="text" class="form-control"
-                                value="{{user.socialaccount_set.all.0.extra_data.name}}"> -->
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -79,7 +75,6 @@
                         </div>
                         <div class="col-sm-9 text-secondary">
                             {{ perfil_form.email }}
-                            <!-- <input type="text" class="form-control" value="{{user.email}}"> -->
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -91,7 +86,6 @@
                         </div>
                         <div class="col-sm-9 text-secondary">
                             {{ perfil_form.telefono }}
-                            <!-- <input type="text" class="form-control" value="+595 983 738 040"> -->
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -103,7 +97,6 @@
                         </div>
                         <div class="col-sm-9 text-secondary">
                             {{ perfil_form.direccion }}
-                            <!-- <input type="text" class="form-control" value="calle ejemplo 123"> -->
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -115,7 +108,6 @@
                         </div>
                         <div class="col-sm-9 text-secondary">
                             {{ perfil_form.avatar_url }}
-                            <!-- <input type="text" class="form-control" value="Proyect Manager"> -->
                         </div>
                     </div>
                     <div class="row">
@@ -125,7 +117,6 @@
                         </div>
                     </div>
                 </form>
-                <!--  -->
             </div>
         </div>
         <div class="row">
