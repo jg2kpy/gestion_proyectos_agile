@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.forms import ModelForm, TextInput
+from django.forms import ModelForm
 from .models import Usuario
 
 
