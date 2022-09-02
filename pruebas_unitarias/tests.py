@@ -103,7 +103,7 @@ class UsuariosTests(TestCase):
         })
         request.user = usuarioTest
         response = agregar_miembro_proyecto(request)
-        self.assertEqual(response.status_code, 401,
+        self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 401 a un usuario no autorizado para esta operacion')
 
         request = request_factory.post('/usuarios/agregar_miembro_proyecto/', data={
@@ -113,7 +113,7 @@ class UsuariosTests(TestCase):
         })
         request.user = master
         response = agregar_miembro_proyecto(request)
-        self.assertEqual(response.status_code, 404,
+        self.assertEqual(response.status_code, 422,
                          'La respuesta no fue un estado HTTP 404 ante un usuario que no existe')
 
         request = request_factory.post('/usuarios/agregar_miembro_proyecto/', data={
@@ -165,7 +165,7 @@ class UsuariosTests(TestCase):
         })
         request.user = usuarioTest
         response = eliminar_miembro_proyecto(request)
-        self.assertEqual(response.status_code, 401,
+        self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 401 a un usuario no autorizado para esta operacion')
 
         request = request_factory.post('/usuarios/eliminar_miembro_proyecto/', data={
@@ -174,7 +174,7 @@ class UsuariosTests(TestCase):
         })
         request.user = master
         response = eliminar_miembro_proyecto(request)
-        self.assertEqual(response.status_code, 404,
+        self.assertEqual(response.status_code, 422,
                          'La respuesta no fue un estado HTTP 404 ante un usuario que no existe')
 
         request = request_factory.post('/usuarios/eliminar_miembro_proyecto/', data={
@@ -222,7 +222,7 @@ class UsuariosTests(TestCase):
         })
         request.user = usuarioTest
         response = asignar_rol_proyecto(request)
-        self.assertEqual(response.status_code, 401,
+        self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 401 a un usuario no autorizado para esta operacion')
 
         request = request_factory.post('/usuarios/asignar_rol_proyecto/', data={
@@ -232,7 +232,7 @@ class UsuariosTests(TestCase):
         })
         request.user = master
         response = asignar_rol_proyecto(request)
-        self.assertEqual(response.status_code, 404,
+        self.assertEqual(response.status_code, 422,
                          'La respuesta no fue un estado HTTP 404 ante un usuario que no existe')
 
         request = request_factory.post('/usuarios/asignar_rol_proyecto/', data={
@@ -281,7 +281,7 @@ class UsuariosTests(TestCase):
         })
         request.user = usuarioTest
         response = eliminar_rol_proyecto(request)
-        self.assertEqual(response.status_code, 401,
+        self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 401 a un usuario no autorizado para esta operacion')
 
         request = request_factory.post('/usuarios/eliminar_rol_proyecto/', data={
@@ -291,7 +291,7 @@ class UsuariosTests(TestCase):
         })
         request.user = master
         response = eliminar_rol_proyecto(request)
-        self.assertEqual(response.status_code, 404,
+        self.assertEqual(response.status_code, 422,
                          'La respuesta no fue un estado HTTP 404 ante un usuario que no existe')
 
         request = request_factory.post('/usuarios/eliminar_rol_proyecto/', data={

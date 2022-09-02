@@ -35,7 +35,7 @@ def eliminar_miembro_proyecto(request):
         proyecto_id = form.get('proyecto')
 
         if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto_id):
-            return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
+            return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
 
         try:
             usuario_a_eliminar_miembro_proyecto = Usuario.objects.get(username=usuario_nombre)
@@ -44,7 +44,7 @@ def eliminar_miembro_proyecto(request):
             [usuario_a_eliminar_miembro_proyecto.roles_proyecto.remove(r) for r in roles]
             usuario_a_eliminar_miembro_proyecto.equipo.remove(proyecto)
         except Usuario.DoesNotExist:
-            return HttpResponse('Usuario no existe', status=404)
+            return HttpResponse('Usuario no existe', status=422)
 
     return redirect('home')
 
@@ -68,7 +68,7 @@ def agregar_miembro_proyecto(request):
         rol_id = form.get('roles_agregar')
 
         if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto_id):
-            return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
+            return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
 
         try:
             usuario_a_agregar_miembro_proyecto = Usuario.objects.get(
@@ -82,7 +82,7 @@ def agregar_miembro_proyecto(request):
             rol_proyecto = RolProyecto.objects.get(id=rol_id)
             usuario_a_agregar_miembro_proyecto.roles_proyecto.add(rol_proyecto)
         except Usuario.DoesNotExist:
-            return HttpResponse('Usuario no existe', status=404)
+            return HttpResponse('Usuario no existe', status=422)
 
     return redirect('home')
 
@@ -108,14 +108,14 @@ def eliminar_rol_proyecto(request):
         rol_id = form.get('rol_id')
 
         if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto_id):
-            return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
+            return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
 
         try:
             usuario_a_eliminar_rol = Usuario.objects.get(username=usuario_nombre)
             rol = RolProyecto.objects.get(id=rol_id)
             usuario_a_eliminar_rol.roles_proyecto.remove(rol)
         except Usuario.DoesNotExist:
-            return HttpResponse('Usuario no existe', status=404)
+            return HttpResponse('Usuario no existe', status=422)
 
     return redirect('home')
 
@@ -139,13 +139,13 @@ def asignar_rol_proyecto(request):
         rol_id = form.get(f'roles{usuario_nombre}')
 
         if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto_id):
-            return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
+            return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
 
         try:
             usuario_a_eliminar_rol = Usuario.objects.get(username=usuario_nombre)
             rol = RolProyecto.objects.get(id=rol_id)
             usuario_a_eliminar_rol.roles_proyecto.add(rol)
         except Usuario.DoesNotExist:
-            return HttpResponse('Usuario no existe', status=404)
+            return HttpResponse('Usuario no existe', status=422)
 
     return redirect('home')
