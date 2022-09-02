@@ -1,0 +1,137 @@
+{% load static %}
+{% load tiene_rol_en %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="Equipo-17" />
+    <title>{% block title %}Gestión Proyectos Agil{% endblock %}</title>
+    <!-- Bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <!-- Material Icons-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body style="height:100vh;">
+    {% if user.is_authenticated %}
+    <main>
+        <div class="flex-shrink-0 p-3 bg-white">
+            <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
+                <span class="fs-5 fw-semibold">Gestión Proyectos Agil</span>
+            </a>
+            <ul class="list-unstyled ps-0">
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#tablero-collapse" aria-expanded="true">
+                        Tablero
+                    </button>
+                    <div class="collapse show" id="tablero-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="#" class="link-dark rounded">US-tipo-1</a></li>
+                            <li><a href="#" class="link-dark rounded">US-tipo-2</a></li>
+                            <li><a href="#" class="link-dark rounded">US-tipo-3</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#sprint-collapse" aria-expanded="false">
+                        Sprint
+                    </button>
+                    <div class="collapse" id="sprint-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="#" class="link-dark rounded">Actual</a></li>
+                            <li><a href="#" class="link-dark rounded">Sprint 3</a></li>
+                            <li><a href="#" class="link-dark rounded">Sprint 2</a></li>
+                            <li><a href="#" class="link-dark rounded">Sprint 1</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#us-collapse" aria-expanded="false">
+                        User Stories
+                    </button>
+                    <div class="collapse" id="us-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="#" class="link-dark rounded">Backlog</a></li>
+                            <li><a href="#" class="link-dark rounded">Historial</a></li>
+                            <li><a href="#" class="link-dark rounded">Cancelados</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="border-top my-3"></li>
+                {% tiene_rol_en_sistema user "gpa_admin" as es_admin %}
+                {% if es_admin %}
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#admin-collapse" aria-expanded="false">
+                        Administrador
+                    </button>
+                    <div class="collapse" id="admin-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="#" class="link-dark rounded">Usuarios</a></li>
+                            <li><a href="#" class="link-dark rounded">Roles Globales</a></li>
+                            <li><a href="#" class="link-dark rounded">Proyectos</a></li>
+                        </ul>
+                    </div>
+                </li>
+                {% endif %}
+                <li class="border-top my-3"></li>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#account-collapse" aria-expanded="false">
+                        Account
+                    </button>
+                    <div class="collapse" id="account-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="#" class="link-dark rounded">Perfil</a></li>
+                            <li><a href="#" class="link-dark rounded">Configuración</a></li>
+                            <li><a href="#" class="link-dark rounded">Cerrar sesión</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="overflow-auto">
+            {% block contenido %}
+
+            <h1>Roles Globales</h1>
+            <h2>{{ rol.nombre }}</h2>
+            <p>{{ rol.descripcion }}</p>
+            <a href="{% url 'rol_global_list' %}">Volver a <b>Roles Globales</b></a>
+
+            {% endblock %}
+        </div>
+
+        
+    </main>
+    {% else %}
+    <div class="container d-flex align-items-center justify-content-center" style="height: 100%;">
+        <div>
+            <h3>Debe tener sesión iniciada para ver esta página</h3>
+            <div class="container d-flex align-items-center justify-content-center" style="height: 100%;">
+                <a class="btn btn-dark align-text-bottom" href="{% provider_login_url 'github' %}">
+                    <i class="material-icons align-text-bottom">person</i>
+                    Ingresar con Github
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</body>
+
+</html>
