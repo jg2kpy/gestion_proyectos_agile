@@ -118,7 +118,11 @@
 
             <ul>
                 {% for rol in roles %}
-                <li><a href="{% url 'rol_global_info' rol.id %}">{{ rol.nombre }}</a></li>
+                <li>
+                    <a href="{% url 'rol_global_info' rol.id %}">{{ rol.nombre }}</a>
+                    <a href="{% url 'rol_global_editar' rol.id %}">Editar</a>
+                    <a href="{% url 'rol_global_eliminar' rol.id %}">Eliminar</a>
+                </li>
                 {% endfor %}
             </ul>
 
