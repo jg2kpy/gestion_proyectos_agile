@@ -24,5 +24,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', Home.as_view(), name='home'),
 
-    path('rol_global/', usuarios_views.rol_globl, name='rol_global'),
+    path('rolesglobales/', usuarios_views.rol_global_list, name='rol_global_list'),
+    path('rolesglobales/<int:id>/', usuarios_views.rol_global_info, name='rol_global_info'),
+    path('rolesglobales/crear/', usuarios_views.rol_global_agregar, name='rol_global_crear')
 ]
