@@ -1,11 +1,11 @@
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
-from .views import agregar_miembro_proyecto, agregar_rol_usuario, eliminar_miembro_proyecto, eliminar_rol_usuario
+from .views import agregar_a_proyecto, asignar_rol_proyecto, eliminar_de_proyecto, eliminar_rol_proyecto
 
 urlpatterns = [
-    path('eliminar_miembro_proyecto/', eliminar_miembro_proyecto, name="eliminar_miembro_proyecto"),
-    path('agregar_a_proyecto/', agregar_miembro_proyecto, name="agregar_usuario_proyecto"),
-    path('eliminar_rol_usuario/', eliminar_rol_usuario, name="eliminar_rol_usuario"),
-    path('agregar_rol_usuario', agregar_rol_usuario, name="agregar_rol_usuario")
+    path('agregar_a_proyecto/', agregar_a_proyecto, name="agregar_a_proyecto"),
+    path('eliminar_de_proyecto/', eliminar_de_proyecto,name="eliminar_de_proyecto"),
+    path('asignar_rol_proyecto', asignar_rol_proyecto, name="asignar_rol_proyecto"),
+    path('eliminar_rol_proyecto/', eliminar_rol_proyecto,name="eliminar_rol_proyecto")
 ]
