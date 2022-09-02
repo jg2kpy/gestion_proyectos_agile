@@ -1,3 +1,4 @@
+import email
 from django.test import TestCase
 
 # Create your tests here.
@@ -63,3 +64,34 @@ class UsuariosTests(TestCase):
         Usuario.objects.create_user(email='normal@user.com', password='foo')
         self.assertEqual(Usuario.objects.filter(
             groups__name='gpa_admin').count(), 1)
+
+    def test_login(self):
+        """
+        Prueba que el login funciona.
+        - usuarios pueden tener campos esperados
+        - login usa correo
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono='1234567890')
+        login = self.client.login(email='testemail@example.com', password='')
+        self.assertFalse(login, "Usuario no se puede loguear con contraseña vacia")
+        login = self.client.login(email='testemail@example.com', password='A123B456c.')
+        self.assertTrue(login, "Usuario se puede loguear con email y contraseña correctos")
+
+    def test_ver_perfil(self):
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        res = self.client.get('/perfil/')
+        self.assertContains(res, '<form action="/perfil/" method="post">', 1,
+                            200, "Usuario loguedao puede ver su perfil")
+        self.client.logout()
+
+    def test_logout(self):
+        """
+        Prueba que el logout funciona
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono='1234567890')
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        res = self.client.get('/perfil/')
+        self.assertContains(res, '<form action="/perfil/" method="post">', 1,
+                            200, "Usuario loguedao puede ver su perfil")
