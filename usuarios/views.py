@@ -24,11 +24,14 @@ def perfil(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/", status=401)
 
+    status = 200
     if request.method == "POST":
         form = UsuarioForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/perfil/')
+        else:
+            status = 422
 
     perfil_form = UsuarioForm(instance=request.user)
-    return render(request, 'socialaccount/perfil.html', {"perfil_form": perfil_form})
+    return render(request, 'socialaccount/perfil.html', {"perfil_form": perfil_form}, status=status)

@@ -127,11 +127,17 @@ class PerfilTests(TestCase):
         self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
                                                          avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
         self.client.login(email='testemail@example.com', password='A123B456c.')
-        res = self.client.post("/perfil/", {'email': 'testemails@example.com',
-                                            'avatar_url': 'avatar2@example.com', 'direccion': 'Calle 2 # 3 - 4', 'telefono': '0983 738041'})
-        print(res)
-        res = self.client.get('/perfil/')
-        self.assertContains(res, 'testemail2@example.com', 1, 200, "Usuario loguedao puede ver su perfil con email")
-        self.assertContains(res, '0983 738041', 1, 200, "Usuario loguedao puede ver su perfil con número de telefono")
-        self.assertContains(res, 'Calle 2 # 3 - 4', 1, 200, "Usuario loguedao puede ver su perfil con direccion")
-        self.assertContains(res, 'avatar2@example.com', None, 200, "Usuario loguedao puede ver su perfil con foto")
+        res = self.client.post("/perfil/", {'email': 'testemail2@example.com', 'first_name': 'TestUserFirst', 'last_name': 'TestUserLast',
+                                            'avatar_url': 'avatar2@example.com', 'direccion': 'Calle 2 # 3 - 4', 'telefono': '0983 738041'}, follow=True)
+        self.assertContains(res, 'testemail2@example.com', 1, 200,
+                            "Usuario loguedao puede ver su perfil con email cambiado después de un post")
+        self.assertContains(res, 'TestUserFirst', 3, 200,
+                            "Usuario loguedao puede ver su perfil con nombre cambiado después de un post")
+        self.assertContains(res, 'TestUserLast', 3, 200,
+                            "Usuario loguedao puede ver su perfil con apellido cambiado después de un post")
+        self.assertContains(res, '0983 738041', 1, 200,
+                            "Usuario loguedao puede ver su perfil con número de telefono cambiado después de un post")
+        self.assertContains(res, 'Calle 2 # 3 - 4', 1, 200,
+                            "Usuario loguedao puede ver su perfil con direccion cambiado después de un post")
+        self.assertContains(res, 'avatar2@example.com', 3, 200,
+                            "Usuario loguedao puede ver su perfil con foto cambiado después de un post")
