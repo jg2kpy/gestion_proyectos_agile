@@ -18,6 +18,9 @@ class UsuarioForm(ModelForm):
 
 @never_cache
 def perfil(request):
+    """
+    Vista para el perfil de usuario con form para editar datos.
+    """
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/")
 
