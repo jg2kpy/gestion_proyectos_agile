@@ -12,7 +12,7 @@ Las vistas relacionadas al package de usuarios
 """
 
 
-def eliminar_de_proyecto(request):
+def eliminar_miembro_proyecto(request):
     """Eliminar miembros de un proyecto
 
     :param request: Solicitud HTTP del cliente junto con el body con los datos del nombre de usuario id del proyecto
@@ -34,16 +34,19 @@ def eliminar_de_proyecto(request):
         if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto_id):
             return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
 
-        usuario_a_eliminar_de_proyecto = Usuario.objects.get(username=usuario_nombre)
-        proyecto = Proyecto.objects.get(id=proyecto_id)
-        roles = RolProyecto.objects.filter(usuario=usuario_a_eliminar_de_proyecto, proyecto=proyecto_id)
-        [usuario_a_eliminar_de_proyecto.roles_proyecto.remove(r) for r in roles]
-        usuario_a_eliminar_de_proyecto.equipo.remove(proyecto)
+        try:
+            usuario_a_eliminar_miembro_proyecto = Usuario.objects.get(username=usuario_nombre)
+            proyecto = Proyecto.objects.get(id=proyecto_id)
+            roles = RolProyecto.objects.filter(usuario=usuario_a_eliminar_miembro_proyecto, proyecto=proyecto_id)
+            [usuario_a_eliminar_miembro_proyecto.roles_proyecto.remove(r) for r in roles]
+            usuario_a_eliminar_miembro_proyecto.equipo.remove(proyecto)
+        except Usuario.DoesNotExist:
+            return HttpResponse('Usuario no existe', status=404)
 
     return redirect('home')
 
 
-def agregar_a_proyecto(request):
+def agregar_miembro_proyecto(request):
     """Agregar miembro al proyecto
 
     :param request: Solicitud HTTP del cliente junto con el body con los datos del nombre de usuario id del proyecto e ir del rol
@@ -65,18 +68,18 @@ def agregar_a_proyecto(request):
             return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
 
         try:
-            usuario_a_agregar_a_proyecto = Usuario.objects.get(
+            usuario_a_agregar_miembro_proyecto = Usuario.objects.get(
                 username=usuario_nombre)
             proyecto = Proyecto.objects.get(id=proyecto_id)
 
-            if usuario_a_agregar_a_proyecto.equipo.filter(id=proyecto.id).count() != 0:
+            if usuario_a_agregar_miembro_proyecto.equipo.filter(id=proyecto.id).count() != 0:
                 return render(request, 'base.html', {'mensaje': 'El usuario ya pertenece al proyecto'})
 
-            usuario_a_agregar_a_proyecto.equipo.add(proyecto)
+            usuario_a_agregar_miembro_proyecto.equipo.add(proyecto)
             rol_proyecto = RolProyecto.objects.get(id=rol_id)
-            usuario_a_agregar_a_proyecto.roles_proyecto.add(rol_proyecto)
+            usuario_a_agregar_miembro_proyecto.roles_proyecto.add(rol_proyecto)
         except Usuario.DoesNotExist:
-            return render(request, 'base.html', {'mensaje': 'Usuario no existe, intente de nuevo'})
+            return HttpResponse('Usuario no existe', status=404)
 
     return redirect('home')
 
@@ -104,9 +107,12 @@ def eliminar_rol_proyecto(request):
         if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto_id):
             return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
 
-        usuario_a_eliminar_rol = Usuario.objects.get(username=usuario_nombre)
-        rol = RolProyecto.objects.get(id=rol_id)
-        usuario_a_eliminar_rol.roles_proyecto.remove(rol)
+        try:
+            usuario_a_eliminar_rol = Usuario.objects.get(username=usuario_nombre)
+            rol = RolProyecto.objects.get(id=rol_id)
+            usuario_a_eliminar_rol.roles_proyecto.remove(rol)
+        except Usuario.DoesNotExist:
+            return HttpResponse('Usuario no existe', status=404)
 
     return redirect('home')
 
@@ -137,6 +143,6 @@ def asignar_rol_proyecto(request):
             rol = RolProyecto.objects.get(id=rol_id)
             usuario_a_eliminar_rol.roles_proyecto.add(rol)
         except Usuario.DoesNotExist:
-            return render(request, 'base.html', {'mensaje': 'Usuario no existe, intente de nuevo'})
+            return HttpResponse('Usuario no existe', status=404)
 
     return redirect('home')

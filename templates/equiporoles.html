@@ -9,7 +9,7 @@
                 {% tiene_rol_en_proyecto user "Scrum Master" proyecto.id as es_master %}
                 {% if es_master %}
                     
-                    <form action="{% url 'agregar_a_proyecto' %}" method="POST">
+                    <form action="{% url 'agregar_miembro_proyecto' %}" method="POST">
                         {% csrf_token %}
                         Agregar usuario a {{ proyecto }}:  <input type="text" name="usuario_a_agregar" id="usuario_a_agregar">
                         <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
@@ -26,7 +26,7 @@
                     <br>              
                     {% for miembros in proyecto.usuario.all %}
                         {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
-                        <form action="{% url 'eliminar_de_proyecto' %}" method="POST">
+                        <form action="{% url 'eliminar_miembro_proyecto' %}" method="POST">
                             {% csrf_token %}
                             <input name="usuario_a_eliminar" id="usuario_a_eliminar" hidden value="{{ miembros.username }}">
                             <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
