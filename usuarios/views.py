@@ -22,7 +22,7 @@ def perfil(request):
     Vista para el perfil de usuario con form para editar datos.
     """
     if not request.user.is_authenticated:
-        return HttpResponseRedirect("/")
+        return HttpResponseRedirect("/", status=401)
 
     if request.method == "POST":
         form = UsuarioForm(request.POST, instance=request.user)

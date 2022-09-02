@@ -84,6 +84,12 @@ class PerfilTests(TestCase):
         self.assertTrue(login, "Usuario se puede loguear con email y contraseña correctos")
 
     def test_ver_perfil(self):
+        res = self.client.get('/perfil/')
+        self.assertNotContains(res, '<form action="/perfil/" method="post">', 1,
+                               401, "Usuario no loguedao debe iniciar sesion para ver su perfil")
+        self.client.logout()
+
+    def test_ver_perfil(self):
         self.client.login(email='testemail@example.com', password='A123B456c.')
         res = self.client.get('/perfil/')
         self.assertContains(res, '<form action="/perfil/" method="post">', 1,
