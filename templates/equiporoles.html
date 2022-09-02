@@ -26,10 +26,21 @@
                     <br>              
                     {% for miembros in proyecto.usuario.all %}
                         {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
-                        <li>{{ miembros.username }} <a class="btn btn-danger" href="{% url 'eliminar_usuario_proyecto' proyecto.id miembros.username %}">Eliminar Usuario</a>
+                        <form action="{% url 'eliminar_miembro_proyecto' %}" method="POST">
+                            {% csrf_token %}
+                            <input name="usuario_a_eliminar" id="usuario_a_eliminar" hidden value="{{ miembros.username }}">
+                            <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
+                            <li>{{ miembros.username }} <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
+                        </form>
                             <br>Roles:<br>
                             {% for r in rolesActual %}
-                                {{ r }} <a class="btn btn-warning" href="{% url 'eliminar_rol_usuario' proyecto.id miembros.username r.id %}">Desasignar rol</a>
+                                <form action="{% url 'eliminar_miembro_proyecto' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input name="usuario_a_sacar_rol" id="usuario_a_sacar_rol" hidden value="{{ miembros.username }}">
+                                    <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
+                                    <input name="rol_id" id="rol_id" hidden value="{{ r.id }}">
+                                    <li>{{ r }} <button type="submit" class="btn btn-warning">Desasignar rol</button>
+                                </form>
                                 <br>
                             {% endfor %}
                             

@@ -12,33 +12,33 @@ Las vistas relacionadas al package de usuarios
 """
 
 
-def eliminar_miembro_proyecto(request, proyecto_id, usuario_nombre):
+def eliminar_miembro_proyecto(request):
     """Eliminar miembros de un proyecto
 
-    :param request: Solicitud HTTP del cliente
+    :param request: Solicitud HTTP del cliente junto con el body con los datos del nombre de usuario id del proyecto
     :type request: HttpRequest
 
-    :param proyecto_id: ID del proyecto 
-    :type proyecto_id: int
-
-    :param usuario_nombre: Nombre del usuario
-    :type usuario_nombre: string
-
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401 en caso de no tener la autorizacion o retorna a la pagina principal
+    :return: Se retorna una respuesta HttpResponse que puede ser un 401 en caso de no tener la autorizacion o retornar a la pagina principal
     :rtype: HttpResponse
     """
-    if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
 
-    if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto_id):
-        return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return HttpResponse('Usuario no autenticado', status=401)
 
-    usuario_a_eliminar_de_proyecto = Usuario.objects.get(
-        username=usuario_nombre)
-    proyecto = Proyecto.objects.get(id=proyecto_id)
-    roles = RolProyecto.objects.filter(usuario=usuario_a_eliminar_de_proyecto, proyecto=proyecto_id)
-    [usuario_a_eliminar_de_proyecto.roles_proyecto.remove(r) for r in roles]
-    usuario_a_eliminar_de_proyecto.equipo.remove(proyecto)
+        form = request.POST
+
+        usuario_nombre = form.get('usuario_a_eliminar')
+        proyecto_id = form.get('proyecto')
+
+        if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto_id):
+            return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
+
+        usuario_a_eliminar_de_proyecto = Usuario.objects.get(username=usuario_nombre)
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        roles = RolProyecto.objects.filter(usuario=usuario_a_eliminar_de_proyecto, proyecto=proyecto_id)
+        [usuario_a_eliminar_de_proyecto.roles_proyecto.remove(r) for r in roles]
+        usuario_a_eliminar_de_proyecto.equipo.remove(proyecto)
 
     return redirect('home')
 
@@ -65,7 +65,8 @@ def agregar_miembro_proyecto(request):
             return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
 
         try:
-            usuario_a_agregar_a_proyecto = Usuario.objects.get(username=usuario_nombre)
+            usuario_a_agregar_a_proyecto = Usuario.objects.get(
+                username=usuario_nombre)
             proyecto = Proyecto.objects.get(id=proyecto_id)
 
             if usuario_a_agregar_a_proyecto.equipo.filter(id=proyecto.id).count() != 0:
@@ -80,33 +81,32 @@ def agregar_miembro_proyecto(request):
     return redirect('home')
 
 
-def eliminar_rol_usuario(request, proyecto_id, usuario_nombre, rol_id):
-    """Desaginar rol de un usuario en un proyecto
+def eliminar_rol_usuario(request):
+    """Eliminar miembros de un proyecto
 
-    :param request: Solicitud HTTP del cliente
+    :param request: Solicitud HTTP del cliente junto con el body con los datos del nombre de usuario, id del proyecto e id del rol
     :type request: HttpRequest
 
-    :param proyecto_id: ID del proyecto 
-    :type proyecto_id: int
-
-    :param usuario_nombre: Nombre del usuario
-    :type usuario_nombre: string
-
-    :param rol_id: Id del rol
-    :type rol_id: int
-
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401 en caso de no tener la autorizacion o retorna a la pagina principal
+    :return: Se retorna una respuesta HttpResponse que puede ser un 401 en caso de no tener la autorizacion o retornar a la pagina principal
     :rtype: HttpResponse
     """
-    if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
 
-    if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto_id):
-        return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return HttpResponse('Usuario no autenticado', status=401)
 
-    usuario_a_eliminar_rol = Usuario.objects.get(username=usuario_nombre)
-    rol = RolProyecto.objects.get(id=rol_id)
-    usuario_a_eliminar_rol.roles_proyecto.remove(rol)
+        form = request.POST
+
+        usuario_nombre = form.get('usuario_a_sacar_rol')
+        proyecto_id = form.get('proyecto')
+        rol_id = form.get('rol_id')
+
+        if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto_id):
+            return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=401)
+
+        usuario_a_eliminar_rol = Usuario.objects.get(username=usuario_nombre)
+        rol = RolProyecto.objects.get(id=rol_id)
+        usuario_a_eliminar_rol.roles_proyecto.remove(rol)
 
     return redirect('home')
 

@@ -63,3 +63,16 @@ class UsuariosTests(TestCase):
         Usuario.objects.create_user(email='normal@user.com', password='foo')
         self.assertEqual(Usuario.objects.filter(
             groups__name='gpa_admin').count(), 1)
+
+
+    def test_eliminar_miembro_proyecto(self):
+        """
+        Prueba que de eliminar mienbros de proyecto
+        """
+        Usuario = get_user_model()
+        Usuario.objects.all().delete()
+        self.assertEqual(Usuario.objects.all().count(), 0,
+                         "No se pudo limpiar la base de datos")
+        Usuario.objects.create_user(email='normal@user.com', password='foo')
+        self.assertEqual(Usuario.objects.filter(
+            groups__name='gpa_admin').count(), 1)
