@@ -8,7 +8,8 @@ from django.shortcuts import redirect
 class RolSistemaForm(forms.ModelForm):
      class Meta:
         model = RolSistema
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('usuario',)
 
 # Create your views here.
 
@@ -20,7 +21,7 @@ def rol_global_info(request, id):
     rol = RolSistema.objects.get(id=id)
     return render(request, 'rol_global/rol_global_info.html', {'rol': rol})
 
-def rol_global_agregar(request):
+def rol_global_crear(request):
     if request.method == 'POST':
         form = RolSistemaForm(request.POST)
         
@@ -32,3 +33,29 @@ def rol_global_agregar(request):
         form = RolSistemaForm()
 
     return render(request, 'rol_global/rol_global_crear.html', {'form': form})
+
+def rol_global_editar(request, id):
+    rol = RolSistema.objects.get(id=id)
+    
+    if request.method == 'POST':
+        form = RolSistemaForm(request.POST, instance=rol)
+    
+        if form.is_valid():
+            form.save()
+            return redirect('rol_global_info', rol.id)
+
+    else:
+        form = RolSistemaForm(instance=rol)
+
+    return render(request, 'rol_global/rol_global_editar.html', {'form': form})
+
+def rol_global_eliminar(request, id):
+    rol = RolSistema.objects.get(id=id)
+
+    if request.method == 'POST':
+        rol.delete()
+        return redirect('rol_global_list')
+        
+    return render(request, 'rol_global/rol_global_eliminar.html', {'rol': rol})
+
+
