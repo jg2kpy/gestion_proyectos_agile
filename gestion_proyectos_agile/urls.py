@@ -17,9 +17,12 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 from .views import Home
+from proyectos import views as proyectos_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
+    path('proyectos/',proyectos_views.proyectos, name='proyectos'),
+    path('proyectos/crear/',proyectos_views.crear_proyecto, name='crear_proyecto'),
     path('', Home.as_view(), name='home'),
 ]
