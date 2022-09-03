@@ -1,0 +1,382 @@
+[
+    {
+        "model": "usuarios.rolproyecto",
+        "pk": 1,
+        "fields": {
+            "nombre": "Scrum Master",
+            "descripcion": "Un Scrum Master es un facilitador para un equipo de desarrollo Agile. Son responsables de gestionar el intercambio de información entre los miembros del equipo. Scrum es un marco de gestión de proyectos que permite a un equipo comunicarse y autoorganizarse para realizar cambios rápidamente, de acuerdo con los principios ágiles.",
+            "proyecto": null,
+            "usuario": []
+        }
+    },
+    {
+        "model": "usuarios.rolproyecto",
+        "pk": 2,
+        "fields": {
+            "nombre": "Product Owner",
+            "descripcion": "Propietario del proyecto",
+            "proyecto": null,
+            "usuario": []
+        }
+    },
+    {
+        "model": "usuarios.rolproyecto",
+        "pk": 3,
+        "fields": {
+            "nombre": "Member",
+            "descripcion": "Mienbro del proyecto",
+            "proyecto": null,
+            "usuario": []
+        }
+    },
+    {
+        "model": "usuarios.rolsistema",
+        "pk": 1,
+        "fields": {
+            "nombre": "gpa_admin",
+            "descripcion": null,
+            "usuario": []
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 1,
+        "fields": {
+            "nombre": "pro_cambiarEstadoProyecto",
+            "descripcion": "Cambiar de estado al proyecto",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 2,
+        "fields": {
+            "nombre": "pro_especificarFechaFinProyecto",
+            "descripcion": "Especificar la fecha de fin de proyecto",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 3,
+        "fields": {
+            "nombre": "pro_crearRolProyecto",
+            "descripcion": "Crear rol de proyecto",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 4,
+        "fields": {
+            "nombre": "pro_asignarRolProyecto",
+            "descripcion": "Asignar rol de proyecto",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 5,
+        "fields": {
+            "nombre": "pro_editarRolProyecto",
+            "descripcion": "Editar rol de proyecto",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 6,
+        "fields": {
+            "nombre": "pro_importarRol",
+            "descripcion": "Importar rol de proyecto custom entre proyectos",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 7,
+        "fields": {
+            "nombre": "pro_asignarMienbros",
+            "descripcion": "Agregar miembros al equipo durante su la planificacion/ejecucion del Proyecto",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 8,
+        "fields": {
+            "nombre": "pro_iniciarSprint",
+            "descripcion": "Iniciar sprint",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 9,
+        "fields": {
+            "nombre": "pro_especificarTiempoDeSprint",
+            "descripcion": "Especificar el tiempo del Sprint",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 10,
+        "fields": {
+            "nombre": "pro_crearTipoUS",
+            "descripcion": "Crear un tipo de US",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 11,
+        "fields": {
+            "nombre": "pro_eliminarTipoUS",
+            "descripcion": "Eliminar un tipo de US",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 12,
+        "fields": {
+            "nombre": "pro_importarTipoUS",
+            "descripcion": "Importar tipos de US entre proyectos",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 13,
+        "fields": {
+            "nombre": "pro_cambiarEstadoSprint",
+            "descripcion": "Cambiar de estado al Sprint",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 14,
+        "fields": {
+            "nombre": "pro_asignarUS",
+            "descripcion": "Asignar US a un miembro",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 15,
+        "fields": {
+            "nombre": "pro_cambiarUsuarioAsignadoUS",
+            "descripcion": "Cambiar a quien esta asignado un US",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 16,
+        "fields": {
+            "nombre": "pro_modificarUS",
+            "descripcion": "Modificar una historia de Usuaior",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 17,
+        "fields": {
+            "nombre": "pro_cargarUSalBacklog",
+            "descripcion": "Cargar US al product backlog",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 18,
+        "fields": {
+            "nombre": "pro_asignarBVaUS",
+            "descripcion": "Asignar BV a un US que esta en product backlog",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 19,
+        "fields": {
+            "nombre": "pro_cancelarUS",
+            "descripcion": "Cancelar una historia de Usuario",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 20,
+        "fields": {
+            "nombre": "pro_cancelarSprint",
+            "descripcion": "Cancelar Sprint",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 21,
+        "fields": {
+            "nombre": "pro_eliminarMienbros",
+            "descripcion": "Eliminar miembros",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 22,
+        "fields": {
+            "nombre": "pro_generarReportes",
+            "descripcion": "Generar los reportes",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 23,
+        "fields": {
+            "nombre": "pro_verproyecto",
+            "descripcion": "Ver el proyecto, pero no modificar nada",
+            "rol": [
+                2
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 24,
+        "fields": {
+            "nombre": "pro_cambiarEstadoUS",
+            "descripcion": "Cambiar estado del US que tiene asignado",
+            "rol": [
+                3
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 25,
+        "fields": {
+            "nombre": "pro_asignarUPaUS",
+            "descripcion": "Asignar UP a un US que esta en product backlog",
+            "rol": [
+                3
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisoproyecto",
+        "pk": 26,
+        "fields": {
+            "nombre": "pro_agregarRetroespectiva",
+            "descripcion": "Agregar retroespectiva",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisosistema",
+        "pk": 1,
+        "fields": {
+            "nombre": "sys_crearproyectos",
+            "descripcion": "Crear proyectos",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisosistema",
+        "pk": 2,
+        "fields": {
+            "nombre": "sys_asignarmaster",
+            "descripcion": "Asignar Scrum Master",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisosistema",
+        "pk": 3,
+        "fields": {
+            "nombre": "sys_crearrolsistema",
+            "descripcion": "Crear Rol del sistema",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisosistema",
+        "pk": 4,
+        "fields": {
+            "nombre": "sys_importarusuarios",
+            "descripcion": "Importar usuarios atravez de SSO y elegir su rol o permisos",
+            "rol": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "usuarios.permisosistema",
+        "pk": 5,
+        "fields": {
+            "nombre": "sys_eliminarUsuarios",
+            "descripcion": "Eliminar usuario",
+            "rol": [
+                1
+            ]
+        }
+    }
+]
