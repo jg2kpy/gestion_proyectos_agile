@@ -29,4 +29,5 @@ urlpatterns = [
     path('rolesglobales/crear/', usuarios_views.rol_global_crear, name='rol_global_crear'),
     path('rolesglobales/<int:id>/editar/', usuarios_views.rol_global_editar, name='rol_global_editar'),
     path('rolesglobales/<int:id>/eliminar/', usuarios_views.rol_global_eliminar, name='rol_global_eliminar'),
+    path('rolesglobales/<int:id>/asignar/', usuarios_views.rol_global_asignar, name='rol_global_asignar'),
 ]
