@@ -14,7 +14,7 @@ ESTADOS_PROYECTO = (
 
 #traemos los usuarios del sistema
 USUARIOS = (
-    (usuario.id, usuario.email) for usuario in Usuario.objects.all()
+    (usuario.id, usuario.username) for usuario in Usuario.objects.all()
 )
 
 
@@ -24,5 +24,8 @@ class ProyectoForm(forms.Form):
     fecha_inicio = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control'}))
     fecha_fin = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control'}))
     scrum_master = forms.ChoiceField(choices=USUARIOS, widget=forms.Select(attrs={'class': 'form-control'}))
-    estado = forms.ChoiceField(choices=ESTADOS_PROYECTO, widget=forms.Select(attrs={'class': 'form-control'}))
+
+# puede ser null el nombre
+class ProyectoCancelForm(forms.Form):
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
 

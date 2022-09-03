@@ -24,5 +24,8 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('proyectos/',proyectos_views.proyectos, name='proyectos'),
     path('proyectos/crear/',proyectos_views.crear_proyecto, name='crear_proyecto'),
+    #path('proyectos/ver/<int:id_proyecto>/',proyectos_views.ver_proyecto, name='ver_proyecto'),
+    #path('proyectos/editar/<int:id_proyecto>/',proyectos_views.editar_proyecto, name='editar_proyecto'),
+    path('proyectos/cancelar/<int:id_proyecto>/',proyectos_views.cancelar_proyecto, name='cancelar_proyecto'),
     path('', Home.as_view(), name='home'),
 ]
