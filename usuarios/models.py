@@ -17,7 +17,10 @@ class Usuario(AbstractUser):
     Similar al usuario de Django, pero con un email en lugar de un username, algunos campos extra y first_name y last_name obligatorios.
     """
     email = models.EmailField(unique=True)
-    direccion = models.CharField(max_length=255, blank=True)
+    USERNAME_FIELD = 'email'
+    username = NULL
+    username = models.CharField(max_length=255, unique=False)
+    direccion = models.CharField(max_length=255, blank=True, null=True)
     telefono = PhoneNumberField(blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

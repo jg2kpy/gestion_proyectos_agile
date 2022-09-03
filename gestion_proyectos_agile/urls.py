@@ -26,6 +26,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', Home.as_view(), name='home'),
-    path('usuarios/', include('usuarios.urls'), name='usuarios')
-    path('perfil/', usuarios_views.perfil, name='perfil'),
+    path('usuarios/', include('usuarios.urls'), name='usuarios'),
+    path('perfil/', usuarios_views.perfil, name='perfil')
 ]
