@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block contenido %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-column align-items-center text-center">
+                    <img src="{{ user.avatar_url }}" alt="{{ user.get_full_name }}"
+                        class="rounded-circle p-1 bg-primary" width="110">
+                    <div class="mt-3">
+                        <h4>{{user.full_name}}</h4>
+                        <p class="text-secondary mb-1">Usuario desde {{ user.date_joined|date:"M, Y" }}</p>
+                    </div>
+                </div>
+                <hr class="my-4">
+                <ul class="list-group list-group-flush">
+                    <h4>Proyectos</h4>
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                        <h6>Proyecto 1</h6>
+                        <div>
+                            <span>Desarrollador</span>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                        <h6>Proyecto 2</h6>
+                        <div>
+                            <span>Scrum Master</span>
+                            <br>
+                            <span>Desarrollador</span>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                        <h6>Proyecto 3</h6>
+                        <div>
+                            <span>Scrum Master</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <form action="/perfil/" method="post">
+                    {% csrf_token %}
+                    {{ perfil_form.non_field_errors }}
+                    <div class="row mb-3">
+                        {{ perfil_form.first_name.errors }}
+                        <div class="col-sm-3">
+                            <label for="{{ perfil_form.first_name.id_for_label }}">
+                                <h6 class="mb-0">Nombre</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.first_name }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        {{ perfil_form.last_name.errors }}
+                        <div class="col-sm-3">
+                            <label for="{{ perfil_form.last_name.id_for_label }}">
+                                <h6 class="mb-0">Apellido</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.last_name }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            {{ perfil_form.email.errors }}
+                            <label for="{{ perfil_form.email.id_for_label }}">
+                                <h6 class="mb-0">Email</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.email }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            {{ perfil_form.telefono.errors }}
+                            <label for="{{ perfil_form.telefono.id_for_label }}">
+                                <h6 class="mb-0">Telefono</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.telefono }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            {{ perfil_form.direccion.errors }}
+                            <label for="{{ perfil_form.telefono.id_for_label }}">
+                                <h6 class="mb-0">Dirección</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.direccion }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            {{ perfil_form.avatar_url.errors }}
+                            <label for="{{ perfil_form.avatar_url.id_for_label }}">
+                                <h6 class="mb-0">Foto perfil</h6>
+                            </label>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ perfil_form.avatar_url }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="submit" class="btn btn-primary px-4" value="Guardar">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- <h5 class="d-flex align-items-center mb-3">Project Status</h5>
+                        <p>Web Design</p>
+                        <div class="progress mb-3" style="height: 5px">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 80%"
+                                aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p>Website Markup</p>
+                        <div class="progress mb-3" style="height: 5px">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 72%" aria-valuenow="72"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p>One Page</p>
+                        <div class="progress mb-3" style="height: 5px">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 89%"
+                                aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p>Mobile Template</p>
+                        <div class="progress mb-3" style="height: 5px">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 55%"
+                                aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p>Backend API</p>
+                        <div class="progress" style="height: 5px">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 66%" aria-valuenow="66"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

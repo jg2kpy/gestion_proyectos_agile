@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Group
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from allauth.account.signals import user_signed_up
+from phonenumber_field.modelfields import PhoneNumberField
 
 from proyectos.models import Proyecto
 from .manager import CustomUserManager
@@ -12,12 +14,17 @@ from django.utils import timezone
 class Usuario(AbstractUser):
     """
     Usuario por defecto.
+    Similar al usuario de Django, pero con un email en lugar de un username, algunos campos extra y first_name y last_name obligatorios.
     """
-    username = models.CharField(max_length=255, unique=True)
-    email = models.EmailField(unique=False)
+    email = models.EmailField(unique=True)
+    direccion = models.CharField(max_length=255, blank=True)
+    telefono = PhoneNumberField(blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
+    avatar_url = models.URLField(blank=True)
+    first_name = models.CharField(null=False, blank=False, max_length=100)
+    last_name = models.CharField(null=False, blank=False, max_length=100)
 
     objects = CustomUserManager()
 
@@ -91,3 +98,20 @@ def crear_primer_admin(sender, instance, **kwargs):
             pass
 
         instance.roles_sistema.add(rol_admin)
+
+
+@receiver(user_signed_up)
+def populate_profile(sociallogin, user, **kwargs):
+    """
+    Se llama después de registrar un nuevo usuario por SSO. Se encarga de crear un perfil de usuario con los datos de la cuenta de SSO.
+    Los adicionales extraidos son;
+    - Link a la cuenta original (GitHub)
+    - Link a la imagen de perfil
+    - Direccion
+    """
+    if sociallogin.account.provider == 'github':
+        user.github_perfil = sociallogin.account.extra_data['html_url']
+        user.avatar_url = sociallogin.account.extra_data['avatar_url']
+        user.direccion = sociallogin.account.extra_data['location']
+
+    user.save()
