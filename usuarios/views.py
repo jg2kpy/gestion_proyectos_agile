@@ -1,15 +1,36 @@
 from django.shortcuts import render
 
-from usuarios.models import RolSistema
+from usuarios.models import RolSistema, Usuario
 from django import forms
 from django.shortcuts import redirect
 
 # Crea forms
 class RolSistemaForm(forms.ModelForm):
-     class Meta:
+    class Meta:
         model = RolSistema
-        # fields = '__all__'
-        exclude = ('usuario',)
+        fields = ['nombre', 'descripcion']
+    
+    def clean(self):
+        super(RolSistemaForm, self).clean()
+         
+        nombre = self.cleaned_data.get('nombre')
+        descripcion = self.cleaned_data.get('descricpion')
+ 
+        if not nombre:
+            self._errors['nombre'] = self.error_class([
+                'No puede quedar vacio el campo'])
+        if nombre and len(nombre) <= 3:
+            self._errors['nombre'] = self.error_class([
+                'Debe tener más de 2 caracteres'])
+        if nombre and len(nombre) > 255:
+            self._errors['nombre'] = self.error_class([
+                'El máximo de caracteres permitidos es 255'])
+        if descripcion and len(descripcion) > 500:
+            self._errors['descripcion'] = self.error_class([
+                'El máximo de caracteres permitidos es 500'])
+ 
+        return self.cleaned_data
+
 
 # Create your views here.
 
@@ -58,4 +79,27 @@ def rol_global_eliminar(request, id):
         
     return render(request, 'rol_global/rol_global_eliminar.html', {'rol': rol})
 
+def rol_global_asignar(request, id):
+    if request.method == 'POST':
+        nombreUsr = request.POST.get('usuarios')
 
+        if not nombreUsr:
+            estado = 'vacio'
+            return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado})
+        
+        else:
+            usuario = Usuario.objects.get(username=nombreUsr)
+            rol = RolSistema.objects.get(id=id)
+            
+            if usuario.roles_sistema.filter(id=id).exists():
+                estado = 'posee_rol'
+                
+            else:
+                estado = 'correcto'
+                usuario.roles_sistema.add(rol)
+            
+            return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado, 'usuario': usuario, 'rol': rol})
+
+    else:
+        usuarios = Usuario.objects.all()
+        return render(request, 'rol_global/rol_global_asignar.html', {'id': id, 'usuarios': usuarios})
