@@ -62,6 +62,11 @@ def cancelar_proyecto(request, id_proyecto):
                 return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
     else:
         form = ProyectoCancelForm()
+    
+    #Si el proyecto ya esta cancelado no se puede cancelar de nuevo
+    if Proyecto.objects.get(id=id_proyecto).estado == ESTADOS_PROYECTO.__getitem__(3)[0]:
+        return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
+
     return render(request, 'proyectos/cancelar_proyecto.html', {'form': form})
 
 # Creamos una vista para ver los roles de proyectos
