@@ -1,5 +1,3 @@
-import imp
-from statistics import mode
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Group
@@ -41,7 +39,7 @@ class RolProyecto(models.Model):
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
     usuario = models.ManyToManyField(Usuario, blank=True, related_name="roles_proyecto")
-    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, null=True)
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, null=True, related_name='proyecto_rol')
 
     class Meta:
         constraints = [
