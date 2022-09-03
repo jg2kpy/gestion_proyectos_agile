@@ -148,3 +148,11 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
     else:
         form = RolProyectoForm(initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
     return render(request, 'proyectos/roles_proyecto/modificar_rol_proyecto.html', {'form': form, 'rol': rol, 'permisos': permisos})
+
+# Eliminar un rol de un proyecto
+def eliminar_rol_proyecto(request, id_rol_proyecto):
+    if request.method == 'POST':
+        rol = RolProyecto.objects.get(id=id_rol_proyecto)
+        rol.delete()
+        return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all() ,'usuario' : request.user})
+    return render(request, 'proyectos/roles_proyecto/eliminar_rol_proyecto.html', {'rol_proyecto': RolProyecto.objects.get(id=id_rol_proyecto)})

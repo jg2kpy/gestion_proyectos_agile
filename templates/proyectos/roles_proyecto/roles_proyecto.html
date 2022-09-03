@@ -28,7 +28,7 @@
                             <td>{{ rol_proyecto.nombre }}</td>
                             <td>
                                 <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">create</span></a>
-                                <a href="#" class="btn btn-link"><span class="material-icons">cancel</span></a>
+                                <a href="{% url 'eliminar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">cancel</span></a>
                                 <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">visibility</span></a>
                             </td>
                         </tr>
