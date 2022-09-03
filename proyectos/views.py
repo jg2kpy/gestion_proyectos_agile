@@ -26,10 +26,6 @@ def proyectos(request):
 # Recibimos una peticion POST para crear un proyecto
 def crear_proyecto(request):
 
-    # Verificamos que el usuario tenga permisos rol de moderador o es el scrum master del proyecto
-    if request.method == 'POST' and not tiene_rol_en_sistema(request.user, 'Moderador'):
-        return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
-
     if request.method == 'POST':
         form = ProyectoForm(request.POST)
         if form.is_valid():

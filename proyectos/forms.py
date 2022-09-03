@@ -25,7 +25,7 @@ class ProyectoForm(forms.Form):
     fecha_fin = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control'}))
     scrum_master = forms.ChoiceField(choices=USUARIOS, widget=forms.Select(attrs={'class': 'form-control'}))
 
-# puede ser null el nombre
+
 class ProyectoCancelForm(forms.Form):
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
 
