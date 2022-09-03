@@ -19,7 +19,7 @@ class RolSistemaForm(forms.ModelForm):
         if not nombre:
             self._errors['nombre'] = self.error_class([
                 'No puede quedar vacio el campo'])
-        if nombre and len(nombre) <= 3:
+        if nombre and len(nombre) < 3:
             self._errors['nombre'] = self.error_class([
                 'Debe tener más de 2 caracteres'])
         if nombre and len(nombre) > 255:
@@ -79,7 +79,9 @@ def rol_global_eliminar(request, id):
         
     return render(request, 'rol_global/rol_global_eliminar.html', {'rol': rol})
 
-def rol_global_asignar(request, id):
+def rol_global_usuarios(request, id):
+    rol = RolSistema.objects.get(id=id)
+
     if request.method == 'POST':
         nombreUsr = request.POST.get('usuarios')
 
@@ -87,19 +89,28 @@ def rol_global_asignar(request, id):
             estado = 'vacio'
             return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado})
         
-        else:
-            usuario = Usuario.objects.get(username=nombreUsr)
-            rol = RolSistema.objects.get(id=id)
-            
+        usuario = Usuario.objects.get(username=nombreUsr)
+        
+        if 'vincular' in request.POST:
             if usuario.roles_sistema.filter(id=id).exists():
                 estado = 'posee_rol'
                 
             else:
-                estado = 'correcto'
                 usuario.roles_sistema.add(rol)
+                estado = 'vinculado'
+            
+            return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado, 'usuario': usuario, 'rol': rol})
+
+        else:
+            if usuario.roles_sistema.filter(id=id).exists():
+                usuario.roles_sistema.remove(rol)
+                estado = 'desvinculado'
+                
+            else:
+                estado = 'rol_inexistente'
             
             return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado, 'usuario': usuario, 'rol': rol})
 
     else:
         usuarios = Usuario.objects.all()
-        return render(request, 'rol_global/rol_global_asignar.html', {'id': id, 'usuarios': usuarios})
+        return render(request, 'rol_global/rol_global_usuarios.html', {'id': id, 'usuarios': usuarios, 'rol': rol})
