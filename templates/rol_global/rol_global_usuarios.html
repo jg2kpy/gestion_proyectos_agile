@@ -110,20 +110,21 @@
             {% block contenido %}
 
             
-            <h1>Asignar Rol Global</h1>
-            
+            <h1>Manejo de Usuarios</h1>
+            <h2>Rol: {{ rol.nombre }}</h2>
             <h2>Usuarios Disponibles:</h2>
 
             <form action="" method="POST">
                 {% csrf_token %}
                 
-                <label for="usr">Usuarios</label>
+                <label for="usr"></label>
                 <select name="usuarios" id="usr" size="4">
                     {% for usuario in usuarios %}
                     <option>{{usuario.username}}</option>
                     {% endfor %}
                 </select>
-                <input type="submit" value="Submit" />
+                <input type="submit" value="Vincular" name="vincular"/>
+                <input type="submit" value="Desvincular" name="desvincular" />
             </form>
 
                         
