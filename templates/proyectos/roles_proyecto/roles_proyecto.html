@@ -27,7 +27,7 @@
                             <th>{{ rol_proyecto.id }}</th>
                             <td>{{ rol_proyecto.nombre }}</td>
                             <td>
-                                <a href="#" class="btn btn-link"><span class="material-icons">create</span></a>
+                                <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">create</span></a>
                                 <a href="#" class="btn btn-link"><span class="material-icons">cancel</span></a>
                                 <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">visibility</span></a>
                             </td>

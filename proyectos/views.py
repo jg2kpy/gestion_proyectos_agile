@@ -106,3 +106,40 @@ def ver_rol_proyecto(request, id_rol_proyecto):
     permisos = PermisoProyecto.objects.filter(rol=rol)
 
     return render(request, 'proyectos/roles_proyecto/ver_rol_proyecto.html', {'rol': rol, 'permisos': permisos})
+
+# Modificar un rol de un proyecto
+def modificar_rol_proyecto(request, id_rol_proyecto):
+    rol = RolProyecto.objects.get(id=id_rol_proyecto)
+
+    # Traemos los permisos del rol
+    permisos = PermisoProyecto.objects.filter(rol=rol)
+
+    if request.method == 'POST':
+        form = RolProyectoForm(request.POST)
+        if form.is_valid():
+            # Modificamos el rol
+            rol.nombre = form.cleaned_data['nombre']
+            rol.descripcion = form.cleaned_data['descripcion']
+            rol.save()
+
+            # Traemos todos los permisos de la base de datos
+            permisos = PermisoProyecto.objects.all()
+
+            # Traemos los permisos que se seleccionaron en el formulario
+            permisos_seleccionados = form.cleaned_data['permisos']
+
+            # Recorremos los permisos y los asignamos al rol
+            for permiso in permisos:
+                if permiso.nombre in permisos_seleccionados.values_list('nombre', flat=True):
+                    #Agregamos el rol al permiso
+                    permiso.rol.add(rol)
+                    permiso.save()
+                else:
+                    #Eliminamos el rol del permiso
+                    permiso.rol.remove(rol)
+                    permiso.save()
+
+            return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all() ,'usuario' : request.user})
+    else:
+        form = RolProyectoForm(initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
+    return render(request, 'proyectos/roles_proyecto/modificar_rol_proyecto.html', {'form': form, 'rol': rol, 'permisos': permisos})
