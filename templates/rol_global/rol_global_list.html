@@ -121,8 +121,8 @@
                 <li>
                     <a href="{% url 'rol_global_info' rol.id %}">{{ rol.nombre }}</a>
                     <a href="{% url 'rol_global_editar' rol.id %}">Editar</a>
-                    <a href="{% url 'rol_global_asignar' rol.id %}">Asignar</a>
                     <a href="{% url 'rol_global_eliminar' rol.id %}">Eliminar</a>
+                    <a href="{% url 'rol_global_usuarios' rol.id %}">Usuarios</a>
                 </li>
                 {% endfor %}
             </ul>
