@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block contenido %}
+<!-- Formulario para crear rol de proyectos Django forms -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Crear rol de proyecto</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form action="." method="POST">
+                {% csrf_token %}
+                {{ form.as_div }}
+                <br>
+                <button type="submit" class="btn btn-primary">Crear rol de proyecto</button>
+                <a href="{% url 'proyectos' %}" class="btn btn-danger">Cancelar</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

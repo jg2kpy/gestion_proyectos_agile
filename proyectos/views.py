@@ -1,8 +1,7 @@
 from django.shortcuts import render
 from .models import Proyecto
-from .forms import ProyectoForm
-from .forms import ProyectoCancelForm
-from usuarios.models import Usuario
+from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
+from usuarios.models import Usuario , RolProyecto, PermisoProyecto
 from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_rol_en_proyecto
 from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_rol_en_sistema
 
@@ -64,3 +63,46 @@ def cancelar_proyecto(request, id_proyecto):
     else:
         form = ProyectoCancelForm()
     return render(request, 'proyectos/cancelar_proyecto.html', {'form': form})
+
+# Creamos una vista para ver los roles de proyectos
+def roles_proyecto(request):
+    return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all() ,'usuario' : request.user})
+
+# Creamos un rol en un proyecto
+def crear_rol_proyecto(request):
+    if request.method == 'POST':
+        form = RolProyectoForm(request.POST)
+        if form.is_valid():
+            # Creamos el rol
+            rol = RolProyecto()
+            rol.nombre = form.cleaned_data['nombre']
+            rol.descripcion = form.cleaned_data['descripcion']
+            rol.save()
+
+            # Traemos todos los permisos de la base de datos
+            permisos = PermisoProyecto.objects.all()
+
+            # Traemos los permisos que se seleccionaron en el formulario
+            permisos_seleccionados = form.cleaned_data['permisos']
+
+            # Recorremos los permisos y los asignamos al rol
+            for permiso in permisos:
+                if permiso.nombre in permisos_seleccionados.values_list('nombre', flat=True):
+                    #Agregamos el rol al permiso
+                    permiso.rol.add(rol)
+                    permiso.save()
+                    
+
+            return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all() ,'usuario' : request.user})
+    else:
+        form = RolProyectoForm()
+    return render(request, 'proyectos/roles_proyecto/crear_rol_proyecto.html', {'form': form})
+
+# Ver la informacion de un rol de un proyecto en especifico
+def ver_rol_proyecto(request, id_rol_proyecto):
+    rol = RolProyecto.objects.get(id=id_rol_proyecto)
+
+    # Traemos los permisos del rol
+    permisos = PermisoProyecto.objects.filter(rol=rol)
+
+    return render(request, 'proyectos/roles_proyecto/ver_rol_proyecto.html', {'rol': rol, 'permisos': permisos})

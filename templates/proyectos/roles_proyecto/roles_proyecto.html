@@ -5,11 +5,10 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h1>Proyectos</h1>
+                <h1>Roles de Proyecto</h1>
             </div>
             <div>
-                <a href="{% url 'crear_proyecto' %}" class="btn btn-primary">Crear proyecto</a>
-                <a href="{% url 'roles_proyecto' %}" class="btn btn-primary">Ver Roles de Proyecto</a>                
+                <a href="{% url 'crear_rol_proyecto' %}" class="btn btn-primary">Crear rol de proyecto</a>     
             </div>
         </div>
         <div class="row">
@@ -19,25 +18,18 @@
                     <tr>
                         <th>#</th>
                         <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Fecha de inicio</th>
-                        <th>Fecha de fin</th>
-                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for proyecto in proyectos %}
+                    {% for rol_proyecto in roles_proyecto %}
                         <tr>
-                            <th>{{ proyecto.id }}</th>
-                            <td>{{ proyecto.nombre }}</td>
-                            <td>{{ proyecto.descripcion }}</td>
-                            <td>{{ proyecto.fecha_inicio }}</td>
-                            <td>{{ proyecto.fecha_fin }}</td>
-                            <td>{{ proyecto.estado }}</td>
+                            <th>{{ rol_proyecto.id }}</th>
+                            <td>{{ rol_proyecto.nombre }}</td>
                             <td>
                                 <a href="#" class="btn btn-link"><span class="material-icons">create</span></a>
-                                <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span class="material-icons">cancel</span></a>
+                                <a href="#" class="btn btn-link"><span class="material-icons">cancel</span></a>
+                                <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">visibility</span></a>
                             </td>
                         </tr>
                     {% endfor %}

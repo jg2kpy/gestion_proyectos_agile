@@ -63,7 +63,7 @@ class PermisoProyecto(models.Model):
     """
     nombre = models.CharField(max_length=255, unique=True)
     descripcion = models.TextField(blank=True, null=True)
-    rol = models.ManyToManyField(RolProyecto, blank=True, related_name='roles')
+    rol = models.ManyToManyField(RolProyecto, blank=True, related_name='permisos')
 
     def __str__(self):
         return self.nombre
@@ -75,7 +75,7 @@ class PermisoSistema(models.Model):
     """
     nombre = models.CharField(max_length=255, unique=True)
     descripcion = models.TextField(blank=True, null=True)
-    rol = models.ManyToManyField(RolSistema, blank=True, related_name='roles')
+    rol = models.ManyToManyField(RolSistema, blank=True, related_name='permisos')
 
     def __str__(self):
         return self.nombre
