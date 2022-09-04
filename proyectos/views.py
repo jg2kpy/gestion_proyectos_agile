@@ -1,9 +1,7 @@
 from django.shortcuts import render
 from .models import Proyecto
-from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
+from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm, ImportarRolProyectoForm
 from usuarios.models import Usuario , RolProyecto, PermisoProyecto
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_rol_en_proyecto
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_rol_en_sistema
 
 #Estados de Proyecto
 ESTADOS_PROYECTO = (
@@ -195,3 +193,40 @@ def crear_rol_a_proyecto(request, id_proyecto):
     else:
         form = RolProyectoForm()
     return render(request, 'proyectos/roles_proyecto/crear_rol_proyecto.html', {'form': form, 'id_proyecto': id_proyecto})
+
+#Importar Rol de otros proyectos
+def importar_rol(request, id_proyecto):
+    if request.method == 'POST':
+        form = ImportarRolProyectoForm(request.POST)
+        if form.is_valid():
+            # Traemos el proyecto elegido en el formulario
+            proyecto = form.cleaned_data['proyecto']
+
+            # Traemos los roles del proyecto elegido
+            roles = RolProyecto.objects.filter(proyecto=proyecto)
+
+            # Recorremos los roles y creamos nuevos roles con los mismos permisos
+            for rol in roles:
+                # Creamos el rol
+                rol_nuevo = RolProyecto()
+                rol_nuevo.nombre = rol.nombre
+                rol_nuevo.descripcion = rol.descripcion
+                rol_nuevo.proyecto = Proyecto.objects.get(id=id_proyecto)
+                rol_nuevo.save()
+
+                # Traemos los permisos del rol
+                permisos = PermisoProyecto.objects.filter(rol=rol)
+
+                # Recorremos los permisos y los asignamos al rol
+                for permiso in permisos:
+                    #Agregamos el rol al permiso
+                    permiso.rol.add(rol_nuevo)
+                    permiso.save()
+
+
+            return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.filter(proyecto=id_proyecto)})
+
+    else:
+        form = ImportarRolProyectoForm()
+    return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'form': form, 'id_proyecto': id_proyecto})
+

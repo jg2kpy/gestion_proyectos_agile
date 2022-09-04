@@ -32,5 +32,6 @@ urlpatterns = [
     path('proyectos/roles_proyecto/eliminar/<int:id_rol_proyecto>/',proyectos_views.eliminar_rol_proyecto, name='eliminar_rol_proyecto'),
     path('proyectos/<int:id_proyecto>/roles/',proyectos_views.ver_roles_asignados, name='rol_proyecto_asignado'),
     path('proyectos/<int:id_proyecto>/roles/crear/',proyectos_views.crear_rol_a_proyecto, name='crear_rol_a_proyecto'),
+    path('proyectos/<int:id_proyecto>/roles/import/',proyectos_views.importar_rol, name='importar_rol'),
     path('', Home.as_view(), name='home'),
 ]

@@ -10,6 +10,7 @@
             <div>
                 {% if id_proyecto %}
                     <a href="{% url 'crear_rol_a_proyecto' id_proyecto %}" class="btn btn-primary">Crear rol de proyecto</a>
+                    <a href="{% url 'importar_rol' id_proyecto %}" class="btn btn-primary">Importar de otros proyectos </a>
                 {% else %}
                     <a href="{% url 'crear_rol_proyecto' %}" class="btn btn-primary">Crear rol de proyecto</a>  
                 {% endif %}  

@@ -1,5 +1,6 @@
 from django import forms
 from usuarios.models import Usuario
+from .models import Proyecto
 #Traemos los roles y los permisos de los proyectos
 from usuarios.models import RolProyecto, PermisoProyecto
 
@@ -24,6 +25,10 @@ PERMISOS = (
     (permiso.id, permiso.descripcion) for permiso in PermisoProyecto.objects.all()
 )
 
+PROYECTOS = (
+    (proyecto.id, proyecto.nombre) for proyecto in Proyecto.objects.all()
+)
+
 class ProyectoForm(forms.Form):
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
@@ -40,3 +45,7 @@ class RolProyectoForm(forms.Form):
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
     permisos = forms.ModelMultipleChoiceField(queryset=PermisoProyecto.objects.all(), widget=forms.CheckboxSelectMultiple())
+
+#Form para importar roles de otros proyectos
+class ImportarRolProyectoForm(forms.Form):
+    proyecto = forms.ChoiceField(choices= PROYECTOS,widget=forms.Select(attrs={'class': 'form-control'}))
