@@ -8,7 +8,11 @@
                 <h1>Roles de Proyecto</h1>
             </div>
             <div>
-                <a href="{% url 'crear_rol_proyecto' %}" class="btn btn-primary">Crear rol de proyecto</a>     
+                {% if id_proyecto %}
+                    <a href="{% url 'crear_rol_a_proyecto' id_proyecto %}" class="btn btn-primary">Crear rol de proyecto</a>
+                {% else %}
+                    <a href="{% url 'crear_rol_proyecto' %}" class="btn btn-primary">Crear rol de proyecto</a>  
+                {% endif %}  
             </div>
         </div>
         <div class="row">

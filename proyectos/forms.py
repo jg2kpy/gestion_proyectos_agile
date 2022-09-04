@@ -29,7 +29,7 @@ class ProyectoForm(forms.Form):
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
     fecha_inicio = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control'}))
     fecha_fin = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control'}))
-    scrum_master = forms.ChoiceField(choices=PERMISOS, widget=forms.Select(attrs={'class': 'form-control'}))
+    scrum_master = forms.ChoiceField(choices=USUARIOS, widget=forms.Select(attrs={'class': 'form-control'}))
 
 
 class ProyectoCancelForm(forms.Form):
