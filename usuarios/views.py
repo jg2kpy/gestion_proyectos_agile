@@ -2,7 +2,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.shortcuts import render
 from django.forms import ModelForm
-from django.http import
 from django.views.decorators.cache import never_cache
 
 from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_rol_en_proyecto

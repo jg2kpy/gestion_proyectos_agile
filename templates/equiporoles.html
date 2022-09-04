@@ -31,9 +31,9 @@
                         <form action="{% url 'vista_equipo' %}" method="POST">
                             {% csrf_token %}
                             <input name="hidden_action" id="hidden_action" hidden value="eliminar_miembro_proyecto">
-                            <input name="usuario_a_eliminar" id="usuario_a_eliminar" hidden value="{{ miembros.username }}">
+                            <input name="usuario_a_eliminar" id="usuario_a_eliminar" hidden value="{{ miembros.email }}">
                             <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
-                            <li>{{ miembros.username }} <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
+                            <li>{{ miembros.email }} <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
                         </form>
                             <br>Roles:<br>
                             {% for r in rolesActual %}
@@ -72,7 +72,7 @@
                 <ul>Miembros:
                     {% for miembros in proyecto.usuario.all %}
                     {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
-                        <li>{{ miembros.username }}</li>
+                        <li>{{ miembros.email }}</li>
                         <br>Roles:<br>
                             {% for r in rolesActual %}
                                 {{ r }}
