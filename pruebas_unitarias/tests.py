@@ -72,13 +72,15 @@ class RolesGlobalesTests(TestCase):
     """
     Pruebas unitarias relacionadas al manejo de Roles Globales.
     """
+
     def test_crear_rol(self):
         """
         Prueba que se pueda crear el rol
         """
         self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.', username='test')
         self.client.login(email='testemail@example.com', password='A123B456c.', username='test')
-        res = self.client.post('/rolesglobales/crear/', data={'nombre': 'rol_global_test', 'descripcion': 'Esto es un test'}, follow=True)
+        res = self.client.post('/rolesglobales/crear/',
+                               data={'nombre': 'rol_global_test', 'descripcion': 'Esto es un test'}, follow=True)
         self.assertContains(res, 'rol_global_test', 1, 200, "No recibe el nombre del rol correctamente")
         self.assertContains(res, 'Esto es un test', 1, 200, "No recibe la descripcion del rol correctamente")
 
@@ -110,11 +112,12 @@ class RolesGlobalesTests(TestCase):
         self.client.login(email='testemail@example.com', password='A123B456c.', username='test')
         rolTest = RolSistema(nombre='test', descripcion='descripcion test')
         rolTest.save()
-        res = self.client.post(f'/rolesglobales/{rolTest.id}/editar/', data={'nombre': 'rol_global_test_editado', 'descripcion': 'Esto es un test editado'}, follow=True)
+        res = self.client.post(f'/rolesglobales/{rolTest.id}/editar/', data={
+                               'nombre': 'rol_global_test_editado', 'descripcion': 'Esto es un test editado'}, follow=True)
         self.assertContains(res, 'rol_global_test_editado', 1, 200, "No recibe el nombre del rol editado correctamente")
-        self.assertContains(res, 'Esto es un test editado', 1, 200, "No recibe la descripcion del rol editado correctamente")
+        self.assertContains(res, 'Esto es un test editado', 1, 200,
+                            "No recibe la descripcion del rol editado correctamente")
 
-    # ARRLEGAR LINEA 126 EL POS (res = self.client.post)
     def test_vincular_rol(self):
         """
         Prueba que se pueda vincular un usuario a un rol
@@ -123,10 +126,12 @@ class RolesGlobalesTests(TestCase):
         self.client.login(email='testemail@example.com', password='A123B456c.', username='test')
         rolTest = RolSistema(nombre='test', descripcion='descripcion test')
         rolTest.save()
-        res = self.client.post(f'/rolesglobales/{rolTest.id}/usuarios/', follow=True)
+        testuser = get_user_model().objects.create_user(email='testuser@example.com', password='A123B456c.', username='testuser')
+        testuser.save()
+        res = self.client.post(f'/rolesglobales/{rolTest.id}/usuarios/',
+                               data={"usuarios": testuser.username, "vincular": "Vincular"}, follow=True)
         self.assertContains(res, 'Se ha vinculado el rol', 1, 200, "No se vincula correctamente el rol")
-    
-    # ARRLEGAR LINEA 138 EL POS (res = self.client.post)
+
     def test_desvincular_rol(self):
         """
         Prueba que se pueda desvincular un usuario a un rol
@@ -135,5 +140,10 @@ class RolesGlobalesTests(TestCase):
         self.client.login(email='testemail@example.com', password='A123B456c.', username='test')
         rolTest = RolSistema(nombre='test', descripcion='descripcion test')
         rolTest.save()
-        res = self.client.post(f'/rolesglobales/{rolTest.id}/usuarios/', follow=True)
+        testuser = get_user_model().objects.create_user(email='testuser@example.com', password='A123B456c.', username='testuser')
+        testuser.save()
+        self.client.post(f'/rolesglobales/{rolTest.id}/usuarios/',
+                         data={"usuarios": testuser.username, "vincular": "Vincular"}, follow=True)
+        res = self.client.post(f'/rolesglobales/{rolTest.id}/usuarios/',
+                               data={"usuarios": testuser.username, "desvincular": "Desvincular"}, follow=True)
         self.assertContains(res, 'Se ha desvinculado el rol', 1, 200, "No se desvincula correctamente el rol")
