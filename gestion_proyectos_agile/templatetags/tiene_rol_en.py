@@ -1,5 +1,6 @@
 from django import template
 from usuarios.models import RolSistema, RolProyecto, Usuario
+from proyectos.models import Proyecto
 
 """
 Los templares tags son funciones en python que podemos ejecutar en los templates HTML
@@ -82,3 +83,15 @@ def tiene_todos_los_roles(usuario, proyecto):
     :rtype: boolean
     """
     return set(usuario.roles_proyecto.filter(proyecto=proyecto)) != set(proyecto.proyecto_rol.all())
+
+@register.simple_tag
+def obtener_proyecto(proyecto_id):
+    """Funcion para obtener el objeto proyecto mediante su id en un template 
+
+    :param proyecto_id: Id del proyecto
+    :type proyecto_id: int
+
+    :return: El objeto proyecto del id dado
+    :rtype: Proyecto
+    """
+    return Proyecto.objects.get(id = proyecto_id)
