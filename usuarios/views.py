@@ -14,7 +14,7 @@ from .models import Usuario
 Las vistas relacionadas al package de usuarios
 """
 
-
+@never_cache
 def vista_equipo(request, proyecto_id):
     """Vista de equipo, funcion que maneja el endpoint /usuarios/equipo
 
@@ -186,7 +186,7 @@ def asignar_rol_proyecto(form, request_user, proyecto_id):
 
     return redirect(f'/usuarios/equipo/{proyecto_id}')
 
-
+@never_cache
 def listar_proyectos(request):
     """Vista de listar los proyectos de un usuario, funcion que maneja el endpoint /usuarios/equipo
 
