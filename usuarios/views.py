@@ -178,6 +178,9 @@ def asignar_rol_proyecto(form, request_user):
 
 
 class UsuarioForm(ModelForm):
+    """
+    Clase que representa el formulario de usuario. Ver Django ModelForm documentación para más información.
+    """
     class Meta:
         model = Usuario
         fields = ['email', 'first_name', 'last_name', 'direccion', 'telefono', 'avatar_url']
@@ -192,6 +195,13 @@ class UsuarioForm(ModelForm):
 def perfil(request):
     """
     Vista para el perfil de usuario con form para editar datos.
+
+    :param request: El request del cliente. Get en caso de quere visualizar y post en caso de querer editar.
+    :type request: HttpRequest
+
+    :return: Se retorna una respuesta HttpResponse que muestra la página actualizada con código 200 en caso exitoroso,
+    401 si no se encuentra logueado o 422 si el formulario no fue llenado correctamente.
+    :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/", status=401)

@@ -8,7 +8,14 @@ class CustomUserManager(BaseUserManager):
 
     def create_user(self, email, password, **extra_fields):
         """
-        Crear un nuevo usuario con correo y contraseña.
+        Crear un nuevo usuario con correo y contraseña. No debería ser llamado directamente en el código.
+
+        :param email: El email del usuario.
+        :type email: str
+        :param password: La contraseña del usuario.
+        :type password: str
+        :param extra_fields: Campos extra para el usuario, ignorados.
+        :type extra_fields: dict
         """
         if not email:
             raise ValueError('Cada usuario debe tener un email')
@@ -20,7 +27,13 @@ class CustomUserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         """
-        Crear superusuario.
+        Crear superusuario. No debería ser llamado directamente en el código.
+
+        :param email: El email del usuario.
+        :type email: str
+        :param password: La contraseña del usuario.
+        :type password: str
+        :param extra_fields: Campos extra para el usuario, ignorados.
         """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
