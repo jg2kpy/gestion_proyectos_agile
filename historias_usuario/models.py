@@ -18,12 +18,6 @@ class EtapaHistoriaUsuario(models.Model):
     descripcion = models.TextField(blank=True, null=True)
     orden = models.IntegerField(blank=False, null=False)
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['nombre', 'proyecto'],
-                                    name='constraint_etapa_historia_usuario_nombre_proyecto')
-        ]
-
     def __str__(self):
         """
         Representación en string de la etapa.
