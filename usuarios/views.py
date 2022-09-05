@@ -6,6 +6,10 @@ from django.shortcuts import redirect
 
 # Crea forms
 class RolSistemaForm(forms.ModelForm):
+    """
+    Model form para los Roles de Globales con los campos nombre y descripcion
+    En la funcion clean se realizan las validaciones por parte del servidor
+    """
     class Meta:
         model = RolSistema
         fields = ['nombre', 'descripcion']
@@ -35,27 +39,45 @@ class RolSistemaForm(forms.ModelForm):
 # Create your views here.
 
 def rol_global_list(request):
+    """
+    Vista para el menu de roles globales
+    """
     roles = RolSistema.objects.all()
     return render(request, 'rol_global/rol_global_list.html', {'roles': roles})
 
 def rol_global_info(request, id):
+    """
+    Vista para informacion de los roles globales
+    """
     rol = RolSistema.objects.get(id=id)
     return render(request, 'rol_global/rol_global_info.html', {'rol': rol})
 
 def rol_global_crear(request):
+    """
+    Vista para creacion y guardado en la base de datos de un rol global
+    """
+    status = 200
+    
     if request.method == 'POST':
         form = RolSistemaForm(request.POST)
-        
+
         if form.is_valid():
             rol = form.save()
             return redirect('rol_global_info', rol.id)
 
+        else:
+            status = 422
+
     else:
         form = RolSistemaForm()
 
-    return render(request, 'rol_global/rol_global_crear.html', {'form': form})
+    return render(request, 'rol_global/rol_global_crear.html', {'form': form}, status=status)
 
 def rol_global_editar(request, id):
+    """
+    Vista para edicion de los atributos de un rol global
+    """
+    status = 200
     rol = RolSistema.objects.get(id=id)
     
     if request.method == 'POST':
@@ -65,12 +87,17 @@ def rol_global_editar(request, id):
             form.save()
             return redirect('rol_global_info', rol.id)
 
+        else:
+            status = 422
     else:
         form = RolSistemaForm(instance=rol)
 
-    return render(request, 'rol_global/rol_global_editar.html', {'form': form})
+    return render(request, 'rol_global/rol_global_editar.html', {'form': form}, status=status)
 
 def rol_global_eliminar(request, id):
+    """
+    Vista para eliminar un rol global del sistema
+    """
     rol = RolSistema.objects.get(id=id)
 
     if request.method == 'POST':
@@ -80,6 +107,10 @@ def rol_global_eliminar(request, id):
     return render(request, 'rol_global/rol_global_eliminar.html', {'rol': rol})
 
 def rol_global_usuarios(request, id):
+    """
+    Vista para la vinculacion y desvinculacion de roles globales a un usuario
+    Junto con las restricciones necesarias
+    """
     rol = RolSistema.objects.get(id=id)
 
     if request.method == 'POST':
