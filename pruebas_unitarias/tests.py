@@ -71,7 +71,7 @@ class UsuariosTests(TestCase):
         self.assertEqual(Usuario.objects.filter(roles_sistema__id=rol_admin.id).count(), 1)
     
 
-class MienbrosRolesTest(TestCase):
+class MiembrosRolesTest(TestCase):
     """
     Pruebas unitarias relacionadas al manejo de roles y miembros en proyectos
     """
@@ -104,11 +104,7 @@ class MienbrosRolesTest(TestCase):
         rolTest.save()
         master.roles_proyecto.add(scrum)
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
-            'usuario_a_agregar': usuarioTest.email,
-            'roles_agregar': rolTest.id,
-            'hidden_action': 'agregar_miembro_proyecto'
-        })
+        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}')
         request.user = usuarioTest
         response = vista_equipo(request, proyectoTest.id)
         self.assertEqual(response.status_code, 403,
