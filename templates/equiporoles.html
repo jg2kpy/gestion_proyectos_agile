@@ -40,7 +40,7 @@
                                 <form action="{% url 'vista_equipo' %}" method="POST">
                                     {% csrf_token %}
                                     <input name="hidden_action" id="hidden_action" hidden value="eliminar_rol_proyecto">
-                                    <input name="usuario_a_sacar_rol" id="usuario_a_sacar_rol" hidden value="{{ miembros.username }}">
+                                    <input name="usuario_a_sacar_rol" id="usuario_a_sacar_rol" hidden value="{{ miembros.email }}">
                                     <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
                                     <input name="rol_id" id="rol_id" hidden value="{{ r.id }}">
                                     <li>{{ r }} <button type="submit" class="btn btn-warning">Desasignar rol</button>
@@ -53,9 +53,9 @@
                                 <form action="{% url 'vista_equipo' %}" method="POST">
                                     {% csrf_token %}
                                     <input name="hidden_action" id="hidden_action" hidden value="asignar_rol_proyecto">
-                                    <input name="usuario_a_cambiar_rol" id="usuario_a_cambiar_rol" hidden value="{{ miembros.username }}">
+                                    <input name="usuario_a_cambiar_rol" id="usuario_a_cambiar_rol" hidden value="{{ miembros.email }}">
                                     <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
-                                    <select name="roles{{ miembros.username }}" id="roles{{ miembros.username }}">
+                                    <select name="roles{{ miembros.email }}" id="roles{{ miembros.email }}">
                                         {% for rol in proyecto.proyecto_rol.all %}
                                             {% if not rol in rolesActual %}
                                                 <option value="{{ rol.id }}" name="rol{{ rol.id }}" id="rol{{ rol.id }}">{{ rol }}</option>

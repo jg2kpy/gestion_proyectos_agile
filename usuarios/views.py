@@ -58,7 +58,7 @@ def eliminar_miembro_proyecto(form, request_user):
     :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar a la pagina principal
     :rtype: HttpResponse
     """
-    usuario_nombre = form.get('usuario_a_eliminar')
+    usuario_email = form.get('usuario_a_eliminar')
     proyecto_id = form.get('proyecto')
 
     if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
@@ -66,7 +66,7 @@ def eliminar_miembro_proyecto(form, request_user):
 
     try:
 
-        usuario_a_eliminar_miembro_proyecto = Usuario.objects.get(username=usuario_nombre)
+        usuario_a_eliminar_miembro_proyecto = Usuario.objects.get(email=usuario_email)
         proyecto = Proyecto.objects.get(id=proyecto_id)
         roles = RolProyecto.objects.filter(usuario=usuario_a_eliminar_miembro_proyecto, proyecto=proyecto_id)
         [usuario_a_eliminar_miembro_proyecto.roles_proyecto.remove(r) for r in roles]
@@ -93,7 +93,7 @@ def agregar_miembro_proyecto(request, form, request_user):
     :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar a la pagina principal
     :rtype: HttpResponse
     """
-    usuario_nombre = form.get('usuario_a_agregar')
+    usuario_email = form.get('usuario_a_agregar')
     proyecto_id = form.get('proyecto')
     rol_id = form.get('roles_agregar')
 
@@ -102,7 +102,7 @@ def agregar_miembro_proyecto(request, form, request_user):
 
     try:
 
-        usuario_a_agregar_miembro_proyecto = Usuario.objects.get(username=usuario_nombre)
+        usuario_a_agregar_miembro_proyecto = Usuario.objects.get(email=usuario_email)
         proyecto = Proyecto.objects.get(id=proyecto_id)
 
         if usuario_a_agregar_miembro_proyecto.equipo.filter(id=proyecto.id).count() != 0:
@@ -131,7 +131,7 @@ def eliminar_rol_proyecto(form, request_user):
     :rtype: HttpResponse
     """
 
-    usuario_nombre = form.get('usuario_a_sacar_rol')
+    usuario_email = form.get('usuario_a_sacar_rol')
     proyecto_id = form.get('proyecto')
     rol_id = form.get('rol_id')
 
@@ -139,7 +139,7 @@ def eliminar_rol_proyecto(form, request_user):
         return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
 
     try:
-        usuario_a_eliminar_rol = Usuario.objects.get(username=usuario_nombre)
+        usuario_a_eliminar_rol = Usuario.objects.get(email=usuario_email)
         rol = RolProyecto.objects.get(id=rol_id)
         usuario_a_eliminar_rol.roles_proyecto.remove(rol)
     except Usuario.DoesNotExist:
@@ -158,16 +158,16 @@ def asignar_rol_proyecto(form, request_user):
     :rtype: HttpResponse
     """
 
-    usuario_nombre = form.get('usuario_a_cambiar_rol')
+    usuario_email = form.get('usuario_a_cambiar_rol')
     proyecto_id = form.get('proyecto')
-    rol_id = form.get(f'roles{usuario_nombre}')
+    rol_id = form.get(f'roles{usuario_email}')
 
     if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
         return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
 
     try:
 
-        usuario_a_eliminar_rol = Usuario.objects.get(username=usuario_nombre)
+        usuario_a_eliminar_rol = Usuario.objects.get(email=usuario_email)
         rol = RolProyecto.objects.get(id=rol_id)
         usuario_a_eliminar_rol.roles_proyecto.add(rol)
 
