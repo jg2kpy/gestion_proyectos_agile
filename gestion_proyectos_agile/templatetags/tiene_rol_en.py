@@ -86,4 +86,12 @@ def tiene_todos_los_roles(usuario, proyecto):
 
 @register.simple_tag
 def obtener_proyecto(proyecto_id):
+    """Funcion para obtener el objeto proyecto mediante su id en un template 
+
+    :param proyecto_id: Id del proyecto
+    :type proyecto_id: int
+
+    :return: El objeto proyecto del id dado
+    :rtype: Proyecto
+    """
     return Proyecto.objects.get(id = proyecto_id)
