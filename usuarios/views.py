@@ -1,6 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.shortcuts import render
 from django.forms import ModelForm
 from django.views.decorators.cache import never_cache
 
@@ -80,7 +79,7 @@ def eliminar_miembro_proyecto(form, request_user, proyecto_id):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'vista_equipo/{proyecto_id}')
+    return redirect(f'/usuarios/equipo/{proyecto_id}')
 
 
 def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
@@ -122,7 +121,7 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
     except Usuario.DoesNotExist:
         return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario no existe', 'proyecto_id': proyecto_id}, status=422)
 
-    return redirect(f'vista_equipo/{proyecto_id}')
+    return redirect(f'/usuarios/equipo/{proyecto_id}')
 
 
 def eliminar_rol_proyecto(form, request_user, proyecto_id):
@@ -154,7 +153,7 @@ def eliminar_rol_proyecto(form, request_user, proyecto_id):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'vista_equipo/{proyecto_id}')
+    return redirect(f'/usuarios/equipo/{proyecto_id}')
 
 
 def asignar_rol_proyecto(form, request_user, proyecto_id):
@@ -185,7 +184,7 @@ def asignar_rol_proyecto(form, request_user, proyecto_id):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'vista_equipo/{proyecto_id}')
+    return redirect(f'/usuarios/equipo/{proyecto_id}')
 
 
 def listar_proyectos(request):
