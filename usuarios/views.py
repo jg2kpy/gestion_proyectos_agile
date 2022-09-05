@@ -200,7 +200,7 @@ def perfil(request):
     :type request: HttpRequest
 
     :return: Se retorna una respuesta HttpResponse que muestra la página actualizada con código 200 en caso exitoroso,
-    401 si no se encuentra logueado o 422 si el formulario no fue llenado correctamente.
+        401 si no se encuentra logueado o 422 si el formulario no fue llenado correctamente.
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
