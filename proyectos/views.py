@@ -37,6 +37,33 @@ def crear_proyecto(request):
             scrum_master = Usuario.objects.get(id=id_scrum_master)
             proyecto.scrumMaster = scrum_master
             proyecto.save()
+
+            scrum_master.equipo.add(proyecto)
+            
+            #Traemos el ID del proyecto recien creado
+            #Traemos todos los roles que tenga null como proyecto_id
+            roles = RolProyecto.objects.filter(proyecto__isnull = True)
+            #Generamos una copia de este rol y el asignamos el id del proyecto
+            for rol in roles:
+                # Creamos el rol
+                rol_nuevo = RolProyecto()
+                rol_nuevo.nombre = rol.nombre
+                rol_nuevo.descripcion = rol.descripcion
+                rol_nuevo.proyecto = Proyecto.objects.get(id=proyecto.id)
+                rol_nuevo.save()
+
+                # Traemos los permisos del rol
+                permisos = PermisoProyecto.objects.filter(rol=rol)
+
+                # Recorremos los permisos y los asignamos al rol
+                for permiso in permisos:
+                    #Agregamos el rol al permiso
+                    permiso.rol.add(rol_nuevo)
+                    permiso.save()
+            
+            scrum_master.roles_proyecto.add(RolProyecto.objects.get(nombre = "Scrum Master", proyecto=proyecto))
+            scrum_master.save()
+
             return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
     else:
         form = ProyectoForm()

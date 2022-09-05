@@ -21,6 +21,7 @@ from django.urls import path
 from django.conf.urls import include
 from .views import Home
 from usuarios import views as usuarios_views
+from proyectos import views as proyectos_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),

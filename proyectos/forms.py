@@ -17,7 +17,7 @@ ESTADOS_PROYECTO = (
 
 #traemos los usuarios del sistema
 USUARIOS = (
-    (usuario.id, usuario.username) for usuario in Usuario.objects.all()
+    (usuario.id, usuario.email) for usuario in Usuario.objects.all()
 )
 
 #Traemos los Permisos de los proyectos
