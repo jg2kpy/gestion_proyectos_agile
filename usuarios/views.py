@@ -15,8 +15,14 @@ from .models import Usuario
 Las vistas relacionadas al package de usuarios
 """
 
+def listar_proyectos(request):
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return HttpResponse('Usuario no autenticado', status=401)
+    
+    return render(request, 'usuarios_equipos/listar_proyectos.html')
 
-def vista_equipo(request):
+def vista_equipo(request, proyecto_id):
     """Vista de equipo, funcion que maneja el endpoint /usuarios/equipo
 
     :param request: Solicitud HTTP del cliente junto con el body con los datos para la realizar la operacion solicitada
@@ -35,18 +41,18 @@ def vista_equipo(request):
         hidden_action = form.get('hidden_action')
 
         if hidden_action == 'eliminar_miembro_proyecto':
-            return eliminar_miembro_proyecto(form, request_user)
+            return eliminar_miembro_proyecto(form, request_user, proyecto_id)
         elif hidden_action == 'agregar_miembro_proyecto':
-            return agregar_miembro_proyecto(request, form, request_user)
+            return agregar_miembro_proyecto(request, form, request_user, proyecto_id)
         elif hidden_action == 'eliminar_rol_proyecto':
-            return eliminar_rol_proyecto(form, request_user)
+            return eliminar_rol_proyecto(form, request_user, proyecto_id)
         elif hidden_action == 'asignar_rol_proyecto':
-            return asignar_rol_proyecto(form, request_user)
+            return asignar_rol_proyecto(form, request_user, proyecto_id)
 
-    return render(request, 'equiporoles.html')
+    return render(request, 'usuarios_equipos/equiporoles.html', {'proyecto_id': proyecto_id})
 
 
-def eliminar_miembro_proyecto(form, request_user):
+def eliminar_miembro_proyecto(form, request_user, proyecto_id):
     """Eliminar miembros de un proyecto
 
     :param form: Un objeto similar a un diccionario que contiene todos los parámetros HTTP POST dados.
@@ -59,7 +65,6 @@ def eliminar_miembro_proyecto(form, request_user):
     :rtype: HttpResponse
     """
     usuario_email = form.get('usuario_a_eliminar')
-    proyecto_id = form.get('proyecto')
 
     if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
         return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
@@ -75,10 +80,10 @@ def eliminar_miembro_proyecto(form, request_user):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect('vista_equipo')
+    return redirect(f'vista_equipo/{proyecto_id}')
 
 
-def agregar_miembro_proyecto(request, form, request_user):
+def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
     """Agregar miembro al proyecto
 
     :param request: Solicitud HTTP del cliente junto con el body con los datos del nombre de usuario id del proyecto e ir del rol
@@ -94,7 +99,6 @@ def agregar_miembro_proyecto(request, form, request_user):
     :rtype: HttpResponse
     """
     usuario_email = form.get('usuario_a_agregar')
-    proyecto_id = form.get('proyecto')
     rol_id = form.get('roles_agregar')
 
     if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
@@ -106,19 +110,20 @@ def agregar_miembro_proyecto(request, form, request_user):
         proyecto = Proyecto.objects.get(id=proyecto_id)
 
         if usuario_a_agregar_miembro_proyecto.equipo.filter(id=proyecto.id).count() != 0:
-            return render(request, 'equiporoles.html', {'mensaje': 'El usuario ya pertenece al proyecto'})
+            return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario ya pertenece al proyecto'})
 
         usuario_a_agregar_miembro_proyecto.equipo.add(proyecto)
         rol_proyecto = RolProyecto.objects.get(id=rol_id)
         usuario_a_agregar_miembro_proyecto.roles_proyecto.add(rol_proyecto)
 
     except Usuario.DoesNotExist:
-        return render(request, 'equiporoles.html', {'mensaje': 'El usuario no existe'}, status=422)
-
-    return redirect('vista_equipo')
+        return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario no existe', 'proyecto_id': proyecto_id}, status=422)
 
 
-def eliminar_rol_proyecto(form, request_user):
+    return redirect(f'vista_equipo/{proyecto_id}')
+
+
+def eliminar_rol_proyecto(form, request_user, proyecto_id):
     """Eliminar miembros de un proyecto
 
     :param form: Un objeto similar a un diccionario que contiene todos los parámetros HTTP POST dados.
@@ -132,7 +137,6 @@ def eliminar_rol_proyecto(form, request_user):
     """
 
     usuario_email = form.get('usuario_a_sacar_rol')
-    proyecto_id = form.get('proyecto')
     rol_id = form.get('rol_id')
 
     if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
@@ -145,10 +149,10 @@ def eliminar_rol_proyecto(form, request_user):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect('vista_equipo')
+    return redirect(f'vista_equipo/{proyecto_id}')
 
 
-def asignar_rol_proyecto(form, request_user):
+def asignar_rol_proyecto(form, request_user, proyecto_id):
     """Asignar un rol de proyecto a un usuario
 
     :param form: Un objeto similar a un diccionario que contiene todos los parámetros HTTP POST dados.
@@ -159,7 +163,6 @@ def asignar_rol_proyecto(form, request_user):
     """
 
     usuario_email = form.get('usuario_a_cambiar_rol')
-    proyecto_id = form.get('proyecto')
     rol_id = form.get(f'roles{usuario_email}')
 
     if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
@@ -174,7 +177,7 @@ def asignar_rol_proyecto(form, request_user):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect('vista_equipo')
+    return redirect(f'vista_equipo/{proyecto_id}')
 
 
 class UsuarioForm(ModelForm):
