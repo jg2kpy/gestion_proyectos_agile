@@ -76,17 +76,51 @@ class MienbrosRolesTest(TestCase):
     Pruebas unitarias relacionadas al manejo de roles y miembros en proyectos
     """
 
-    def test_agregar_miembro_proyecto(self):
-        """
-        Prueba de la vista de agregar miembro de un proyecto
-        """
+    def test_listar_proyectos(self):
         request_factory = RequestFactory()
         request = request_factory.post('/usuarios/equipo/')
         request.user = AnonymousUser()
         response = listar_proyectos(request)
         self.assertEqual(response.status_code, 401,
                          'La respuesta no fue un estado HTTP 401 a un usuario no autorizado')
+    
+    
+    def test_vizualizar_proyecto(self):
+        request_factory = RequestFactory()
+        request = request_factory.post('/usuarios/equipo/')
+        usuarioTest = Usuario(
+            username="test", email='normal@user.com', password='foo')
+        master = Usuario(username="master",
+                         email='master@user.com', password='foo')
+        usuarioTest.save()
+        master.save()
 
+        proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=master)
+        proyectoTest.save()
+
+        scrum = RolProyecto(nombre="Scrum Master", proyecto=proyectoTest)
+        rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
+        scrum.save()
+        rolTest.save()
+        master.roles_proyecto.add(scrum)
+
+        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+            'usuario_a_agregar': usuarioTest.email,
+            'roles_agregar': rolTest.id,
+            'hidden_action': 'agregar_miembro_proyecto'
+        })
+        request.user = usuarioTest
+        response = vista_equipo(request, proyectoTest.id)
+        self.assertEqual(response.status_code, 403,
+                         'La respuesta no fue un estado HTTP 403 a un usuario no autorizado para esta operacion')
+
+
+    def test_agregar_miembro_proyecto(self):
+        """
+        Prueba de la vista de agregar miembro de un proyecto
+        """
+        request_factory = RequestFactory()
+        request = request_factory.post('/usuarios/equipo/')
         usuarioTest = Usuario(
             username="test", email='normal@user.com', password='foo')
         master = Usuario(username="master",
@@ -143,10 +177,6 @@ class MienbrosRolesTest(TestCase):
         """
         request_factory = RequestFactory()
         request = request_factory.post('usuarios/equipo/')
-        request.user = AnonymousUser()
-        response = listar_proyectos(request)
-        self.assertEqual(response.status_code, 401,
-                         'La respuesta no fue un estado HTTP 401 a un usuario no autorizado')
 
         usuarioTest = Usuario(
             username="test", email='normal@user.com', password='foo')
@@ -205,10 +235,6 @@ class MienbrosRolesTest(TestCase):
         """
         request_factory = RequestFactory()
         request = request_factory.post('usuarios/equipo')
-        request.user = AnonymousUser()
-        response = listar_proyectos(request)
-        self.assertEqual(response.status_code, 401,
-                         'La respuesta no fue un estado HTTP 401 a un usuario no autorizado')
 
         usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
         master = Usuario(username="master", email='master@user.com', password='foo')
@@ -262,10 +288,6 @@ class MienbrosRolesTest(TestCase):
         """
         request_factory = RequestFactory()
         request = request_factory.post('usuarios/equipo')
-        request.user = AnonymousUser()
-        response = listar_proyectos(request)
-        self.assertEqual(response.status_code, 401,
-                         'La respuesta no fue un estado HTTP 401 a un usuario no autorizado')
 
         usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
         master = Usuario(username="master",

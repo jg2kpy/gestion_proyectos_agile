@@ -27,12 +27,12 @@ def vista_equipo(request, proyecto_id):
     :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar nuevamente a la pagina /usuarios/equipo
     :rtype: HttpResponse
     """
+    request_user = request.user
     if request.method == 'POST':
         if not request.user.is_authenticated:
             return HttpResponse('Usuario no autenticado', status=401)
 
         form = request.POST
-        request_user = request.user
 
         hidden_action = form.get('hidden_action')
 
@@ -44,6 +44,9 @@ def vista_equipo(request, proyecto_id):
             return eliminar_rol_proyecto(form, request_user, proyecto_id)
         elif hidden_action == 'asignar_rol_proyecto':
             return asignar_rol_proyecto(form, request_user, proyecto_id)
+    
+    if not request_user.equipo.filter(id=proyecto_id):
+        return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
 
     return render(request, 'usuarios_equipos/equiporoles.html', {'proyecto_id': proyecto_id})
 
