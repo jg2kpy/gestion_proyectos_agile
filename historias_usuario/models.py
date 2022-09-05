@@ -93,6 +93,33 @@ class HistoriaUsuario(models.Model):
     """
     Cada historia de usuario representa un trabajo a realizar.
     Debe tener UserPoints (up) y BuisnessValue (bv). Se guarda un historial completo.
+
+    :param nombre: Nombre de la historia de usuario.
+    :type nombre: str
+    :param descripcion: Descripción de la historia de usuario.
+    :type descripcion: str
+    :param fecha_creacion: Fecha de creación de la historia de usuario.
+    :type fecha_creacion: datetime
+    :param fecha_modificacion: Fecha de modificación de la historia de usuario.
+    :type fecha_modificacion: datetime
+    :param sprint: Sprint al que pertenece la historia de usuario.
+    :type sprint: Sprint
+    :param etapa: Etapa actual de la historia de usuario.
+    :type etapa: EtapaHistoriaUsuario
+    :param tipo: Tipo de la historia de usuario.
+    :type tipo: TipoHistoriaUsusario
+    :param versionPrevia: Version anterior en el historial.
+    :type versionPrevia: HistoriaUsuario
+    :param up: UserPoints de la historia de usuario.
+    :type up: int
+    :param bv: BuisnessValue de la historia de usuario.
+    :type bv: int
+    :param usuarioAsignado: Usuario asignado a la historia de usuario.
+    :type usuarioAsignado: Usuario
+    :param proyecto: Proyecto al que pertenece la historia de usuario.
+    :type proyecto: Proyecto
+    :param archivo: Archivos anexos a la historia de usuario.
+    :type archivo: List[ArchivoAnexo]
     """
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
