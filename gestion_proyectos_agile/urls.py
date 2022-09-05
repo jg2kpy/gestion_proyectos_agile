@@ -2,10 +2,13 @@
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
+
 Examples:
+
 Function views
-    1. Add an import:  from my_app import views
+    1. Add an import: from my_app import views
     2. Add a URL to urlpatterns:  path('', views.home, name='home')
+
 Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
@@ -17,7 +20,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 from .views import Home
-from proyectos import views as proyectos_views
+from usuarios import views as usuarios_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,4 +37,6 @@ urlpatterns = [
     path('proyectos/<int:id_proyecto>/roles/crear/',proyectos_views.crear_rol_a_proyecto, name='crear_rol_a_proyecto'),
     path('proyectos/<int:id_proyecto>/roles/import/',proyectos_views.importar_rol, name='importar_rol'),
     path('', Home.as_view(), name='home'),
+    path('usuarios/', include('usuarios.urls'), name='usuarios'),
+    path('perfil/', usuarios_views.perfil, name='perfil')
 ]

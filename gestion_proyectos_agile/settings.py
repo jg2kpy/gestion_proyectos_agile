@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'phonenumber_field',
 
     'usuarios',
     'proyectos',
@@ -166,3 +167,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'home'
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+PHONENUMBER_DEFAULT_REGION = 'PY'
+USERNAME_FIELD = 'email'
+SILENCED_SYSTEM_CHECKS = ["auth.W004"]
