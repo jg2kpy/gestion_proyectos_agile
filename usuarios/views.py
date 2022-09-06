@@ -216,7 +216,6 @@ def rol_global_usuarios(request, id):
         if not nombreUsr:
             estado = 'vacio'
             status = 422
-
             return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado}, status=status)
         
         usuario = Usuario.objects.get(username=nombreUsr)
@@ -229,8 +228,6 @@ def rol_global_usuarios(request, id):
                 usuario.roles_sistema.add(rol)
                 estado = 'vinculado'
             
-            return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado, 'usuario': usuario, 'rol': rol})
-
         else:
             if usuario.roles_sistema.filter(id=id).exists():
                 usuario.roles_sistema.remove(rol)
@@ -239,7 +236,7 @@ def rol_global_usuarios(request, id):
             else:
                 estado = 'rol_inexistente'
             
-            return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado, 'usuario': usuario, 'rol': rol}, status=status)
+        return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado, 'usuario': usuario, 'rol': rol}, status=status)
 
     else:
         usuarios = Usuario.objects.all()
