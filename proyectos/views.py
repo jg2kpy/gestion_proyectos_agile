@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import Proyecto
 from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm, ImportarRolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
+from django.views.decorators.cache import never_cache
 
 # Estados de Proyecto
 ESTADOS_PROYECTO = (
@@ -258,38 +259,45 @@ def crear_rol_a_proyecto(request, id_proyecto):
 
 # Importar Rol de otros proyectos
 
-
+@never_cache
 def importar_rol(request, id_proyecto):
     if request.method == 'POST':
-        form = ImportarRolProyectoForm(request.POST)
-        if form.is_valid():
-            # Traemos el proyecto elegido en el formulario
-            proyecto = form.cleaned_data['proyecto']
+        # id_proyecto: Proyecto a donde se VA A IMPORTAR
+        roles = [] # Lista de los id de los roles a importar
+        proyecto_seleccionado = Proyecto.objects.get(id=int(request.POST.get('proyecto_seleccionado'))) # Proyecto de donde SE IMPORTA los roles
+        for rol in proyecto_seleccionado.proyecto_rol.all():
+            if request.POST.get(f'{rol.id}') != None:
+                roles.append(rol)
 
-            # Traemos los roles del proyecto elegido
-            roles = RolProyecto.objects.filter(proyecto=proyecto)
+        # Recorremos los roles y creamos nuevos roles con los mismos permisos
+        for rol in roles:
+            if rol.nombre not in RolProyecto.objects.filter(proyecto=id_proyecto).values_list('nombre', flat=True):
+                # Creamos el rol
+                rol_nuevo = RolProyecto()
+                rol_nuevo.nombre = rol.nombre
+                rol_nuevo.descripcion = rol.descripcion
+                rol_nuevo.proyecto = Proyecto.objects.get(id=id_proyecto)
+                rol_nuevo.save()
 
-            # Recorremos los roles y creamos nuevos roles con los mismos permisos
-            for rol in roles:
-                if rol.nombre not in RolProyecto.objects.filter(proyecto=id_proyecto).values_list('nombre', flat=True):
-                    # Creamos el rol
-                    rol_nuevo = RolProyecto()
-                    rol_nuevo.nombre = rol.nombre
-                    rol_nuevo.descripcion = rol.descripcion
-                    rol_nuevo.proyecto = Proyecto.objects.get(id=id_proyecto)
-                    rol_nuevo.save()
+                # Traemos los permisos del rol
+                permisos = PermisoProyecto.objects.filter(rol=rol)
 
-                    # Traemos los permisos del rol
-                    permisos = PermisoProyecto.objects.filter(rol=rol)
+                # Recorremos los permisos y los asignamos al rol
+                for permiso in permisos:
+                    # Agregamos el rol al permiso
+                    permiso.rol.add(rol_nuevo)
+                    permiso.save()
 
-                    # Recorremos los permisos y los asignamos al rol
-                    for permiso in permisos:
-                        # Agregamos el rol al permiso
-                        permiso.rol.add(rol_nuevo)
-                        permiso.save()
-
-            return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.filter(proyecto=id_proyecto)})
+        return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.filter(proyecto=id_proyecto)})
 
     else:
-        form = ImportarRolProyectoForm()
-    return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'form': form, 'id_proyecto': id_proyecto})
+        proyectos = Proyecto.objects.exclude(id=id_proyecto)
+        # proyecto_objetivo = Proyecto.objects.get(nombre = request.GET.get('proyectos'))
+        if request.GET.get('proyectos'): # Este es el GET cuando solicita ver los roles de proyectos de un proyecto en especifico
+            proyecto = Proyecto.objects.get(nombre = request.GET.get('proyectos'))
+            roles = RolProyecto.objects.filter(proyecto = proyecto)
+        else:# Este es el GET cuando se llama desde otra pagina
+            proyecto = proyectos[0]
+            roles = RolProyecto.objects.filter(proyecto = proyectos[0])
+        
+    return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto, 'roles': roles})
