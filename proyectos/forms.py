@@ -22,6 +22,11 @@ class ProyectoForm(forms.Form):
     fecha_fin = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control'}))
     scrum_master = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['scrum_master'].choices = [
+            (usuario.id, f'{usuario.get_full_name()} ({usuario.email})') for usuario in Usuario.objects.all()]
+
 
 class ProyectoCancelForm(forms.Form):
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -34,8 +39,16 @@ class RolProyectoForm(forms.Form):
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
     permisos = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple())
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['permisos'].queryset = PermisoProyecto.objects.all()
+
 # Form para importar roles de otros proyectos
 
 
 class ImportarRolProyectoForm(forms.Form):
     proyecto = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['proyecto'].choices = [(proyecto.id, proyecto.nombre) for proyecto in Proyecto.objects.all()]

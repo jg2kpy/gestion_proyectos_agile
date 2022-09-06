@@ -64,10 +64,7 @@ def crear_proyecto(request):
             return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
     else:
         form = ProyectoForm()
-        form.scrum_master.choices = [(proyecto.id, proyecto.nombre) for proyecto in Proyecto.objects.all()]
-        formRol = RolProyectoForm()
-        formRol.permisos = [(permiso.id, permiso.descripcion) for permiso in PermisoProyecto.objects.all()]
-    return render(request, 'proyectos/crear_proyecto.html', {'form': form, 'form_rol': formRol})
+    return render(request, 'proyectos/crear_proyecto.html', {'form': form})
 
 # Recibimos una peticion POST para cancelar un proyecto
 
@@ -131,7 +128,6 @@ def crear_rol_proyecto(request):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
     else:
         form = RolProyectoForm()
-        form.permisos = [(permiso.id, permiso.descripcion) for permiso in PermisoProyecto.objects.all()]
     return render(request, 'proyectos/roles_proyecto/crear_rol_proyecto.html', {'form': form})
 
 # Ver la informacion de un rol de un proyecto en especifico
@@ -182,7 +178,6 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
     else:
         form = RolProyectoForm(initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
-        form.permisos = [(permiso.id, permiso.descripcion) for permiso in PermisoProyecto.objects.all()]
     return render(request, 'proyectos/roles_proyecto/modificar_rol_proyecto.html', {'form': form, 'rol': rol, 'permisos': permisos})
 
 # Eliminar un rol de un proyecto
@@ -234,7 +229,6 @@ def crear_rol_a_proyecto(request, id_proyecto):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.filter(proyecto=id_proyecto)})
     else:
         form = RolProyectoForm()
-        form.permisos = [(permiso.id, permiso.descripcion) for permiso in PermisoProyecto.objects.all()]
     return render(request, 'proyectos/roles_proyecto/crear_rol_proyecto.html', {'form': form, 'id_proyecto': id_proyecto})
 
 # Importar Rol de otros proyectos
@@ -272,5 +266,4 @@ def importar_rol(request, id_proyecto):
 
     else:
         form = ImportarRolProyectoForm()
-        form.choices = [(proyecto.id, proyecto.nombre) for proyecto in Proyecto.objects.all()]
     return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'form': form, 'id_proyecto': id_proyecto})
