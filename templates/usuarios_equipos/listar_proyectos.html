@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block contenido %}
+{% load tiene_rol_en %}
+
+{% for proyecto in user.equipo.all %}
+    <a href="{% url 'vista_equipo' proyecto.id %}">{{ proyecto }}</a>
+    <br>
+{% endfor %}
+
+{% endblock %}

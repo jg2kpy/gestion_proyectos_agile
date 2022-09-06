@@ -2,10 +2,13 @@
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
+
 Examples:
+
 Function views
-    1. Add an import:  from my_app import views
+    1. Add an import: from my_app import views
     2. Add a URL to urlpatterns:  path('', views.home, name='home')
+
 Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
@@ -30,4 +33,6 @@ urlpatterns = [
     path('rolesglobales/<int:id>/editar/', usuarios_views.rol_global_editar, name='rol_global_editar'),
     path('rolesglobales/<int:id>/eliminar/', usuarios_views.rol_global_eliminar, name='rol_global_eliminar'),
     path('rolesglobales/<int:id>/usuarios/', usuarios_views.rol_global_usuarios, name='rol_global_usuarios'),
+    path('usuarios/', include('usuarios.urls'), name='usuarios'),
+    path('perfil/', usuarios_views.perfil, name='perfil')
 ]
