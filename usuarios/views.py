@@ -49,25 +49,63 @@ class RolSistemaForm(forms.ModelForm):
 @never_cache
 def rol_global_list(request):
     """
-    Vista para el menu de roles globales
+    Vista para el menu de roles globales, funcion que maneja el endpoint /rolesglobales/
+
+    :param request: Solicitud HTTP del cliente junto con el body con los datos para la realizar la operacion solicitada
+    :type request: HttpRequest
+
+    :return: Se retorna una respuesta HttpResponse que puede ser un 401 en caso de no tener la autorizacion, 200 en caso de
+        cargar correctamente el contenido
+    :rtype: HttpResponse
     """
+    status = 200
+
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('Usuario no autenticado', status=401)
+
     roles = RolSistema.objects.all()
-    return render(request, 'rol_global/rol_global_list.html', {'roles': roles})
+    return render(request, 'rol_global/rol_global_list.html', {'roles': roles}, status=status)
 
 @never_cache
 def rol_global_info(request, id):
     """
-    Vista para informacion de los roles globales
+    Vista para visualizar informacion de un rol global especifico
+
+    :param request: Solicitud HTTP del cliente junto con el body con los datos para la realizar la operacion solicitada
+    :type request: HttpRequest
+
+    :param id: Id del proyecto que se recibe por URL
+    :type id: int
+
+    :return: Se retorna una respuesta HttpResponse que muestra la página actualizada con código 200 en caso exitoso,
+        401 si no se encuentra logueado
+    :rtype: HttpResponse
     """
+    status = 200
+
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('Usuario no autenticado', status=401)
+
     rol = RolSistema.objects.get(id=id)
-    return render(request, 'rol_global/rol_global_info.html', {'rol': rol})
+    return render(request, 'rol_global/rol_global_info.html', {'rol': rol}, status=status)
 
 @never_cache
 def rol_global_crear(request):
     """
     Vista para creacion y guardado en la base de datos de un rol global
+
+    :param request: Solicitud HTTP del cliente junto con el body con los datos para la realizar la operacion solicitada
+    :type request: HttpRequest
+
+    :return: Se retorna una respuesta HttpResponse que muestra la página actualizada con código 200 en caso exitoso,
+        401 si no se encuentra logueado o 422 si el formulario no fue llenado correctamente o redirecciona a la página
+        rolesglobales/<int:id>/
+    :rtype: HttpResponse
     """
     status = 200
+
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('Usuario no autenticado', status=401)
     
     if request.method == 'POST':
         form = RolSistemaForm(request.POST)
@@ -88,8 +126,23 @@ def rol_global_crear(request):
 def rol_global_editar(request, id):
     """
     Vista para edicion de los atributos de un rol global
+
+    :param request: Solicitud HTTP del cliente junto con el body con los datos para la realizar la operacion solicitada
+    :type request: HttpRequest
+
+    :param id: Id del proyecto que se recibe por URL
+    :type id: int
+
+    :return: Se retorna una respuesta HttpResponse que muestra la página actualizada con código 200 en caso exitoso,
+        401 si no se encuentra logueado o 422 si el formulario no fue llenado correctamente o redirecciona a la página
+        rolesglobales/<int:id>/
+    :rtype: HttpResponse
     """
     status = 200
+
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('Usuario no autenticado', status=401)
+        
     rol = RolSistema.objects.get(id=id)
     
     if request.method == 'POST':
@@ -110,21 +163,51 @@ def rol_global_editar(request, id):
 def rol_global_eliminar(request, id):
     """
     Vista para eliminar un rol global del sistema
+
+    :param request: Solicitud HTTP del cliente junto con el body con los datos para la realizar la operacion solicitada
+    :type request: HttpRequest
+
+    :param id: Id del proyecto que se recibe por URL
+    :type id: int
+
+    :return: Se retorna una respuesta HttpResponse que muestra la página actualizada con código 200 en caso exitoso,
+        401 si no se encuentra logueado o redirecciona a la página rolesglobales/<int:id>/
+    :rtype: HttpResponse
     """
+    status = 200
+
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('Usuario no autenticado', status=401)
+
     rol = RolSistema.objects.get(id=id)
 
     if request.method == 'POST':
         rol.delete()
         return redirect('rol_global_list')
         
-    return render(request, 'rol_global/rol_global_eliminar.html', {'rol': rol})
+    return render(request, 'rol_global/rol_global_eliminar.html', {'rol': rol}, status=status)
 
 @never_cache
 def rol_global_usuarios(request, id):
     """
-    Vista para la vinculacion y desvinculacion de roles globales a un usuario
-    Junto con las restricciones necesarias
+    Vista para la vinculacion y desvinculacion de roles globales a un usuario junto con las restricciones necesarias
+
+    :param request: Solicitud HTTP del cliente junto con el body con los datos para la realizar la operacion solicitada
+    :type request: HttpRequest
+
+    :param id: Id del proyecto que se recibe por URL
+    :type id: int
+
+    :return: Se retorna una respuesta HttpResponse que muestra la página actualizada con código 200 en caso exitoso,
+        401 si no se encuentra logueado o redirecciona a la página rolesglobales/<int:id>/, 422 en caso de no seleccionar
+        un usuario e intentar realizar una operacion
+    :rtype: HttpResponse
     """
+    status = 200
+
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('Usuario no autenticado', status=401)
+
     rol = RolSistema.objects.get(id=id)
 
     if request.method == 'POST':
@@ -132,7 +215,9 @@ def rol_global_usuarios(request, id):
 
         if not nombreUsr:
             estado = 'vacio'
-            return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado})
+            status = 422
+
+            return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado}, status=status)
         
         usuario = Usuario.objects.get(username=nombreUsr)
         
@@ -154,11 +239,11 @@ def rol_global_usuarios(request, id):
             else:
                 estado = 'rol_inexistente'
             
-            return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado, 'usuario': usuario, 'rol': rol})
+            return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado, 'usuario': usuario, 'rol': rol}, status=status)
 
     else:
         usuarios = Usuario.objects.all()
-        return render(request, 'rol_global/rol_global_usuarios.html', {'id': id, 'usuarios': usuarios, 'rol': rol})
+        return render(request, 'rol_global/rol_global_usuarios.html', {'id': id, 'usuarios': usuarios, 'rol': rol}, status=status)
 
 @never_cache
 def vista_equipo(request, proyecto_id):

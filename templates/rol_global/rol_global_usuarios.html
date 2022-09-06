@@ -10,7 +10,7 @@
     <label for="usr"></label>
     <select name="usuarios" id="usr" size="4">
         {% for usuario in usuarios %}
-        <option>{{usuario.username}}</option>
+        <option>{{ usuario.username }}</option>
         {% endfor %}
     </select>
     <input type="submit" value="Vincular" name="vincular"/>
