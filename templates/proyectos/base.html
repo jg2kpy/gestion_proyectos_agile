@@ -36,7 +36,7 @@
                             <td>{{ proyecto.fecha_fin }}</td>
                             <td>{{ proyecto.estado }}</td>
                             <td>
-                                <a href="#" class="btn btn-link"><span class="material-icons">create</span></a>
+                                <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn btn-link"><span class="material-icons">create</span></a>
                                 <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span class="material-icons">cancel</span></a>
                                 <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-link"><span class="material-icons">visibility</span></a>
                             </td>

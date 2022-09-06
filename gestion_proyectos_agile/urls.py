@@ -28,6 +28,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('proyectos/',proyectos_views.proyectos, name='proyectos'),
     path('proyectos/crear/',proyectos_views.crear_proyecto, name='crear_proyecto'),
+    path('proyectos/<int:id_proyecto>/editar/',proyectos_views.editar_proyecto, name='editar_proyecto'),
     path('proyectos/cancelar/<int:id_proyecto>/',proyectos_views.cancelar_proyecto, name='cancelar_proyecto'),
     path('proyectos/roles_proyecto/',proyectos_views.roles_proyecto, name='roles_proyecto'),
     path('proyectos/roles_proyecto/crear/',proyectos_views.crear_rol_proyecto, name='crear_rol_proyecto'),

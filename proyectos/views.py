@@ -66,9 +66,34 @@ def crear_proyecto(request):
         form = ProyectoForm()
     return render(request, 'proyectos/crear_proyecto.html', {'form': form})
 
+#Editar un proyecto
+def editar_proyecto(request, id_proyecto):
+    # Verificamos que el usuario tenga permisos rol de moderador o es el scrum master del proyecto
+    if request.method == 'POST':
+        form = ProyectoForm(request.POST)
+        if form.is_valid():
+            # Editamos el proyecto
+            proyecto = Proyecto.objects.get(id=id_proyecto)
+            proyecto.nombre = form.cleaned_data['nombre']
+            proyecto.descripcion = form.cleaned_data['descripcion']
+            proyecto.fecha_inicio = form.cleaned_data['fecha_inicio']
+            proyecto.fecha_fin = form.cleaned_data['fecha_fin']
+            proyecto.save()
+            return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
+    else:
+        form = ProyectoForm()
+        # cargamos los datos del proyecto
+        proyecto = Proyecto.objects.get(id=id_proyecto)
+        form.fields['nombre'].initial = proyecto.nombre
+        form.fields['descripcion'].initial = proyecto.descripcion
+        #TODO Fix de las fechas de inicio y fin
+        form.fields['fecha_inicio'].initial = proyecto.fecha_creacion
+        form.fields['fecha_fin'].initial = proyecto.fecha_modificacion
+
+
+    return render(request, 'proyectos/editar_proyecto.html', {'form': form})
+
 # Recibimos una peticion POST para cancelar un proyecto
-
-
 def cancelar_proyecto(request, id_proyecto):
     # Verificamos que el usuario tenga permisos rol de moderador o es el scrum master del proyecto
     if request.method == 'POST':
