@@ -246,21 +246,22 @@ def importar_rol(request, id_proyecto):
 
             # Recorremos los roles y creamos nuevos roles con los mismos permisos
             for rol in roles:
-                # Creamos el rol
-                rol_nuevo = RolProyecto()
-                rol_nuevo.nombre = rol.nombre
-                rol_nuevo.descripcion = rol.descripcion
-                rol_nuevo.proyecto = Proyecto.objects.get(id=id_proyecto)
-                rol_nuevo.save()
+                if rol.nombre not in RolProyecto.objects.filter(proyecto=id_proyecto).values_list('nombre', flat=True):
+                    # Creamos el rol
+                    rol_nuevo = RolProyecto()
+                    rol_nuevo.nombre = rol.nombre
+                    rol_nuevo.descripcion = rol.descripcion
+                    rol_nuevo.proyecto = Proyecto.objects.get(id=id_proyecto)
+                    rol_nuevo.save()
 
-                # Traemos los permisos del rol
-                permisos = PermisoProyecto.objects.filter(rol=rol)
+                    # Traemos los permisos del rol
+                    permisos = PermisoProyecto.objects.filter(rol=rol)
 
-                # Recorremos los permisos y los asignamos al rol
-                for permiso in permisos:
-                    # Agregamos el rol al permiso
-                    permiso.rol.add(rol_nuevo)
-                    permiso.save()
+                    # Recorremos los permisos y los asignamos al rol
+                    for permiso in permisos:
+                        # Agregamos el rol al permiso
+                        permiso.rol.add(rol_nuevo)
+                        permiso.save()
 
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.filter(proyecto=id_proyecto)})
 
