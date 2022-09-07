@@ -5,6 +5,18 @@
 {% tiene_rol_en_proyecto user "Scrum Master" proyecto.id as es_master %}
 
 {% if es_master %}
+    <div class="row mt-5">
+        <div class="col-lg-6">
+            {% if mensaje != '' %}
+                <div class="alert alert-danger"><h6>{{ mensaje }}</h6></div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <h3>Miembros de {{ proyecto.nombre }}</h3>
+        </div>
+    </div>
     <div class="row mt-2">
         <div class="col-lg-6">
             <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
@@ -25,11 +37,6 @@
                 <button type="submit" class="btn btn-success">Agregar miembro al proyecto</button>
             </div>
             </form>
-    </div>
-    <div class="row mt-2">
-        <div class="col-lg-6">
-            <h4>Miembros:</h4>
-        </div>
     </div>
     {% for miembros in proyecto.usuario.all %}
     {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
@@ -94,7 +101,7 @@
                     </select>
                 </div>
                 <div class="col-lg-6">
-                    <button type="submit" class="btn btn-primary">Agregar Rol</button>
+                    <button type="submit" class="btn btn-primary">Asignar Rol</button>
                 </div>
                 </form>
         </div>
