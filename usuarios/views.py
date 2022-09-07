@@ -183,9 +183,9 @@ def asignar_rol_proyecto(form, request_user, proyecto_id):
 
         usuario_email = form.get('usuario_a_cambiar_rol')
         rol_id = form.get(f'roles{usuario_email}')
-        usuario_a_eliminar_rol = Usuario.objects.get(email=usuario_email)
+        usuario_a_agregar_rol = Usuario.objects.get(email=usuario_email)
         rol = RolProyecto.objects.get(id=rol_id)
-        usuario_a_eliminar_rol.roles_proyecto.add(rol)
+        usuario_a_agregar_rol.roles_proyecto.add(rol)
 
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
