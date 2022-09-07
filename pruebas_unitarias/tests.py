@@ -77,6 +77,9 @@ class MiembrosRolesTest(TestCase):
     """
 
     def test_listar_proyectos(self):
+        """
+        Prueba de la vista de listar proyectos
+        """
         request_factory = RequestFactory()
         request = request_factory.post('/usuarios/equipo/')
         request.user = AnonymousUser()
@@ -85,7 +88,10 @@ class MiembrosRolesTest(TestCase):
                          'La respuesta no fue un estado HTTP 401 a un usuario no autorizado')
     
     
-    def test_vizualizar_proyecto(self):
+    def test_visualizar_proyecto(self):
+        """
+        Prueba de la vista de visualizar gestion de miembros y roles de proyectos
+        """
         request_factory = RequestFactory()
         request = request_factory.post('/usuarios/equipo/')
         usuarioTest = Usuario(
