@@ -6,12 +6,12 @@
 
 {% if es_master %}
     <div class="row mt-5">
-        <div class="col-lg-12" style="text-align: center;">
+        <div class="col-12" style="text-align: center;">
             <h3>Miembros del Proyecto {{ proyecto.nombre }}</h3>
         </div>
     </div>
     <div class="row mt-2">
-        <div class="col-lg-6">
+        <div class="col-6">
             {% if mensaje %}
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <h6>{{ mensaje }}</h6>
@@ -21,14 +21,14 @@
         </div>
     </div>
     <div class="row mt-2">
-        <div class="col-lg-6">
+        <div class="col-5">
             <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
                 
                 {% csrf_token %}
                 <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
                 <input name="hidden_action" id="hidden_action" hidden value="agregar_miembro_proyecto">
 
-                <label for="usuario_a_agregar">Agregar usuario</label><input type="text" name="usuario_a_agregar" id="usuario_a_agregar" required="">
+                <label for="usuario_a_agregar">Email: </label><input type="text" name="usuario_a_agregar" id="usuario_a_agregar" required="">
                 <select name="roles_agregar" id="roles_agregar">
                     {% for rol in proyecto.proyecto_rol.all %}
                         <option value="{{ rol.id }}" name="rol" id="rol">{{ rol.nombre }}</option>
@@ -36,8 +36,8 @@
                 </select>
 
             </div>
-            <div class="col-lg-6">
-                <button type="submit" class="btn btn-primary">Agregar miembro al proyecto</button>
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary">Agregar usuario al proyecto</button>
             </div>
             </form>
     </div>
@@ -45,7 +45,7 @@
     <hr>
     {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
         <div class="row mt-2">
-            <div class="col-lg-6">
+            <div class="col-5">
                 <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
 
                     {% csrf_token %}
@@ -59,19 +59,16 @@
                         <p>{{ miembros.get_full_name }} ({{ miembros.email }})</p>
                     {% endif %}
                 </div>
-                <div class="col-lg-6">
-                    <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
-                </div>
+                {% if user != miembros%}
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
+                    </div>
+                {% endif %}
                 </form>
-        </div>
-        <div class="row mt-2">
-            <div class="col-lg-12">
-                <p>Roles:</p>
-            </div>
         </div>
         {% for r in rolesActual %}
             <div class="row mt-2">
-                <div class="col-6">
+                <div class="col-5 ">
                     <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
 
                         {% csrf_token %}
@@ -80,7 +77,7 @@
                         <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
                         <input name="rol_id" id="rol_id" hidden value="{{ r.id }}">
 
-                        <p>{{ r.nombre }}</p>
+                        <p> - {{ r.nombre }}</p>
                         </div>
                         <div class="col-6">
                             <button type="submit" class="btn btn-primary">Desasignar rol</button>
@@ -92,7 +89,7 @@
         {% tiene_todos_los_roles miembros proyecto as tiene_todo %}
         {% if tiene_todo %}
         <div class="row mt-2">
-            <div class="col-lg-6">
+            <div class="col-5">
                 <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
 
                     {% csrf_token %}
@@ -108,7 +105,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-6">
                     <button type="submit" class="btn btn-primary">Asignar Rol</button>
                 </div>
                 </form>
@@ -116,24 +113,29 @@
         {% endif %}
     {% endfor %}
 {% else %}
+    <div class="row mt-5">
+        <div class="col-12" style="text-align: center;">
+            <h3>Miembros del Proyecto {{ proyecto.nombre }}</h3>
+        </div>
+    </div>
     {% for miembros in proyecto.usuario.all %}
     {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
+        <hr>
         <div class="row mt-2">
-            <div class="col-lg-12">
-                <h4>{{ miembros.get_full_name }} ( {{ miembros.email }} )</h4>
+            <div class="col-12">
+                {% if miembros.get_full_name == '' %}
+                    <p>{{ miembros.email }}</p>
+                {% else %}
+                    <p>{{ miembros.get_full_name }} ({{ miembros.email }})</p>
+                {% endif %}
             </div>
         </div>
-        <div class="row mt-2">
-            <div class="col-lg-12">
-                <h5>Roles:</h5>
-            </div>
-        </div>
-        {% for r in rolesActual %}
-            <div class="row mt-2">
-                <div class="col-lg-12 offset-lg-2">
-                    <p>{{ r }}</p>
+            {% for r in rolesActual %}
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <p>{{ r.nombre }}</p>
+                    </div>
                 </div>
-            </div>
         {% endfor %}
     {% endfor %}
 {% endif %}
