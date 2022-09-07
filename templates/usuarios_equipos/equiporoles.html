@@ -6,39 +6,43 @@
 
 {% if es_master %}
     <div class="row mt-5">
-        <div class="col-lg-6">
-            {% if mensaje != '' %}
-                <div class="alert alert-danger"><h6>{{ mensaje }}</h6></div>
-            {% endif %}
+        <div class="col-lg-12" style="text-align: center;">
+            <h3>Miembros del Proyecto {{ proyecto.nombre }}</h3>
         </div>
     </div>
-    <div class="row mt-5">
-        <div class="col-lg-12">
-            <h3>Miembros de {{ proyecto.nombre }}</h3>
+    <div class="row mt-2">
+        <div class="col-lg-6">
+            {% if mensaje %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h6>{{ mensaje }}</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endif %}
         </div>
     </div>
     <div class="row mt-2">
         <div class="col-lg-6">
             <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
-
+                
                 {% csrf_token %}
                 <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
                 <input name="hidden_action" id="hidden_action" hidden value="agregar_miembro_proyecto">
 
-                <label for="usuario_a_agregar">Agregar usuario: </label><input type="text" name="usuario_a_agregar" id="usuario_a_agregar" required="">
+                <label for="usuario_a_agregar">Agregar usuario</label><input type="text" name="usuario_a_agregar" id="usuario_a_agregar" required="">
                 <select name="roles_agregar" id="roles_agregar">
                     {% for rol in proyecto.proyecto_rol.all %}
-                        <option value="{{ rol.id }}" name="rol" id="rol">{{ rol}}</option>
+                        <option value="{{ rol.id }}" name="rol" id="rol">{{ rol.nombre }}</option>
                     {% endfor %}
                 </select>
 
             </div>
             <div class="col-lg-6">
-                <button type="submit" class="btn btn-success">Agregar miembro al proyecto</button>
+                <button type="submit" class="btn btn-primary">Agregar miembro al proyecto</button>
             </div>
             </form>
     </div>
     {% for miembros in proyecto.usuario.all %}
+    <hr>
     {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
         <div class="row mt-2">
             <div class="col-lg-6">
@@ -49,7 +53,11 @@
                     <input name="usuario_a_eliminar" id="usuario_a_eliminar" hidden value="{{ miembros.email }}">
                     <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
 
-                    <p>{{ miembros.email }}</p>
+                    {% if miembros.get_full_name == '' %}
+                        <p>{{ miembros.email }}</p>
+                    {% else %}
+                        <p>{{ miembros.get_full_name }} ({{ miembros.email }})</p>
+                    {% endif %}
                 </div>
                 <div class="col-lg-6">
                     <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
@@ -58,7 +66,7 @@
         </div>
         <div class="row mt-2">
             <div class="col-lg-12">
-                <h5>Roles:</h5>
+                <p>Roles:</p>
             </div>
         </div>
         {% for r in rolesActual %}
@@ -72,10 +80,10 @@
                         <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
                         <input name="rol_id" id="rol_id" hidden value="{{ r.id }}">
 
-                        {{ r.nombre }}
+                        <p>{{ r.nombre }}</p>
                         </div>
                         <div class="col-6">
-                            <button type="submit" class="btn btn-warning">Desasignar rol</button>
+                            <button type="submit" class="btn btn-primary">Desasignar rol</button>
                         </div>
                         </form>
                 </div>
@@ -95,7 +103,7 @@
                     <select name="roles{{ miembros.email }}" id="roles{{ miembros.email }}">
                         {% for rol in proyecto.proyecto_rol.all %}
                             {% if not rol in rolesActual %}
-                                <option value="{{ rol.id }}" name="rol{{ rol.id }}" id="rol{{ rol.id }}">{{ rol }}</option>
+                                <option value="{{ rol.id }}" name="rol{{ rol.id }}" id="rol{{ rol.id }}">{{ rol.nombre }}</option>
                             {% endif %}
                         {% endfor %}
                     </select>
@@ -112,7 +120,7 @@
     {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
         <div class="row mt-2">
             <div class="col-lg-12">
-                <h4>{{ miembros.email }}</h4>
+                <h4>{{ miembros.get_full_name }} ( {{ miembros.email }} )</h4>
             </div>
         </div>
         <div class="row mt-2">
