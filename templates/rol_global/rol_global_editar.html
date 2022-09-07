@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block contenido %}
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+
+<a href="{% url 'rol_global_list' %}">Volver a <b>Roles Globales</b></a>
+{% endblock %}
+       
