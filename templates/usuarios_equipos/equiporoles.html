@@ -5,7 +5,7 @@
 {% tiene_rol_en_proyecto user "Scrum Master" proyecto.id as es_master %}
 
 {% if es_master %}
-    <div class="row mt-4">
+    <div class="row mt-2">
         <div class="col-lg-6">
             <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
 
@@ -26,14 +26,14 @@
             </div>
             </form>
     </div>
-    <div class="row mt-4">
+    <div class="row mt-2">
         <div class="col-lg-6">
             <h4>Miembros:</h4>
         </div>
     </div>
     {% for miembros in proyecto.usuario.all %}
     {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
-        <div class="row mt-4">
+        <div class="row mt-2">
             <div class="col-lg-6">
                 <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
 
@@ -49,13 +49,13 @@
                 </div>
                 </form>
         </div>
-        <div class="row mt-4">
+        <div class="row mt-2">
             <div class="col-lg-12">
                 <h5>Roles:</h5>
             </div>
         </div>
         {% for r in rolesActual %}
-            <div class="row mt-4">
+            <div class="row mt-2">
                 <div class="col-6">
                     <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
 
@@ -76,7 +76,7 @@
 
         {% tiene_todos_los_roles miembros proyecto as tiene_todo %}
         {% if tiene_todo %}
-        <div class="row mt-4">
+        <div class="row mt-2">
             <div class="col-lg-6">
                 <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
 
@@ -103,18 +103,18 @@
 {% else %}
     {% for miembros in proyecto.usuario.all %}
     {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
-        <div class="row mt-4">
+        <div class="row mt-2">
             <div class="col-lg-12">
                 <h4>{{ miembros.email }}</h4>
             </div>
         </div>
-        <div class="row mt-4">
+        <div class="row mt-2">
             <div class="col-lg-12">
                 <h5>Roles:</h5>
             </div>
         </div>
         {% for r in rolesActual %}
-            <div class="row mt-4">
+            <div class="row mt-2">
                 <div class="col-lg-12 offset-lg-2">
                     <p>{{ r }}</p>
                 </div>
