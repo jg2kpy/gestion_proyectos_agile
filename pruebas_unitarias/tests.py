@@ -81,40 +81,53 @@ class MiembrosRolesTest(TestCase):
         Prueba de la vista de listar proyectos
         """
         request_factory = RequestFactory()
-        request = request_factory.post('/usuarios/equipo/')
+        request = request_factory.get('/usuarios/equipo/')
         request.user = AnonymousUser()
         response = listar_proyectos(request)
         self.assertEqual(response.status_code, 401,
                          'La respuesta no fue un estado HTTP 401 a un usuario no autorizado')
     
     
-    def test_visualizar_proyecto(self):
+    def test_get_visualizar_proyecto(self):
         """
         Prueba de la vista de visualizar gestion de miembros y roles de proyectos
         """
         request_factory = RequestFactory()
-        request = request_factory.post('/usuarios/equipo/')
-        usuarioTest = Usuario(
-            username="test", email='normal@user.com', password='foo')
-        master = Usuario(username="master",
-                         email='master@user.com', password='foo')
-        usuarioTest.save()
-        master.save()
 
-        proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=master)
+        usuario_no_miembro = Usuario(username="test", email='normal@user.com', password='foo')
+        usuario_miembro = Usuario(username="master",email='master@user.com', password='foo')
+        usuario_no_miembro.save()
+        usuario_miembro.save()
+
+        proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=usuario_miembro)
         proyectoTest.save()
+        usuario_miembro.equipo.add(proyectoTest)
+        
+        request = request_factory.get(f'/usuarios/equipo/{proyectoTest.id}')
+        request.user = AnonymousUser()
+        response = vista_equipo(request, proyectoTest.id)
+        self.assertEqual(response.status_code, 401,
+                         'La respuesta no fue un estado HTTP 401 a un usuario no autorizado')
 
-        scrum = RolProyecto(nombre="Scrum Master", proyecto=proyectoTest)
-        rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
-        scrum.save()
-        rolTest.save()
-        master.roles_proyecto.add(scrum)
+        request = request_factory.get(f'/usuarios/equipo/{proyectoTest.id}')
+        request.user = usuario_miembro
+        response = vista_equipo(request, proyectoTest.id)
+        self.assertEqual(response.status_code, 200,
+                         'La respuesta no fue un estado HTTP 200 a un usuario no autorizado para esta operacion')
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}')
-        request.user = usuarioTest
+        request = request_factory.get(f'/usuarios/equipo/{proyectoTest.id}')
+        request.user = usuario_no_miembro
         response = vista_equipo(request, proyectoTest.id)
         self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 403 a un usuario no autorizado para esta operacion')
+             
+        proyectoTest.delete()
+        
+        request = request_factory.get(f'/usuarios/equipo/{proyectoTest.id}')
+        request.user = usuario_miembro
+        response = vista_equipo(request, proyectoTest.id)
+        self.assertEqual(response.status_code, 404,
+                         'La respuesta no fue un estado HTTP 404 ante una pagina que no existe')
 
 
     def test_agregar_miembro_proyecto(self):
@@ -122,23 +135,22 @@ class MiembrosRolesTest(TestCase):
         Prueba de la vista de agregar miembro de un proyecto
         """
         request_factory = RequestFactory()
-        request = request_factory.post('/usuarios/equipo/')
-        usuarioTest = Usuario(
-            username="test", email='normal@user.com', password='foo')
-        master = Usuario(username="master",
-                         email='master@user.com', password='foo')
+
+        usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
+        master = Usuario(username="master",email='master@user.com', password='foo')
         usuarioTest.save()
         master.save()
 
         proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=master)
         proyectoTest.save()
+        master.equipo.add(proyectoTest)
 
         scrum = RolProyecto(nombre="Scrum Master", proyecto=proyectoTest)
         rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
         scrum.save()
         rolTest.save()
         master.roles_proyecto.add(scrum)
-
+        
         request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
             'usuario_a_agregar': usuarioTest.email,
             'roles_agregar': rolTest.id,
@@ -178,26 +190,23 @@ class MiembrosRolesTest(TestCase):
         Prueba de la vista de eliminar miembro de un proyecto
         """
         request_factory = RequestFactory()
-        request = request_factory.post('usuarios/equipo/')
 
-        usuarioTest = Usuario(
-            username="test", email='normal@user.com', password='foo')
-        master = Usuario(username="master",
-                         email='master@user.com', password='foo')
+        usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
+        master = Usuario(username="master", email='master@user.com', password='foo')
         usuarioTest.save()
         master.save()
 
         proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=master)
         proyectoTest.save()
 
+        master.equipo.add(proyectoTest)
+        usuarioTest.equipo.add(proyectoTest)
+
         scrum = RolProyecto(nombre="Scrum Master", proyecto=proyectoTest)
         rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
         scrum.save()
         rolTest.save()
         master.roles_proyecto.add(scrum)
-
-        master.equipo.add(proyectoTest)
-        usuarioTest.equipo.add(proyectoTest)
         usuarioTest.roles_proyecto.add(rolTest)
 
         request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
@@ -224,6 +233,7 @@ class MiembrosRolesTest(TestCase):
         })
         request.user = master
         response = vista_equipo(request, proyectoTest.id)
+
         self.assertEqual(response.status_code, 302,
                          'La respuesta no fue un estado HTTP 302 ante una presunta operacion exitosa')
         self.assertFalse(proyectoTest in usuarioTest.equipo.all(),
@@ -236,7 +246,6 @@ class MiembrosRolesTest(TestCase):
         Prueba de la vista de asignar rol de proyecto a un miembro
         """
         request_factory = RequestFactory()
-        request = request_factory.post('usuarios/equipo')
 
         usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
         master = Usuario(username="master", email='master@user.com', password='foo')
@@ -246,12 +255,15 @@ class MiembrosRolesTest(TestCase):
         proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=master)
         proyectoTest.save()
 
+        usuarioTest.equipo.add(proyectoTest)
+        master.equipo.add(proyectoTest)
+
         scrum = RolProyecto(nombre="Scrum Master", proyecto=proyectoTest)
         rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
         scrum.save()
         rolTest.save()
         master.roles_proyecto.add(scrum)
-
+        
         request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
             'usuario_a_cambiar_rol': usuarioTest.username,
             f'roles{usuarioTest.username}': rolTest.id,
@@ -281,6 +293,7 @@ class MiembrosRolesTest(TestCase):
         response = vista_equipo(request, proyectoTest.id)
         self.assertEqual(response.status_code, 302,
                          'La respuesta no fue un estado HTTP 302 ante una presunta operacion exitosa')
+        
         self.assertTrue(rolTest in usuarioTest.roles_proyecto.all(),
                         'El usuario tiene el rol asignado en el proyecto')
 
@@ -289,24 +302,26 @@ class MiembrosRolesTest(TestCase):
         Prueba de la vista de desasignar rol de proyecto a un miembro
         """
         request_factory = RequestFactory()
-        request = request_factory.post('usuarios/equipo')
 
         usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
-        master = Usuario(username="master",
-                         email='master@user.com', password='foo')
+        master = Usuario(username="master",email='master@user.com', password='foo')
         usuarioTest.save()
         master.save()
 
         proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=master)
         proyectoTest.save()
 
+        master.equipo.add(proyectoTest)
+        usuarioTest.equipo.add(proyectoTest)
+
         scrum = RolProyecto(nombre="Scrum Master", proyecto=proyectoTest)
         rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
         scrum.save()
         rolTest.save()
+
         master.roles_proyecto.add(scrum)
         usuarioTest.roles_proyecto.add(rolTest)
-
+        
         request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
             'usuario_a_sacar_rol': usuarioTest.email,
             'rol_id': rolTest.id,
@@ -336,6 +351,7 @@ class MiembrosRolesTest(TestCase):
         response = vista_equipo(request, proyectoTest.id)
         self.assertEqual(response.status_code, 302,
                          'La respuesta no fue un estado HTTP 302 ante una presunta operacion exitosa')
+        
         self.assertFalse(rolTest in usuarioTest.roles_proyecto.all(),
                          'El usuario tiene el rol asignado en el proyecto')
 
