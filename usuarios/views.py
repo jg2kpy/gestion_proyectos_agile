@@ -17,7 +17,7 @@ Las vistas relacionadas al package de usuarios
 
 @never_cache
 def vista_equipo(request, proyecto_id):
-    """Vista de equipo, funcion que maneja el endpoint /usuarios/equipo
+    """Vista de equipo, funcion que maneja el endpoint /usuarios/equipo/<proyecto_id>
 
     :param request: Solicitud HTTP del cliente junto con el body con los datos para la realizar la operacion solicitada
     :type request: HttpRequest
@@ -25,7 +25,7 @@ def vista_equipo(request, proyecto_id):
     :param proyecto_id: Id del proyecto que se recibe por URL
     :type proyecto_id: int
 
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar nuevamente a la pagina /usuarios/equipo
+    :return: Se retorna una respuesta HttpResponse que puede ser un 401 (no autorizado), 404 (proyecto no existe) o 403 (no tiene permiso de ver este proyecto), en caso de ser una peticion GET, se retorna el HTML correspondiente o en POST se realiza la accion solicitada
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
@@ -59,13 +59,13 @@ def eliminar_miembro_proyecto(form, request_user, proyecto_id):
     :param form: Un objeto similar a un diccionario que contiene todos los parámetros HTTP POST dados.
     :type form: QueryDict
 
-    :param proyecto_id: Id del proyecto que se recibe por URL
-    :type proyecto_id: int
-
     :param request_user: Objeto de tipo Usuario del cual se realizo la peticion HTTP
     :type request_user: Usuario
 
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar a la pagina principal
+    :param proyecto_id: Id del proyecto que se recibe por URL
+    :type proyecto_id: int
+
+    :return: Se retorna una respuesta HttpResponse que puede ser un 403 en caso de no tener la autorizacion, 422 en caso que el formulario tenga datos erroneos o retornar a la pagina principal
     :rtype: HttpResponse
     """
 
@@ -101,7 +101,7 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
     :param proyecto_id: Id del proyecto que se recibe por URL
     :type proyecto_id: int
 
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar a la pagina principal
+    :return: Se retorna una respuesta HttpResponse que puede ser un 403 en caso de no tener la autorizacion, 422 en caso que el formulario tenga datos erroneos o retornar a la pagina principal
     :rtype: HttpResponse
     """
 
@@ -139,7 +139,7 @@ def eliminar_rol_proyecto(form, request_user, proyecto_id):
     :param proyecto_id: Id del proyecto que se recibe por URL
     :type proyecto_id: int
 
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar a la pagina principal
+    :return: Se retorna una respuesta HttpResponse que puede ser un 403 en caso de no tener la autorizacion, 422 en caso que el formulario tenga datos erroneos o retornar a la pagina principal
     :rtype: HttpResponse
     """
 
@@ -166,10 +166,13 @@ def asignar_rol_proyecto(form, request_user, proyecto_id):
     :param form: Un objeto similar a un diccionario que contiene todos los parámetros HTTP POST dados.
     :type form: QueryDict
 
+    :param request_user: Objeto de tipo Usuario del cual se realizo la peticion HTTP
+    :type request_user: Usuario
+
     :param proyecto_id: Id del proyecto que se recibe por URL
     :type proyecto_id: int
 
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar a la pagina principal
+    :return: Se retorna una respuesta HttpResponse que puede ser un 403 en caso de no tener la autorizacion, 422 en caso que el formulario tenga datos erroneos o retornar a la pagina principal
     :rtype: HttpResponse
     """
 
