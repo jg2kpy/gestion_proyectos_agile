@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Proyecto
-from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm, ImportarRolProyectoForm
+from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 from django.views.decorators.cache import never_cache
 
@@ -297,6 +297,8 @@ def importar_rol(request, id_proyecto):
             proyecto = Proyecto.objects.get(nombre = request.GET.get('proyectos'))
             roles = RolProyecto.objects.filter(proyecto = proyecto)
         else:# Este es el GET cuando se llama desde otra pagina
+            if proyectos.count() == 0:
+                return redirect('crear_proyecto')
             proyecto = proyectos[0]
             roles = RolProyecto.objects.filter(proyecto = proyectos[0])
         
