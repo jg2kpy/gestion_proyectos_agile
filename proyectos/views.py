@@ -340,9 +340,11 @@ def ver_rol_proyecto(request, id_rol_proyecto):
     if not request_user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
 
-    #Verificar que solo el administrador puede ver los roles de proyectos
-    if not tiene_rol_en_sistema(request_user, 'gpa_admin') and not tiene_rol_en_sistema(request_user, 'Scrum Master', proyecto):
-        return HttpResponse('No tiene permisos para ver los roles de proyectos', status=403)
+    #Si es proyecto None entonces si o si tiene que ser un gpa_admin
+    if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+        return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
+    elif proyecto is not None and not tiene_rol_en_proyecto(request_user,'Scrum Master', proyecto):
+        return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
 
 
     # Traemos los permisos del rol
@@ -380,8 +382,12 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
 
     proyecto = rol.proyecto
 
-    if not tiene_rol_en_proyecto(request_user, proyecto, 'gpa_admin') and not tiene_rol_en_proyecto(request_user,'ScrumMaster', proyecto):
-        return HttpResponse('No tiene permisos para modificar roles de proyectos', status=403)
+    #Si es proyecto None entonces si o si tiene que ser un gpa_admin
+    if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+        return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
+    elif proyecto is not None and not tiene_rol_en_proyecto(request_user,'Scrum Master', proyecto):
+        return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
+
 
     # Traemos los permisos del rol
     permisos = PermisoProyecto.objects.filter(rol=rol)
@@ -442,8 +448,12 @@ def eliminar_rol_proyecto(request, id_rol_proyecto):
 
     proyecto = rol.proyecto
 
-    if not tiene_rol_en_proyecto(request_user, proyecto, 'gpa_admin') and not tiene_rol_en_proyecto(request_user,'ScrumMaster', proyecto):
-        return HttpResponse('No tiene permisos para modificar roles de proyectos', status=403)
+    #Si es proyecto None entonces si o si tiene que ser un gpa_admin
+    if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+        return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
+    elif proyecto is not None and not tiene_rol_en_proyecto(request_user,'Scrum Master', proyecto):
+        return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
+
 
     if request.method == 'POST':
         rol = RolProyecto.objects.get(id=id_rol_proyecto)
@@ -477,7 +487,7 @@ def ver_roles_asignados(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
     
     #Verificar que solo el administrador puede crear roles de proyectos
-    if not tiene_rol_en_sistema(request_user, 'gpa_admin') and not tiene_rol_en_proyecto(request_user, 'ScrumMaster', proyecto):
+    if not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto):
         return HttpResponse('No tiene permisos para ver los roles de proyectos', status=403)
     
     # Traemos los roles que tengan el id del proyecto
@@ -514,9 +524,12 @@ def crear_rol_a_proyecto(request, id_proyecto):
     if not request_user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
     
-    # Verificacion que o es SrumMaster o es admin del sistema
-    if not tiene_rol_en_proyecto(request_user, 'ScrumMaster', proyecto) and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
-        return HttpResponse('No tiene permisos para crear roles de proyecto', status=403)
+    #Si es proyecto None entonces si o si tiene que ser un gpa_admin
+    if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+        return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
+    elif proyecto is not None and not tiene_rol_en_proyecto(request_user,'Scrum Master', proyecto):
+        return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
+
 
 
 
@@ -575,7 +588,7 @@ def importar_rol(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
 
     # Verificacion que o es SrumMaster o es admin del sistema
-    if not tiene_rol_en_proyecto(request_user, 'ScrumMaster', proyecto) and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+    if not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto): 
         return HttpResponse('No tiene permisos para importar roles de proyecto', status=403)
 
     if request.method == 'POST':
