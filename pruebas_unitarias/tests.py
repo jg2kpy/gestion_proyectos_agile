@@ -1187,6 +1187,7 @@ class ProyectoTests(TestCase):
         request.user = usuarioTest2
         response = importar_rol(request, proyecto.id)
         self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a un usuario Scrum Master')
-        
+
+
 
 

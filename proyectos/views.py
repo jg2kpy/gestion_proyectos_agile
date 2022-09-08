@@ -416,8 +416,10 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
                     # Eliminamos el rol del permiso
                     permiso.rol.remove(rol)
                     permiso.save()
-
+        if (rol.proyecto is None):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
+        else:
+            return redirect(f'/proyectos/{rol.proyecto.id}/roles/')
     else:
         form = RolProyectoForm(initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
     return render(request, 'proyectos/roles_proyecto/modificar_rol_proyecto.html', {'form': form, 'rol': rol, 'permisos': permisos})
@@ -458,7 +460,10 @@ def eliminar_rol_proyecto(request, id_rol_proyecto):
     if request.method == 'POST':
         rol = RolProyecto.objects.get(id=id_rol_proyecto)
         rol.delete()
-        return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
+        if (rol.proyecto is None):
+            return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
+        else:
+            return redirect(f'/proyectos/{rol.proyecto.id}/roles/')
     return render(request, 'proyectos/roles_proyecto/eliminar_rol_proyecto.html', {'rol_proyecto': RolProyecto.objects.get(id=id_rol_proyecto)})
 
 
@@ -556,7 +561,7 @@ def crear_rol_a_proyecto(request, id_proyecto):
                     permiso.rol.add(rol)
                     permiso.save()
 
-            return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.filter(proyecto=id_proyecto)})
+            return redirect(f'/proyectos/{id_proyecto}/roles/')
     else:
         form = RolProyectoForm()
     return render(request, 'proyectos/roles_proyecto/crear_rol_proyecto.html', {'form': form, 'id_proyecto': id_proyecto})
@@ -632,4 +637,4 @@ def importar_rol(request, id_proyecto):
             proyecto = proyectos[0]
             roles = RolProyecto.objects.filter(proyecto = proyectos[0])
         
-    return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto, 'roles': roles})
+    return redirect(f'/proyectos/{id_proyecto}/roles/')
