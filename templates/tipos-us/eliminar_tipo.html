@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Esta a punto de eliminar el tipo de historia de usuario "{{ tipo.nombre }}"</h3>
+        </div>
+    </div>
+    <div class="row">
+        <p>¿Estas seguro que deseas eliminar este tipo de historia de usuario?</p>
+        <div class="col-md-12">
+            <form action="." method="POST">
+                {% csrf_token %}
+                <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="btn btn-light">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Borrar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

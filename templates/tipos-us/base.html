@@ -1,3 +1,39 @@
 {% extends "base.html" %}
 {% block contenido %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Tipos de historias de usuario</h1>
+        </div>
+        <div>
+            <a href="{% url 'crearTipoHistoriaUsuario' proyecto.id %}" class="btn btn-primary">Crear rol</a>
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tipo in tipos %}
+                <tr>
+                    <th>{{ tipo.id }}</th>
+                    <td>{{ tipo.nombre }}</td>
+                    <td>{{ tipo.descripcion }}</td>
+                    <td>
+                        <a href="{% url 'editarTipoHistoriaUsuario' proyecto.id tipo.id %}" class="btn btn-link"><span
+                                class="material-icons">create</span></a>
+                        <a href="{% url 'borrarTipoHistoriaUsuario' proyecto.id tipo.id %}" class="btn btn-link"><span
+                                class="material-icons">delete</span></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </div>
+</div>
 {% endblock %}
