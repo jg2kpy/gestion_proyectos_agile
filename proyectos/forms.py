@@ -41,8 +41,6 @@ class ProyectoForm(forms.Form):
     """
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
-    fecha_inicio = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control'}))
-    fecha_fin = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control'}))
     scrum_master = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
 
     def __init__(self, *args, **kwargs):

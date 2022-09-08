@@ -1,4 +1,6 @@
+import email
 import os
+from urllib import response
 from django import setup
 os.environ.setdefault("DJANGO_SETTINGS_MODULE","gestion_proyectos_agile.settings")
 setup()
@@ -9,11 +11,12 @@ from django.test.client import RequestFactory
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, User
 
-from usuarios.models import RolSistema
+from usuarios.models import PermisoProyecto, RolSistema
 from proyectos.models import Proyecto
 from usuarios.views import listar_proyectos, vista_equipo
 from usuarios.models import RolProyecto, Usuario
 from phonenumber_field.modelfields import PhoneNumber
+from proyectos.views import cancelar_proyecto, proyectos,crear_proyecto, editar_proyecto, roles_proyecto, crear_rol_proyecto
 
 
 class UsuariosTests(TestCase):
@@ -406,3 +409,253 @@ class PerfilTests(TestCase):
                             "Usuario loguedao puede ver su perfil con direccion cambiado después de un post")
         self.assertContains(res, 'avatar2@example.com', 3, 200,
                             "Usuario loguedao puede ver su perfil con foto cambiado después de un post")
+
+
+class ProyectoTests(TestCase):
+
+    def test_ver_proyectos(self):
+        """
+        Prueba que el usuario puede ver los proyectos
+        """
+        request_factory = RequestFactory()
+        request = request_factory.get('/proyectos/')
+        request.user = AnonymousUser()
+        response = proyectos(request)
+        self.assertEqual(response.status_code, 401, "Usuario puede ver los proyectos pero no esta autenticado")
+        
+        #Creamos un usuario con roles del sistema Admin
+        master = Usuario(username="master",
+                         email='master@user.com', password='foo')
+        master.save()
+        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
+        
+        #Creamos un usuario sin roles de admin
+        user = Usuario(username="user",
+                        email='user@user.com', password='foo')
+        user.save()
+
+        #Verificamos que el usuario sin de admin puede ver los proyectos
+        request.user = user
+        response = proyectos(request)
+        self.assertEqual(response.status_code, 403, "Usuario puede ver los proyectos pero no tiene roles de gpa_admin")
+
+        #Verificamos que el usuario puede ver los proyectos
+        request.user = master
+        response = proyectos(request)
+        self.assertEqual(response.status_code, 200, "Usuario no puede ver los proyectos")
+        
+
+
+
+    def test_crear_proyecto(self):
+        """
+        Prueba que el usuario puede crear un proyecto
+        """
+        request_factory = RequestFactory()
+        request = request_factory.post('/proyectos/crear/')
+        request.user = AnonymousUser()
+        response = crear_proyecto(request)
+        self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autorizado')
+        
+        #Verificar que gpa_admin puede crear proyectos
+        usuarioTest = Usuario(
+            username="test", email='normal@user.com', password='foo')
+        master = Usuario(username="master",
+                         email='master@user.com', password='foo')
+        master.save()
+        usuarioTest.save()
+
+        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
+        
+        request.user = usuarioTest
+        response = crear_proyecto(request)
+        self.assertEqual(response.status_code, 403, 'La respuesta no fue un estado HTTP 403 a un usuario sin permisos GPA_ADMIN')
+
+        #Verfificamos la creacion de un proyecto
+        request = request_factory.post('/proyectos/crear/', {'nombre': 'Proyecto de prueba', 'descripcion': 'Descripcion de prueba', 'scrum_master': master.id})
+        request.user = master
+        response = crear_proyecto(request)
+        self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 de la creacion de un proyecto')
+
+        #Verificamos que el proyecto se creo correctamente
+        proyecto = Proyecto.objects.get(nombre='Proyecto de prueba')
+        self.assertEqual(proyecto.nombre, 'Proyecto de prueba', 'El nombre del proyecto no es el correcto')
+        self.assertEqual(proyecto.descripcion, 'Descripcion de prueba', 'La descripcion del proyecto no es la correcta')
+        self.assertEqual(proyecto.scrumMaster, master, 'El scrum master del proyecto no es el correcto')
+        self.assertEqual(proyecto.estado, 'Planificacion', 'El estado del proyecto no es el correcto')
+
+
+
+    def test_editar_proyecto(self):
+        """
+        Prueba que el usuario puede editar un proyecto
+        """
+        #Iniciamos seccion con acceso de Admin
+        master = Usuario(username="master",
+                         email='master@user.com', password='foo')
+        master.save()
+        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
+
+
+        # Creamos un proyecto y lo guardamos en la base de datos 
+        proyecto = Proyecto(nombre="Proyecto de prueba", descripcion="Descripcion de prueba", estado="Planificacion", scrumMaster=master)
+        proyecto.save()
+
+        # Creamos un usuario que no este logueado
+        usuarioTest = Usuario(
+            username="test",
+            email='test@example.com',
+            password='foo'
+        )
+        usuarioTest.save()
+
+        #Creamos la solicitud
+        request_factory = RequestFactory()
+        request = request_factory.post(f'/proyectos/{proyecto.id}/editar')
+
+        #Verficicamos un usuario no logueado
+        request.user = AnonymousUser()
+        response = editar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
+        
+        #Verficicamos un usuario logueado sin permisos
+        request.user = usuarioTest
+        response = editar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 403, 'La respuesta no fue un estado HTTP 403 a un usuario sin permisos')
+
+        #Verficicamos la edicion correcta de un proyecto
+        request  = request_factory.post(f'/proyectos/{proyecto.id}/editar', {'nombre': 'Proyecto de prueba 2', 'descripcion': 'Descripcion de prueba 2'})
+        request.user = master
+        response = editar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 422, 'La respuesta no fue un estado HTTP 422 a una petición incorrecta')
+
+        #Verficicamos la edicion correcta de un proyecto
+        request  = request_factory.post(f'/proyectos/{proyecto.id}/editar', {'nombre': 'Proyecto de prueba 22', 'descripcion': 'Descripcion de prueba 2', 'estado': 'Planificacion', 'scrumMaster': master.id})
+        request.user = master
+        response = editar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 422, 'La respuesta fue un estado HTTP 422 a una petición correcta')
+        self.assertFalse(Proyecto.objects.filter(nombre="Proyecto de prueba 22").exists(), 'El proyecto no se edito correctamente')
+        
+
+    def test_cancelar_proyecto(self):
+        """
+        Prueba que el usuario puede cancelar un proyecto
+        """
+        
+        #Creamos un usuario gpa_admin
+        master = Usuario(username="master",
+                         email='master@user.com', password='foo')
+        master.save()
+        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
+
+        #Creamos un proyecto de prueba
+        proyecto = Proyecto(nombre="Proyecto de prueba", descripcion="Descripcion de prueba", estado="Planificacion", scrumMaster=master)
+        proyecto.save()
+        
+        #Verificamos que un usuario no logueado no puede cancelar un proyecto
+        request_factory = RequestFactory()
+        request = request_factory.get(f'proyectos/cancelar/{proyecto.id}/')
+        request.user = AnonymousUser()
+        response = cancelar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
+
+        #Verificamos que un usuario sin permisos no puede cancelar un proyecto
+        usuarioTest = Usuario(username="test",email='user@user.com', password='foo')
+        usuarioTest.save()
+        request.user = usuarioTest
+        response = cancelar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 403, 'La respuesta no fue un estado HTTP 403 a un usuario sin permisos')
+
+        #Verificamos que un usuario con permisos puede cancelar un proyecto
+        request = request_factory.post(f'proyectos/cancelar/{proyecto.id}/', {'nombre':'Proyecto de prueba'})
+        request.user = master
+        response = cancelar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a una petición incorrecta')
+        
+        #Verificamos que el proyecto se cancelo correctamente
+        proyecto = Proyecto.objects.get(id=proyecto.id)
+        self.assertEqual(proyecto.estado, 'Cancelado', 'El estado del proyecto al cancelar no es el correcto')
+
+        #Verificamos que no se puede cancelar un proyecto cuando no tiene nombre correcto
+        proyecto = Proyecto(nombre="PruebaCancelar", descripcion="Descripcion de prueba", estado="Planificacion", scrumMaster=master)
+        proyecto.save()
+
+        request = request_factory.post(f'proyectos/cancelar/{proyecto.id}/', {'nombre':'Proyecto de prueba 2'})
+        request.user = master
+        response = cancelar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 422, 'La respuesta no fue un estado HTTP 422 a una petición incorrecta')
+        #Verificamos que el proyecto no se cancelo
+        proyecto = Proyecto.objects.get(id=proyecto.id)
+        self.assertEqual(proyecto.estado, 'Planificacion', 'Se cancelo el proyecto por mas que introdujo un nombre incorrecto')
+
+
+    def test_ver_roles_proyecto(self):
+        """
+        Prueba que el usuario puede ver la pantalla de los roles de un proyecto
+        """
+        #Creamos un usuario gpa_admin
+        master = Usuario(username="master",
+                         email='master@user.com', password='foo')
+        master.save()
+        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
+
+        #Verificamos que el usuario no logueado no puede ver los roles de un proyecto
+        request_factory = RequestFactory()
+        request = request_factory.get(f'proyectos/roles_proyecto/{master.id}/')
+        request.user = AnonymousUser()
+        response = roles_proyecto(request)
+        self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
+
+        #Verificamos que el usuario sin permisos no puede ver los roles de un proyecto
+        usuarioTest = Usuario(username="test", email="test@user.com", password="foo")
+        usuarioTest.save()
+        request.user = usuarioTest
+        response = roles_proyecto(request)
+        self.assertEqual(response.status_code, 403, 'La respuesta no fue un estado HTTP 403 a un usuario sin permisos')
+    
+        #Verificamos que el usuario con permisos puede ver los roles de un proyecto
+        request.user = master
+        response = roles_proyecto(request)
+        self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a una petición correcta')
+
+    def test_crear_rol_proyecto(self):
+        """
+        Prueba que el usuario puede crear un rol de proyecto opcion para admin
+        """
+        #Creamos un usuario gpa_admin
+        master = Usuario(username="master",
+                         email='master@user.com', password='foo')
+        master.save()
+        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
+
+        #Creamos un usuario normal
+        usuarioTest = Usuario(username="test", email="test@user.com", password="foo")
+        usuarioTest.save()
+
+        permisos = PermisoProyecto.objects.all()
+
+        #Creamos un rol de proyecto con un usuario no autenticado
+        """
+        request_factory = RequestFactory()
+        request = request_factory.post(f'proyectos/roles_proyecto/crear/', {
+            'nombre':'Rol de prueba', 
+            'descripcion':'Descripcion de prueba',
+            'permisos':permisos.values_list('nombre', flat=True),
+            })
+        request.user = AnonymousUser()
+        response = crear_rol_proyecto(request)
+        self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
+        
+        #Creamos un rol de proyecto con un usuario sin permisos
+        request.user = usuarioTest
+        response = crear_rol_proyecto(request)
+        self.assertEqual(response.status_code, 403, 'La respuesta no fue un estado HTTP 403 a un usuario sin permisos')
+
+        #Creamos un rol de proyecto con un usuario con permisos
+        request.user = master
+        response = crear_rol_proyecto(request)
+        self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a una petición correcta')
+
+        #Asignamos el rol de Scrum Master al usuario
+        usuarioTest.rolProyecto.add()
+        """
