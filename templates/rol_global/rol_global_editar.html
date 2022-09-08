@@ -1,11 +1,30 @@
 {% extends "base.html" %}
 {% block contenido %}
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit">
-</form>
-
-<a href="{% url 'rol_global_list' %}">Volver a <b>Roles Globales</b></a>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mx-auto mb-4">
+            <div class="section-title text-center ">
+                <h1 class="top-c-sep">Editar Rol Global</h1>
+                <div class="job-box d-md-flex align-items-center justify-content-center">
+                    <div class="job-left my-4 d-md-flex align-items-center flex-wrap">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="id_nombre" class="form-label">Nombre:</label>
+                                <input type="text" name="nombre" maxlength="255" required="" id="id_nombre" class="form-control" aria-describedby="textAyuda" value="{{ rol.nombre }}">
+                                <div id="textAyuda" class="form-text">Mínimo 3 caracteres y máximo 255 caracteres</div>
+                            </div>
+                                <div class="mb-3">
+                                <label for="id_descripcion" class="form-label">Descripción:</label>
+                                <textarea name="descripcion" cols="40" rows="10" id="id_descripcion" class="form-control">{{ rol.descripcion }}</textarea>
+                            </div>
+                            <input type="submit" class="btn btn-light" value="Enviar"></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'rol_global_list' %}" class="btn btn-light">Volver a <b>Roles Globales</b></a>
+        </div>
+    </div>
+</div>
 {% endblock %}
-       
