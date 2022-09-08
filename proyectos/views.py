@@ -623,7 +623,7 @@ def importar_rol(request, id_proyecto):
                     permiso.rol.add(rol_nuevo)
                     permiso.save()
 
-        return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.filter(proyecto=id_proyecto)}, status=200)
+        return redirect(f'/proyectos/{id_proyecto}/roles/')
 
     else:
         proyectos = Proyecto.objects.exclude(id=id_proyecto)
@@ -637,4 +637,4 @@ def importar_rol(request, id_proyecto):
             proyecto = proyectos[0]
             roles = RolProyecto.objects.filter(proyecto = proyectos[0])
         
-    return redirect(f'/proyectos/{id_proyecto}/roles/')
+    return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto, 'roles': roles})
