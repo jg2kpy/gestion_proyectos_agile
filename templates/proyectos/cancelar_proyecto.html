@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<!-- Formulario para cancelar proyecto Django forms -->
+<!-- Para cancelar un proyecto tiene que ingresar el nombre del proyecto para confirmar -->
+<!-- El usuario tiene que ser o Scrum Master o moderador del Proyecto -->
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Estas a punto de cancelar un proyecto</h3>
+        </div>
+    </div>
+    <div class="row">
+        <p>¿Estas seguro que deseas cancelar el proyecto? Introduce el nombre del proyecto</p>
+        <div class="col-md-12">
+            <form action="." method="POST">
+                {% csrf_token %}
+                {{ form.as_div }}
+                <br>
+                <button type="submit" class="btn btn-primary">Cancelar proyecto</button>
+                <a href="{% url 'proyectos' %}" class="btn btn-danger">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

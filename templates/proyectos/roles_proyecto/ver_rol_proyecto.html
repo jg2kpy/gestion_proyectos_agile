@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+    <!-- Ver informacion especifica de un rol seleccionado -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>{{ rol.nombre }}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Descripción</h6>
+                <p>{{ rol.descripcion }}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h6>Permisos</h6>
+                <ul>
+                    {% for permiso in rol.permisos.all %}
+                        <li>{{ permiso.descripcion }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+    </div>
+
+{% endblock %}
