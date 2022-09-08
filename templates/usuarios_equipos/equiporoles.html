@@ -78,12 +78,12 @@
                         <input name="rol_id" id="rol_id" hidden value="{{ r.id }}">
 
                         <p> - {{ r.nombre }}</p>
-                        {% if not miembros == user and not r.nombre == 'Scrum Master'%}
-                            </div>
-                            <div class="col-6">
-                                <button type="submit" class="btn btn-primary">Desasignar rol</button>
-                            </div>
-                            </form>
+                        {% if not miembros == user or not r.nombre == "Scrum Master"%}
+                                </div>
+                                <div class="col-6">
+                                    <button type="submit" class="btn btn-primary">Desasignar rol</button>
+                                </div>
+                                </form>
                         {% endif %}
                 </div>
         {% endfor %}
