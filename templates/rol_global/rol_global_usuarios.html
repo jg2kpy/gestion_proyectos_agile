@@ -1,19 +1,32 @@
 {% extends "base.html" %}
 {% block contenido %}
-<h1>Manejo de Usuarios</h1>
-<h2>Rol: {{ rol.nombre }}</h2>
-<h2>Usuarios Disponibles:</h2>
-
-<form action="" method="POST">
-    {% csrf_token %}
-    
-    <label for="usr"></label>
-    <select name="usuarios" id="usr" size="4">
-        {% for usuario in usuarios %}
-        <option>{{ usuario.username }}</option>
-        {% endfor %}
-    </select>
-    <input type="submit" value="Vincular" name="vincular"/>
-    <input type="submit" value="Desvincular" name="desvincular" />
-</form>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mx-auto mb-4">
+            <div class="section-title text-center ">
+                <h1 class="top-c-sep">Manejo de Usuarios</h1>
+                <h4>Rol: {{ rol.nombre }}</h2>
+                <h4>Usuarios Disponibles:</h2>
+                <div class="job-box d-md-flex align-items-center justify-content-center">
+                    <div class="job-left my-4 d-md-flex align-items-center flex-wrap">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="usr"></label>
+                                <select name="usuarios" id="usr" size="4">          
+                                {% for usuario in usuarios %}
+                                <option>{{ usuario.email }}</option>
+                                {% endfor %}
+                            </select>
+                            <br>
+                            <input type="submit" value="Vincular" name="vincular" class="btn btn-light"/>
+                            <input type="submit" value="Desvincular" name="desvincular" class="btn btn-light"/>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'rol_global_list' %}" class="btn btn-light">Volver a <b>Roles Globales</b></a>
+    </div>
+</div>
 {% endblock %}
