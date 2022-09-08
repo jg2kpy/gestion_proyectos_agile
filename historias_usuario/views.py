@@ -110,30 +110,37 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+    try:
+        tipo = TipoHistoriaUsusario.objects.get(id=tipo_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
 
-    if not tiene_permiso_en_proyecto(request.user, "pro_crearTipoUS", proyecto):
+    if not tiene_permiso_en_proyecto(request.user, "pro_editarTipoUS", proyecto):
         return HttpResponseRedirect("/", status=422)
 
     status = 200
-    formset_factory = inlineformset_factory(TipoHistoriaUsusario, EtapaHistoriaUsuario, form=EtapaHistoriaUsuarioForm, extra=1, can_delete=False)
+    formset_factory = inlineformset_factory(TipoHistoriaUsusario, EtapaHistoriaUsuario, form=EtapaHistoriaUsuarioForm, extra=0, can_delete=False)
     if request.method == 'POST':
-        form = TipoHistoriaUsuarioForm(request.POST)
+        form = TipoHistoriaUsuarioForm(request.POST, instance=tipo)
         formset = formset_factory(request.POST, instance=form.instance)
         if form.is_valid() and formset.is_valid():
             tipo = form.save(commit=False)
             tipo.proyecto = proyecto
-            if tipo.nombre in [t.nombre for t in proyecto.tiposHistoriaUsuario.all()]:
-                form.add_error('nombre', "Ya existe un tipo de historia de usuario con este nombre.")
-                status = 422
-            elif '' in [e.instance.nombre for e in formset]:
+            tipo.id = tipo_id
+            if '' in [e.instance.nombre for e in formset]:
                 form.add_error(None, "No puede haber etapas sin nombre.")
                 status = 422
             else:
                 tipo.save()
                 for i, etapa_form in enumerate(formset):
                     etapa = etapa_form.save(commit=False)
+                    if EtapaHistoriaUsuario.objects.filter(TipoHistoriaUsusario=tipo, orden=i).exists():
+                        etapa.id = EtapaHistoriaUsuario.objects.get(TipoHistoriaUsusario=tipo, orden=i).id
                     etapa.orden = i
                     etapa.save()
+                for i in range(len(formset), tipo.etapas.count()):
+                    EtapaHistoriaUsuario.objects.get(TipoHistoriaUsusario=tipo, orden=i).delete()
+
                 status = 200
                 return HttpResponseRedirect(f"/tipo-historia-usuario/{proyecto.id}/")
         else:
@@ -141,6 +148,6 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
             status = 422
         pass
     else:
-        form = TipoHistoriaUsuarioForm()
-        formset = formset_factory()
-    return render(request, 'tipo-us/editar.html', {'form': form, 'proyecto': proyecto}, status=status)
+        form = TipoHistoriaUsuarioForm(instance=tipo)
+        formset = formset_factory(instance=tipo)
+    return render(request, 'tipos-us/editar_tipo.html', {'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)

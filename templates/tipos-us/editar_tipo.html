@@ -4,7 +4,7 @@
     <div class="col-lg-2 col-md-1">
     </div>
     <div class="col-lg-8 col-md-10">
-        <h3>Nueva historia de usuario</h3>
+        <h3>Editar historia de usuario</h3>
         <form method="post">
             {% csrf_token %}
             {{ form.non_form_errors }}
@@ -26,6 +26,11 @@
                         add
                     </span>
                 </button>
+                <button class="btn-dark  mt-3" id="delete" type="button">
+                    <span class="material-icons">
+                        delete
+                    </span>
+                </button>
                 <br>
                 <div id="empty_form" style="display:none">
                     <table class='no_error'>
@@ -42,6 +47,11 @@
                 var form_idx = $('#id_etapas-TOTAL_FORMS').val();
                 $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
                 $('#id_etapas-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+            });
+            $('#delete').click(function () {
+                var form_idx = parseInt($('#id_etapas-TOTAL_FORMS').val()) - 1;
+                $('#id_etapas-' + form_idx + '-nombre').parent().parent().parent().parent().remove();
+                $('#id_etapas-TOTAL_FORMS').val(form_idx);
             });
         </script>
     </div>
