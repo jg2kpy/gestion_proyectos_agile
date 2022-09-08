@@ -18,6 +18,8 @@ class Proyecto(models.Model):
     :type usuario: List[Usuario]
     :param estado: Estado del proyecto.
     :type estado: str
+    :param scrum_master: Scrum Master del proyecto.
+    :type scrum_master: Usuario
     """
     nombre = models.CharField(max_length=255, unique=True)
     descripcion = models.TextField(blank=True, null=True)

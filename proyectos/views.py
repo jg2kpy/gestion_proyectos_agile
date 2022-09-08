@@ -333,7 +333,17 @@ def ver_rol_proyecto(request, id_rol_proyecto):
         :rtype: HttpResponse
     """
 
+    request_user = request.user
     rol = RolProyecto.objects.get(id=id_rol_proyecto)
+    proyecto=rol.proyecto
+
+    if not request_user.is_authenticated:
+        return HttpResponse('Usuario no autenticado', status=401)
+
+    #Verificar que solo el administrador puede ver los roles de proyectos
+    if not tiene_rol_en_sistema(request_user, 'gpa_admin') and not tiene_rol_en_sistema(request_user, 'Scrum Master', proyecto):
+        return HttpResponse('No tiene permisos para ver los roles de proyectos', status=403)
+
 
     # Traemos los permisos del rol
     permisos = PermisoProyecto.objects.filter(rol=rol)

@@ -1,7 +1,9 @@
 import email
 import os
+from ssl import _PasswordType
 from urllib import response
 from django import setup
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE","gestion_proyectos_agile.settings")
 setup()
 
@@ -16,7 +18,8 @@ from proyectos.models import Proyecto
 from usuarios.views import listar_proyectos, vista_equipo
 from usuarios.models import RolProyecto, Usuario
 from phonenumber_field.modelfields import PhoneNumber
-from proyectos.views import cancelar_proyecto, proyectos,crear_proyecto, editar_proyecto, roles_proyecto, crear_rol_proyecto
+from proyectos.views import cancelar_proyecto, proyectos,crear_proyecto, editar_proyecto, roles_proyecto, crear_rol_proyecto,ver_rol_proyecto
+from django.forms import forms
 
 
 class UsuariosTests(TestCase):
@@ -632,15 +635,13 @@ class ProyectoTests(TestCase):
         usuarioTest = Usuario(username="test", email="test@user.com", password="foo")
         usuarioTest.save()
 
-        permisos = PermisoProyecto.objects.all()
-
         #Creamos un rol de proyecto con un usuario no autenticado
-        """
+        
         request_factory = RequestFactory()
         request = request_factory.post(f'proyectos/roles_proyecto/crear/', {
             'nombre':'Rol de prueba', 
             'descripcion':'Descripcion de prueba',
-            'permisos':permisos.values_list('nombre', flat=True),
+            'permisos': [1,2,3]
             })
         request.user = AnonymousUser()
         response = crear_rol_proyecto(request)
@@ -656,6 +657,82 @@ class ProyectoTests(TestCase):
         response = crear_rol_proyecto(request)
         self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a una petición correcta')
 
-        #Asignamos el rol de Scrum Master al usuario
-        usuarioTest.rolProyecto.add()
+    def test_ver_rol_de_proyecto(self):
         """
+        Prueba que el usuario puede ver un rol de proyecto
+        """
+        #Creamos un usuario gpa_admin
+        
+        #Creamos un usuario gpa_admin
+        master = Usuario(username="master",
+                         email='master@user.com', password='foo')
+        master.save()
+        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
+
+        #Creamos un usuario normal
+        usuarioTest = Usuario(username="test", email="test@user.com", password="foo")
+        usuarioTest.save()
+        
+        #Creamos un rol de proyecto
+        rol = RolProyecto(nombre="Rol de prueba", descripcion="Descripcion de prueba")
+        rol.save()
+        
+        #Recuperamos el rol en la base de datos
+        rol = RolProyecto.objects.get(nombre="Rol de prueba")
+
+        #Verificamos que el usuario no logueado no puede ver un rol de proyecto
+        request_factory = RequestFactory()
+        request = request_factory.get(f'proyectos/roles_proyecto/{rol.id}/')
+        request.user = AnonymousUser()
+        response = ver_rol_proyecto(request, rol.id)
+        self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
+
+        #Verificamos que el usuario con permisos puede ver un rol de proyecto
+        request.user = master
+        response = ver_rol_proyecto(request, rol.id)
+        self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a una petición correcta')
+        
+        #Creamos un proyecto con el rol de proyecto
+        proyecto = Proyecto(nombre="Proyecto de prueba", descripcion="Descripcion de prueba", estado="Planificacion", scrumMaster_id=usuarioTest.id)
+        proyecto.save()
+        
+        #Obtenemos la id del proyecto
+        proyecto = Proyecto.objects.get(nombre="Proyecto de prueba")
+
+        #Creamos un usuario con rol Scrum Master
+        usuarioTest = Usuario(username="test2", email="test@example.com", password="foo")
+        usuarioTest.save()
+
+        #Asignamos el rol de Scrum Master al usuario
+        proyecto.scrumMaster = usuarioTest
+
+        #Verificamos que el usuario con rol Scrum Master puede ver un rol de proyecto
+        request.user = usuarioTest
+        response = ver_rol_proyecto(request, rol.id)
+        self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a una petición correcta')
+    
+    def test_modificar_rol_proyecto(self):
+        """
+        Prueba que el usuario puede modificar un rol de proyecto
+        """
+        #Creamos un usuario gpa_admin
+        master = Usuario(username="master", email="master@master.com", password="foo")
+        master.save()
+        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
+
+        #Creamos un usuario normal
+        usuarioTest = Usuario(username="test", email="test@user.com", password="foo")
+        usuarioTest.save()
+
+        #Creamos un usuario que sera el Scrum Master del proyecto
+        usuarioTest2 = Usuario(username="test2", email="test2@test.com", _Password="foo")
+        usuarioTest2.save()
+
+        #Creamos un proyecto de ejemplo
+        proyecto = Proyecto(nombre="Proyecto de prueba", descripcion="Descripcion de prueba", estado="Planificacion", scrumMaster_id=usuarioTest2.id)
+
+        #Creamos un rol de proyecto
+        rol = RolProyecto(nombre="Rol de prueba", descripcion="Descripcion de prueba", proyecto=proyecto)
+        rol.save()
+
+        
