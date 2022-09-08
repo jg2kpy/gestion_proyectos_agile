@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+{% if estado == 'vacio' %}
+<h1>Error! No ha seleccionado ningun usuario</h1>
+{% endif %}
+
+{% if estado == 'posee_rol' %}
+<h1>El usuario {{ usuario.username }} ya posee el rol {{ rol.nombre }}</h1>
+{% endif %}
+
+{% if estado == 'rol_inexistente' %}
+<h1>El usuario {{ usuario.username }} no posee el rol {{ rol.nombre }} que se quiere desvincular</h1>
+{% endif %}
+
+{% if estado == 'vinculado' or estado == 'desvinculado' %}
+<h1>Se ha {{ estado }} el rol <b>{{ rol.nombre }}</b> al usuario <b>{{ usuario.username }}</b></h1>
+{% endif %}
+
+{% endblock %}

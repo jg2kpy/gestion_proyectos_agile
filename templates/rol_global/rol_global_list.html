@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Roles Globales</h1>
+
+<a href="{% url 'rol_global_crear' %}">Crear nuevo <b>Rol Global</b></a>
+
+<h2>Roles Disponibles:</h2>
+
+<ul>
+    {% for rol in roles %}
+    <li>
+        <a href="{% url 'rol_global_info' rol.id %}">{{ rol.nombre }}</a>
+        <a href="{% url 'rol_global_editar' rol.id %}">Editar</a>
+        <a href="{% url 'rol_global_eliminar' rol.id %}">Eliminar</a>
+        <a href="{% url 'rol_global_usuarios' rol.id %}">Usuarios</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
