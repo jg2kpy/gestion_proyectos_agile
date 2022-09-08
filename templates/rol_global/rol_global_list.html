@@ -28,7 +28,7 @@
             {% for rol in roles %}
             <div class="d-flex bd-highlight mb-3 align-items-center">
                 <div class="me-auto p-2 bd-highlight text-center">
-                    <h5>{{ rol.nombre }}</h5>
+                    <h5 class="rolEncontrado">{{ rol.nombre }}</h5>
                 </div>
                 <div class="p-2 bd-highlight">
                     <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalVer{{ rol.id }}">
@@ -67,7 +67,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    ¿Está seguro que desea eliminar {{ rol.nombre }}?
+                                    ¿Está seguro que desea eliminar <b>{{ rol.nombre }}</b>?
                                 </div>
                                 <div class="modal-footer">
                                     <form action="" method="post">
