@@ -242,9 +242,10 @@ def rol_global_usuarios(request, id):
         usuarios = Usuario.objects.all()
         return render(request, 'rol_global/rol_global_usuarios.html', {'id': id, 'usuarios': usuarios, 'rol': rol}, status=status)
 
+
 @never_cache
 def vista_equipo(request, proyecto_id):
-    """Vista de equipo, funcion que maneja el endpoint /usuarios/equipo
+    """Vista de equipo, funcion que maneja el endpoint /usuarios/equipo/<proyecto_id>
 
     :param request: Solicitud HTTP del cliente junto con el body con los datos para la realizar la operacion solicitada
     :type request: HttpRequest
@@ -252,29 +253,30 @@ def vista_equipo(request, proyecto_id):
     :param proyecto_id: Id del proyecto que se recibe por URL
     :type proyecto_id: int
 
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar nuevamente a la pagina /usuarios/equipo
+    :return: Se retorna una respuesta HttpResponse que puede ser un 401 (no autorizado), 404 (proyecto no existe) o 403 (no tiene permiso de ver este proyecto), en caso de ser una peticion GET, se retorna el HTML correspondiente o en POST se realiza la accion solicitada
     :rtype: HttpResponse
     """
-    request_user = request.user
+    if not request.user.is_authenticated:
+        return HttpResponse('Usuario no autenticado', status=401)
+
+    if Proyecto.objects.filter(id=proyecto_id).count() == 0:
+        return HttpResponse('Proyecto no existe', status=404)
+
+    if not request.user.equipo.filter(id=proyecto_id):
+        return HttpResponse('Usuario no pertenece al proyecto', status=403)
+
     if request.method == 'POST':
-        if not request.user.is_authenticated:
-            return HttpResponse('Usuario no autenticado', status=401)
-
         form = request.POST
-
         hidden_action = form.get('hidden_action')
 
         if hidden_action == 'eliminar_miembro_proyecto':
-            return eliminar_miembro_proyecto(form, request_user, proyecto_id)
+            return eliminar_miembro_proyecto(form, request.user, proyecto_id)
         elif hidden_action == 'agregar_miembro_proyecto':
-            return agregar_miembro_proyecto(request, form, request_user, proyecto_id)
+            return agregar_miembro_proyecto(request, form, request.user, proyecto_id)
         elif hidden_action == 'eliminar_rol_proyecto':
-            return eliminar_rol_proyecto(form, request_user, proyecto_id)
+            return eliminar_rol_proyecto(form, request.user, proyecto_id)
         elif hidden_action == 'asignar_rol_proyecto':
-            return asignar_rol_proyecto(form, request_user, proyecto_id)
-    
-    if not request_user.equipo.filter(id=proyecto_id):
-        return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
+            return asignar_rol_proyecto(form, request.user, proyecto_id)
 
     return render(request, 'usuarios_equipos/equiporoles.html', {'proyecto_id': proyecto_id})
 
@@ -285,22 +287,21 @@ def eliminar_miembro_proyecto(form, request_user, proyecto_id):
     :param form: Un objeto similar a un diccionario que contiene todos los parámetros HTTP POST dados.
     :type form: QueryDict
 
-    :param proyecto_id: Id del proyecto que se recibe por URL
-    :type proyecto_id: int
-
     :param request_user: Objeto de tipo Usuario del cual se realizo la peticion HTTP
     :type request_user: Usuario
 
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar a la pagina principal
+    :param proyecto_id: Id del proyecto que se recibe por URL
+    :type proyecto_id: int
+
+    :return: Se retorna una respuesta HttpResponse que puede ser un 403 en caso de no tener la autorizacion, 422 en caso que el formulario tenga datos erroneos o retornar a la pagina principal
     :rtype: HttpResponse
     """
-    usuario_email = form.get('usuario_a_eliminar')
 
     if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
-        return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
+        return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
-
+        usuario_email = form.get('usuario_a_eliminar')
         usuario_a_eliminar_miembro_proyecto = Usuario.objects.get(email=usuario_email)
         proyecto = Proyecto.objects.get(id=proyecto_id)
         roles = RolProyecto.objects.filter(usuario=usuario_a_eliminar_miembro_proyecto, proyecto=proyecto_id)
@@ -328,22 +329,21 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
     :param proyecto_id: Id del proyecto que se recibe por URL
     :type proyecto_id: int
 
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar a la pagina principal
+    :return: Se retorna una respuesta HttpResponse que puede ser un 403 en caso de no tener la autorizacion, 422 en caso que el formulario tenga datos erroneos o retornar a la pagina principal
     :rtype: HttpResponse
     """
-    usuario_email = form.get('usuario_a_agregar')
-    rol_id = form.get('roles_agregar')
 
     if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
-        return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
+        return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
-
+        usuario_email = form.get('usuario_a_agregar')
+        rol_id = form.get('roles_agregar')
         usuario_a_agregar_miembro_proyecto = Usuario.objects.get(email=usuario_email)
         proyecto = Proyecto.objects.get(id=proyecto_id)
 
         if usuario_a_agregar_miembro_proyecto.equipo.filter(id=proyecto.id).count() != 0:
-            return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario ya pertenece al proyecto'})
+            return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario ya pertenece al proyecto', 'proyecto_id': proyecto_id}, status=422)
 
         usuario_a_agregar_miembro_proyecto.equipo.add(proyecto)
         rol_proyecto = RolProyecto.objects.get(id=rol_id)
@@ -367,20 +367,21 @@ def eliminar_rol_proyecto(form, request_user, proyecto_id):
     :param proyecto_id: Id del proyecto que se recibe por URL
     :type proyecto_id: int
 
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar a la pagina principal
+    :return: Se retorna una respuesta HttpResponse que puede ser un 403 en caso de no tener la autorizacion, 422 en caso que el formulario tenga datos erroneos o retornar a la pagina principal
     :rtype: HttpResponse
     """
 
-    usuario_email = form.get('usuario_a_sacar_rol')
-    rol_id = form.get('rol_id')
-
     if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
-        return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
+        return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
+
+        usuario_email = form.get('usuario_a_sacar_rol')
+        rol_id = form.get('rol_id')
         usuario_a_eliminar_rol = Usuario.objects.get(email=usuario_email)
         rol = RolProyecto.objects.get(id=rol_id)
         usuario_a_eliminar_rol.roles_proyecto.remove(rol)
+
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
@@ -393,29 +394,32 @@ def asignar_rol_proyecto(form, request_user, proyecto_id):
     :param form: Un objeto similar a un diccionario que contiene todos los parámetros HTTP POST dados.
     :type form: QueryDict
 
+    :param request_user: Objeto de tipo Usuario del cual se realizo la peticion HTTP
+    :type request_user: Usuario
+
     :param proyecto_id: Id del proyecto que se recibe por URL
     :type proyecto_id: int
 
-    :return: Se retorna una respuesta HttpResponse que puede ser un 401, 403 o 422 en caso de no tener la autorizacion o retornar a la pagina principal
+    :return: Se retorna una respuesta HttpResponse que puede ser un 403 en caso de no tener la autorizacion, 422 en caso que el formulario tenga datos erroneos o retornar a la pagina principal
     :rtype: HttpResponse
     """
 
-    usuario_email = form.get('usuario_a_cambiar_rol')
-    rol_id = form.get(f'roles{usuario_email}')
-
     if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
-        return HttpResponse('Usuario no pertenece al proyecto o no posee el permiso de realizar esta accion', status=403)
+        return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
 
-        usuario_a_eliminar_rol = Usuario.objects.get(email=usuario_email)
+        usuario_email = form.get('usuario_a_cambiar_rol')
+        rol_id = form.get(f'roles{usuario_email}')
+        usuario_a_agregar_rol = Usuario.objects.get(email=usuario_email)
         rol = RolProyecto.objects.get(id=rol_id)
-        usuario_a_eliminar_rol.roles_proyecto.add(rol)
+        usuario_a_agregar_rol.roles_proyecto.add(rol)
 
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
     return redirect(f'/usuarios/equipo/{proyecto_id}')
+
 
 @never_cache
 def listar_proyectos(request):
@@ -427,12 +431,10 @@ def listar_proyectos(request):
     :return: Se retorna una respuesta HttpResponse o 401 en caso de no estar autenticado
     :rtype: HttpResponse
     """
-    if request.method == 'POST':
-        if not request.user.is_authenticated:
-            return HttpResponse('Usuario no autenticado', status=401)
+    if not request.user.is_authenticated:
+        return HttpResponse('Usuario no autenticado', status=401)
 
     return render(request, 'usuarios_equipos/listar_proyectos.html')
-
 
 
 class UsuarioForm(ModelForm):
