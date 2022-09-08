@@ -17,7 +17,7 @@ def tiene_rol_en_sistema(usuario, nombre_rol):
     :type usuario: Usuario
 
     :param nombre_rol: Nombre del rol del cual vamos a verificar
-    :type nombre_rol: String
+    :type nombre_rol: str
 
     :return: Se retorna un valor True si el usuario tiene el rol en el sistema o False en caso contrario
     :rtype: boolean
@@ -34,7 +34,7 @@ def tiene_rol_en_proyecto(usuario, nombre_rol, proyecto):
     :type usuario: Usuario
 
     :param nombre_rol: Nombre del rol del cual vamos a verificar
-    :type nombre_rol: string
+    :type nombre_rol: str
 
     :param proyecto: Proyecto donde se verficara si el usuario tiene el rol en este proyecto
     :type proyecto: Proyecto
