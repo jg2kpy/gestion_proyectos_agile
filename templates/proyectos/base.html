@@ -9,8 +9,8 @@
             <h1>Proyectos</h1>
         </div>
         <div>
-            {% tiene_permiso_en_sistema user 'sys_crearproyecto' as sys_crearproyecto %}
-            {% if sys_crearproyecto %}
+            {% tiene_permiso_en_sistema user 'sys_crearproyectos' as sys_crearproyectos %}
+            {% if sys_crearproyectos %}
             <a href="{% url 'crear_proyecto' %}" class="btn btn-primary">Crear proyecto</a>
             {% endif %}
         </div>
@@ -39,15 +39,19 @@
                     <td>{{ proyecto.fecha_fin }}</td>
                     <td>{{ proyecto.estado }}</td>
                     <td>
-                        {% tiene_permiso_en_proyecto user 'pro_crearRolProyecto' proyecto as pro_crearRolProyecto %}
-                        {% if pro_crearRolProyecto %}
-                        <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn btn-link"><span
-                                class="material-icons">create</span></a>
-                        <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span
-                                class="material-icons">cancel</span></a>
+                        {% tiene_permiso_en_sistema user 'sys_crearproyectos' as sys_crearproyectos %}
+                        {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
+                        {% if sys_crearproyectos or pro_cambiarEstadoProyecto %}
+                            {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
+                            {% if pro_cambiarEstadoProyecto %}
+                            <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn btn-link"><span
+                                    class="material-icons">create</span></a>
+                            <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span
+                                    class="material-icons">cancel</span></a>
+                            {% endif %}
+                            <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-link"><span
+                                    class="material-icons">visibility</span></a>
                         {% endif %}
-                        <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-link"><span
-                                class="material-icons">visibility</span></a>
                     </td>
                 </tr>
                 {% endfor %}

@@ -154,7 +154,7 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
     except TipoHistoriaUsusario.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
 
-    if not tiene_permiso_en_proyecto(request.user, "pro_editarTipoUS", proyecto):
+    if not tiene_permiso_en_proyecto(request.user, "pro_crearTipoUS", proyecto):
         return HttpResponseRedirect("/", status=422)
 
     status = 200

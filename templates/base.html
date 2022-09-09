@@ -130,9 +130,15 @@
                         </ul>
                     </div>
                 </li>
-                <li class="border-top my-3"></li>
+                <li class="mb-1">
+                    <a class="btn align-items-center rounded" href="{% url 'proyectos' %}">
+                        <i class="material-icons  align-text-bottom">create_new_folder</i>
+                        Administrar proyectos
+                    </a>
+                </li>
                 {% tiene_rol_en_sistema user "gpa_admin" as es_admin %}
                 {% if user.roles_sistema.count > 0 or es_admin %}
+                <li class="border-top my-3"></li>
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                         data-bs-target="#admin-collapse" aria-expanded="false">
@@ -163,7 +169,7 @@
                         data-bs-target="#account-collapse" aria-expanded="false">
                         <img src="{{ user.avatar_url }}" alt="{{ user.get_full_name }}" width="30" height="30"
                             class="rounded-circle" style="margin-right: 10px;" />
-                        Account
+                        Cuenta
                     </button>
                     <div class="collapse" id="account-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">

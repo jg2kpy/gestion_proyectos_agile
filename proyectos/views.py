@@ -47,10 +47,10 @@ def proyectos(request):
     if not request.user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
 
-    if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
-        return HttpResponse('No tiene permisos para administrar proyectos', status=403)
+    if tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
+        return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})        
 
-    return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
+    return render(request, 'proyectos/base.html', {'proyectos': [rol.proyecto for rol in request_user.roles_proyecto.filter(permisos__nombre='pro_cambiarEstadoProyecto')]})
 
 
 @never_cache

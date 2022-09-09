@@ -114,7 +114,7 @@ def tiene_permiso_en_proyecto(usuario, permiso, proyecto):
     :return: Se retorna un valor True si el usuario tiene el permiso en el proyecto indicado o False en caso contrario
     :rtype: boolean
     """
-    return proyecto.scrumMaster == usuario or usuario.roles_proyecto.filter(proyecto=proyecto).filter(permisos__nombre=permiso).exists()
+    return usuario.roles_proyecto.filter(proyecto=proyecto).filter(permisos__nombre=permiso).exists()
 
 
 @register.simple_tag

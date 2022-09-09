@@ -168,6 +168,19 @@ class MiembrosRolesTest(TestCase):
     fixtures = [
        "databasedump.json",
     ]
+
+    def setUp(self):
+        """
+        Crea un usuario para realizar las pruebas y un proyecto.
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+                                                         
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        res = self.client.post("/proyectos/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id})
+        self.assertEqual(res.status_code, 200)
+        self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
+        self.assertTrue(self.proyecto.proyecto_rol.filter(usuario=self.user, nombre="Scrum Master").exists())
     
     def test_get_visualizar_proyecto(self):
         """
@@ -180,8 +193,7 @@ class MiembrosRolesTest(TestCase):
         usuario_no_miembro.save()
         usuario_miembro.save()
 
-        proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=usuario_miembro)
-        proyectoTest.save()
+        proyectoTest = self.proyecto
         usuario_miembro.equipo.add(proyectoTest)
         
         request = request_factory.get(f'/usuarios/equipo/{proyectoTest.id}')
@@ -218,19 +230,13 @@ class MiembrosRolesTest(TestCase):
         request_factory = RequestFactory()
 
         usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
-        master = Usuario(username="master",email='master@user.com', password='foo')
+        master = self.user
         usuarioTest.save()
-        master.save()
 
-        proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=master)
-        proyectoTest.save()
-        master.equipo.add(proyectoTest)
+        proyectoTest = self.proyecto
 
-        scrum = RolProyecto(nombre="Scrum Master", proyecto=proyectoTest)
         rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
-        scrum.save()
         rolTest.save()
-        master.roles_proyecto.add(scrum)
         
         request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
             'usuario_a_agregar': usuarioTest.email,
@@ -273,21 +279,15 @@ class MiembrosRolesTest(TestCase):
         request_factory = RequestFactory()
 
         usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
-        master = Usuario(username="master", email='master@user.com', password='foo')
+        master = self.user
         usuarioTest.save()
-        master.save()
 
-        proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=master)
-        proyectoTest.save()
+        proyectoTest = self.proyecto
 
-        master.equipo.add(proyectoTest)
         usuarioTest.equipo.add(proyectoTest)
 
-        scrum = RolProyecto(nombre="Scrum Master", proyecto=proyectoTest)
         rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
-        scrum.save()
         rolTest.save()
-        master.roles_proyecto.add(scrum)
         usuarioTest.roles_proyecto.add(rolTest)
 
         request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
@@ -329,21 +329,13 @@ class MiembrosRolesTest(TestCase):
         request_factory = RequestFactory()
 
         usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
-        master = Usuario(username="master", email='master@user.com', password='foo')
+        master = self.user
         usuarioTest.save()
-        master.save()
 
-        proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=master)
-        proyectoTest.save()
+        proyectoTest = self.proyecto
 
-        usuarioTest.equipo.add(proyectoTest)
-        master.equipo.add(proyectoTest)
-
-        scrum = RolProyecto(nombre="Scrum Master", proyecto=proyectoTest)
         rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
-        scrum.save()
         rolTest.save()
-        master.roles_proyecto.add(scrum)
         
         request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
             'usuario_a_cambiar_rol': usuarioTest.username,
@@ -385,22 +377,17 @@ class MiembrosRolesTest(TestCase):
         request_factory = RequestFactory()
 
         usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
-        master = Usuario(username="master",email='master@user.com', password='foo')
+        master = self.user
         usuarioTest.save()
-        master.save()
 
-        proyectoTest = Proyecto(nombre="proyecto Test", scrumMaster=master)
+        proyectoTest = self.proyecto
         proyectoTest.save()
 
-        master.equipo.add(proyectoTest)
         usuarioTest.equipo.add(proyectoTest)
 
-        scrum = RolProyecto(nombre="Scrum Master", proyecto=proyectoTest)
         rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
-        scrum.save()
         rolTest.save()
 
-        master.roles_proyecto.add(scrum)
         usuarioTest.roles_proyecto.add(rolTest)
         
         request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={

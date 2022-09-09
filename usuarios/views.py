@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.forms import ModelForm
 from django.views.decorators.cache import never_cache
 
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_rol_en_proyecto
+from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
 from proyectos.models import Proyecto
 from usuarios.models import RolProyecto, Usuario
 from .models import PermisoSistema, Usuario
@@ -249,24 +249,26 @@ def vista_equipo(request, proyecto_id):
 
     if not request.user.equipo.filter(id=proyecto_id):
         return HttpResponse('Usuario no pertenece al proyecto', status=403)
+    
+    proyecto = Proyecto.objects.get(id=proyecto_id)
 
     if request.method == 'POST':
         form = request.POST
         hidden_action = form.get('hidden_action')
 
         if hidden_action == 'eliminar_miembro_proyecto':
-            return eliminar_miembro_proyecto(form, request.user, proyecto_id)
+            return eliminar_miembro_proyecto(form, request.user, proyecto)
         elif hidden_action == 'agregar_miembro_proyecto':
-            return agregar_miembro_proyecto(request, form, request.user, proyecto_id)
+            return agregar_miembro_proyecto(request, form, request.user, proyecto)
         elif hidden_action == 'eliminar_rol_proyecto':
-            return eliminar_rol_proyecto(form, request.user, proyecto_id)
+            return eliminar_rol_proyecto(form, request.user, proyecto)
         elif hidden_action == 'asignar_rol_proyecto':
-            return asignar_rol_proyecto(form, request.user, proyecto_id)
+            return asignar_rol_proyecto(form, request.user, proyecto)
 
     return render(request, 'usuarios_equipos/equiporoles.html', {'proyecto': Proyecto.objects.get(id=proyecto_id)})
 
 
-def eliminar_miembro_proyecto(form, request_user, proyecto_id):
+def eliminar_miembro_proyecto(form, request_user, proyecto):
     """Eliminar miembros de un proyecto, endpoint /usuarios/equipo/<proyecto_id>
 
     :param form: Un objeto similar a un diccionario que contiene todos los parámetros HTTP POST dados.
@@ -282,24 +284,24 @@ def eliminar_miembro_proyecto(form, request_user, proyecto_id):
     :rtype: HttpResponse
     """
 
-    if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
+    if not tiene_permiso_en_proyecto(request_user, "pro_eliminarMiembros", proyecto):
         return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
         usuario_email = form.get('usuario_a_eliminar')
         usuario_a_eliminar_miembro_proyecto = Usuario.objects.get(email=usuario_email)
-        proyecto = Proyecto.objects.get(id=proyecto_id)
-        roles = RolProyecto.objects.filter(usuario=usuario_a_eliminar_miembro_proyecto, proyecto=proyecto_id)
+        proyecto = Proyecto.objects.get(id=proyecto.id)
+        roles = RolProyecto.objects.filter(usuario=usuario_a_eliminar_miembro_proyecto, proyecto=proyecto.id)
         [usuario_a_eliminar_miembro_proyecto.roles_proyecto.remove(r) for r in roles]
         usuario_a_eliminar_miembro_proyecto.equipo.remove(proyecto)
 
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'/usuarios/{proyecto_id}')
+    return redirect(f'/usuarios/{proyecto.id}')
 
 
-def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
+def agregar_miembro_proyecto(request, form, request_user, proyecto):
     """Agregar miembro al proyecto, endpoint /usuarios/equipo/<proyecto_id>
 
     :param request: Solicitud HTTP del cliente junto con el body con los datos del nombre de usuario  e id del rol
@@ -318,13 +320,8 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
     :rtype: HttpResponse
     """
 
-    if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
+    if not tiene_permiso_en_proyecto(request_user, "pro_asignarMiembros", proyecto):
         return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
-
-    try:
-        proyecto = Proyecto.objects.get(id=proyecto_id)
-    except Proyecto.DoesNotExist:
-        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     try:
         usuario_email = form.get('usuario_a_agregar')
@@ -341,10 +338,10 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
     except Usuario.DoesNotExist:
         return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario no existe', 'proyecto': proyecto}, status=422)
 
-    return redirect(f'/usuarios/{proyecto_id}')
+    return redirect(f'/usuarios/{proyecto.id}')
 
 
-def eliminar_rol_proyecto(form, request_user, proyecto_id):
+def eliminar_rol_proyecto(form, request_user, proyecto):
     """Eliminar miembros de un proyecto, endpoint /usuarios/equipo/<proyecto_id>
 
     :param form: Un objeto similar a un diccionario que contiene todos los parámetros HTTP POST dados.
@@ -360,7 +357,7 @@ def eliminar_rol_proyecto(form, request_user, proyecto_id):
     :rtype: HttpResponse
     """
 
-    if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
+    if not tiene_permiso_en_proyecto(request_user, "pro_editarRolProyecto", proyecto):
         return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
@@ -374,10 +371,10 @@ def eliminar_rol_proyecto(form, request_user, proyecto_id):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'/usuarios/{proyecto_id}')
+    return redirect(f'/usuarios/{proyecto.id}')
 
 
-def asignar_rol_proyecto(form, request_user, proyecto_id):
+def asignar_rol_proyecto(form, request_user, proyecto):
     """Asignar un rol de proyecto a un usuario
 
     :param form: Un objeto similar a un diccionario que contiene todos los parámetros HTTP POST dados.
@@ -393,7 +390,7 @@ def asignar_rol_proyecto(form, request_user, proyecto_id):
     :rtype: HttpResponse
     """
 
-    if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
+    if not tiene_permiso_en_proyecto(request_user, "pro_asignarRolProyecto", proyecto):
         return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
@@ -407,7 +404,7 @@ def asignar_rol_proyecto(form, request_user, proyecto_id):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'/usuarios/{proyecto_id}')
+    return redirect(f'/usuarios/{proyecto.id}')
 
 
 class UsuarioForm(ModelForm):

@@ -30,12 +30,10 @@ class TiposHistoriasUsuarioTest(TestCase):
                                                          avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
                                                          
         self.client.login(email='testemail@example.com', password='A123B456c.')
-        proyecto = Proyecto()
-        proyecto.nombre = "Proyecto de prueba"
-        proyecto.descripcion = "Descripcion de prueba"
-        proyecto.scrumMaster = self.user
-        proyecto.save()
-        self.proyecto = proyecto
+        res = self.client.post("/proyectos/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id})
+        self.assertEqual(res.status_code, 200)
+        self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
+        self.assertTrue(self.proyecto.proyecto_rol.filter(usuario=self.user, nombre="Scrum Master").exists())
 
     def test_crearTipoHistoriaUsuario(self):
         """
@@ -60,6 +58,7 @@ class TiposHistoriasUsuarioTest(TestCase):
         creado = TipoHistoriaUsusario.objects.get(nombre='Test')
         res = self.client.post(f"/tipo-historia-usuario/editar/{self.proyecto.id}/{creado.id}/", {'nombre': 'Testedit', 'descripcion': 'etapa prueba edit', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
                         'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000', 'etapas-0-nombre': 'Etapa 1', 'etapas-0-descripcion': "descripcion1"}, follow=True)
+        self.assertEqual(res.status_code, 200)
         creado.refresh_from_db()
         self.assertEqual(creado.nombre, 'Testedit')
         self.assertEqual(creado.descripcion, 'etapa prueba edit')
