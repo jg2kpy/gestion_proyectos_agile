@@ -12,6 +12,11 @@
             <a href="{% url 'crearTipoHistoriaUsuario' proyecto.id %}" class="btn btn-primary">Crear Tipo de Historia de
                 Usuario</a>
             {% endif %}
+            {% tiene_permiso_en_proyecto user 'pro_importarTipoUS' proyecto as pro_importarTipoUS %}
+            {% if pro_importarTipoUS %}
+            <a href="{% url 'importarTipoHistoriaUsuario' proyecto.id %}" class="btn btn-primary">Importar Tipo de Historia de
+                Usuario</a>
+            {% endif %}
         </div>
     </div>
     <div class="row">
