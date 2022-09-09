@@ -66,6 +66,9 @@ def rol_global_list(request):
 
     if request.POST.get('accion') == 'eliminar':
         rol = RolSistema.objects.get(nombre=request.POST.get('nombre'))
+        if rol.nombre == 'Scrum Master':
+            status = 422
+            return HttpResponse('No se puede eliminar el rol Scrum Master', status=status)
         rol.delete()
         return redirect('rol_global_list')
 

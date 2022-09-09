@@ -66,10 +66,12 @@
                         class="btn d-block w-100 d-sm-inline-block btn-light">Editar</a>
                 </div>
                 <div class="p-2 bd-highlight">
+                    {% if not rol.nombre == 'gpa_admin' %}
                     <button type="button" class="btn btn-light" data-bs-toggle="modal"
                         data-bs-target="#modalEliminar{{ rol.id }}">
                         Eliminar
                     </button>
+                    {% endif %}
                     <!-- Modal -->
                     <div class="modal fade" id="modalEliminar{{ rol.id }}" tabindex="-1"
                         aria-labelledby="exampleModalLabel" aria-hidden="true">

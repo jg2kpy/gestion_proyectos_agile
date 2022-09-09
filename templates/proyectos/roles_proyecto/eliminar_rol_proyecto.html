@@ -19,7 +19,7 @@
                 {% csrf_token %}
                 <br>
                 <button type="submit" class="btn btn-primary">Eliminar rol</button>
-                <a href="{% url 'rol_proyecto_asignado' id_proyecto %}" class="btn btn-danger">Cancelar</a>
+                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-danger">Cancelar</a>
             </form>
         </div>
     </div>
