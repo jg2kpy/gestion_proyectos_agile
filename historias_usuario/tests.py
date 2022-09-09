@@ -30,12 +30,8 @@ class TiposHistoriasUsuarioTest(TestCase):
                                                          avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
                                                          
         self.client.login(email='testemail@example.com', password='A123B456c.')
-        proyecto = Proyecto()
-        proyecto.nombre = "Proyecto de prueba"
-        proyecto.descripcion = "Descripcion de prueba"
-        proyecto.scrumMaster = self.user
-        proyecto.save()
-        self.proyecto = proyecto
+        self.client.post("/proyectos/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id})
+        self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
 
     def test_crearTipoHistoriaUsuario(self):
         """
