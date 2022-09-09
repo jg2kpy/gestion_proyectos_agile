@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.produccion
-    command: bash -c "python3 manage.py makemigrations usuarios && python3 manage.py migrate && python3 manage.py loaddata databasedump.json && python3 manage.py collectstatic --noinput && gunicorn gestion_proyectos_agile.wsgi:application --bind 0.0.0.0:8000"
+    command: bash -c "python3 manage.py makemigrations usuarios proyectos historias_usuario && python3 manage.py migrate && python3 manage.py loaddata databasedump.json && python3 manage.py collectstatic --noinput && gunicorn gestion_proyectos_agile.wsgi:application --bind 0.0.0.0:8000"
     env_file:
       - .env.produccion
     volumes:
