@@ -42,12 +42,16 @@
                     </button>
                     <div class="collapse" id="us-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
+                            {% tiene_permiso_en_proyecto user 'pro_eliminarTipoUS' proyecto as pro_eliminarTipoUS %}
+                            {% if pro_crearTipoUS or pro_eliminarTipoUS %}
                             <li>
                                 <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="link-dark rounded">
                                     <i class="material-icons  align-text-bottom">settings</i>
                                     Tipos
                                 </a>
                             </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </li>

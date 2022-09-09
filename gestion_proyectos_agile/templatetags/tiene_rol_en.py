@@ -118,7 +118,7 @@ def tiene_permiso_en_proyecto(usuario, permiso, proyecto):
 
 
 @register.simple_tag
-def tiene_permiso_en_sistema(usuario, permiso, proyecto):
+def tiene_permiso_en_sistema(usuario, permiso):
     """Funcion para verificar si un usuario tiene un permiso en el sistema 
 
     :param usuario: Objeto usuario del cual se verifica 

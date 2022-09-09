@@ -530,7 +530,7 @@ def ver_roles_asignados(request, id_proyecto):
     try:
         roles = RolProyecto.objects.filter(proyecto=id_proyecto)
     except RolProyecto.DoesNotExist:
-        roles = None
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': roles, 'proyecto': proyecto})
 

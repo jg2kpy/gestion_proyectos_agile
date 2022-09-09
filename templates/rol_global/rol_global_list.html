@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block contenido %}
+{% load tiene_rol_en %}
 <div class="container">
+    {% tiene_permiso_en_sistema user 'sys_crearrolsistema' as sys_crearrolsistema %}
+    {% if sys_crearrolsistema %}
     <div class="row">
         <div class="col-lg-10 mx-auto mb-4">
             <div class="section-title text-center ">
@@ -22,6 +25,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     <div class="row">
         <div class="col-lg-10 mx-auto">
@@ -55,6 +59,8 @@
                     </div>
                     <!-- End Modal -->
                 </div>
+                {% tiene_permiso_en_sistema user 'sys_crearrolsistema' as sys_crearrolsistema %}
+                {% if sys_crearrolsistema %}
                 <div class="p-2 bd-highlight">
                     <a href="{% url 'rol_global_editar' rol.id %}"
                         class="btn d-block w-100 d-sm-inline-block btn-light">Editar</a>
@@ -96,6 +102,7 @@
                     <a href="{% url 'rol_global_usuarios' rol.id %}"
                         class="btn d-block w-100 d-sm-inline-block btn-light">Usuarios</a>
                 </div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
