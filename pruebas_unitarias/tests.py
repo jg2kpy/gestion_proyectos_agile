@@ -518,6 +518,10 @@ class PerfilTests(TestCase):
 
 class ProyectoTests(TestCase):
 
+    fixtures = [
+       "databasedump.json",
+    ]
+
     def test_ver_proyectos(self):
         """
         Prueba que el usuario puede ver los proyectos
@@ -893,7 +897,7 @@ class ProyectoTests(TestCase):
         #Editamos el rol de proyecto con un usuario Scrum Master
         request.user = usuarioTest2
         response = modificar_rol_proyecto(request, rol.id)
-        self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a una petición correcta')
+        self.assertEqual(response.status_code, 302, 'La respuesta no fue un estado HTTP 302 a una petición correcta')
 
         #Verificamos que el rol de proyecto fue modificado
         rol = RolProyecto.objects.get(nombre="Rol de prueba modificada")
@@ -918,8 +922,8 @@ class ProyectoTests(TestCase):
         self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a una petición correcta')
 
         #Verificamos que el rol de proyecto fue modificado
-        rol2 = RolProyecto.objects.get(nombre="Rol de prueba 2")
-        self.assertEqual(rol2.descripcion, "Descripcion de prueba 2", 'La descripcion del rol de proyecto no fue modificada')
+        rol2 = RolProyecto.objects.get(nombre='Rol de prueba modificada', proyecto=None)
+        self.assertEqual(rol2.descripcion, 'Descripcion de prueba modificada', 'La descripcion del rol de proyecto no fue modificada')
 
     def test_eliminar_rol_proyecto(self):
         """
@@ -978,7 +982,7 @@ class ProyectoTests(TestCase):
         #Eliminamos el rol de proyecto con un usuario Scrum Master
         request.user = usuarioTest2
         response = eliminar_rol_proyecto_view(request, rol.id)
-        self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a una petición correcta')
+        self.assertEqual(response.status_code, 302, 'La respuesta no fue un estado HTTP 302 a una petición correcta')
 
         #Verificamos que el rol de proyecto fue eliminado
         self.assertRaises(RolProyecto.DoesNotExist, RolProyecto.objects.get, nombre="Rol de prueba")
@@ -1123,7 +1127,7 @@ class ProyectoTests(TestCase):
 
         request.user = usuarioTest2
         response = crear_rol_a_proyecto(request, proyecto.id)
-        self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a un usuario Scrum Master')
+        self.assertEqual(response.status_code, 302, 'La respuesta no fue un estado HTTP 302 a un usuario Scrum Master')
 
         #Probamos que el rol se creo correctamente
         rol = RolProyecto.objects.get(nombre="Rol de prueba")
@@ -1186,7 +1190,7 @@ class ProyectoTests(TestCase):
 
         request.user = usuarioTest2
         response = importar_rol(request, proyecto.id)
-        self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a un usuario Scrum Master')
+        self.assertEqual(response.status_code, 302, 'La respuesta no fue un estado HTTP 302 a un usuario Scrum Master')
 
 
 

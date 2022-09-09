@@ -110,7 +110,6 @@ def crear_proyecto(request):
                 scrum_master.roles_proyecto.add(RolProyecto.objects.get(nombre="Scrum Master", proyecto=proyecto))
                 scrum_master.save()
             except Exception as e:
-                print(e)
                 return HttpResponse('Error al crear el proyecto', status=500)
 
             return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
@@ -165,7 +164,6 @@ def editar_proyecto(request, id_proyecto):
                 proyecto.save()
                 return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
             except Exception as e:
-                print(e)
                 return HttpResponse('Error al editar el proyecto', status=500)
         else:
             return HttpResponse('Formulario invalido', status=422)
@@ -536,7 +534,7 @@ def crear_rol_a_proyecto(request, id_proyecto):
         return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
 
 
-
+    status = 200
 
     if request.method == 'POST':
         form = RolProyectoForm(request.POST)
@@ -562,9 +560,12 @@ def crear_rol_a_proyecto(request, id_proyecto):
                     permiso.save()
 
             return redirect(f'/proyectos/{id_proyecto}/roles/')
+        else:
+            status = 422
+
     else:
         form = RolProyectoForm()
-    return render(request, 'proyectos/roles_proyecto/crear_rol_proyecto.html', {'form': form, 'id_proyecto': id_proyecto})
+    return render(request, 'proyectos/roles_proyecto/crear_rol_proyecto.html', {'form': form, 'id_proyecto': id_proyecto}, status=status)
 
 # Importar Rol de otros proyectos
 
