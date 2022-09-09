@@ -53,6 +53,11 @@
                                 <div class="modal-body">
                                     <h2 style="margin-bottom: 25px;">{{ rol.nombre }}</h2>
                                     <p>{{ rol.descripcion }}</p>
+                                    <ul>
+                                        {% for permiso in rol.permisos.all %}
+                                        <li>{{ permiso.nombre }}</li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
