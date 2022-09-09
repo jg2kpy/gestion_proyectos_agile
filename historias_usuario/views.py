@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from django.forms import inlineformset_factory
 
@@ -32,7 +32,7 @@ def tiposHistoriaUsuario(request, proyecto_id):
     if not tiene_permiso_en_proyecto(request.user, "pro_crearTipoUS", proyecto):
         return HttpResponseRedirect("/", status=422)
 
-    return render(request, 'tipos-us/base.html', {'tipos': TipoHistoriaUsusario.objects.all(), 'proyecto': proyecto})
+    return render(request, 'tipos-us/base.html', {'tipos': TipoHistoriaUsusario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
 
 
 @never_cache
@@ -142,9 +142,6 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
     :type tipo_id: int
     :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 422 con información adicional si el formulario no fue creado correctamente, 200 con un formulario para editar un tipo de historia de usuario si todo esta bien
     """
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect("/", status=401)
-
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
@@ -190,3 +187,72 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
         form = TipoHistoriaUsuarioForm(instance=tipo)
         formset = formset_factory(instance=tipo)
     return render(request, 'tipos-us/editar_tipo.html', {'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
+
+@ never_cache
+def importar_tipoUS(request, proyecto_id):
+    """
+        Importar tipo de historia de usuario desde otro proyecto
+
+        :param request: Peticion HTTP donde se recibe la informacion del tipo de historia de usuario a importar
+        :type request: HttpRequest
+
+        :param proyecto_id: ID del proyecto al que se le importara el tipo de historia de usuario
+        :type proyecto_id: int
+
+        :return: Renderiza la pagina para importar un tipo de historia
+        :rtype: HttpResponse
+    """
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return HttpResponse('Usuario no autenticado', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_importarTipoUS', proyecto):
+        return HttpResponse('No tiene permisos para importar tipos de historias de usuario', status=403)
+
+    mensaje = None
+    if request.method == 'POST':
+        tipos = []
+        proyecto_seleccionado = Proyecto.objects.get(id=int(request.POST.get('proyecto_seleccionado')))
+        for tipoUS in proyecto_seleccionado.tiposHistoriaUsuario.all():
+            if request.POST.get(f'{tipoUS.id}') != None:
+                tipos.append(tipoUS)
+
+        for tipoUS in tipos:
+            if tipoUS.nombre not in TipoHistoriaUsusario.objects.filter(proyecto=proyecto_id).values_list('nombre', flat=True):
+                tipoUS_nuevo = TipoHistoriaUsusario()
+                tipoUS_nuevo.nombre = tipoUS.nombre
+                tipoUS_nuevo.descripcion = tipoUS.descripcion
+                tipoUS_nuevo.proyecto = proyecto
+                tipoUS_nuevo.save()
+
+                for etapa in tipoUS.etapas.all():
+                    etapa_nueva = EtapaHistoriaUsuario()
+                    etapa_nueva.nombre = etapa.nombre
+                    etapa_nueva.descripcion = etapa.descripcion
+                    etapa_nueva.orden = etapa.orden
+                    etapa_nueva.TipoHistoriaUsusario = tipoUS_nuevo
+                    etapa_nueva.save()
+
+                return redirect(f'/tipo-historia-usuario/{proyecto_id}/')
+            
+            else:
+                mensaje = 'Ya existe un tipo de historia de usuario con ese nombre'
+
+
+    proyectos = Proyecto.objects.exclude(id=proyecto_id)
+    if request.GET.get('proyectos'):
+        proyecto_seleccionado = Proyecto.objects.get(nombre=request.GET.get('proyectos'))
+        tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyecto)
+    elif proyectos.count() > 0:
+        proyecto_seleccionado = proyectos[0]
+        tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyectos[0])
+    else:
+        tipos = None
+
+    return render(request, 'tipos-us/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
