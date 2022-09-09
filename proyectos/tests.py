@@ -48,7 +48,8 @@ class ProyectoTests(TestCase):
         #Verificamos que el usuario sin de admin puede ver los proyectos
         request.user = user
         response = proyectos(request)
-        self.assertEqual(response.status_code, 403, "Usuario puede ver los proyectos pero no tiene roles de gpa_admin")
+        self.assertContains(response, '<h1>Proyectos</h1>', None, 200,  "Usuario ve lista vacia si no es Scrum Master")
+        self.assertContains(response, 'http://localhost/proyectos/crear/', 0, 200,  "Usuario no tiene opcion crear proyecto si no es Scrum Master")
 
         #Verificamos que el usuario puede ver los proyectos
         request.user = master
