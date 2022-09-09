@@ -3,31 +3,6 @@ from proyectos.models import Proyecto, Sprint
 from usuarios.models import Usuario
 
 
-class EtapaHistoriaUsuario(models.Model):
-    """
-    Etapas de historias de usuario, cada una se muestra como una columna en el tablero de la historia de usuario correspondiente.
-
-    :param nombre: Nombre de la etapa.
-    :type nombre: str
-    :param descripcion: Descripción de la etapa.
-    :type descripcion: str
-    :param orden: El número de la etapa en la historia de usuario
-    :type orden: int
-    """
-    nombre = models.CharField(max_length=255)
-    descripcion = models.TextField(blank=True, null=True)
-    orden = models.IntegerField(blank=False, null=False)
-
-    def __str__(self):
-        """
-        Representación en string de la etapa.
-
-        Returns:
-            str: Nombre de la etapa.
-        """
-        return self.nombre
-
-
 class TipoHistoriaUsusario(models.Model):
     """
     Un tipo de historia de usuario. Cada tipo esta relacionado con un proyecto.
@@ -45,7 +20,6 @@ class TipoHistoriaUsusario(models.Model):
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
     proyecto = models.ForeignKey(Proyecto, related_name='tiposHistoriaUsuario', on_delete=models.CASCADE)
-    etapas = models.ManyToManyField(EtapaHistoriaUsuario, blank=True)
 
     class Meta:
         constraints = [
@@ -59,6 +33,32 @@ class TipoHistoriaUsusario(models.Model):
 
         Returns:
             str: El nombre del tipo de historia de usuario.
+        """
+        return self.nombre
+
+
+class EtapaHistoriaUsuario(models.Model):
+    """
+    Etapas de historias de usuario, cada una se muestra como una columna en el tablero de la historia de usuario correspondiente.
+
+    :param nombre: Nombre de la etapa.
+    :type nombre: str
+    :param descripcion: Descripción de la etapa.
+    :type descripcion: str
+    :param orden: El número de la etapa en la historia de usuario
+    :type orden: int
+    """
+    nombre = models.CharField(max_length=255)
+    descripcion = models.TextField(blank=True, null=True)
+    orden = models.IntegerField(blank=False, null=False)
+    TipoHistoriaUsusario = models.ForeignKey(TipoHistoriaUsusario, related_name='etapas', on_delete=models.CASCADE)
+
+    def __str__(self):
+        """
+        Representación en string de la etapa.
+
+        Returns:
+            str: Nombre de la etapa.
         """
         return self.nombre
 

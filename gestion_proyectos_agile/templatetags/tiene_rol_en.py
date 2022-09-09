@@ -84,6 +84,7 @@ def tiene_todos_los_roles(usuario, proyecto):
     """
     return set(usuario.roles_proyecto.filter(proyecto=proyecto)) != set(proyecto.proyecto_rol.all())
 
+
 @register.simple_tag
 def obtener_proyecto(proyecto_id):
     """Funcion para obtener el objeto proyecto mediante su id en un template 
@@ -94,4 +95,23 @@ def obtener_proyecto(proyecto_id):
     :return: El objeto proyecto del id dado
     :rtype: Proyecto
     """
-    return Proyecto.objects.get(id = proyecto_id)
+    return Proyecto.objects.get(id=proyecto_id)
+
+
+@register.simple_tag
+def tiene_permiso_en_proyecto(usuario, permiso, proyecto):
+    """Funcion para verificar si un usuario tiene un permiso en un proyecto 
+
+    :param usuario: Objeto usuario del cual se verifica 
+    :type usuario: Usuario
+
+    :param permiso: Nombre del permiso a verificar
+    :type permiso: String
+
+    :param proyecto: Proyecto donde se verifica si el usuario tiene el permiso en este proyecto
+    :type proyecto: Proyecto
+
+    :return: Se retorna un valor True si el usuario tiene el permiso en el proyecto indicado o False en caso contrario
+    :rtype: boolean
+    """
+    return proyecto.scrumMaster == usuario or usuario.roles_proyecto.filter(proyecto=proyecto).filter(permisos__nombre=permiso).exists()

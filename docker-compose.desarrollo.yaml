@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.desarrollo
-    command: bash -c "sleep 5 && python3 manage.py makemigrations usuarios proyectos historias_usuario && python3 manage.py migrate && python3 manage.py loaddata databasedump.json && python3 manage.py runserver 0.0.0.0:8000"
+    command: bash -c "sleep 1 && python3 manage.py makemigrations usuarios proyectos historias_usuario && python3 manage.py migrate && python3 manage.py loaddata databasedump.json && python3 manage.py runserver 0.0.0.0:8000"
     env_file:
       - .env.desarrollo
     volumes:
