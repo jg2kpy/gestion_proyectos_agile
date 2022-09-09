@@ -12,6 +12,15 @@ from .models import EtapaHistoriaUsuario, TipoHistoriaUsusario
 
 @never_cache
 def tiposHistoriaUsario(request, proyecto_id):
+    """Obtener vista de tipos de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere ver los tipos de historia de usuario
+    :type proyecto_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 200 con una tabla de los permisos si todo esta bien
+    :rtype: HttpResponse
+    """
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/", status=401)
 
@@ -28,6 +37,15 @@ def tiposHistoriaUsario(request, proyecto_id):
 
 @never_cache
 def crear_tipoHistoriaUsuario(request, proyecto_id):
+    """Obtener vista de crear tipo de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere crear un tipo de historia de usuario
+    :type proyecto_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 422 con información adicional si el formulario no fue creado correctamente, 200 con un formulario para crear un tipo de historia de usuario si todo esta bien
+    :rtype: HttpResponse
+    """
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/", status=401)
 
@@ -73,6 +91,17 @@ def crear_tipoHistoriaUsuario(request, proyecto_id):
 
 @never_cache
 def borrar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
+    """Obtener vista de borrar tipo de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere borrar un tipo de historia de usuario
+    :type proyecto_id: int
+    :param tipo_id: Id del tipo de historia de usuario que se quiere borrar
+    :type tipo_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 422 con información adicional si el formulario no fue creado correctamente, 200 con un formulario para borrar un tipo de historia de usuario si todo esta bien
+    :rtype: HttpResponse
+    """
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/", status=401)
 
@@ -103,6 +132,16 @@ def borrar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
 
 @never_cache
 def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
+    """Editar tipo de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere editar un tipo de historia de usuario
+    :type proyecto_id: int
+    :param tipo_id: Id del tipo de historia de usuario que se quiere editar
+    :type tipo_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 422 con información adicional si el formulario no fue creado correctamente, 200 con un formulario para editar un tipo de historia de usuario si todo esta bien
+    """
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/", status=401)
 
