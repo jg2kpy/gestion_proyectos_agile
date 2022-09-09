@@ -6,7 +6,7 @@ from django.views.decorators.cache import never_cache
 from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_rol_en_proyecto
 from proyectos.models import Proyecto
 from usuarios.models import RolProyecto, Usuario
-from .models import Usuario
+from .models import PermisoSistema, Usuario
 
 from usuarios.models import RolSistema, Usuario
 from django import forms
@@ -14,36 +14,27 @@ from django.shortcuts import redirect
 
 # Crea forms
 
-
-class RolSistemaForm(forms.ModelForm):
+class RolSistemaForm(forms.Form):
     """
-    Model form para los Roles de Globales con los campos nombre y descripcion
-    En la funcion clean se realizan las validaciones por parte del servidor
+        Formulario para crear un rol de sistema
+
+        :param nombre: Nombre del rol de sistema
+        :type nombre: Texto
+        :param descripcion: Descripcion del rol de sistema
+        :type descripcion: Texto
+        :param permisos: Permisos del rol de sistema
+        :type permisos: Lista de permisos
+
+        :return: Formulario para crear un rol de sistema
+        :rtype: Formulario
     """
-    class Meta:
-        model = RolSistema
-        fields = ['nombre', 'descripcion']
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
+    permisos = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple())
 
-    def clean(self):
-        super(RolSistemaForm, self).clean()
-
-        nombre = self.cleaned_data.get('nombre')
-        descripcion = self.cleaned_data.get('descricpion')
-
-        if not nombre:
-            self._errors['nombre'] = self.error_class([
-                'No puede quedar vacio el campo'])
-        if nombre and len(nombre) < 3:
-            self._errors['nombre'] = self.error_class([
-                'Debe tener más de 2 caracteres'])
-        if nombre and len(nombre) > 255:
-            self._errors['nombre'] = self.error_class([
-                'El máximo de caracteres permitidos es 255'])
-        if descripcion and len(descripcion) > 500:
-            self._errors['descripcion'] = self.error_class([
-                'El máximo de caracteres permitidos es 500'])
-
-        return self.cleaned_data
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['permisos'].queryset = PermisoSistema.objects.all()
 
 
 @never_cache
@@ -99,7 +90,15 @@ def rol_global_crear(request):
         form = RolSistemaForm(request.POST)
 
         if form.is_valid():
-            form.save()
+            rol = RolSistema()
+            rol.nombre = form.cleaned_data['nombre']
+            rol.descripcion = form.cleaned_data['descripcion']
+            try:
+                rol.save()
+                [rol.permisos.add(PermisoSistema.objects.get(nombre=permiso_nombre)) for permiso_nombre in form.cleaned_data['permisos']]
+            except RolSistema.DuplicateEntry:
+                status = 422
+                form.add_error("nombre", "Ya existe un rol con ese nombre")
             return redirect('rol_global_list')
 
         else:
@@ -135,16 +134,31 @@ def rol_global_editar(request, id):
     rol = RolSistema.objects.get(id=id)
 
     if request.method == 'POST':
-        form = RolSistemaForm(request.POST, instance=rol)
+        form = RolSistemaForm(request.POST)
 
         if form.is_valid():
-            form.save()
+            rol.nombre = form.cleaned_data['nombre']
+            rol.descripcion = form.cleaned_data['descripcion']
+            try:
+                rol.save()
+                for permiso in PermisoSistema.objects.all():
+                    if permiso.nombre in form.cleaned_data['permisos'].values_list('nombre', flat=True):
+                        # Agregamos el rol al permiso
+                        permiso.rol.add(rol)
+                        permiso.save()
+                    else:
+                        # Eliminamos el rol del permiso
+                        permiso.rol.remove(rol)
+                        permiso.save()
+            except RolSistema.DuplicateEntry:
+                status = 422
+                form.add_error("nombre", "Ya existe un rol con ese nombre")
             return redirect('rol_global_list')
 
         else:
             status = 422
     else:
-        form = RolSistemaForm(instance=rol)
+        form = RolSistemaForm(initial={'nombre': rol.nombre, 'descripcion': rol.descripcion, 'permisos': rol.permisos.all()})
 
     return render(request, 'rol_global/rol_global_editar.html', {'form': form, 'rol': rol}, status=status)
 
