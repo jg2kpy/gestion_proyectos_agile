@@ -1,51 +1,60 @@
 {% extends "base.html" %}
 {% block contenido %}
+{% load tiene_rol_en %}
 
 <!-- Redirigir a home si no tiene los permisos para ver esta pantalla -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Proyectos</h1>
-            </div>
-            <div>
-                <a href="{% url 'crear_proyecto' %}" class="btn btn-primary">Crear proyecto</a>
-                <a href="{% url 'roles_proyecto' %}" class="btn btn-primary">Ver Roles de Proyecto</a>                
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Proyectos</h1>
         </div>
-        <div class="row">
-            <!-- Traemos en una tabla los proyectos -->
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Fecha de inicio</th>
-                        <th>Fecha de fin</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for proyecto in proyectos %}
-                        <tr>
-                            <th>{{ proyecto.id }}</th>
-                            <td>{{ proyecto.nombre }}</td>
-                            <td>{{ proyecto.descripcion }}</td>
-                            <td>{{ proyecto.fecha_inicio }}</td>
-                            <td>{{ proyecto.fecha_fin }}</td>
-                            <td>{{ proyecto.estado }}</td>
-                            <td>
-                                <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn btn-link"><span class="material-icons">create</span></a>
-                                <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span class="material-icons">cancel</span></a>
-                                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-link"><span class="material-icons">visibility</span></a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
+        <div>
+            {% tiene_permiso_en_sistema user 'sys_crearproyecto' as sys_crearproyecto %}
+            {% if sys_crearproyecto %}
+            <a href="{% url 'crear_proyecto' %}" class="btn btn-primary">Crear proyecto</a>
+            {% endif %}
         </div>
     </div>
+    <div class="row">
+        <!-- Traemos en una tabla los proyectos -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Fecha de inicio</th>
+                    <th>Fecha de fin</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proyecto in proyectos %}
+                <tr>
+                    <th>{{ proyecto.id }}</th>
+                    <td>{{ proyecto.nombre }}</td>
+                    <td>{{ proyecto.descripcion }}</td>
+                    <td>{{ proyecto.fecha_inicio }}</td>
+                    <td>{{ proyecto.fecha_fin }}</td>
+                    <td>{{ proyecto.estado }}</td>
+                    <td>
+                        {% tiene_permiso_en_proyecto user 'pro_crearRolProyecto' proyecto as pro_crearRolProyecto %}
+                        {% if pro_crearRolProyecto %}
+                        <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">create</span></a>
+                        <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">cancel</span></a>
+                        {% endif %}
+                        <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">visibility</span></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </div>
+</div>
 
-    
-    
+
+
 {% endblock %}

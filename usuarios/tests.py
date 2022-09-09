@@ -12,7 +12,7 @@ from django.test.client import RequestFactory
 from usuarios.views import *
 from usuarios.models import RolSistema
 from proyectos.models import Proyecto
-from usuarios.views import listar_proyectos, vista_equipo
+from usuarios.views import vista_equipo
 from usuarios.models import RolProyecto, Usuario
 from phonenumber_field.modelfields import PhoneNumber
 
@@ -79,14 +79,19 @@ class RolesGlobalesTests(TestCase):
     Pruebas unitarias relacionadas al manejo de Roles Globales.
     """
 
+    fixtures = [
+       "databasedump.json",
+    ]
+
     def test_crear_rol(self):
         """
         Prueba que se pueda crear el rol
         """
         self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.', username='test')
         self.client.login(email='testemail@example.com', password='A123B456c.')
+        permisos = PermisoSistema.objects.all()
         res = self.client.post('/rolesglobales/crear/',
-                               data={'nombre': 'rol_global_test22', 'descripcion': 'Esto es un test'}, follow=True)
+                               data={'nombre': 'rol_global_test22', 'descripcion': 'Esto es un test', 'permisos': [permisos[0].id, permisos[1].id]}, follow=True)
         self.assertContains(res, '<h5 class="rolEncontrado">rol_global_test22</h5>', 1, 200, "No recibe el nombre del rol correctamente")
         self.assertContains(res, 'Esto es un test', 1, 200, "No recibe la descripcion del rol correctamente")
 
@@ -118,8 +123,9 @@ class RolesGlobalesTests(TestCase):
         self.client.login(email='testemail@example.com', password='A123B456c.', username='test')
         rolTest = RolSistema(nombre='test', descripcion='descripcion test')
         rolTest.save()
+        permisos = PermisoSistema.objects.all()
         res = self.client.post(f'/rolesglobales/{rolTest.id}/editar/', data={
-                            'nombre': 'rol_global_test_editado', 'descripcion': 'Esto es un test editado'}, follow=True)
+                            'nombre': 'rol_global_test_editado', 'descripcion': 'Esto es un test editado', 'permisos': [permisos[0].id, permisos[1].id]}, follow=True)
         self.assertContains(res, '<h5 class="rolEncontrado">rol_global_test_editado</h5>', 1, 200, "No recibe el nombre del rol editado correctamente")
         self.assertContains(res, 'Esto es un test editado', 1, 200,
                             "No recibe la descripcion del rol editado correctamente")
@@ -159,17 +165,9 @@ class MiembrosRolesTest(TestCase):
     Pruebas unitarias relacionadas al manejo de roles y miembros en proyectos
     """
 
-    def test_listar_proyectos(self):
-        """
-        Prueba de la vista de listar proyectos
-        """
-        request_factory = RequestFactory()
-        request = request_factory.get('/usuarios/equipo/')
-        request.user = AnonymousUser()
-        response = listar_proyectos(request)
-        self.assertEqual(response.status_code, 401,
-                         'La respuesta no fue un estado HTTP 401 a un usuario no autorizado')
-    
+    fixtures = [
+       "databasedump.json",
+    ]
     
     def test_get_visualizar_proyecto(self):
         """

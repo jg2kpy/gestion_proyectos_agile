@@ -19,7 +19,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
-from .views import Home
+from .views import Home, error_404_view
 from usuarios import views as usuarios_views
 from proyectos import views as proyectos_views
 
@@ -27,6 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('tipo-historia-usuario/', include('historias_usuario.urls')),
+    path('<int:id_proyecto>/', proyectos_views.proyecto_home, name='proyecto_home'),
     path('proyectos/', proyectos_views.proyectos, name='proyectos'),
     path('proyectos/crear/', proyectos_views.crear_proyecto, name='crear_proyecto'),
     path('proyectos/<int:id_proyecto>/editar/', proyectos_views.editar_proyecto, name='editar_proyecto'),
@@ -48,3 +49,4 @@ urlpatterns = [
     path('usuarios/', include('usuarios.urls'), name='usuarios'),
     path('perfil/', usuarios_views.perfil, name='perfil')
 ]
+handler404 = 'gestion_proyectos_agile.views.error_404_view'

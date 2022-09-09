@@ -10,7 +10,7 @@ from django.test.client import RequestFactory
 from usuarios.views import *
 from usuarios.models import RolSistema
 from proyectos.models import Proyecto
-from usuarios.views import listar_proyectos, vista_equipo
+from usuarios.views import vista_equipo
 from usuarios.models import RolProyecto, Usuario
 
 from proyectos.views import cancelar_proyecto, crear_rol_a_proyecto, importar_rol, modificar_rol_proyecto, proyectos,crear_proyecto, editar_proyecto, roles_proyecto, crear_rol_proyecto,ver_rol_proyecto, ver_roles_asignados

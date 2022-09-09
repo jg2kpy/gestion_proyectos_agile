@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block contenido %}
+{% load tiene_rol_en %}
 <div class="container">
+    {% tiene_permiso_en_sistema user 'sys_crearrolsistema' as sys_crearrolsistema %}
+    {% if sys_crearrolsistema %}
     <div class="row">
         <div class="col-lg-10 mx-auto mb-4">
             <div class="section-title text-center ">
@@ -14,13 +17,15 @@
                         </div>
                     </div>
                     <div class="job-right my-4 flex-shrink-0">
-                        <a href="{% url 'rol_global_crear' %}" class="btn d-block w-100 d-sm-inline-block btn-light">Crear</a>
+                        <a href="{% url 'rol_global_crear' %}"
+                            class="btn d-block w-100 d-sm-inline-block btn-light">Crear</a>
                     </div>
                 </div>
                 <h3 class="top-c-sep">Lista de Roles Globales</h3>
             </div>
         </div>
     </div>
+    {% endif %}
 
     <div class="row">
         <div class="col-lg-10 mx-auto">
@@ -31,40 +36,56 @@
                     <h5 class="rolEncontrado">{{ rol.nombre }}</h5>
                 </div>
                 <div class="p-2 bd-highlight">
-                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalVer{{ rol.id }}">
+                    <button type="button" class="btn btn-light" data-bs-toggle="modal"
+                        data-bs-target="#modalVer{{ rol.id }}">
                         Ver
                     </button>
                     <!-- Modal -->
-                    <div class="modal fade" id="modalVer{{ rol.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="modalVer{{ rol.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel">Descripción</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <h2 style="margin-bottom: 25px;">{{ rol.nombre }}</h2>
                                     <p>{{ rol.descripcion }}</p>
+                                    <ul>
+                                        {% for permiso in rol.permisos.all %}
+                                        <li>{{ permiso.nombre }}</li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!-- End Modal -->
                 </div>
+                {% tiene_permiso_en_sistema user 'sys_crearrolsistema' as sys_crearrolsistema %}
+                {% if sys_crearrolsistema %}
                 <div class="p-2 bd-highlight">
-                    <a href="{% url 'rol_global_editar' rol.id %}" class="btn d-block w-100 d-sm-inline-block btn-light">Editar</a>
+                    <a href="{% url 'rol_global_editar' rol.id %}"
+                        class="btn d-block w-100 d-sm-inline-block btn-light">Editar</a>
                 </div>
                 <div class="p-2 bd-highlight">
-                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ rol.id }}">
+                    {% if not rol.nombre == 'gpa_admin' %}
+                    <button type="button" class="btn btn-light" data-bs-toggle="modal"
+                        data-bs-target="#modalEliminar{{ rol.id }}">
                         Eliminar
                     </button>
+                    {% endif %}
                     <!-- Modal -->
-                    <div class="modal fade" id="modalEliminar{{ rol.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="modalEliminar{{ rol.id }}" tabindex="-1"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel">Eliminar</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     ¿Está seguro que desea eliminar <b>{{ rol.nombre }}</b>?
@@ -72,9 +93,11 @@
                                 <div class="modal-footer">
                                     <form action="" method="post">
                                         {% csrf_token %}
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancelar</button>
                                         <input type="hidden" name="accion" value="eliminar">
-                                        <button type="submit" class="btn btn-primary" name="nombre" value="{{ rol.nombre }}">Aceptar</button>
+                                        <button type="submit" class="btn btn-primary" name="nombre"
+                                            value="{{ rol.nombre }}">Aceptar</button>
                                     </form>
                                 </div>
                             </div>
@@ -83,8 +106,10 @@
                     <!-- End Modal -->
                 </div>
                 <div class="p-2 bd-highlight">
-                    <a href="{% url 'rol_global_usuarios' rol.id %}" class="btn d-block w-100 d-sm-inline-block btn-light">Usuarios</a>
+                    <a href="{% url 'rol_global_usuarios' rol.id %}"
+                        class="btn d-block w-100 d-sm-inline-block btn-light">Usuarios</a>
                 </div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
