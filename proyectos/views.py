@@ -178,9 +178,10 @@ def editar_proyecto(request, id_proyecto):
     if not tiene_rol_en_sistema(request_user, 'gpa_admin'):
         return HttpResponse('No tiene permisos para editar proyectos', status=403)
 
-    proyecto = Proyecto.objects.get(id=id_proyecto)
-    if not proyecto:
-        return HttpResponse('Proyecto no encontrado', status=422)
+    try:
+        proyecto = Proyecto.objects.get(id=id_proyecto)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     # Verificamos que el usuario tenga permisos rol de moderador o es el scrum master del proyecto
     if request.method == 'POST':
@@ -237,9 +238,10 @@ def cancelar_proyecto(request, id_proyecto):
     if not tiene_rol_en_sistema(request_user, 'gpa_admin'):
         return HttpResponse('No tiene permisos para cancelar proyectos', status=403)
 
-    proyecto = Proyecto.objects.get(id=id_proyecto)
-    if not proyecto:
-        return HttpResponse('Proyecto no encontrado', status=422)
+    try:
+        proyecto = Proyecto.objects.get(id=id_proyecto)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if request.method == 'POST':
         form = ProyectoCancelForm(request.POST)
@@ -366,7 +368,10 @@ def ver_rol_proyecto(request, id_rol_proyecto):
     """
 
     request_user = request.user
-    rol = RolProyecto.objects.get(id=id_rol_proyecto)
+    try:
+        rol = RolProyecto.objects.get(id=id_rol_proyecto)
+    except RolProyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este rol."}, status=404)
     proyecto = rol.proyecto
 
     if not request_user.is_authenticated:
@@ -409,7 +414,10 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
 
     # Verificar que solo el administrador y el Scrum Master pueden modificar roles de proyectos
 
-    rol = RolProyecto.objects.get(id=id_rol_proyecto)
+    try:
+        rol = RolProyecto.objects.get(id=id_rol_proyecto)
+    except RolProyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este rol."}, status=404)
 
     proyecto = rol.proyecto
 
@@ -478,7 +486,10 @@ def eliminar_rol_proyecto(request, id_rol_proyecto):
 
     # Verificar que solo el administrador y el Scrum Master pueden modificar roles de proyectos
 
-    rol = RolProyecto.objects.get(id=id_rol_proyecto)
+    try:
+        rol = RolProyecto.objects.get(id=id_rol_proyecto)
+    except RolProyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este rol."}, status=404)
 
     proyecto = rol.proyecto
 
@@ -516,7 +527,10 @@ def ver_roles_asignados(request, id_proyecto):
     """
 
     request_user = request.user
-    proyecto = Proyecto.objects.get(id=id_proyecto)
+    try:
+        proyecto = Proyecto.objects.get(id=id_proyecto)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     # Verificacion que o es SrumMaster o es admin del sistema
     if not request_user.is_authenticated:
@@ -556,11 +570,14 @@ def crear_rol_a_proyecto(request, id_proyecto):
     """
 
     request_user = request.user
-    proyecto = Proyecto.objects.get(id=id_proyecto)
-
     # Verificar si esta autenticado
     if not request_user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=id_proyecto)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     # Si es proyecto None entonces si o si tiene que ser un gpa_admin
     if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
@@ -627,11 +644,15 @@ def importar_rol(request, id_proyecto):
         :rtype: HttpResponse
     """
     request_user = request.user
-    proyecto = Proyecto.objects.get(id=id_proyecto)
 
     # Verificamos que el usuario este autenticado
     if not request_user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=id_proyecto)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     # Verificacion que o es SrumMaster o es admin del sistema
     if not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto):

@@ -33,13 +33,12 @@
             <form method="POST">
                 {% csrf_token %}
                 {% for rol in roles %}
-                <input type="checkbox" name="{{rol.id}}" value="{{rol.id}}"><label for="{{rol.id}}">{{ rol.nombre
-                    }}</label>
+                <input type="checkbox" name="{{rol.id}}" value="{{rol.id}}"><label for="{{rol.id}}">{{ rol.nombre }}</label>
                 <br>
                 {% endfor %}
                 <input hidden name="proyecto_seleccionado" value="{{proyecto_seleccionado.id}}">
                 <button type="submit" class="btn btn-primary">Importar estos roles</button>
-                <a href="{% url 'rol_proyecto_asignado' id_proyecto %}" class="btn btn-danger">Cancelar</a>
+                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-danger">Cancelar</a>
             </form>
         </div>
     </div>

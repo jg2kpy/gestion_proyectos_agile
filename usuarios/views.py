@@ -221,7 +221,7 @@ def vista_equipo(request, proyecto_id):
         return HttpResponse('Usuario no autenticado', status=401)
 
     if Proyecto.objects.filter(id=proyecto_id).count() == 0:
-        return HttpResponse('Proyecto no existe', status=404)
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not request.user.equipo.filter(id=proyecto_id):
         return HttpResponse('Usuario no pertenece al proyecto', status=403)

@@ -14,8 +14,8 @@
                 {{ form.as_div }}
                 <br>
                 <button type="submit" class="btn btn-primary">Crear rol de proyecto</button>
-                {% if id_proyecto %}
-                <a href="{% url 'rol_proyecto_asignado' id_proyecto %}" class="btn btn-danger">Cancelar</a>
+                {% if proyecto %}
+                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-danger">Cancelar</a>
                 {% else %}
                 <a href="{% url 'roles_proyecto' %}" class="btn btn-danger">Cancelar</a>
                 {% endif%}

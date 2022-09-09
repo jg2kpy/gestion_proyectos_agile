@@ -111,7 +111,7 @@ def borrar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
     try:
         tipo = TipoHistoriaUsusario.objects.get(id=tipo_id)
-    except Proyecto.DoesNotExist:
+    except TipoHistoriaUsusario.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
 
     if not tiene_permiso_en_proyecto(request.user, "pro_eliminarTipoUS", proyecto):
@@ -151,7 +151,7 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
     try:
         tipo = TipoHistoriaUsusario.objects.get(id=tipo_id)
-    except Proyecto.DoesNotExist:
+    except TipoHistoriaUsusario.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
 
     if not tiene_permiso_en_proyecto(request.user, "pro_editarTipoUS", proyecto):
