@@ -40,6 +40,11 @@ urlpatterns = [
     path('proyectos/<int:id_proyecto>/roles/crear/', proyectos_views.crear_rol_a_proyecto, name='crear_rol_a_proyecto'),
     path('proyectos/<int:id_proyecto>/roles/import/', proyectos_views.importar_rol, name='importar_rol'),
     path('', Home.as_view(), name='home'),
+
+    path('rolesglobales/', usuarios_views.rol_global_list, name='rol_global_list'),
+    path('rolesglobales/crear/', usuarios_views.rol_global_crear, name='rol_global_crear'),
+    path('rolesglobales/<int:id>/editar/', usuarios_views.rol_global_editar, name='rol_global_editar'),
+    path('rolesglobales/<int:id>/usuarios/', usuarios_views.rol_global_usuarios, name='rol_global_usuarios'),
     path('usuarios/', include('usuarios.urls'), name='usuarios'),
     path('perfil/', usuarios_views.perfil, name='perfil')
 ]

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block contenido %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mx-auto mb-4">
+            <div class="section-title text-center ">
+                {% if estado == 'vacio' %}
+                <h1>Error! No ha seleccionado ningun usuario</h1>
+                {% endif %}
+
+                {% if estado == 'posee_rol' %}
+                <h1>El usuario {{ usuario.username }} ya posee el rol {{ rol.nombre }}</h1>
+                {% endif %}
+
+                {% if estado == 'rol_inexistente' %}
+                <h1>El usuario {{ usuario.username }} no posee el rol {{ rol.nombre }} que se quiere desvincular</h1>
+                {% endif %}
+
+                {% if estado == 'vinculado' or estado == 'desvinculado' %}
+                <h1>Se ha {{ estado }} el rol <b>{{ rol.nombre }}</b> al usuario <b>{{ usuario.username }}</b></h1>
+                {% endif %}
+            </div>
+        </div>
+        <div class="mb-3">
+            <a href="{% url 'rol_global_usuarios' rol.id %}" class="btn btn-light" class="mb-3"><b>Continuar Vinculando</b></a>
+            <br><br>
+            <a href="{% url 'rol_global_list' %}" class="btn btn-light" class="mb-3"><b>Volver a Roles Globales</b></a>
+        </div>
+    </div>
+</div>
+{% endblock %}

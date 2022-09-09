@@ -29,17 +29,32 @@
                 </thead>
                 <tbody>
                     {% for rol_proyecto in roles_proyecto %}
-                        {% if rol_proyecto.proyecto != none %}
-                        <tr>
-                            <th>{{ rol_proyecto.id }}</th>
-                            <td>{{ rol_proyecto.nombre }}</td>
-                            <td>{{ rol_proyecto.proyecto }}</td>
-                            <td>
-                                <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">create</span></a>
-                                <a href="{% url 'eliminar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">cancel</span></a>
-                                <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">visibility</span></a>
-                            </td>
-                        </tr>
+                        {% if id_proyecto %}
+                            {% if rol_proyecto.proyecto != none %}
+                            <tr>
+                                <th>{{ rol_proyecto.id }}</th>
+                                <td>{{ rol_proyecto.nombre }}</td>
+                                <td>{{ rol_proyecto.proyecto }}</td>
+                                <td>
+                                    <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">create</span></a>
+                                    <a href="{% url 'eliminar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">cancel</span></a>
+                                    <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">visibility</span></a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% else %}
+                            {% if rol_proyecto.proyecto == none %}
+                            <tr>
+                                <th>{{ rol_proyecto.id }}</th>
+                                <td>{{ rol_proyecto.nombre }}</td>
+                                <td>{{ rol_proyecto.proyecto }}</td>
+                                <td>
+                                    <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">create</span></a>
+                                    <a href="{% url 'eliminar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">cancel</span></a>
+                                    <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">visibility</span></a>
+                                </td>
+                            </tr>
+                            {% endif %}
                         {% endif %}
                     {% endfor %}
                 </tbody>

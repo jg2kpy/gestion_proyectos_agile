@@ -1,86 +1,145 @@
 {% extends "base.html" %}
 {% block contenido %}
-    {% load tiene_rol_en %}
-    <br>
-    <h2>Usuario: {{ user.username }}</h2>
-    <h2>Proyectos</h2>
-            <ol>
-                {% obtener_proyecto proyecto_id as proyecto %}
-                <h3><li>{{ proyecto }}</h3>
-                {% tiene_rol_en_proyecto user "Scrum Master" proyecto.id as es_master %}
-                {% if es_master %}
-                    
-                    <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
-                        {% csrf_token %}
-                        Agregar usuario a {{ proyecto }}:  <input type="text" name="usuario_a_agregar" id="usuario_a_agregar" required="">
-                        <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
-                        <input name="hidden_action" id="hidden_action" hidden value="agregar_miembro_proyecto">
-                        <select name="roles_agregar" id="roles_agregar">
-                            {% for rol in proyecto.proyecto_rol.all %}
-                                <option value="{{ rol.id }}" name="rol" id="rol">{{ rol}}</option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="btn btn-success">Agregar miembro al proyecto</button>
-                    </form>
-                    {{ mensaje }}
-                    <br>
-                    <ul>Miembros:
-                    <br>              
-                    {% for miembros in proyecto.usuario.all %}
-                        {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
-                        <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
-                            {% csrf_token %}
-                            <input name="hidden_action" id="hidden_action" hidden value="eliminar_miembro_proyecto">
-                            <input name="usuario_a_eliminar" id="usuario_a_eliminar" hidden value="{{ miembros.email }}">
-                            <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
-                            <li>{{ miembros.email }} <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
-                        </form>
-                            <br>Roles:<br>
-                            {% for r in rolesActual %}
-                                <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
-                                    {% csrf_token %}
-                                    <input name="hidden_action" id="hidden_action" hidden value="eliminar_rol_proyecto">
-                                    <input name="usuario_a_sacar_rol" id="usuario_a_sacar_rol" hidden value="{{ miembros.email }}">
-                                    <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
-                                    <input name="rol_id" id="rol_id" hidden value="{{ r.id }}">
-                                    <li>{{ r }} <button type="submit" class="btn btn-warning">Desasignar rol</button>
-                                </form>
-                                <br>
-                            {% endfor %}
-                            
-                            {% tiene_todos_los_roles miembros proyecto as tiene_todo %}
-                            {% if tiene_todo %}
-                                <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
-                                    {% csrf_token %}
-                                    <input name="hidden_action" id="hidden_action" hidden value="asignar_rol_proyecto">
-                                    <input name="usuario_a_cambiar_rol" id="usuario_a_cambiar_rol" hidden value="{{ miembros.email }}">
-                                    <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
-                                    <select name="roles{{ miembros.email }}" id="roles{{ miembros.email }}">
-                                        {% for rol in proyecto.proyecto_rol.all %}
-                                            {% if not rol in rolesActual %}
-                                                <option value="{{ rol.id }}" name="rol{{ rol.id }}" id="rol{{ rol.id }}">{{ rol }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                    <button type="submit" class="btn btn-primary">Agregar Rol</button>
-                                </form>
-                            {% endif %}
-                        </li>
-                    <br><br><br>
-                    {% endfor %}</ul>
-                {% else %}
-                <ul>Miembros:
-                    {% for miembros in proyecto.usuario.all %}
-                    {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
-                        <li>{{ miembros.email }}</li>
-                        <br>Roles:<br>
-                            {% for r in rolesActual %}
-                                {{ r }}
-                                <br>
-                            {% endfor %}
-                    {% endfor %}
-                {% endif %}</ul>
-                </li>
-            </ol>
+{% load tiene_rol_en %}
+{% obtener_proyecto proyecto_id as proyecto %}
+{% tiene_rol_en_proyecto user "Scrum Master" proyecto.id as es_master %}
+
+{% if es_master %}
+    <div class="row mt-5">
+        <div class="col-12" style="text-align: center;">
+            <h3>Miembros del Proyecto {{ proyecto.nombre }}</h3>
         </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-6">
+            {% if mensaje %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h6>{{ mensaje }}</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-5">
+            <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
+                
+                {% csrf_token %}
+                <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
+                <input name="hidden_action" id="hidden_action" hidden value="agregar_miembro_proyecto">
+
+                <label for="usuario_a_agregar">Email: </label><input type="text" name="usuario_a_agregar" id="usuario_a_agregar" required="">
+                <select name="roles_agregar" id="roles_agregar">
+                    {% for rol in proyecto.proyecto_rol.all %}
+                        <option value="{{ rol.id }}" name="rol" id="rol">{{ rol.nombre }}</option>
+                    {% endfor %}
+                </select>
+
+            </div>
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary">Agregar usuario al proyecto</button>
+            </div>
+            </form>
+    </div>
+    {% for miembros in proyecto.usuario.all %}
+    <hr>
+    {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
+        <div class="row mt-2">
+            <div class="col-5">
+                <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
+
+                    {% csrf_token %}
+                    <input name="hidden_action" id="hidden_action" hidden value="eliminar_miembro_proyecto">
+                    <input name="usuario_a_eliminar" id="usuario_a_eliminar" hidden value="{{ miembros.email }}">
+                    <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
+
+                    {% if miembros.get_full_name == '' %}
+                        <p>{{ miembros.email }}</p>
+                    {% else %}
+                        <p>{{ miembros.get_full_name }} ({{ miembros.email }})</p>
+                    {% endif %}
+                </div>
+                {% if user != miembros%}
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
+                    </div>
+                {% endif %}
+                </form>
+        </div>
+        {% for r in rolesActual %}
+            <div class="row mt-2">
+                <div class="col-5 ">
+                    <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
+
+                        {% csrf_token %}
+                        <input name="hidden_action" id="hidden_action" hidden value="eliminar_rol_proyecto">
+                        <input name="usuario_a_sacar_rol" id="usuario_a_sacar_rol" hidden value="{{ miembros.email }}">
+                        <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
+                        <input name="rol_id" id="rol_id" hidden value="{{ r.id }}">
+
+                        <p> - {{ r.nombre }}</p>
+                        {% if not miembros == user or not r.nombre == "Scrum Master"%}
+                                </div>
+                                <div class="col-6">
+                                    <button type="submit" class="btn btn-primary">Desasignar rol</button>
+                                </div>
+                                </form>
+                        {% endif %}
+                </div>
+        {% endfor %}
+
+        {% tiene_todos_los_roles miembros proyecto as tiene_todo %}
+        {% if tiene_todo %}
+        <div class="row mt-2">
+            <div class="col-5">
+                <form action="{% url 'vista_equipo' proyecto_id %}" method="POST">
+
+                    {% csrf_token %}
+                    <input name="hidden_action" id="hidden_action" hidden value="asignar_rol_proyecto">
+                    <input name="usuario_a_cambiar_rol" id="usuario_a_cambiar_rol" hidden value="{{ miembros.email }}">
+                    <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
+
+                    <select name="roles{{ miembros.email }}" id="roles{{ miembros.email }}">
+                        {% for rol in proyecto.proyecto_rol.all %}
+                            {% if not rol in rolesActual %}
+                                <option value="{{ rol.id }}" name="rol{{ rol.id }}" id="rol{{ rol.id }}">{{ rol.nombre }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6">
+                    <button type="submit" class="btn btn-primary">Asignar Rol</button>
+                </div>
+                </form>
+        </div>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <div class="row mt-5">
+        <div class="col-12" style="text-align: center;">
+            <h3>Miembros del Proyecto {{ proyecto.nombre }}</h3>
+        </div>
+    </div>
+    {% for miembros in proyecto.usuario.all %}
+    {% obtener_rol_en_proyecto miembros proyecto.id as rolesActual %}
+        <hr>
+        <div class="row mt-2">
+            <div class="col-12">
+                {% if miembros.get_full_name == '' %}
+                    <p>{{ miembros.email }}</p>
+                {% else %}
+                    <p>{{ miembros.get_full_name }} ({{ miembros.email }})</p>
+                {% endif %}
+            </div>
+        </div>
+            {% for r in rolesActual %}
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <p>{{ r.nombre }}</p>
+                    </div>
+                </div>
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+
 {% endblock %}
