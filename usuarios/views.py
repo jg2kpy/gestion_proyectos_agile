@@ -56,12 +56,15 @@ def rol_global_list(request):
         return HttpResponseRedirect('Usuario no autenticado', status=401)
 
     if request.POST.get('accion') == 'eliminar':
-        rol = RolSistema.objects.get(nombre=request.POST.get('nombre'))
-        if rol.nombre == 'Scrum Master':
-            status = 422
-            return HttpResponse('No se puede eliminar el rol Scrum Master', status=status)
-        rol.delete()
-        return redirect('rol_global_list')
+        try:
+            rol = RolSistema.objects.get(nombre=request.POST.get('nombre'))
+            if rol.nombre == 'Scrum Master':
+                status = 422
+                return HttpResponse('No se puede eliminar el rol Scrum Master', status=status)
+            rol.delete()
+            return redirect('rol_global_list')
+        finally:
+            return redirect('rol_global_list')
 
     else:
         roles = RolSistema.objects.all()
@@ -130,8 +133,11 @@ def rol_global_editar(request, id):
 
     if not request.user.is_authenticated:
         return HttpResponseRedirect('Usuario no autenticado', status=401)
-
-    rol = RolSistema.objects.get(id=id)
+    
+    try:
+        rol = RolSistema.objects.get(id=id)
+    except:
+        return redirect('rol_global_list')
 
     if request.method == 'POST':
         form = RolSistemaForm(request.POST)
@@ -183,7 +189,10 @@ def rol_global_usuarios(request, id):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('Usuario no autenticado', status=401)
 
-    rol = RolSistema.objects.get(id=id)
+    try:
+        rol = RolSistema.objects.get(id=id)
+    except:
+        return redirect('rol_global_list')
 
     if request.method == 'POST':
         email = request.POST.get('usuarios')
