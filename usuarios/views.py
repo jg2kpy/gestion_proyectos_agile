@@ -105,6 +105,7 @@ def rol_global_crear(request):
             return redirect('rol_global_list')
 
         else:
+            print(form.errors)
             status = 422
 
     else:
@@ -321,10 +322,14 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
         return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    try:
         usuario_email = form.get('usuario_a_agregar')
         rol_id = form.get('roles_agregar')
         usuario_a_agregar_miembro_proyecto = Usuario.objects.get(email=usuario_email)
-        proyecto = Proyecto.objects.get(id=proyecto_id)
 
         if usuario_a_agregar_miembro_proyecto.equipo.filter(id=proyecto.id).count() != 0:
             return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario ya pertenece al proyecto', 'proyecto_id': proyecto_id}, status=422)
