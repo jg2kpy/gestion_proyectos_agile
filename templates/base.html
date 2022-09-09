@@ -132,7 +132,7 @@
                 </li>
                 <li class="border-top my-3"></li>
                 {% tiene_rol_en_sistema user "gpa_admin" as es_admin %}
-                {% if es_admin %}
+                {% if user.roles_sistema.count > 0 or es_admin %}
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                         data-bs-target="#admin-collapse" aria-expanded="false">

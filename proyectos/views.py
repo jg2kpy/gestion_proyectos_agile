@@ -8,7 +8,7 @@ from .models import Proyecto
 from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 from django.views.decorators.cache import never_cache
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_rol_en_proyecto, tiene_rol_en_sistema
+from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
 from django.http import HttpResponse
 
 """
@@ -47,7 +47,7 @@ def proyectos(request):
     if not request.user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
 
-    if not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+    if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para administrar proyectos', status=403)
 
     return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
@@ -96,7 +96,7 @@ def crear_proyecto(request):
         return HttpResponse('Usuario no autenticado', status=401)
 
     # Verificar que solo el administrador puede crear proyectos
-    if not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+    if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para crear proyectos', status=403)
 
     if request.method == 'POST':
@@ -175,7 +175,7 @@ def editar_proyecto(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
 
     # Verificar que solo el administrador puede editar proyectos
-    if not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+    if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para editar proyectos', status=403)
 
     try:
@@ -235,7 +235,7 @@ def cancelar_proyecto(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
 
     # Verificar que solo el administrador puede cancelar proyectos
-    if not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+    if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para cancelar proyectos', status=403)
 
     try:
@@ -284,7 +284,7 @@ def roles_proyecto(request):
         return HttpResponse('Usuario no autenticado', status=401)
 
     # Verificar que solo el administrador puede ver los roles de proyectos
-    if not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+    if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para ver los roles de proyectos', status=403)
 
     return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all()})
@@ -311,7 +311,7 @@ def crear_rol_proyecto(request):
         return HttpResponse('Usuario no autenticado', status=401)
 
     # Verificar que solo el administrador puede crear roles de proyectos
-    if not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+    if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para crear roles de proyectos', status=403)
 
     if request.method == 'POST':
@@ -422,7 +422,7 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
     proyecto = rol.proyecto
 
     # Si es proyecto None entonces si o si tiene que ser un gpa_admin
-    if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
+    if proyecto is None and not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para modificar roles de proyectos', status=403)
     elif proyecto is not None and not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto):
         return HttpResponse('No tiene permisos para modificar roles de proyectos', status=403)
@@ -538,7 +538,7 @@ def ver_roles_asignados(request, id_proyecto):
 
     # Verificar que solo el administrador puede crear roles de proyectos
     if not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto):
-        return HttpResponse('No tiene permisos para ver los roles de proyectos', status=403)
+        return HttpResponse('No tiene permisos para ver los roles de este proyecto', status=403)
 
     # Traemos los roles que tengan el id del proyecto
     try:
