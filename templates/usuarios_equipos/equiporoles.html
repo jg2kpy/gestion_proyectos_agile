@@ -111,7 +111,7 @@
 
             <select name="roles{{ miembros.email }}" id="roles{{ miembros.email }}">
                 {% for rol in proyecto.proyecto_rol.all %}
-                {% if not rol in rolesActual %}
+                {% if not rol in rolesActual and rol.nombre != "Scrum Master" %}
                 <option value="{{ rol.id }}" name="rol{{ rol.id }}" id="rol{{ rol.id }}">{{ rol.nombre }}</option>
                 {% endif %}
                 {% endfor %}
