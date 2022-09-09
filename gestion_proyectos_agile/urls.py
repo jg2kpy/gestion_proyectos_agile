@@ -27,6 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('tipo-historia-usuario/', include('historias_usuario.urls')),
+    path('<int:id_proyecto>/', proyectos_views.proyecto_home, name='proyecto_home'),
     path('proyectos/', proyectos_views.proyectos, name='proyectos'),
     path('proyectos/crear/', proyectos_views.crear_proyecto, name='crear_proyecto'),
     path('proyectos/<int:id_proyecto>/editar/', proyectos_views.editar_proyecto, name='editar_proyecto'),

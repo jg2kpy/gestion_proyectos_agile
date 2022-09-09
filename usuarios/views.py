@@ -13,6 +13,8 @@ from django import forms
 from django.shortcuts import redirect
 
 # Crea forms
+
+
 class RolSistemaForm(forms.ModelForm):
     """
     Model form para los Roles de Globales con los campos nombre y descripcion
@@ -21,13 +23,13 @@ class RolSistemaForm(forms.ModelForm):
     class Meta:
         model = RolSistema
         fields = ['nombre', 'descripcion']
-    
+
     def clean(self):
         super(RolSistemaForm, self).clean()
-         
+
         nombre = self.cleaned_data.get('nombre')
         descripcion = self.cleaned_data.get('descricpion')
- 
+
         if not nombre:
             self._errors['nombre'] = self.error_class([
                 'No puede quedar vacio el campo'])
@@ -40,7 +42,7 @@ class RolSistemaForm(forms.ModelForm):
         if descripcion and len(descripcion) > 500:
             self._errors['descripcion'] = self.error_class([
                 'El máximo de caracteres permitidos es 500'])
- 
+
         return self.cleaned_data
 
 
@@ -61,7 +63,7 @@ def rol_global_list(request):
 
     if not request.user.is_authenticated:
         return HttpResponseRedirect('Usuario no autenticado', status=401)
-    
+
     if request.POST.get('accion') == 'eliminar':
         rol = RolSistema.objects.get(nombre=request.POST.get('nombre'))
         rol.delete()
@@ -70,6 +72,7 @@ def rol_global_list(request):
     else:
         roles = RolSistema.objects.all()
         return render(request, 'rol_global/rol_global_list.html', {'roles': roles}, status=status)
+
 
 @never_cache
 def rol_global_crear(request):
@@ -88,7 +91,7 @@ def rol_global_crear(request):
 
     if not request.user.is_authenticated:
         return HttpResponseRedirect('Usuario no autenticado', status=401)
-    
+
     if request.method == 'POST':
         form = RolSistemaForm(request.POST)
 
@@ -103,6 +106,7 @@ def rol_global_crear(request):
         form = RolSistemaForm()
 
     return render(request, 'rol_global/rol_global_crear.html', {'form': form}, status=status)
+
 
 @never_cache
 def rol_global_editar(request, id):
@@ -124,12 +128,12 @@ def rol_global_editar(request, id):
 
     if not request.user.is_authenticated:
         return HttpResponseRedirect('Usuario no autenticado', status=401)
-        
+
     rol = RolSistema.objects.get(id=id)
-    
+
     if request.method == 'POST':
         form = RolSistemaForm(request.POST, instance=rol)
-    
+
         if form.is_valid():
             form.save()
             return redirect('rol_global_list')
@@ -139,7 +143,8 @@ def rol_global_editar(request, id):
     else:
         form = RolSistemaForm(instance=rol)
 
-    return render(request, 'rol_global/rol_global_editar.html', {'form': form, 'rol':rol}, status=status)
+    return render(request, 'rol_global/rol_global_editar.html', {'form': form, 'rol': rol}, status=status)
+
 
 @never_cache
 def rol_global_usuarios(request, id):
@@ -170,25 +175,25 @@ def rol_global_usuarios(request, id):
             estado = 'vacio'
             status = 422
             return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado, 'rol': rol}, status=status)
-        
+
         usuario = Usuario.objects.get(email=email)
-        
+
         if 'vincular' in request.POST:
             if usuario.roles_sistema.filter(id=id).exists():
                 estado = 'posee_rol'
-                
+
             else:
                 usuario.roles_sistema.add(rol)
                 estado = 'vinculado'
-            
+
         else:
             if usuario.roles_sistema.filter(id=id).exists():
                 usuario.roles_sistema.remove(rol)
                 estado = 'desvinculado'
-                
+
             else:
                 estado = 'rol_inexistente'
-            
+
         return render(request, 'rol_global/rol_global_validacion.html', {'estado': estado, 'usuario': usuario, 'rol': rol}, status=status)
 
     else:
@@ -231,7 +236,7 @@ def vista_equipo(request, proyecto_id):
         elif hidden_action == 'asignar_rol_proyecto':
             return asignar_rol_proyecto(form, request.user, proyecto_id)
 
-    return render(request, 'usuarios_equipos/equiporoles.html', {'proyecto_id': proyecto_id})
+    return render(request, 'usuarios_equipos/equiporoles.html', {'proyecto': Proyecto.objects.get(id=proyecto_id)})
 
 
 def eliminar_miembro_proyecto(form, request_user, proyecto_id):
@@ -264,7 +269,7 @@ def eliminar_miembro_proyecto(form, request_user, proyecto_id):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'/usuarios/equipo/{proyecto_id}')
+    return redirect(f'/usuarios/{proyecto_id}')
 
 
 def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
@@ -303,9 +308,9 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
         usuario_a_agregar_miembro_proyecto.roles_proyecto.add(rol_proyecto)
 
     except Usuario.DoesNotExist:
-        return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario no existe', 'proyecto_id': proyecto_id}, status=422)
+        return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario no existe', 'proyecto': proyecto}, status=422)
 
-    return redirect(f'/usuarios/equipo/{proyecto_id}')
+    return redirect(f'/usuarios/{proyecto_id}')
 
 
 def eliminar_rol_proyecto(form, request_user, proyecto_id):
@@ -338,7 +343,7 @@ def eliminar_rol_proyecto(form, request_user, proyecto_id):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'/usuarios/equipo/{proyecto_id}')
+    return redirect(f'/usuarios/{proyecto_id}')
 
 
 def asignar_rol_proyecto(form, request_user, proyecto_id):
@@ -371,23 +376,7 @@ def asignar_rol_proyecto(form, request_user, proyecto_id):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'/usuarios/equipo/{proyecto_id}')
-
-
-@never_cache
-def listar_proyectos(request):
-    """Vista de listar los proyectos de un usuario, funcion que maneja el endpoint /usuarios/equipo
-
-    :param request: Solicitud HTTP del cliente
-    :type request: HttpRequest
-
-    :return: Se retorna una respuesta HttpResponse o 401 en caso de no estar autenticado
-    :rtype: HttpResponse
-    """
-    if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
-
-    return render(request, 'usuarios_equipos/listar_proyectos.html')
+    return redirect(f'/usuarios/{proyecto_id}')
 
 
 class UsuarioForm(ModelForm):

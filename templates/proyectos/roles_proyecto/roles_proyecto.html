@@ -2,65 +2,71 @@
 {% block contenido %}
 
 <!-- Redirigir a home si no tiene los permisos para ver esta pantalla -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Roles de Proyecto</h1>
-            </div>
-            <div>
-                {% if id_proyecto %}
-                    <a href="{% url 'crear_rol_a_proyecto' id_proyecto %}" class="btn btn-primary">Crear rol de proyecto</a>
-                    <a href="{% url 'importar_rol' id_proyecto %}" class="btn btn-primary">Importar de otros proyectos </a>
-                {% else %}
-                    <a href="{% url 'crear_rol_proyecto' %}" class="btn btn-primary">Crear rol de proyecto</a>  
-                {% endif %}  
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Roles de Proyecto</h1>
         </div>
-        <div class="row">
-            <!-- Traemos en una tabla los proyectos -->
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Proyecto</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for rol_proyecto in roles_proyecto %}
-                        {% if id_proyecto %}
-                            {% if rol_proyecto.proyecto != none %}
-                            <tr>
-                                <th>{{ rol_proyecto.id }}</th>
-                                <td>{{ rol_proyecto.nombre }}</td>
-                                <td>{{ rol_proyecto.proyecto }}</td>
-                                <td>
-                                    <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">create</span></a>
-                                    <a href="{% url 'eliminar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">cancel</span></a>
-                                    <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">visibility</span></a>
-                                </td>
-                            </tr>
-                            {% endif %}
-                        {% else %}
-                            {% if rol_proyecto.proyecto == none %}
-                            <tr>
-                                <th>{{ rol_proyecto.id }}</th>
-                                <td>{{ rol_proyecto.nombre }}</td>
-                                <td>{{ rol_proyecto.proyecto }}</td>
-                                <td>
-                                    <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">create</span></a>
-                                    <a href="{% url 'eliminar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">cancel</span></a>
-                                    <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span class="material-icons">visibility</span></a>
-                                </td>
-                            </tr>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
+        <div>
+            {% if id_proyecto %}
+            <a href="{% url 'crear_rol_a_proyecto' id_proyecto %}" class="btn btn-primary">Crear rol de proyecto</a>
+            <a href="{% url 'importar_rol' id_proyecto %}" class="btn btn-primary">Importar de otros proyectos </a>
+            {% else %}
+            <a href="{% url 'crear_rol_proyecto' %}" class="btn btn-primary">Crear rol de proyecto</a>
+            {% endif %}
         </div>
     </div>
+    <div class="row">
+        <!-- Traemos en una tabla los proyectos -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Proyecto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rol_proyecto in roles_proyecto %}
+                {% if id_proyecto %}
+                {% if rol_proyecto.proyecto != none %}
+                <tr>
+                    <th>{{ rol_proyecto.id }}</th>
+                    <td>{{ rol_proyecto.nombre }}</td>
+                    <td>{{ rol_proyecto.proyecto }}</td>
+                    <td>
+                        <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">create</span></a>
+                        <a href="{% url 'eliminar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">cancel</span></a>
+                        <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">visibility</span></a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% else %}
+                {% if rol_proyecto.proyecto == none %}
+                <tr>
+                    <th>{{ rol_proyecto.id }}</th>
+                    <td>{{ rol_proyecto.nombre }}</td>
+                    <td>{{ rol_proyecto.proyecto }}</td>
+                    <td>
+                        <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">create</span></a>
+                        <a href="{% url 'eliminar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">cancel</span></a>
+                        <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">visibility</span></a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+            </tbody>
+    </div>
+</div>
 
-    
-    
+
+
 {% endblock %}

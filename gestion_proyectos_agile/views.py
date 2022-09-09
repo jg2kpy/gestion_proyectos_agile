@@ -10,4 +10,4 @@ class NeverCacheMixin(object):
 
 
 class Home(NeverCacheMixin, TemplateView):
-    template_name = 'home.html'
+    template_name = 'base.html'

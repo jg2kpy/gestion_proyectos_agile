@@ -15,8 +15,12 @@
                 {{ form.as_div }}
                 <br>
                 <button type="submit" class="btn btn-primary">Modificar rol de proyecto</button>
+                {% if proyecto %}
+                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-danger">Cancelar</a>
+                {% else %}
                 <a href="{% url 'roles_proyecto' %}" class="btn btn-danger">Cancelar</a>
+                {% endif %}
             </form>
         </div>
     </div>
-{% endblock %}
+    {% endblock %}

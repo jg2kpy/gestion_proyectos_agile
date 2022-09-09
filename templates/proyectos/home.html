@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block contenido %}
+<div class="d-flex align-items-center justify-content-center h-75 d-inline-block">
+    <div class="box text-center">
+        <h1>{{ proyecto.nombre }}</h1>
+        <a href="{% url 'vista_equipo' proyecto.id %}" class="btn-primary btn-lg ms-3">
+            <span class="material-icons  align-text-bottom">
+                groups
+            </span>
+            Miembros
+        </a>
+        <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn-primary btn-lg ms-3">
+            <span class="material-icons  align-text-bottom">
+                manage_accounts
+            </span>
+            Roles
+        </a>
+        <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="btn-primary btn-lg ms-3">
+            <span class="material-icons  align-text-bottom">
+                checklist
+            </span>
+            Tipos US
+        </a>
+    </div>
+</div>
+{% endblock %}

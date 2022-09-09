@@ -11,12 +11,14 @@
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label for="id_nombre" class="form-label">Nombre:</label>
-                                <input type="text" name="nombre" maxlength="255" required="" id="id_nombre" class="form-control" aria-describedby="textAyuda" value="{{ rol.nombre }}">
+                                <input type="text" name="nombre" maxlength="255" required="" id="id_nombre"
+                                    class="form-control" aria-describedby="textAyuda" value="{{ rol.nombre }}">
                                 <div id="textAyuda" class="form-text">Mínimo 3 caracteres y máximo 255 caracteres</div>
                             </div>
-                                <div class="mb-3">
+                            <div class="mb-3">
                                 <label for="id_descripcion" class="form-label">Descripción:</label>
-                                <textarea name="descripcion" cols="40" rows="10" id="id_descripcion" class="form-control">{{ rol.descripcion }}</textarea>
+                                <textarea name="descripcion" cols="40" rows="10" id="id_descripcion"
+                                    class="form-control">{{ rol.descripcion }}</textarea>
                             </div>
                             <input type="submit" class="btn btn-light" value="Enviar"></button>
                         </form>

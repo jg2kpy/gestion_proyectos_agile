@@ -11,7 +11,7 @@ from .models import EtapaHistoriaUsuario, TipoHistoriaUsusario
 
 
 @never_cache
-def tiposHistoriaUsario(request, proyecto_id):
+def tiposHistoriaUsuario(request, proyecto_id):
     """Obtener vista de tipos de historia de usuario
 
     :param request: HttpRequest
