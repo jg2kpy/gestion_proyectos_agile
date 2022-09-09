@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo rm -rf ./usuarios/migrations
+sudo rm -rf ./*/migrations

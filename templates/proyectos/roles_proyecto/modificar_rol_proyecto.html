@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<!-- Formulario para modificar rol de proyectos Django forms -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Modificar rol de proyecto</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form action="." method="POST">
+                {% csrf_token %}
+                {{ form.as_div }}
+                <br>
+                <button type="submit" class="btn btn-primary">Modificar rol de proyecto</button>
+                {% if proyecto %}
+                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-danger">Cancelar</a>
+                {% else %}
+                <a href="{% url 'roles_proyecto' %}" class="btn btn-danger">Cancelar</a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+    {% endblock %}

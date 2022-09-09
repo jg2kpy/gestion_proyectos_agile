@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block contenido %}
+{% load tiene_rol_en %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Tipos de historias de usuario</h1>
+        </div>
+        <div>
+            {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
+            {% if pro_crearTipoUS %}
+            <a href="{% url 'crearTipoHistoriaUsuario' proyecto.id %}" class="btn btn-primary">Crear Tipo de Historia de
+                Usuario</a>
+            {% endif %}
+            {% tiene_permiso_en_proyecto user 'pro_importarTipoUS' proyecto as pro_importarTipoUS %}
+            {% if pro_importarTipoUS %}
+            <a href="{% url 'importarTipoHistoriaUsuario' proyecto.id %}" class="btn btn-primary">Importar Tipo de Historia de
+                Usuario</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tipo in tipos %}
+                <tr>
+                    <th>{{ tipo.id }}</th>
+                    <td>{{ tipo.nombre }}</td>
+                    <td>{{ tipo.descripcion }}</td>
+                    <td>
+                        {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
+                        {% if pro_crearTipoUS %}
+                        <a href="{% url 'editarTipoHistoriaUsuario' proyecto.id tipo.id %}" class="btn btn-link"><span
+                                class="material-icons">create</span></a>
+                        {% endif %}
+                        {% tiene_permiso_en_proyecto user 'pro_eliminarTipoUS' proyecto as pro_eliminarTipoUS %}
+                        {% if pro_eliminarTipoUS %}
+                        <a href="{% url 'borrarTipoHistoriaUsuario' proyecto.id tipo.id %}" class="btn btn-link"><span
+                                class="material-icons">delete</span></a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </div>
+</div>
+{% endblock %}

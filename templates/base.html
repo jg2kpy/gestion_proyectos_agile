@@ -22,70 +22,143 @@
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <!-- Material Icons-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- jQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <body style="height:100vh;">
-    {% if user.is_authenticated %}
     <main>
-        <div class="flex-shrink-0 p-3 bg-white">
+        {% if proyecto and user.is_authenticated %}
+        <div class="flex-shrink-0 p-3 bg-light">
             <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
                 <span class="fs-5 fw-semibold">Gestión Proyectos Agil</span>
             </a>
             <ul class="list-unstyled ps-0">
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
-                        data-bs-target="#tablero-collapse" aria-expanded="true">
-                        Tablero
-                    </button>
-                    <div class="collapse show" id="tablero-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded">US-tipo-1</a></li>
-                            <li><a href="#" class="link-dark rounded">US-tipo-2</a></li>
-                            <li><a href="#" class="link-dark rounded">US-tipo-3</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
-                        data-bs-target="#sprint-collapse" aria-expanded="false">
-                        Sprint
-                    </button>
-                    <div class="collapse" id="sprint-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded">Actual</a></li>
-                            <li><a href="#" class="link-dark rounded">Sprint 3</a></li>
-                            <li><a href="#" class="link-dark rounded">Sprint 2</a></li>
-                            <li><a href="#" class="link-dark rounded">Sprint 1</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                         data-bs-target="#us-collapse" aria-expanded="false">
+                        <i class="material-icons  align-text-bottom">checklist</i>
                         User Stories
                     </button>
                     <div class="collapse" id="us-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded">Backlog</a></li>
-                            <li><a href="#" class="link-dark rounded">Historial</a></li>
-                            <li><a href="#" class="link-dark rounded">Cancelados</a></li>
+                            {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
+                            {% tiene_permiso_en_proyecto user 'pro_eliminarTipoUS' proyecto as pro_eliminarTipoUS %}
+                            {% if pro_crearTipoUS or pro_eliminarTipoUS %}
+                            <li>
+                                <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="link-dark rounded">
+                                    <i class="material-icons  align-text-bottom">settings</i>
+                                    Tipos
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </li>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#equipo-collapse" aria-expanded="false">
+                        <i class="material-icons  align-text-bottom">people</i>
+                        Equipo
+                    </button>
+                    <div class="collapse" id="equipo-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li>
+                                <a href="{% url 'vista_equipo' proyecto.id %}" class="link-dark rounded">
+                                    <i class="material-icons  align-text-bottom">manage_accounts</i>
+                                    Administrar
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="link-dark rounded">
+                                    <i class="material-icons  align-text-bottom">manage_accounts</i>
+                                    Roles
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
 
                 <li class="border-top my-3"></li>
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#account-collapse" aria-expanded="false">
+                        <img src="{{ user.avatar_url }}" alt="{{ user.get_full_name }}" width="30" height="30"
+                            class="rounded-circle" style="margin-right: 10px;" />
+                        Account
+                    </button>
+                    <div class="collapse" id="account-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li>
+                                <a href="/perfil/" class="link-dark rounded">
+                                    <i class="material-icons  align-text-bottom">person</i>
+                                    Perfil
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/accounts/logout/" class="link-dark rounded">
+                                    <i class="material-icons  align-text-bottom">logout</i>
+                                    Cerrar sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        {% elif user.is_authenticated %}
+        <div class="flex-shrink-0 p-3 bg-light">
+            <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
+                <span class="fs-5 fw-semibold">Gestión Proyectos Agil</span>
+            </a>
+            <ul class="list-unstyled ps-0">
+                <li class="mb-1">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#proyects-collapse" aria-expanded="false">
+                        <i class="material-icons  align-text-bottom">grid_view</i>
+                        Proyectos
+                    </button>
+                    <div class="collapse" id="proyects-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            {% for proyecto in user.equipo.all %}
+                            <li>
+                                <a href="{% url 'proyecto_home' proyecto.id %}" class="link-dark rounded">
+                                    {{ proyecto.nombre }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+                <li class="mb-1">
+                    <a class="btn align-items-center rounded" href="{% url 'proyectos' %}">
+                        <i class="material-icons  align-text-bottom">create_new_folder</i>
+                        Administrar proyectos
+                    </a>
+                </li>
                 {% tiene_rol_en_sistema user "gpa_admin" as es_admin %}
-                {% if es_admin %}
+                {% if user.roles_sistema.count > 0 or es_admin %}
+                <li class="border-top my-3"></li>
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                         data-bs-target="#admin-collapse" aria-expanded="false">
+                        <i class="material-icons  align-text-bottom">admin_panel_settings</i>
                         Administrador
                     </button>
                     <div class="collapse" id="admin-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded">Usuarios</a></li>
-                            <li><a href="#" class="link-dark rounded">Roles Globales</a></li>
-                            <li><a href="#" class="link-dark rounded">Proyectos</a></li>
+                            <li>
+                                <a href="{% url 'rol_global_list' %}" class="link-dark rounded">
+                                    <i class="material-icons  align-text-bottom">groups</i>
+                                    Roles Globales
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'proyectos' %}" class="link-dark rounded">
+                                    <i class="material-icons  align-text-bottom">create_new_folder</i>
+                                    Proyectos
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -94,35 +167,48 @@
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                         data-bs-target="#account-collapse" aria-expanded="false">
-                        Account
+                        <img src="{{ user.avatar_url }}" alt="{{ user.get_full_name }}" width="30" height="30"
+                            class="rounded-circle" style="margin-right: 10px;" />
+                        Cuenta
                     </button>
                     <div class="collapse" id="account-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded">Perfil</a></li>
-                            <li><a href="#" class="link-dark rounded">Configuración</a></li>
-                            <li><a href="#" class="link-dark rounded">Cerrar sesión</a></li>
+                            <li>
+                                <a href="/perfil/" class="link-dark rounded">
+                                    <i class="material-icons  align-text-bottom">person</i>
+                                    Perfil
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/accounts/logout/" class="link-dark rounded">
+                                    <i class="material-icons  align-text-bottom">logout</i>
+                                    Cerrar sesión
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
             </ul>
         </div>
-        <div class="overflow-auto">
-            {% block contenido %}Página vacía{% endblock %}
-        </div>
-    </main>
-    {% else %}
-    <div class="container d-flex align-items-center justify-content-center" style="height: 100%;">
-        <div>
-            <h3>Debe tener sesión iniciada para ver esta página</h3>
-            <div class="container d-flex align-items-center justify-content-center" style="height: 100%;">
-                <a class="btn btn-dark align-text-bottom" href="{% provider_login_url 'github' %}">
-                    <i class="material-icons align-text-bottom">person</i>
-                    Ingresar con Github
-                </a>
+        {% endif %}
+        {% if not user.is_authenticated %}
+        <div class="container d-flex align-items-center justify-content-center" style="height: 100%;">
+            <div>
+                <h3>Debe tener sesión iniciada para ver esta página</h3>
+                <div class="container d-flex align-items-center justify-content-center" style="height: 100%;">
+                    <a class="btn btn-dark align-text-bottom" href="{% provider_login_url 'github' %}">
+                        <i class="material-icons align-text-bottom">person</i>
+                        Ingresar con Github
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-    {% endif %}
+        {% else %}
+        <div style="width: 100%; overflow-y: auto; overflow-x: hidden;">
+            {% block contenido %}{% endblock %}
+        </div>
+        {% endif %}
+    </main>
 </body>
 
 </html>

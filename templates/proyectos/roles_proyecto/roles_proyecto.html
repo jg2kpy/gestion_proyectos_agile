@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block contenido %}
+{% load tiene_rol_en %}
+
+<!-- Redirigir a home si no tiene los permisos para ver esta pantalla -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Roles de Proyecto</h1>
+        </div>
+        <div>
+            {% if proyecto %}
+            {% tiene_permiso_en_proyecto user 'pro_crearRolProyecto' proyecto as pro_crearRolProyecto %}
+            {% if pro_crearRolProyecto %}
+            <a href="{% url 'crear_rol_a_proyecto' proyecto.id %}" class="btn btn-primary">Crear rol de proyecto</a>
+            {% endif %}
+            {% tiene_permiso_en_proyecto user 'pro_importarRol' proyecto as pro_importarRol %}
+            {% if pro_importarRol %}
+            <a href="{% url 'importar_rol' proyecto.id %}" class="btn btn-primary">Importar de otros proyectos </a>
+            {% endif %}
+            {% else %}
+            <a href="{% url 'crear_rol_proyecto' %}" class="btn btn-primary">Crear rol de proyecto</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <!-- Traemos en una tabla los proyectos -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Proyecto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rol_proyecto in roles_proyecto %}
+                {% if proyecto.id %}
+                {% if rol_proyecto.proyecto %}
+                <tr>
+                    <th>{{ rol_proyecto.id }}</th>
+                    <td>{{ rol_proyecto.nombre }}</td>
+                    <td>{{ rol_proyecto.proyecto }}</td>
+                    <td>
+                        {% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
+                        {% if pro_editarRolProyecto %}
+                        <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">create</span></a>
+                        {% if not rol_proyecto.nombre == 'Scrum Master' %}
+                        <a href="{% url 'eliminar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">cancel</span></a>
+                        {% endif %}
+                        {% endif %}
+                        <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons">visibility</span></a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+            </tbody>
+    </div>
+</div>
+
+
+
+{% endblock %}

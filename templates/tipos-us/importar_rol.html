@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<!-- Formulario para modificar rol de proyectos Django forms -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Importar rol de un proyecto</h1>
+        </div>
+    </div>
+    {% if proyectos %}
+    <div class="row mt-2">
+        <div class="col-6">
+            {% if mensaje %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <h6>{{ mensaje }}</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form method="GET">
+                {% csrf_token %}
+                <br>
+                <select name="proyectos">
+                    {% for proyecto in proyectos %}
+                    {% if proyecto == proyecto_seleccionado %}
+                    <option selected>{{ proyecto }}</option>
+                    {% else %}
+                    <option>{{ proyecto }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Obtener tipos de este proyecto</button>
+            </form>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-12">
+            <form method="POST">
+                {% csrf_token %}
+                {% for tipo in tipos %}
+                <input type="checkbox" name="{{tipo.id}}" value="{{tipo.id}}"><label for="{{tipo.id}}">{{ tipo.nombre }}</label>
+                <p>{{ tipo.descripcion}} </p>
+                <br>
+                {% endfor %}
+                <input hidden name="proyecto_seleccionado" value="{{proyecto_seleccionado.id}}">
+                <button type="submit" class="btn btn-primary">Importar estos tipos</button>
+                <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="btn btn-danger">Cancelar</a>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-md-12">
+            <p>No hay proyectos de cuales importar</p>
+        </div>
+    </div>
+    {% endif %}
+    {% endblock %}
