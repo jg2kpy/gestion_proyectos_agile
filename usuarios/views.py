@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.forms import ModelForm
 from django.views.decorators.cache import never_cache
 
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_rol_en_proyecto
+from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
 from proyectos.models import Proyecto
 from usuarios.models import RolProyecto, Usuario
 from .models import PermisoSistema, Usuario
@@ -282,7 +282,7 @@ def eliminar_miembro_proyecto(form, request_user, proyecto_id):
     :rtype: HttpResponse
     """
 
-    if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
+    if not tiene_permiso_en_proyecto(request_user, "pro_eliminarMiembros", proyecto_id):
         return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
@@ -318,7 +318,7 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto_id):
     :rtype: HttpResponse
     """
 
-    if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
+    if not tiene_permiso_en_proyecto(request_user, "pro_asignarMiembros", proyecto_id):
         return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
@@ -360,7 +360,7 @@ def eliminar_rol_proyecto(form, request_user, proyecto_id):
     :rtype: HttpResponse
     """
 
-    if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
+    if not tiene_permiso_en_proyecto(request_user, "pro_editarRolProyecto", proyecto_id):
         return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
@@ -393,7 +393,7 @@ def asignar_rol_proyecto(form, request_user, proyecto_id):
     :rtype: HttpResponse
     """
 
-    if not tiene_rol_en_proyecto(request_user, "Scrum Master", proyecto_id):
+    if not tiene_permiso_en_proyecto(request_user, "pro_asignarRolProyecto", proyecto_id):
         return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
 
     try:
