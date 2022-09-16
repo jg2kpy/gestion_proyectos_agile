@@ -329,7 +329,7 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto):
         usuario_a_agregar_miembro_proyecto = Usuario.objects.get(email=usuario_email)
 
         if usuario_a_agregar_miembro_proyecto.equipo.filter(id=proyecto.id).count() != 0:
-            return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario ya pertenece al proyecto', 'proyecto_id': proyecto_id}, status=422)
+            return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario ya pertenece al proyecto', 'proyecto': proyecto}, status=422)
 
         usuario_a_agregar_miembro_proyecto.equipo.add(proyecto)
         rol_proyecto = RolProyecto.objects.get(id=rol_id)
