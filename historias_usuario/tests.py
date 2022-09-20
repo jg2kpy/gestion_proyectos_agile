@@ -33,7 +33,7 @@ class TiposHistoriasUsuarioTest(TestCase):
         res = self.client.post("/proyectos/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id})
         self.assertEqual(res.status_code, 200)
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
-        self.assertTrue(self.proyecto.proyecto_rol.filter(usuario=self.user, nombre="Scrum Master").exists())
+        self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists())
 
     def test_crearTipoHistoriaUsuario(self):
         """

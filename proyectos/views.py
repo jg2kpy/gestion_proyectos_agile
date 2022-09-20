@@ -662,7 +662,7 @@ def importar_rol(request, id_proyecto):
         # id_proyecto: Proyecto a donde se VA A IMPORTAR
         roles = []  # Lista de los id de los roles a importar
         proyecto_seleccionado = Proyecto.objects.get(id=int(request.POST.get('proyecto_seleccionado')))  # Proyecto de donde SE IMPORTA los roles
-        for rol in proyecto_seleccionado.proyecto_rol.all():
+        for rol in proyecto_seleccionado.roles.all():
             if request.POST.get(f'{rol.id}') != None:
                 roles.append(rol)
 
