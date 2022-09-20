@@ -31,7 +31,7 @@
             <label for="usuario_a_agregar">Email: </label><input type="text" name="usuario_a_agregar"
                 id="usuario_a_agregar" required="">
             <select name="roles_agregar" id="roles_agregar">
-                {% for rol in proyecto.proyecto_rol.all %}
+                {% for rol in proyecto.roles.all %}
                 {% if rol.nombre != "Scrum Master" %}
                 <option value="{{ rol.id }}" name="rol" id="rol">{{ rol.nombre }}</option>
                 {% endif %}
@@ -110,7 +110,7 @@
             <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
 
             <select name="roles{{ miembros.email }}" id="roles{{ miembros.email }}">
-                {% for rol in proyecto.proyecto_rol.all %}
+                {% for rol in proyecto.roles.all %}
                 {% if not rol in rolesActual and rol.nombre != "Scrum Master" %}
                 <option value="{{ rol.id }}" name="rol{{ rol.id }}" id="rol{{ rol.id }}">{{ rol.nombre }}</option>
                 {% endif %}

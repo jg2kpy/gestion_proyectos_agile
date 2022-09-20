@@ -82,7 +82,7 @@ def tiene_todos_los_roles(usuario, proyecto):
     :return: Se retorna un valor True si el usuario tiene todos los roles en el proyecto indicado o False en caso contrario
     :rtype: boolean
     """
-    return set(usuario.roles_proyecto.filter(proyecto=proyecto)) != set(proyecto.proyecto_rol.all())
+    return set(usuario.roles_proyecto.filter(proyecto=proyecto)) != set(proyecto.roles.all())
 
 
 @register.simple_tag
