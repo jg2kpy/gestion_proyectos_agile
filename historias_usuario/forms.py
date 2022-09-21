@@ -154,8 +154,8 @@ class HistoriaUsuarioEditarConUserForm(forms.ModelForm):
         fields = ('descripcion', 'bv', 'up', 'usuarioAsignado')
         widgets = {
             'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
-            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
-            'up': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'up': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
             'usuarioAsignado': forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
