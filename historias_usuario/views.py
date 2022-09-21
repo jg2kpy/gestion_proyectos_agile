@@ -59,7 +59,8 @@ def crear_tipoHistoriaUsuario(request, proyecto_id):
         return HttpResponseRedirect("/", status=422)
 
     status = 200
-    formset_factory = inlineformset_factory(TipoHistoriaUsusario, EtapaHistoriaUsuario, form=EtapaHistoriaUsuarioForm, extra=1, can_delete=False)
+    formset_factory = inlineformset_factory(
+        TipoHistoriaUsusario, EtapaHistoriaUsuario, form=EtapaHistoriaUsuarioForm, extra=1, can_delete=False)
     if request.method == 'POST':
         form = TipoHistoriaUsuarioForm(request.POST)
         formset = formset_factory(request.POST, instance=form.instance)
@@ -67,7 +68,8 @@ def crear_tipoHistoriaUsuario(request, proyecto_id):
             tipo = form.save(commit=False)
             tipo.proyecto = proyecto
             if tipo.nombre in [t.nombre for t in proyecto.tiposHistoriaUsuario.all()]:
-                form.add_error('nombre', "Ya existe un tipo de historia de usuario con este nombre.")
+                form.add_error(
+                    'nombre', "Ya existe un tipo de historia de usuario con este nombre.")
                 status = 422
             elif '' in [e.instance.nombre for e in formset]:
                 form.add_error(None, "No puede haber etapas sin nombre.")
@@ -156,7 +158,8 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
         return HttpResponseRedirect("/", status=422)
 
     status = 200
-    formset_factory = inlineformset_factory(TipoHistoriaUsusario, EtapaHistoriaUsuario, form=EtapaHistoriaUsuarioForm, extra=0, can_delete=False)
+    formset_factory = inlineformset_factory(
+        TipoHistoriaUsusario, EtapaHistoriaUsuario, form=EtapaHistoriaUsuarioForm, extra=0, can_delete=False)
     if request.method == 'POST':
         form = TipoHistoriaUsuarioForm(request.POST, instance=tipo)
         formset = formset_factory(request.POST, instance=form.instance)
@@ -172,11 +175,13 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
                 for i, etapa_form in enumerate(formset):
                     etapa = etapa_form.save(commit=False)
                     if EtapaHistoriaUsuario.objects.filter(TipoHistoriaUsusario=tipo, orden=i).exists():
-                        etapa.id = EtapaHistoriaUsuario.objects.get(TipoHistoriaUsusario=tipo, orden=i).id
+                        etapa.id = EtapaHistoriaUsuario.objects.get(
+                            TipoHistoriaUsusario=tipo, orden=i).id
                     etapa.orden = i
                     etapa.save()
                 for i in range(len(formset), tipo.etapas.count()):
-                    EtapaHistoriaUsuario.objects.get(TipoHistoriaUsusario=tipo, orden=i).delete()
+                    EtapaHistoriaUsuario.objects.get(
+                        TipoHistoriaUsusario=tipo, orden=i).delete()
 
                 status = 200
                 return HttpResponseRedirect(f"/tipo-historia-usuario/{proyecto.id}/")
@@ -188,6 +193,7 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
         form = TipoHistoriaUsuarioForm(instance=tipo)
         formset = formset_factory(instance=tipo)
     return render(request, 'tipos-us/editar_tipo.html', {'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
+
 
 @ never_cache
 def importar_tipoUS(request, proyecto_id):
@@ -219,7 +225,8 @@ def importar_tipoUS(request, proyecto_id):
     mensaje = None
     if request.method == 'POST':
         tipos = []
-        proyecto_seleccionado = Proyecto.objects.get(id=int(request.POST.get('proyecto_seleccionado')))
+        proyecto_seleccionado = Proyecto.objects.get(
+            id=int(request.POST.get('proyecto_seleccionado')))
         for tipoUS in proyecto_seleccionado.tiposHistoriaUsuario.all():
             if request.POST.get(f'{tipoUS.id}') != None:
                 tipos.append(tipoUS)
@@ -241,14 +248,14 @@ def importar_tipoUS(request, proyecto_id):
                     etapa_nueva.save()
 
                 return redirect(f'/tipo-historia-usuario/{proyecto_id}/')
-            
+
             else:
                 mensaje = 'Ya existe un tipo de historia de usuario con ese nombre'
 
-
     proyectos = Proyecto.objects.exclude(id=proyecto_id)
     if request.GET.get('proyectos'):
-        proyecto_seleccionado = Proyecto.objects.get(nombre=request.GET.get('proyectos'))
+        proyecto_seleccionado = Proyecto.objects.get(
+            nombre=request.GET.get('proyectos'))
         tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyecto)
     elif proyectos.count() > 0:
         proyecto_seleccionado = proyectos[0]
@@ -257,6 +264,7 @@ def importar_tipoUS(request, proyecto_id):
         tipos = None
 
     return render(request, 'tipos-us/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
+
 
 @never_cache
 def historiaUsuario(request, proyecto_id):
@@ -282,6 +290,7 @@ def historiaUsuario(request, proyecto_id):
 
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
 
+
 @never_cache
 def crear_historiaUsuario(request, proyecto_id):
     """Obtener vista de crear tipo de historia de usuario
@@ -300,7 +309,7 @@ def crear_historiaUsuario(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
-    
+
     if not tiene_permiso_en_proyecto(request.user, "pro_cargarUSalBacklog", proyecto):
         return HttpResponseRedirect("/", status=422)
 
@@ -310,7 +319,8 @@ def crear_historiaUsuario(request, proyecto_id):
         if form.is_valid():
             historia = form.save(commit=False)
             if historia.nombre in [h.nombre for h in proyecto.backlog.all()]:
-                form.add_error('nombre', "Ya existe una historia de usuario con este nombre en este proyecto.")
+                form.add_error(
+                    'nombre', "Ya existe una historia de usuario con este nombre en este proyecto.")
                 status = 422
             else:
                 historia.proyecto = proyecto
@@ -354,7 +364,7 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
         historia = HistoriaUsuario.objects.get(id=historia_id)
     except HistoriaUsuario.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
-    
+
     status = 200
     if request.method == 'POST':
         try:
@@ -365,6 +375,7 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
         return HttpResponseRedirect(f"/historia-usuario/{proyecto.id}/")
 
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
+
 
 @never_cache
 def editar_historiaUsuario(request, proyecto_id, historia_id):
@@ -380,12 +391,10 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/", status=401)
 
-
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
-
 
     if not tiene_permiso_en_proyecto(request.user, "pro_modificarUS", proyecto):
         return HttpResponseRedirect("/", status=422)
@@ -399,14 +408,14 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
     if request.method == 'POST':
         form = HistoriaUsuarioEditarConUserForm(request.POST)
         if form.is_valid():
-            
+
             historia.descripcion = form.cleaned_data['descripcion']
             historia.bv = form.cleaned_data['bv']
             historia.up = form.cleaned_data['up']
-        
+
             if form.cleaned_data['usuarioAsignado'] != None:
                 historia.usuarioAsignado = form.cleaned_data['usuarioAsignado']
-            
+
             historia.save()
 
             return HttpResponseRedirect(f"/historia-usuario/{proyecto.id}/")
@@ -416,9 +425,11 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
     else:
 
         if not tiene_permiso_en_proyecto(request.user, "pro_cambiarUsuarioAsignadoUS", proyecto):
-            form = HistoriaUsuarioEditarForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion, 'bv': historia.bv, 'up':historia.up})
+            form = HistoriaUsuarioEditarForm(initial={
+                                             'nombre': historia.nombre, 'descripcion': historia.descripcion, 'bv': historia.bv, 'up': historia.up})
         else:
-            form = HistoriaUsuarioEditarConUserForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion, 'bv': historia.bv, 'up':historia.up, 'usuarioAsignado': historia.usuarioAsignado})
+            form = HistoriaUsuarioEditarConUserForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion,
+                                                    'bv': historia.bv, 'up': historia.up, 'usuarioAsignado': historia.usuarioAsignado})
     return render(request, 'historias/editar_historia.html', {'form': form, 'proyecto': proyecto, 'historia': historia}, status=status)
 
 
@@ -450,9 +461,10 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
     if request.method == 'POST':
         form = ComentarioForm(request.POST)
         if form.is_valid():
-            
-            comentario = Comentario(contenido=form.cleaned_data['contenido'], historiaUsuario=historia, usuario=request.user)
-            
+
+            comentario = Comentario(
+                contenido=form.cleaned_data['contenido'], historiaUsuario=historia, usuario=request.user)
+
             comentario.save()
 
             return HttpResponseRedirect(f"/historia-usuario/comentarios/{proyecto.id}/{historia.id}/")

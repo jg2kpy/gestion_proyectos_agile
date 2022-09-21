@@ -74,6 +74,7 @@ class EtapaHistoriaUsuarioForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'class': 'form-control'})
         }
 
+
 class HistoriaUsuarioForm(forms.ModelForm):
     """ Formulario para crear un tipo de historia de usuario
     """
@@ -88,7 +89,8 @@ class HistoriaUsuarioForm(forms.ModelForm):
         :type widgets: dict
         """
         model = HistoriaUsuario
-        fields = ('nombre', 'descripcion', 'bv', 'up', 'tipo', 'usuarioAsignado')
+        fields = ('nombre', 'descripcion', 'bv',
+                  'up', 'tipo', 'usuarioAsignado')
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
@@ -105,6 +107,7 @@ class HistoriaUsuarioForm(forms.ModelForm):
             "tipo": "Tipo de Historia de Usuario",
             "usuarioAsignado": "Usuario asignado"
         }
+
 
 class HistoriaUsuarioEditarForm(forms.ModelForm):
     """ Formulario para crear un tipo de historia de usuario
@@ -132,7 +135,8 @@ class HistoriaUsuarioEditarForm(forms.ModelForm):
             "tipo": "Tipo de Historia de Usuario",
             "up": "User Points"
         }
-    
+
+
 class HistoriaUsuarioEditarConUserForm(forms.ModelForm):
     """ Formulario para crear un tipo de historia de usuario
     """
@@ -160,7 +164,6 @@ class HistoriaUsuarioEditarConUserForm(forms.ModelForm):
             "up": "User Points",
             "usuarioAsignado": "Usuario asignado"
         }
-
 
 
 class ComentarioForm(forms.ModelForm):
