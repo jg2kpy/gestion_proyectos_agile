@@ -324,7 +324,6 @@ def crear_historiaUsuario(request, proyecto_id):
                 status = 422
             else:
                 historia.proyecto = proyecto
-                historia.up = 0
                 historia.save()
                 status = 200
                 return HttpResponseRedirect(f"/historia-usuario/{proyecto.id}/")
