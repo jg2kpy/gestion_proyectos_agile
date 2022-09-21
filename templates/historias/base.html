@@ -21,7 +21,6 @@
                     <th>#</th>
                     <th>Nombre</th>
                     <th>Tipo</th>
-                    <th>Fecha de creacion</th>
                     <th>User Points</th>
                     <th>Business Value</th>
                     <th>Usuario</th>
@@ -34,12 +33,15 @@
                     <th>{{ historia.id }}</th>
                     <td>{{ historia.nombre }}</td>
                     <td>{{ historia.tipo }}</td>
-                    <td>{{ historia.fecha_creacion }}</td>
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
                     <td>{{ historia.usuarioAsignado }}</td>
                     <td>
+                        <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
+                            class="material-icons">create</span></a>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></button>
+                        <a href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
+                            class="material-icons">comments_disabled</span></a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -61,29 +63,6 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
                     {% csrf_token %}
-                    <input type="submit" class="btn btn-danger" value="Eliminar">
-                </form>
-                </div>
-            </div>
-            </div>
-        </div>
-
-        <!-- Modal -->
-        <div class="modal fade" id="modalUP{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Asignar User Points a esta historia de usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Cuantos user points desea asignarle a la historia de usuario {{ historia.nombre }}?</p>
-                </div>
-                <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
-                    {% csrf_token %}
-                    <input type="number" min="0" name="up">
                     <input type="submit" class="btn btn-danger" value="Eliminar">
                 </form>
                 </div>

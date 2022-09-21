@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import asignarUP_historiaUsuario, borrar_historiaUsuario, crear_historiaUsuario, crear_tipoHistoriaUsuario, historiaUsuario, tiposHistoriaUsuario, editar_tipoHistoriaUsuario, borrar_tipoHistoriaUsuario, importar_tipoUS
+from .views import borrar_historiaUsuario, comentarios_historiaUsuario, crear_historiaUsuario, crear_tipoHistoriaUsuario, editar_historiaUsuario, historiaUsuario, tiposHistoriaUsuario, editar_tipoHistoriaUsuario, borrar_tipoHistoriaUsuario, importar_tipoUS
 
 urlpatterns = [
     path('tipo-historia-usuario/<int:proyecto_id>/', tiposHistoriaUsuario, name='tiposHistoriaUsuario'),
@@ -11,5 +11,6 @@ urlpatterns = [
     path('historia-usuario/<int:proyecto_id>/', historiaUsuario, name='historiaUsuario'),
     path('historia-usuario/crear/<int:proyecto_id>/', crear_historiaUsuario, name='crearhistoriaUsuario'),
     path('historia-usuario/borrar/<int:proyecto_id>/<int:historia_id>/', borrar_historiaUsuario, name='borrar_historiaUsuario'),
-    path('historia-usuario/asignarUP/<int:proyecto_id>/<int:historia_id>/', asignarUP_historiaUsuario, name='asignarUP_historiaUsuario'),
+    path('historia-usuario/editar/<int:proyecto_id>/<int:historia_id>/', editar_historiaUsuario, name='editar_historiaUsuario'),
+    path('historia-usuario/comentarios/<int:proyecto_id>/<int:historia_id>/', comentarios_historiaUsuario, name='comentarios_historiaUsuario'),
 ]
