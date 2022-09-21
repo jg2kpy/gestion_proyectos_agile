@@ -1,5 +1,5 @@
 from django import forms
-from historias_usuario.models import EtapaHistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
 from django.forms.utils import ErrorList
 
 
@@ -72,4 +72,34 @@ class EtapaHistoriaUsuarioForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control'})
+        }
+
+class HistoriaUsuarioForm(forms.ModelForm):
+    """ Formulario para crear un tipo de historia de usuario
+    """
+    class Meta:
+        """ Meta
+
+        :param model: TipoHistoriaUsusario
+        :type model: TipoHistoriaUsusario
+        :param fields: ['nombre', 'descripcion']
+        :type fields: list
+        :param widgets: TextInput y TextClass con clase form-control
+        :type widgets: dict
+        """
+        model = HistoriaUsuario
+        fields = ('nombre', 'descripcion', 'bv', 'tipo', 'usuarioAsignado')
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
+            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+            'tipo': forms.Select(attrs={'class': 'form-control'}),
+            'usuarioAsignado': forms.Select(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            "nombre": "Nombre",
+            "descripcion": "Descripcion",
+            "bv": "Business Value",
+            "tipo": "Tipo de Historia de Usuario",
+            "usuarioAsignado": "Usuario asignado"
         }

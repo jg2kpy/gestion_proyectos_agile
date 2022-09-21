@@ -4,10 +4,11 @@ from django.views.decorators.cache import never_cache
 from django.forms import inlineformset_factory
 
 from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto
-from .forms import EtapaHistoriaUsuarioForm, TipoHistoriaUsuarioForm
+from usuarios.models import Usuario
+from .forms import EtapaHistoriaUsuarioForm, HistoriaUsuarioForm, TipoHistoriaUsuarioForm
 
 from proyectos.models import Proyecto
-from .models import EtapaHistoriaUsuario, TipoHistoriaUsusario
+from .models import EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
 
 
 @never_cache
@@ -256,3 +257,149 @@ def importar_tipoUS(request, proyecto_id):
         tipos = None
 
     return render(request, 'tipos-us/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
+
+@never_cache
+def historiaUsuario(request, proyecto_id):
+    """Obtener vista de tipos de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere ver los tipos de historia de usuario
+    :type proyecto_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 200 con una tabla de los permisos si todo esta bien
+    :rtype: HttpResponse
+    """
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/", status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not proyecto.usuario.filter(id=request.user.id).exists():
+        return HttpResponseRedirect("/", status=422)
+
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
+
+@never_cache
+def crear_historiaUsuario(request, proyecto_id):
+    """Obtener vista de crear tipo de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere crear un tipo de historia de usuario
+    :type proyecto_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 422 con información adicional si el formulario no fue creado correctamente, 200 con un formulario para crear un tipo de historia de usuario si todo esta bien
+    :rtype: HttpResponse
+    """
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/", status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request.user, "pro_cargarUSalBacklog", proyecto):
+        return HttpResponseRedirect("/", status=422)
+
+    status = 200
+    if request.method == 'POST':
+        form = HistoriaUsuarioForm(request.POST)
+        if form.is_valid():
+            historia = form.save(commit=False)
+            if historia.nombre in [h.nombre for h in proyecto.backlog.all()]:
+                form.add_error('nombre', "Ya existe una historia de usuario con este nombre en este proyecto.")
+                status = 422
+            else:
+                historia.proyecto = proyecto
+                historia.up = 0
+                historia.save()
+                status = 200
+                return HttpResponseRedirect(f"/historia-usuario/{proyecto.id}/")
+        else:
+            form.add_error(None, "Hay errores en el formulario.")
+            status = 422
+    else:
+        form = HistoriaUsuarioForm()
+    return render(request, 'historias/crear_historia.html', {'form': form, 'proyecto': proyecto}, status=status)
+
+
+@never_cache
+def borrar_historiaUsuario(request, proyecto_id, historia_id):
+    """Obtener vista de borrar tipo de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere borrar un tipo de historia de usuario
+    :type proyecto_id: int
+    :param tipo_id: Id del tipo de historia de usuario que se quiere borrar
+    :type tipo_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 422 con información adicional si el formulario no fue creado correctamente, 200 con un formulario para borrar un tipo de historia de usuario si todo esta bien
+    :rtype: HttpResponse
+    """
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/", status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+    try:
+        historia = HistoriaUsuario.objects.get(id=historia_id)
+    except HistoriaUsuario.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request.user, "pro_cancelarUS", proyecto):
+        return HttpResponseRedirect("/", status=422)
+    
+    status = 200
+    if request.method == 'POST':
+        try:
+            historia.delete()
+        except HistoriaUsuario.DoesNotExist:
+            pass
+        status = 200
+        return HttpResponseRedirect(f"/historia-usuario/{proyecto.id}/")
+
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
+
+@never_cache
+def asignarUP_historiaUsuario(request, proyecto_id, historia_id):
+    """Obtener vista de borrar tipo de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere borrar un tipo de historia de usuario
+    :type proyecto_id: int
+    :param tipo_id: Id del tipo de historia de usuario que se quiere borrar
+    :type tipo_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 422 con información adicional si el formulario no fue creado correctamente, 200 con un formulario para borrar un tipo de historia de usuario si todo esta bien
+    :rtype: HttpResponse
+    """
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/", status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+    try:
+        historia = HistoriaUsuario.objects.get(id=historia_id)
+    except HistoriaUsuario.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request.user, "pro_cancelarUS", proyecto):
+        return HttpResponseRedirect("/", status=422)
+    
+    status = 200
+    if request.method == 'POST':
+        try:
+            historia.delete()
+        except HistoriaUsuario.DoesNotExist:
+            pass
+        status = 200
+        return HttpResponseRedirect(f"/historia-usuario/{proyecto.id}/")
+
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})

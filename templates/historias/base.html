@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block contenido %}
+{% load tiene_rol_en %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Historias de usuario</h1>
+        </div>
+        <div>
+            {% tiene_permiso_en_proyecto user 'pro_cargarUSalBacklog' proyecto as pro_cargarUSalBacklog %}
+            {% if pro_cargarUSalBacklog %}
+            <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Cargar US al product backlog</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Fecha de creacion</th>
+                    <th>User Points</th>
+                    <th>Business Value</th>
+                    <th>Usuario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for historia in historias %}
+                <tr>
+                    <th>{{ historia.id }}</th>
+                    <td>{{ historia.nombre }}</td>
+                    <td>{{ historia.tipo }}</td>
+                    <td>{{ historia.fecha_creacion }}</td>
+                    <td>{{ historia.up }}</td>
+                    <td>{{ historia.bv }}</td>
+                    <td>{{ historia.usuarioAsignado }}</td>
+                    <td>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </div>
+    {% for historia in historias %}
+        <!-- Modal -->
+        <div class="modal fade" id="modal{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Estas seguro que desea eliminar?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Esta seguro que desea eliminar la historia de usuario {{ historia.nombre }}?</p>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-danger" value="Eliminar">
+                </form>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="modalUP{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Asignar User Points a esta historia de usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Cuantos user points desea asignarle a la historia de usuario {{ historia.nombre }}?</p>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
+                    {% csrf_token %}
+                    <input type="number" min="0" name="up">
+                    <input type="submit" class="btn btn-danger" value="Eliminar">
+                </form>
+                </div>
+            </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

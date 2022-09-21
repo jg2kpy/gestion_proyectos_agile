@@ -26,7 +26,7 @@ from proyectos import views as proyectos_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    path('tipo-historia-usuario/', include('historias_usuario.urls')),
+    path('', include('historias_usuario.urls')),
     path('<int:id_proyecto>/', proyectos_views.proyecto_home, name='proyecto_home'),
     path('proyectos/', proyectos_views.proyectos, name='proyectos'),
     path('proyectos/crear/', proyectos_views.crear_proyecto, name='crear_proyecto'),
