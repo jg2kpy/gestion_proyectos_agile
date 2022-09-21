@@ -135,6 +135,17 @@ class HistoriaUsuario(models.Model):
     usuarioAsignado = models.ForeignKey('usuarios.Usuario', related_name='usuarioAsignado',
                                         blank=True, null=True, on_delete=models.SET_NULL)
     proyecto = models.ForeignKey(Proyecto, related_name='backlog', on_delete=models.PROTECT)
+
+    class Estado(models.TextChoices):
+        ACTIVO = 'A', _('Activo')
+        TERMINADO = 'T', _('Terminado')
+        CANCELADO = 'C', _('Cancelado')
+
+    estado = models.CharField(
+        max_length=1,
+        choices=Estado.choices,
+        default=Estado.ACTIVO,
+    )
     archivo = models.ManyToManyField(ArchivoAnexo, blank=True)
 
     class Meta:

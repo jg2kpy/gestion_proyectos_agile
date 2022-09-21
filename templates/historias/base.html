@@ -37,11 +37,13 @@
                     <td>{{ historia.bv }}</td>
                     <td>{{ historia.usuarioAsignado }}</td>
                     <td>
+                        {% if historia.estado == historia.Estado.ACTIVO %}
                         <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
                             class="material-icons">create</span></a>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></button>
                         <a href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
                             class="material-icons">comments_disabled</span></a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

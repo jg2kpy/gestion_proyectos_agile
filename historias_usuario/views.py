@@ -267,7 +267,7 @@ def importar_tipoUS(request, proyecto_id):
 
 
 @never_cache
-def historiaUsuario(request, proyecto_id):
+def historiaUsuarioBacklog(request, proyecto_id):
     """Obtener vista de tipos de historia de usuario
 
     :param request: HttpRequest
@@ -288,7 +288,55 @@ def historiaUsuario(request, proyecto_id):
     if not proyecto.usuario.filter(id=request.user.id).exists():
         return HttpResponseRedirect("/", status=422)
 
-    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=None, estado=HistoriaUsuario.Estado.ACTIVO), 'proyecto': proyecto})
+
+@never_cache
+def historiaUsuarioCancelado(request, proyecto_id):
+    """Obtener vista de tipos de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere ver los tipos de historia de usuario
+    :type proyecto_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 200 con una tabla de los permisos si todo esta bien
+    :rtype: HttpResponse
+    """
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/", status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not proyecto.usuario.filter(id=request.user.id).exists():
+        return HttpResponseRedirect("/", status=422)
+
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.CANCELADO), 'proyecto': proyecto})
+
+@never_cache
+def historiaUsuarioTerminado(request, proyecto_id):
+    """Obtener vista de tipos de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere ver los tipos de historia de usuario
+    :type proyecto_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 200 con una tabla de los permisos si todo esta bien
+    :rtype: HttpResponse
+    """
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/", status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not proyecto.usuario.filter(id=request.user.id).exists():
+        return HttpResponseRedirect("/", status=422)
+
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.TERMINADO), 'proyecto': proyecto})
 
 
 @never_cache
