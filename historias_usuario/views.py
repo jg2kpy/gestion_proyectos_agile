@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from django.forms import inlineformset_factory
+from datetime import datetime
 
 from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto
 from usuarios.models import Usuario
@@ -345,13 +346,14 @@ def configHistoriasPendientes(request, id_proyecto, id_historia):
 
 
     if request.method == 'POST':
-
+        historia.guardarConHistorial()
         sigOrden = historia.etapa.orden + 1 if historia.etapa else 1
         if sigOrden == historia.tipo.etapas.count():
             historia.estado = HistoriaUsuario.Estado.TERMINADO
         else:
             sigEtapa = EtapaHistoriaUsuario.objects.get(orden=sigOrden)
             historia.etapa = sigEtapa
+
         historia.save()
 
         return redirect(request.POST.get('url'))
@@ -571,7 +573,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
     if request.method == 'POST':
         form = HistoriaUsuarioEditarConUserForm(request.POST)
         if form.is_valid():
-
+            historia.guardarConHistorial()
             historia.descripcion = form.cleaned_data['descripcion']
             historia.bv = form.cleaned_data['bv']
             historia.up = form.cleaned_data['up']
@@ -637,3 +639,34 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
     else:
         form = ComentarioForm()
     return render(request, 'historias/comentarios.html', {'form': form, 'proyecto': proyecto, 'historia': historia, 'comentarios': historia.comentarios.all()}, status=status)
+
+@never_cache
+def restaurar_historia_historial(request, proyecto_id, historia_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/", status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    try:
+        historia = HistoriaUsuario.objects.get(id=historia_id)
+    except HistoriaUsuario.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
+    
+    if request.method == 'POST':
+        try:
+            versionPrevia = HistoriaUsuario.objects.get(id=request.POST.get('version'))
+        except HistoriaUsuario.DoesNotExist:
+            return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
+
+        historia.guardarConHistorial()
+        historia.nombre = versionPrevia.nombre
+        historia.descripcion = versionPrevia.descripcion
+        historia.bv = versionPrevia.bv
+        historia.up = versionPrevia.up
+        historia.usuarioAsignado = versionPrevia.usuarioAsignado
+        historia.save()
+    
+    return render(request, 'historias/historial.html', {'proyecto': proyecto, 'version_ori': historia_id, 'versiones': historia.obtenerVersiones()}, status=200)
