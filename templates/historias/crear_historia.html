@@ -9,7 +9,8 @@
             {% csrf_token %}
             {{ form.non_form_errors }}
             {{ form.as_p }}
-            <input type="submit" class="btn btn-primary px-4 mt-3" value="Guardar">
+            <input type="submit" class="btn btn-primary" value="Guardar">
+            <a href="{% url 'historiaUsuarioBacklog' proyecto.id %}" class="btn btn-danger">Cancelar</a>
         </form>
     </div>
 </div>

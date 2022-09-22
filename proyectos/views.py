@@ -380,7 +380,7 @@ def ver_rol_proyecto(request, id_rol_proyecto):
     # Si es proyecto None entonces si o si tiene que ser un gpa_admin
     if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
         return HttpResponse('No tiene permisos para ver roles de proyectos', status=403)
-    elif proyecto is not None and not tiene_permiso_en_proyecto(request.user, 'pro_cambiarEstadoProyecto', proyecto) and not tiene_permiso_en_sistema(request.user, 'sys_crearproyectos'):
+    elif proyecto is not None and not tiene_rol_en_proyecto(request.user, 'Scrum Master', proyecto)  and not tiene_permiso_en_sistema(request.user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para ver roles de proyectos', status=403)
 
     # Traemos los permisos del rol
@@ -537,7 +537,7 @@ def ver_roles_asignados(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
 
     # Verificar que solo el administrador puede crear roles de proyectos
-    if not tiene_permiso_en_proyecto(request.user, 'pro_cambiarEstadoProyecto', proyecto) and not tiene_permiso_en_sistema(request.user, 'sys_crearproyectos'):
+    if not tiene_rol_en_proyecto(request.user, 'Scrum Master', proyecto) and not tiene_permiso_en_sistema(request.user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para ver los roles de este proyecto', status=403)
 
     # Traemos los roles que tengan el id del proyecto

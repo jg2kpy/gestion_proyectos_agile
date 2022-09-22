@@ -30,7 +30,7 @@ class TiposHistoriasUsuarioTest(TestCase):
                                                          avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
                                                          
         self.client.login(email='testemail@example.com', password='A123B456c.')
-        res = self.client.post("/proyectos/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id})
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id})
         self.assertEqual(res.status_code, 200)
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
         self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists())
@@ -39,7 +39,7 @@ class TiposHistoriasUsuarioTest(TestCase):
         """
         Crea una historia de usuario para realizar las pruebas.
         """
-        res = self.client.post(f"/tipo-historia-usuario/crear/{self.proyecto.id}/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tipo-historia-usuario/crear/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
                         'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000', 'etapas-0-nombre': 'Etapa 1', 'etapas-0-descripcion': "descripcion1"}, follow=True)
         self.assertEqual(res.status_code, 200)
         creado = TipoHistoriaUsusario.objects.get(nombre='Test')
@@ -53,10 +53,10 @@ class TiposHistoriasUsuarioTest(TestCase):
         """
         Edita un tipo de historia de usuario pero no sus etapas.
         """
-        self.client.post(f"/tipo-historia-usuario/crear/{self.proyecto.id}/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
+        self.client.post(f"/proyecto/{self.proyecto.id}/tipo-historia-usuario/crear/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
                         'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000', 'etapas-0-nombre': 'Etapa 1', 'etapas-0-descripcion': "descripcion1"}, follow=True)
         creado = TipoHistoriaUsusario.objects.get(nombre='Test')
-        res = self.client.post(f"/tipo-historia-usuario/editar/{self.proyecto.id}/{creado.id}/", {'nombre': 'Testedit', 'descripcion': 'etapa prueba edit', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tipo-historia-usuario/{creado.id}/editar/", {'nombre': 'Testedit', 'descripcion': 'etapa prueba edit', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
                         'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000', 'etapas-0-nombre': 'Etapa 1', 'etapas-0-descripcion': "descripcion1"}, follow=True)
         self.assertEqual(res.status_code, 200)
         creado.refresh_from_db()
@@ -69,10 +69,10 @@ class TiposHistoriasUsuarioTest(TestCase):
         """
         Edita un tipo de historia de usuario pero no sus etapas.
         """
-        self.client.post(f"/tipo-historia-usuario/crear/{self.proyecto.id}/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
+        self.client.post(f"/proyecto/{self.proyecto.id}/tipo-historia-usuario/crear/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
                         'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000', 'etapas-0-nombre': 'Etapa 1', 'etapas-0-descripcion': "descripcion1"}, follow=True)
         creado = TipoHistoriaUsusario.objects.get(nombre='Test')
-        res = self.client.post(f"/tipo-historia-usuario/editar/{self.proyecto.id}/{creado.id}/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '2', 'etapas-INITIAL_FORMS': '0',
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tipo-historia-usuario/{creado.id}/editar/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '2', 'etapas-INITIAL_FORMS': '0',
                         'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000', 'etapas-0-nombre': 'Etapa 1', 'etapas-0-descripcion': "descripcion1", 'etapas-1-nombre': 'Etapa 2', 'etapas-1-descripcion': "descripcion2"}, follow=True)
         self.assertEqual(res.status_code, 200)
         creado = TipoHistoriaUsusario.objects.get(nombre='Test')
@@ -88,10 +88,10 @@ class TiposHistoriasUsuarioTest(TestCase):
         """
         Edita un tipo de historia de usuario pero no sus etapas.
         """
-        self.client.post(f"/tipo-historia-usuario/crear/{self.proyecto.id}/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
+        self.client.post(f"/proyecto/{self.proyecto.id}/tipo-historia-usuario/crear/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '1', 'etapas-INITIAL_FORMS': '0',
                         'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000', 'etapas-0-nombre': 'Etapa 1', 'etapas-0-descripcion': "descripcion1"}, follow=True)
         creado = TipoHistoriaUsusario.objects.get(nombre='Test')
-        res = self.client.post(f"/tipo-historia-usuario/editar/{self.proyecto.id}/{creado.id}/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '0', 'etapas-INITIAL_FORMS': '0',
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tipo-historia-usuario/{creado.id}/editar/", {'nombre': 'Test', 'descripcion': 'etapa prueba', 'etapas-TOTAL_FORMS': '0', 'etapas-INITIAL_FORMS': '0',
                         'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000'}, follow=True)
         self.assertEqual(res.status_code, 200)
         creado = TipoHistoriaUsusario.objects.get(nombre='Test')
