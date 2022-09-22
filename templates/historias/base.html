@@ -20,11 +20,15 @@
                 <tr>
                     <th>#</th>
                     <th>Nombre</th>
-                    <th>Tipo</th>
+                    <th>Etapa</th>
                     <th>User Points</th>
                     <th>Business Value</th>
                     <th>Usuario</th>
-                    <th>Acciones</th>
+                    {% if esBacklog %}
+                        <th>Acciones</th>
+                    {% else %}
+                        <th>Fecha de modificacion</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -32,26 +36,26 @@
                 <tr>
                     <th>{{ historia.id }}</th>
                     <td>{{ historia.nombre }}</td>
-                    <td>{{ historia.tipo }}</td>
+                    <td>{{ historia.etapa }}</td>
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
                     <td>{{ historia.usuarioAsignado }}</td>
-                    <td>
-                        {% if historia.estado == historia.Estado.ACTIVO %}
-                        <button type="button" class="btn btn-link" data-bs-toggle="modal"
-                            data-bs-target="#modalVer{{ historia.id }}"><span 
-                            class="material-icons">visibility</span>
-                        </button>
-                        <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
-                            class="material-icons">create</span></a>
-                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></button>
-                        <a href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
-                            class="material-icons">comment</span></a>
-                        {% endif %}
-                        
-                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
-
-                    </td>
+                    {% if esBacklog %}
+                        <td>
+                            <button type="button" class="btn btn-link" data-bs-toggle="modal"
+                                data-bs-target="#modalVer{{ historia.id }}"><span 
+                                class="material-icons">visibility</span>
+                            </button>
+                            <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
+                                class="material-icons">create</span></a>
+                            <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></button>
+                            <a href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
+                                class="material-icons">comment</span></a>
+                            <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
+                        </td>
+                    {% else %}
+                        <td>{{ historia.fecha_modificacion }}</td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -122,7 +126,7 @@
             <form method="post" action="{% url 'config_historias_usuario' proyecto.id historia.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="url" value="{{ request.path }}">
-                <input type="submit" class="btn btn-primary" value="mover">
+                <input type="submit" class="btn btn-primary" value="Mover">
             </form>
             </div>
         </div>

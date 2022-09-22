@@ -9,8 +9,8 @@ urlpatterns = [
     path('tipo-historia-usuario/importar/<int:proyecto_id>/', importar_tipoUS, name='importarTipoHistoriaUsuario'),
 
     path('backlog/<int:proyecto_id>/', historiaUsuarioBacklog, name='historiaUsuarioBacklog'),
-    path('historias-canceladas/<int:proyecto_id>/', historiaUsuarioCancelado, name='historiaUsuarioBacklog'),
-    path('historias-terminadas/<int:proyecto_id>/', historiaUsuarioTerminado, name='historiaUsuarioBacklog'),
+    path('historias-canceladas/<int:proyecto_id>/', historiaUsuarioCancelado, name='historiaUsuarioCancelado'),
+    path('historias-terminadas/<int:proyecto_id>/', historiaUsuarioTerminado, name='historiaUsuarioTerminado'),
     path('mis-historias/<int:proyecto_id>/', historiaUsuarioAsignado, name='historiaUsuarioAsignado'),
     path('historia-usuario/crear/<int:proyecto_id>/', crear_historiaUsuario, name='crearhistoriaUsuario'),
     path('historia-usuario/borrar/<int:proyecto_id>/<int:historia_id>/', borrar_historiaUsuario, name='borrar_historiaUsuario'),

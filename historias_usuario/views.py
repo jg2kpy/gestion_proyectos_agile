@@ -350,7 +350,7 @@ def configHistoriasPendientes(request, id_proyecto, id_historia):
         if sigOrden == historia.tipo.etapas.count():
             historia.estado = HistoriaUsuario.Estado.TERMINADO
         else:
-            sigEtapa = EtapaHistoriaUsuario.objects.get(orden=sigOrden)
+            sigEtapa = EtapaHistoriaUsuario.objects.get(orden=sigOrden, TipoHistoriaUsusario=historia.tipo)
             historia.etapa = sigEtapa
         historia.save()
 
@@ -487,6 +487,7 @@ def crear_historiaUsuario(request, proyecto_id):
                 status = 422
             else:
                 historia.proyecto = proyecto
+                historia.etapa = historia.tipo.etapas.get(orden=0, TipoHistoriaUsusario=historia.tipo)
                 historia.save()
                 status = 200
                 return HttpResponseRedirect(f"/backlog/{proyecto.id}/")
