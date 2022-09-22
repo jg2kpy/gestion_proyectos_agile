@@ -299,7 +299,6 @@ def eliminar_miembro_proyecto(form, request_user, proyecto):
         return HttpResponse('Usuario no existe', status=422)
 
     return redirect('vista_equipo', proyecto_id=proyecto.id)
-    #return redirect(f'/usuarios/{proyecto.id}')
 
 
 def agregar_miembro_proyecto(request, form, request_user, proyecto):
@@ -340,7 +339,6 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto):
         return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario no existe', 'proyecto': proyecto}, status=422)
 
     return redirect('vista_equipo', proyecto_id=proyecto.id)
-    #return redirect(f'/usuarios/{proyecto.id}')
 
 
 def eliminar_rol_proyecto(form, request_user, proyecto):
@@ -374,7 +372,6 @@ def eliminar_rol_proyecto(form, request_user, proyecto):
         return HttpResponse('Usuario no existe', status=422)
 
     return redirect('vista_equipo', proyecto_id=proyecto.id)
-    #return redirect(f'/usuarios/{proyecto.id}')
 
 
 def asignar_rol_proyecto(form, request_user, proyecto):
@@ -408,7 +405,6 @@ def asignar_rol_proyecto(form, request_user, proyecto):
         return HttpResponse('Usuario no existe', status=422)
 
     return redirect('vista_equipo', proyecto_id=proyecto.id)
-    #return redirect(f'/usuarios/{proyecto.id}')
 
 
 class UsuarioForm(ModelForm):

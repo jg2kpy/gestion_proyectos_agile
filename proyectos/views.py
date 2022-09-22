@@ -458,7 +458,6 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
         else:
             return redirect('rol_proyecto_asignado', id_proyecto=rol.proyecto.id)
-            #return redirect(f'/proyectos/{rol.proyecto.id}/roles/')
     else:
         form = RolProyectoForm(initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
     return render(request, 'proyectos/roles_proyecto/modificar_rol_proyecto.html', {'form': form, 'rol': rol, 'permisos': permisos, 'proyecto': proyecto})
@@ -507,7 +506,6 @@ def eliminar_rol_proyecto(request, id_rol_proyecto):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
         else:
             return redirect('rol_proyecto_asignado', id_proyecto=rol.proyecto.id)
-            #return redirect(f'/proyectos/{rol.proyecto.id}/roles/')
     return render(request, 'proyectos/roles_proyecto/eliminar_rol_proyecto.html', {'rol_proyecto': RolProyecto.objects.get(id=id_rol_proyecto), 'proyecto': proyecto})
 
 
@@ -618,7 +616,6 @@ def crear_rol_a_proyecto(request, id_proyecto):
                     permiso.save()
 
             return redirect('rol_proyecto_asignado', id_proyecto=rol.proyecto.id)
-            #return redirect(f'/proyectos/{rol.proyecto.id}/roles/')
         else:
             status = 422
 
@@ -689,7 +686,6 @@ def importar_rol(request, id_proyecto):
                     permiso.save()
 
         return redirect('rol_proyecto_asignado', id_proyecto=rol.proyecto.id)
-        #return redirect(f'/proyectos/{rol.proyecto.id}/roles/')
 
     else:
         proyectos = Proyecto.objects.exclude(id=id_proyecto)
@@ -700,7 +696,6 @@ def importar_rol(request, id_proyecto):
         else:  # Este es el GET cuando se llama desde otra pagina
             if proyectos.count() == 0:
                 return redirect('crear_proyecto')
-                #return redirect('crear_proyecto')
             proyecto = proyectos[0]
             roles = RolProyecto.objects.filter(proyecto=proyectos[0])
 

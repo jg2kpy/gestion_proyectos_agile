@@ -83,7 +83,6 @@ def crear_tipoHistoriaUsuario(request, proyecto_id):
                     etapa.save()
                 status = 200
                 return redirect('tiposHistoriaUsuario', proyecto_id=proyecto_id)
-                #return HttpResponseRedirect(f"/tipo-historia-usuario/{proyecto.id}/")
         else:
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
@@ -131,7 +130,6 @@ def borrar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
             pass
         status = 200
         return redirect('tiposHistoriaUsuario', proyecto_id=proyecto_id)
-        #return HttpResponseRedirect(f"/tipo-historia-usuario/{proyecto.id}/")
 
     return render(request, 'tipos-us/eliminar_tipo.html', {'tipo': tipo, 'proyecto': proyecto, }, status=status)
 
@@ -188,7 +186,6 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
 
                 status = 200
                 return redirect('tiposHistoriaUsuario', proyecto_id=proyecto_id)
-                #return HttpResponseRedirect(f"/tipo-historia-usuario/{proyecto.id}/")
         else:
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
@@ -252,7 +249,6 @@ def importar_tipoUS(request, proyecto_id):
                     etapa_nueva.save()
 
                 return redirect('tiposHistoriaUsuario', proyecto_id=proyecto_id)
-                #return HttpResponseRedirect(f"/tipo-historia-usuario/{proyecto.id}/")
 
             else:
                 mensaje = 'Ya existe un tipo de historia de usuario con ese nombre'
@@ -495,7 +491,6 @@ def crear_historiaUsuario(request, proyecto_id):
                 historia.save()
                 status = 200
                 return redirect('historiaUsuarioBacklog', proyecto_id=proyecto_id)
-                #return HttpResponseRedirect(f"/backlog/{proyecto.id}/")
         else:
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
@@ -588,7 +583,6 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             historia.save()
 
             return redirect('historiaUsuarioBacklog', proyecto_id=proyecto_id)
-            #return HttpResponseRedirect(f"/backlog/{proyecto.id}/")
         else:
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
@@ -637,7 +631,6 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
 
             comentario.save()
             return redirect('comentarios_historiaUsuario', proyecto_id=proyecto_id, historia_id=historia.id)
-            #return HttpResponseRedirect(f"/historia-usuario/comentarios/{proyecto.id}/{historia.id}/")
         else:
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
