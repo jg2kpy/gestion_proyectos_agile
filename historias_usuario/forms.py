@@ -1,7 +1,7 @@
 from django import forms
-from historias_usuario.models import Comentario, EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
 from django.forms.utils import ErrorList
 
+from historias_usuario.models import Comentario, EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
 
 class DivErrorList(ErrorList):
     """ Lista de errores de un form estilizados

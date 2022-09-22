@@ -1,15 +1,13 @@
-from queue import Empty
-from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.views.decorators.cache import never_cache
 from django.forms import inlineformset_factory
+from django.views.decorators.cache import never_cache
+from django.http import HttpResponse, HttpResponseRedirect
 
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
-from usuarios.models import Usuario
-from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, TipoHistoriaUsuarioForm
 
 from proyectos.models import Proyecto
 from .models import Comentario, EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
+from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
+from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, TipoHistoriaUsuarioForm
 
 
 @never_cache
@@ -298,16 +296,12 @@ def verHistoriasAsignadas(request, id_proyecto):
             mostrarPendiente = False
 
     return render(request, 'historias/historias_list.html',
-        {
-            'historias_usr': HistoriaUsuario.objects.filter(proyecto=proyecto).filter(usuarioAsignado=request.user),
-            'historias_pro': HistoriaUsuario.objects.filter(proyecto=proyecto),
-            'proyecto': proyecto,
-            'mostrar_pendiente': mostrarPendiente
-        })
-
-    
-
-
+                  {
+                      'historias_usr': HistoriaUsuario.objects.filter(proyecto=proyecto).filter(usuarioAsignado=request.user),
+                      'historias_pro': HistoriaUsuario.objects.filter(proyecto=proyecto),
+                      'proyecto': proyecto,
+                      'mostrar_pendiente': mostrarPendiente
+                  })
 
     # * Para historias de usuario terminadas
     # TODO: Cambiar etapa__nombre__contains='Terminar' por nombre apropiado de etapa final
@@ -316,6 +310,7 @@ def verHistoriasAsignadas(request, id_proyecto):
     #         'historias': HistoriaUsuario.objects.filter(proyecto=proyecto).filter(etapa__nombre__contains='terminar'),
     #         'proyecto': proyecto
     #     })
+
 
 def configHistoriasPendientes(request, id_proyecto, id_historia):
     """
@@ -346,20 +341,21 @@ def configHistoriasPendientes(request, id_proyecto, id_historia):
     if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto) and not historia.usuarioAsignado == request.user:
         return HttpResponseRedirect("/", status=422)
 
-
     if request.method == 'POST':
 
         sigOrden = historia.etapa.orden + 1 if historia.etapa else 1
         if sigOrden == historia.tipo.etapas.count():
             historia.estado = HistoriaUsuario.Estado.TERMINADO
         else:
-            sigEtapa = EtapaHistoriaUsuario.objects.get(orden=sigOrden, TipoHistoriaUsusario=historia.tipo)
+            sigEtapa = EtapaHistoriaUsuario.objects.get(
+                orden=sigOrden, TipoHistoriaUsusario=historia.tipo)
             historia.etapa = sigEtapa
         historia.save()
 
         return redirect(request.POST.get('url'))
-    
+
     return render(request, '404.html', {'info_adicional': "No se encontró la historia de usuario."}, status=404)
+
 
 @never_cache
 def historiaUsuarioBacklog(request, proyecto_id):
@@ -385,6 +381,7 @@ def historiaUsuarioBacklog(request, proyecto_id):
 
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=None, estado=HistoriaUsuario.Estado.ACTIVO).order_by('nombre'), 'proyecto': proyecto, 'esBacklog': True, 'titulo': 'Backlog'})
 
+
 @never_cache
 def historiaUsuarioCancelado(request, proyecto_id):
     """Obtener vista de la lista de historias de usuario canceladas
@@ -408,6 +405,7 @@ def historiaUsuarioCancelado(request, proyecto_id):
         return HttpResponseRedirect("/", status=422)
 
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.CANCELADO).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Historias Canceladas'})
+
 
 @never_cache
 def historiaUsuarioTerminado(request, proyecto_id):
@@ -433,6 +431,7 @@ def historiaUsuarioTerminado(request, proyecto_id):
 
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.TERMINADO).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Historias Terminadas'})
 
+
 @never_cache
 def historiaUsuarioAsignado(request, proyecto_id):
     """Obtener vista de historias de usuario asignados al usuario que realiza la peticion
@@ -456,6 +455,7 @@ def historiaUsuarioAsignado(request, proyecto_id):
         return HttpResponseRedirect("/", status=422)
 
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.ACTIVO, usuarioAsignado=request.user).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Mis Historias'})
+
 
 @never_cache
 def crear_historiaUsuario(request, proyecto_id):
@@ -489,10 +489,13 @@ def crear_historiaUsuario(request, proyecto_id):
                     'nombre', "Ya existe una historia de usuario con este nombre en este proyecto.")
                 status = 422
             else:
+
                 historia.proyecto = proyecto
-                historia.etapa = historia.tipo.etapas.get(orden=0, TipoHistoriaUsusario=historia.tipo)
+                historia.etapa = historia.tipo.etapas.get(
+                    orden=0, TipoHistoriaUsusario=historia.tipo)
                 historia.save()
                 status = 200
+
                 return redirect('historiaUsuarioBacklog', proyecto_id=proyecto_id)
         else:
             form.add_error(None, "Hay errores en el formulario.")
@@ -590,7 +593,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             status = 422
     else:
         form = HistoriaUsuarioEditarForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion,
-                                                    'bv': historia.bv, 'up': historia.up, 'usuarioAsignado': historia.usuarioAsignado})
+                                                  'bv': historia.bv, 'up': historia.up, 'usuarioAsignado': historia.usuarioAsignado})
     return render(request, 'historias/editar_historia.html', {'form': form, 'proyecto': proyecto, 'historia': historia}, status=status)
 
 
