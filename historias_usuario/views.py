@@ -544,7 +544,7 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
         status = 200
         return HttpResponseRedirect(request.POST.get('url'))
 
-    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto}, status=status)
 
 
 @never_cache
