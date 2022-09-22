@@ -1,5 +1,5 @@
 from django import forms
-from historias_usuario.models import EtapaHistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.models import Comentario, EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
 from django.forms.utils import ErrorList
 
 
@@ -72,4 +72,118 @@ class EtapaHistoriaUsuarioForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control'})
+        }
+
+
+class HistoriaUsuarioForm(forms.ModelForm):
+    """ Formulario para crear un tipo de historia de usuario
+    """
+    class Meta:
+        """ Meta
+
+        :param model: TipoHistoriaUsusario
+        :type model: TipoHistoriaUsusario
+        :param fields: ['nombre', 'descripcion']
+        :type fields: list
+        :param widgets: TextInput y TextClass con clase form-control
+        :type widgets: dict
+        """
+        model = HistoriaUsuario
+        fields = ('nombre', 'descripcion', 'bv',
+                  'up', 'tipo', 'usuarioAsignado')
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
+            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+            'up': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+            'tipo': forms.Select(attrs={'class': 'form-control'}),
+            'usuarioAsignado': forms.Select(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            "nombre": "Nombre",
+            "descripcion": "Descripcion",
+            "bv": "Business Value",
+            "up": "User Point",
+            "tipo": "Tipo de Historia de Usuario",
+            "usuarioAsignado": "Usuario asignado"
+        }
+
+
+class HistoriaUsuarioEditarForm(forms.ModelForm):
+    """ Formulario para crear un tipo de historia de usuario
+    """
+    class Meta:
+        """ Meta
+
+        :param model: TipoHistoriaUsusario
+        :type model: TipoHistoriaUsusario
+        :param fields: ['nombre', 'descripcion']
+        :type fields: list
+        :param widgets: TextInput y TextClass con clase form-control
+        :type widgets: dict
+        """
+        model = HistoriaUsuario
+        fields = ('descripcion', 'bv', 'up')
+        widgets = {
+            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
+            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+            'up': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+        }
+        labels = {
+            "descripcion": "Descripcion",
+            "bv": "Business Value",
+            "tipo": "Tipo de Historia de Usuario",
+            "up": "User Points"
+        }
+
+
+class HistoriaUsuarioEditarConUserForm(forms.ModelForm):
+    """ Formulario para crear un tipo de historia de usuario
+    """
+    class Meta:
+        """ Meta
+
+        :param model: TipoHistoriaUsusario
+        :type model: TipoHistoriaUsusario
+        :param fields: ['nombre', 'descripcion']
+        :type fields: list
+        :param widgets: TextInput y TextClass con clase form-control
+        :type widgets: dict
+        """
+        model = HistoriaUsuario
+        fields = ('descripcion', 'bv', 'up', 'usuarioAsignado')
+        widgets = {
+            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
+            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'up': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'usuarioAsignado': forms.Select(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            "descripcion": "Descripcion",
+            "bv": "Business Value",
+            "up": "User Points",
+            "usuarioAsignado": "Usuario asignado"
+        }
+
+
+class ComentarioForm(forms.ModelForm):
+    """ Formulario para crear un tipo de historia de usuario
+    """
+    class Meta:
+        """ Meta
+
+        :param model: TipoHistoriaUsusario
+        :type model: TipoHistoriaUsusario
+        :param fields: ['nombre', 'descripcion']
+        :type fields: list
+        :param widgets: TextInput y TextClass con clase form-control
+        :type widgets: dict
+        """
+        model = Comentario
+        fields = ('contenido',)
+        widgets = {
+            'contenido': forms.Textarea(attrs={'class': 'form-control'})
+        }
+        labels = {
+            "contenido": "Comentario"
         }

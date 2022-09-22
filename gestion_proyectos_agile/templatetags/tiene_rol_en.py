@@ -131,3 +131,8 @@ def tiene_permiso_en_sistema(usuario, permiso):
     :rtype: boolean
     """
     return usuario.roles_sistema.filter(permisos__nombre=permiso).exists()
+
+@register.simple_tag
+def siguente_etapa(historia):
+    siguiente = historia.etapa.orden + 1 if historia.etapa else 1
+    return historia.tipo.etapas.all()[siguiente].nombre if siguiente < historia.tipo.etapas.count() else 'terminado'

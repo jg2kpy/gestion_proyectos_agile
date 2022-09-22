@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block contenido %}
+{% load tiene_rol_en %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mx-auto mb-4">
+            <div class="section-title text-center">
+                <h1>Historias de Usuario</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-inline-flex p-2">
+                        <input type="submit" value="Pendiente" name="pendiente" class="btn btn-light" />
+                    </div>
+                    <div class="d-inline-flex p-2">
+                        <input type="submit" value="Finalizado" name="finalizado" class="btn btn-light" />
+                    </div>
+                </form>
+                {% for historia in historias_pro %}
+                {% if historia.etapa.nombre != 'terminar' and mostrar_pendiente or historia.etapa.nombre == 'terminar' and not mostrar_pendiente %}
+                <div class="d-flex bd-highlight mb-3 align-items-center">
+                    <div class="me-auto p-2 bd-highlight text-center">
+                        <h5 class="historiaEncontrada">{{ historia.nombre }}</h5>
+                    </div>
+                    <div class="p-2 bd-highlight">
+                        <button type="button" class="btn btn-light" data-bs-toggle="modal"
+                            data-bs-target="#modalVer{{ historia.id }}">
+                            Ver
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="modalVer{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Descripción</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h2 style="margin-bottom: 25px;">{{ historia.nombre }}</h2>
+                                        <p>{{ historia.descripcion }}</p>
+                                        <p>Creado: {{ historia.fecha_creacion }}</p>
+                                        {% if historia.fechar_modificacion %}
+                                        <p>Modificado: {{ historia.fechar_modificacion }}</p>
+                                        {% endif %}
+                                        <p>Etapa: {{ historia.etapa.nombre }}</p>
+                                        <p>Encargado: {{ historia.usuarioAsignado }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Modal -->
+                    </div>
+                    {% if mostrar_pendiente %}
+                    <div class="p-2 bd-highlight">
+                        <a href="{% url 'config_historias_usuario' proyecto.id historia.id %}" class="btn d-block w-100 d-sm-inline-block btn-light">Configuración</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif%}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

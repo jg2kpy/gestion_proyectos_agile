@@ -380,7 +380,7 @@ def ver_rol_proyecto(request, id_rol_proyecto):
     # Si es proyecto None entonces si o si tiene que ser un gpa_admin
     if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
         return HttpResponse('No tiene permisos para ver roles de proyectos', status=403)
-    elif proyecto is not None and not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto):
+    elif proyecto is not None and not tiene_rol_en_proyecto(request.user, 'Scrum Master', proyecto)  and not tiene_permiso_en_sistema(request.user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para ver roles de proyectos', status=403)
 
     # Traemos los permisos del rol
@@ -457,7 +457,7 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
         if (rol.proyecto is None):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
         else:
-            return redirect(f'/proyectos/{rol.proyecto.id}/roles/')
+            return redirect('rol_proyecto_asignado', id_proyecto=rol.proyecto.id)
     else:
         form = RolProyectoForm(initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
     return render(request, 'proyectos/roles_proyecto/modificar_rol_proyecto.html', {'form': form, 'rol': rol, 'permisos': permisos, 'proyecto': proyecto})
@@ -505,7 +505,7 @@ def eliminar_rol_proyecto(request, id_rol_proyecto):
         if (rol.proyecto is None):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
         else:
-            return redirect(f'/proyectos/{rol.proyecto.id}/roles/')
+            return redirect('rol_proyecto_asignado', id_proyecto=rol.proyecto.id)
     return render(request, 'proyectos/roles_proyecto/eliminar_rol_proyecto.html', {'rol_proyecto': RolProyecto.objects.get(id=id_rol_proyecto), 'proyecto': proyecto})
 
 
@@ -537,7 +537,7 @@ def ver_roles_asignados(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
 
     # Verificar que solo el administrador puede crear roles de proyectos
-    if not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto):
+    if not tiene_rol_en_proyecto(request.user, 'Scrum Master', proyecto) and not tiene_permiso_en_sistema(request.user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para ver los roles de este proyecto', status=403)
 
     # Traemos los roles que tengan el id del proyecto
@@ -615,7 +615,7 @@ def crear_rol_a_proyecto(request, id_proyecto):
                     permiso.rol.add(rol)
                     permiso.save()
 
-            return redirect(f'/proyectos/{id_proyecto}/roles/')
+            return redirect('rol_proyecto_asignado', id_proyecto=rol.proyecto.id)
         else:
             status = 422
 
@@ -685,7 +685,7 @@ def importar_rol(request, id_proyecto):
                     permiso.rol.add(rol_nuevo)
                     permiso.save()
 
-        return redirect(f'/proyectos/{id_proyecto}/roles/')
+        return redirect('rol_proyecto_asignado', id_proyecto=rol.proyecto.id)
 
     else:
         proyectos = Proyecto.objects.exclude(id=id_proyecto)

@@ -177,7 +177,7 @@ class MiembrosRolesTest(TestCase):
                                                          avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
                                                          
         self.client.login(email='testemail@example.com', password='A123B456c.')
-        res = self.client.post("/proyectos/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id})
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id})
         self.assertEqual(res.status_code, 200)
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
         self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists())
@@ -196,19 +196,19 @@ class MiembrosRolesTest(TestCase):
         proyectoTest = self.proyecto
         usuario_miembro.equipo.add(proyectoTest)
         
-        request = request_factory.get(f'/usuarios/equipo/{proyectoTest.id}')
+        request = request_factory.get(f'/proyecto/{proyectoTest.id}/usuarios/')
         request.user = AnonymousUser()
         response = vista_equipo(request, proyectoTest.id)
         self.assertEqual(response.status_code, 401,
                          'La respuesta no fue un estado HTTP 401 a un usuario no autorizado')
 
-        request = request_factory.get(f'/usuarios/equipo/{proyectoTest.id}')
+        request = request_factory.get(f'/proyecto/{proyectoTest.id}/usuarios/')
         request.user = usuario_miembro
         response = vista_equipo(request, proyectoTest.id)
         self.assertEqual(response.status_code, 200,
                          'La respuesta no fue un estado HTTP 200 a un usuario no autorizado para esta operacion')
 
-        request = request_factory.get(f'/usuarios/equipo/{proyectoTest.id}')
+        request = request_factory.get(f'/proyecto/{proyectoTest.id}/usuarios/')
         request.user = usuario_no_miembro
         response = vista_equipo(request, proyectoTest.id)
         self.assertEqual(response.status_code, 403,
@@ -216,7 +216,7 @@ class MiembrosRolesTest(TestCase):
              
         proyectoTest.delete()
         
-        request = request_factory.get(f'/usuarios/equipo/{proyectoTest.id}')
+        request = request_factory.get(f'/proyecto/{proyectoTest.id}/usuarios/')
         request.user = usuario_miembro
         response = vista_equipo(request, proyectoTest.id)
         self.assertEqual(response.status_code, 404,
@@ -238,7 +238,7 @@ class MiembrosRolesTest(TestCase):
         rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
         rolTest.save()
         
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_agregar': usuarioTest.email,
             'roles_agregar': rolTest.id,
             'hidden_action': 'agregar_miembro_proyecto'
@@ -248,7 +248,7 @@ class MiembrosRolesTest(TestCase):
         self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 403 a un usuario no autorizado para esta operacion')
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_agregar': '',
             'roles_agregar': rolTest.id,
             'hidden_action': 'agregar_miembro_proyecto'
@@ -258,7 +258,7 @@ class MiembrosRolesTest(TestCase):
         self.assertEqual(response.status_code, 422,
                          'La respuesta no fue un estado HTTP 422 ante un usuario que no existe')
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_agregar': usuarioTest.email,
             'roles_agregar': rolTest.id,
             'hidden_action': 'agregar_miembro_proyecto'
@@ -290,7 +290,7 @@ class MiembrosRolesTest(TestCase):
         rolTest.save()
         usuarioTest.roles_proyecto.add(rolTest)
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_eliminar': usuarioTest.email,
             'hidden_action': 'eliminar_miembro_proyecto'
         })
@@ -299,7 +299,7 @@ class MiembrosRolesTest(TestCase):
         self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 403 a un usuario no autorizado para esta operacion')
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_eliminar': '',
             'hidden_action': 'eliminar_miembro_proyecto'
         })
@@ -308,7 +308,7 @@ class MiembrosRolesTest(TestCase):
         self.assertEqual(response.status_code, 422,
                          'La respuesta no fue un estado HTTP 422 ante un usuario que no existe')
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_eliminar': usuarioTest.email,
             'hidden_action': 'eliminar_miembro_proyecto'
         })
@@ -337,7 +337,7 @@ class MiembrosRolesTest(TestCase):
         rolTest = RolProyecto(nombre="rol test", proyecto=proyectoTest)
         rolTest.save()
         
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_cambiar_rol': usuarioTest.username,
             f'roles{usuarioTest.username}': rolTest.id,
             'hidden_action': 'asignar_rol_proyecto'
@@ -347,7 +347,7 @@ class MiembrosRolesTest(TestCase):
         self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 403 a un usuario no autorizado para esta operacion')
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_cambiar_rol': '',
             f'roles{usuarioTest.username}': rolTest.id,
             'hidden_action': 'asignar_rol_proyecto'
@@ -357,7 +357,7 @@ class MiembrosRolesTest(TestCase):
         self.assertEqual(response.status_code, 422,
                          'La respuesta no fue un estado HTTP 422 ante un usuario que no existe')
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_cambiar_rol': usuarioTest.email,
             f'roles{usuarioTest.email}': rolTest.id,
             'hidden_action': 'asignar_rol_proyecto'
@@ -390,7 +390,7 @@ class MiembrosRolesTest(TestCase):
 
         usuarioTest.roles_proyecto.add(rolTest)
         
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_sacar_rol': usuarioTest.email,
             'rol_id': rolTest.id,
             'hidden_action': 'eliminar_rol_proyecto'
@@ -400,7 +400,7 @@ class MiembrosRolesTest(TestCase):
         self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 403 a un usuario no autorizado para esta operacion')
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_cambiar_rol': '',
             'rol_id': rolTest.id,
             'hidden_action': 'eliminar_rol_proyecto'
@@ -410,7 +410,7 @@ class MiembrosRolesTest(TestCase):
         self.assertEqual(response.status_code, 422,
                          'La respuesta no fue un estado HTTP 422 ante un usuario que no existe')
 
-        request = request_factory.post(f'/usuarios/equipo/{proyectoTest.id}', data={
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
             'usuario_a_sacar_rol': usuarioTest.email,
             'rol_id': rolTest.id,
             'hidden_action': 'eliminar_rol_proyecto'

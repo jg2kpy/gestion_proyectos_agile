@@ -166,7 +166,7 @@ class ProyectoTests(TestCase):
         
         #Verificamos que un usuario no logueado no puede cancelar un proyecto
         request_factory = RequestFactory()
-        request = request_factory.get(f'proyectos/cancelar/{proyecto.id}/')
+        request = request_factory.get(f'proyecto/cancelar/{proyecto.id}/')
         request.user = AnonymousUser()
         response = cancelar_proyecto(request, proyecto.id)
         self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
@@ -179,7 +179,7 @@ class ProyectoTests(TestCase):
         self.assertEqual(response.status_code, 403, 'La respuesta no fue un estado HTTP 403 a un usuario sin permisos')
 
         #Verificamos que un usuario con permisos puede cancelar un proyecto
-        request = request_factory.post(f'proyectos/cancelar/{proyecto.id}/', {'nombre':'Proyecto de prueba'})
+        request = request_factory.post(f'proyecto/cancelar/{proyecto.id}/', {'nombre':'Proyecto de prueba'})
         request.user = master
         response = cancelar_proyecto(request, proyecto.id)
         self.assertEqual(response.status_code, 200, 'La respuesta no fue un estado HTTP 200 a una petición incorrecta')
@@ -192,7 +192,7 @@ class ProyectoTests(TestCase):
         proyecto = Proyecto(nombre="PruebaCancelar", descripcion="Descripcion de prueba", estado="Planificacion", scrumMaster=master)
         proyecto.save()
 
-        request = request_factory.post(f'proyectos/cancelar/{proyecto.id}/', {'nombre':'Proyecto de prueba 2'})
+        request = request_factory.post(f'proyecto/cancelar/{proyecto.id}/', {'nombre':'Proyecto de prueba 2'})
         request.user = master
         response = cancelar_proyecto(request, proyecto.id)
         self.assertEqual(response.status_code, 422, 'La respuesta no fue un estado HTTP 422 a una petición incorrecta')
@@ -213,7 +213,7 @@ class ProyectoTests(TestCase):
 
         #Verificamos que el usuario no logueado no puede ver los roles de un proyecto
         request_factory = RequestFactory()
-        request = request_factory.get(f'proyectos/roles_proyecto/{master.id}/')
+        request = request_factory.get(f'proyecto/roles_proyecto/{master.id}/')
         request.user = AnonymousUser()
         response = roles_proyecto(request)
         self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
@@ -247,7 +247,7 @@ class ProyectoTests(TestCase):
         #Creamos un rol de proyecto con un usuario no autenticado
         
         request_factory = RequestFactory()
-        request = request_factory.post(f'proyectos/roles_proyecto/crear/', {
+        request = request_factory.post(f'proyecto/roles_proyecto/crear/', {
             'nombre':'Rol de prueba', 
             'descripcion':'Descripcion de prueba',
             'permisos': [1,2,3]
@@ -291,7 +291,7 @@ class ProyectoTests(TestCase):
 
         #Verificamos que el usuario no logueado no puede ver un rol de proyecto
         request_factory = RequestFactory()
-        request = request_factory.get(f'proyectos/roles_proyecto/{rol.id}/')
+        request = request_factory.get(f'proyecto/roles_proyecto/{rol.id}/')
         request.user = AnonymousUser()
         response = ver_rol_proyecto(request, rol.id)
         self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
@@ -381,7 +381,7 @@ class ProyectoTests(TestCase):
 
         #Editamos el rol de proyecto con un usuario no autenticado
         request_factory = RequestFactory()
-        request = request_factory.post(f'proyectos/roles_proyecto/editar/{rol.id}/', {
+        request = request_factory.post(f'proyecto/roles_proyecto/editar/{rol.id}/', {
             'nombre':'Rol de prueba modificada', 
             'descripcion':'Descripcion de prueba modificada',
             'permisos': [1,2,3]
@@ -472,7 +472,7 @@ class ProyectoTests(TestCase):
 
         #Creamos el query para eliminar el rol de proyecto
         request_factory = RequestFactory()
-        request = request_factory.post(f'proyectos/roles_proyecto/eliminar/{rol.id}/')
+        request = request_factory.post(f'proyecto/roles_proyecto/eliminar/{rol.id}/')
         request.user = AnonymousUser()
         response=eliminar_rol_proyecto_view(request, rol.id)
         self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
@@ -558,7 +558,7 @@ class ProyectoTests(TestCase):
 
         #Verificamos que solo el Scrum Master puede ver los roles de un proyecto
         request_factory = RequestFactory()
-        request = request_factory.get(f'proyectos/{proyecto.id}/roles/')
+        request = request_factory.get(f'proyecto/{proyecto.id}/roles/')
         request.user = AnonymousUser()
         response=ver_roles_asignados(request, proyecto.id)
         self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
@@ -613,7 +613,7 @@ class ProyectoTests(TestCase):
 
         #Probamos que solamente el ScrumMaster puede crear un rol de proyecto
         request_factory = RequestFactory()
-        request = request_factory.post(f'proyectos/{proyecto.id}/roles/crear/', {
+        request = request_factory.post(f'proyecto/{proyecto.id}/roles/crear/', {
             'nombre':'Rol de prueba', 
             'descripcion':'Descripcion de prueba',
             'permisos': [1,2,3]
@@ -682,7 +682,7 @@ class ProyectoTests(TestCase):
 
         #Probamos que solamente el ScrumMaster puede importar un rol de proyecto
         request_factory = RequestFactory()
-        request = request_factory.get(f'proyectos/{proyecto.id}/roles/import/')
+        request = request_factory.get(f'proyecto/{proyecto.id}/roles/import/')
         request.user = AnonymousUser()
         response = importar_rol(request, proyecto.id)
         self.assertEqual(response.status_code, 401, 'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')

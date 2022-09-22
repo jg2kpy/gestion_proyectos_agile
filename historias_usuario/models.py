@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from proyectos.models import Proyecto, Sprint
 from usuarios.models import Usuario
 
@@ -125,8 +126,8 @@ class HistoriaUsuario(models.Model):
     descripcion = models.TextField(blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
-    sprint = models.ForeignKey(Sprint, related_name='historias', on_delete=models.PROTECT)
-    etapa = models.ForeignKey(EtapaHistoriaUsuario, related_name='historias', on_delete=models.PROTECT)
+    sprint = models.ForeignKey(Sprint, related_name='historias', on_delete=models.PROTECT, blank=True, null=True)
+    etapa = models.ForeignKey(EtapaHistoriaUsuario, related_name='historias', on_delete=models.PROTECT, blank=True, null=True)
     tipo = models.ForeignKey(TipoHistoriaUsusario, related_name='historias', on_delete=models.PROTECT)
     versionPrevia = models.ForeignKey('HistoriaUsuario', related_name='versionSiguiente',
                                       blank=True, null=True, on_delete=models.PROTECT)
@@ -135,6 +136,17 @@ class HistoriaUsuario(models.Model):
     usuarioAsignado = models.ForeignKey('usuarios.Usuario', related_name='usuarioAsignado',
                                         blank=True, null=True, on_delete=models.SET_NULL)
     proyecto = models.ForeignKey(Proyecto, related_name='backlog', on_delete=models.PROTECT)
+
+    class Estado(models.TextChoices):
+        ACTIVO = 'A', _('Activo')
+        TERMINADO = 'T', _('Terminado')
+        CANCELADO = 'C', _('Cancelado')
+
+    estado = models.CharField(
+        max_length=1,
+        choices=Estado.choices,
+        default=Estado.ACTIVO,
+    )
     archivo = models.ManyToManyField(ArchivoAnexo, blank=True)
 
     class Meta:

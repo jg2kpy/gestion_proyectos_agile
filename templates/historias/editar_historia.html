@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block contenido %}
+<div class="row">
+    <div class="col-lg-2 col-md-1">
+    </div>
+    <div class="col-lg-8 col-md-10">
+        <h3>Editar historia de usuario {{ historia }}</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_form_errors }}
+            {{ form.as_p }}
+            <br>
+            <input type="submit" class="btn btn-primary" value="Guardar">
+            <a href="{% url 'historiaUsuarioBacklog' proyecto.id %}" class="btn btn-danger">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

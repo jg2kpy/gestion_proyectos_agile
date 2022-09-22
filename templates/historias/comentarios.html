@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block contenido %}
+{% load tiene_rol_en %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Comentarios de la historia de Usuario {{ historia.nombre }}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.non_form_errors }}
+                {{ form.as_p }}
+                <input type="submit" class="btn btn-primary" value="Enviar comentario">
+                <a href="{% url 'historiaUsuarioBacklog' proyecto.id %}" class="btn btn-danger">Volver al backlog</a>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Comentario</th>
+                    <th>Usuario</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comentario in comentarios %}
+                <tr>
+                    <th>{{ comentario.id }}</th>
+                    <td>{{ comentario.contenido }}</td>
+                    <td>{{ comentario.usuario }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </div>
+</div>
+{% endblock %}
