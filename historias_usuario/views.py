@@ -290,7 +290,7 @@ def verHistoriasAsignadas(request, id_proyecto):
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
-    if not tiene_permiso_en_proyecto(request.user, "pro_verproyecto", proyecto):
+    if not proyecto.usuario.filter(id=request.user.id).exists():
         return HttpResponseRedirect("/", status=422)
 
     if request.method == 'POST':
@@ -338,57 +338,25 @@ def configHistoriasPendientes(request, id_proyecto, id_historia):
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
-    if not tiene_permiso_en_proyecto(request.user, "pro_verproyecto", proyecto):
-        return HttpResponseRedirect("/", status=422)
-    
-    usuarios = proyecto.usuario.all()
-
     try:
         historia = HistoriaUsuario.objects.get(id=id_historia)
     except HistoriaUsuario.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró la historia de usuario."}, status=404)
-    
+
+
     if request.method == 'POST':
-        usuario = None
-        email = request.POST.get('usuarios')
 
-        if not email and 'mover' not in request.POST:
-            estado = 'vacio'
-            status = 422
-            return render(request, 'historias/historias_validacion.html', {'estado': estado, 'historia': historia, 'proyecto': proyecto}, status=status)
-
-        if 'mover' in request.POST:
-            estado = 'movido'
-            sigOrden = historia.etapa.orden + 1
+        sigOrden = historia.etapa.orden + 1 if historia.etapa else 1
+        if sigOrden == historia.tipo.etapas.count():
+            historia.estado = HistoriaUsuario.Estado.TERMINADO
+        else:
             sigEtapa = EtapaHistoriaUsuario.objects.get(orden=sigOrden)
             historia.etapa = sigEtapa
-            historia.save()
+        historia.save()
 
-            if historia.etapa.nombre == 'terminar':
-                estado = 'movido_terminar'
-
-        else:
-            usuario = Usuario.objects.get(email=email)
-            
-            if 'asignar' in request.POST:
-                if historia.usuarioAsignado == request.user:
-                    estado = 'ya_asignado'
-                else:
-                    historia.usuarioAsignado = usuario
-                    historia.save()
-                    estado = 'asignado'
-            else:
-                if historia.usuarioAsignado:
-                    historia.usuarioAsignado = None
-                    historia.save()
-                    estado = 'removido'
-                else:
-                    estado = 'inexistente'
-        
-        return render(request, 'historias/historias_validacion.html', {'estado': estado, 'usuario': usuario, 'historia': historia, 'proyecto': proyecto}, status=status)
-
-    else:
-        return render(request, 'historias/historias_config.html', {'historia': historia, 'proyecto': proyecto, 'usuarios': usuarios})
+        return redirect(request.POST.get('url'))
+    
+    return render(request, '404.html', {'info_adicional': "No se encontró la historia de usuario."}, status=404)
 
 @never_cache
 def historiaUsuarioBacklog(request, proyecto_id):
@@ -412,7 +380,7 @@ def historiaUsuarioBacklog(request, proyecto_id):
     if not proyecto.usuario.filter(id=request.user.id).exists():
         return HttpResponseRedirect("/", status=422)
 
-    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=None, estado=HistoriaUsuario.Estado.ACTIVO), 'proyecto': proyecto})
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=None, estado=HistoriaUsuario.Estado.ACTIVO).order_by('nombre'), 'proyecto': proyecto, 'esBacklog': True, 'titulo': 'Backlog'})
 
 @never_cache
 def historiaUsuarioCancelado(request, proyecto_id):
@@ -436,7 +404,7 @@ def historiaUsuarioCancelado(request, proyecto_id):
     if not proyecto.usuario.filter(id=request.user.id).exists():
         return HttpResponseRedirect("/", status=422)
 
-    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.CANCELADO), 'proyecto': proyecto})
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.CANCELADO).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Historias Canceladas'})
 
 @never_cache
 def historiaUsuarioTerminado(request, proyecto_id):
@@ -460,8 +428,31 @@ def historiaUsuarioTerminado(request, proyecto_id):
     if not proyecto.usuario.filter(id=request.user.id).exists():
         return HttpResponseRedirect("/", status=422)
 
-    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.TERMINADO), 'proyecto': proyecto})
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.TERMINADO).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Historias Terminadas'})
 
+@never_cache
+def historiaUsuarioAsignado(request, proyecto_id):
+    """Obtener vista de tipos de historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere ver los tipos de historia de usuario
+    :type proyecto_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 200 con una tabla de los permisos si todo esta bien
+    :rtype: HttpResponse
+    """
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/", status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not proyecto.usuario.filter(id=request.user.id).exists():
+        return HttpResponseRedirect("/", status=422)
+
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.ACTIVO, usuarioAsignado=request.user).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Mis Historias'})
 
 @never_cache
 def crear_historiaUsuario(request, proyecto_id):
@@ -498,7 +489,7 @@ def crear_historiaUsuario(request, proyecto_id):
                 historia.proyecto = proyecto
                 historia.save()
                 status = 200
-                return HttpResponseRedirect(f"/historia-usuario/{proyecto.id}/")
+                return HttpResponseRedirect(f"/backlog/{proyecto.id}/")
         else:
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
@@ -539,11 +530,12 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
     status = 200
     if request.method == 'POST':
         try:
-            historia.delete()
+            historia.estado = HistoriaUsuario.Estado.CANCELADO
+            historia.save()
         except HistoriaUsuario.DoesNotExist:
             pass
         status = 200
-        return HttpResponseRedirect(f"/historia-usuario/{proyecto.id}/")
+        return HttpResponseRedirect(request.POST.get('url'))
 
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
 
@@ -589,7 +581,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
 
             historia.save()
 
-            return HttpResponseRedirect(f"/historia-usuario/{proyecto.id}/")
+            return HttpResponseRedirect(f"/backlog/{proyecto.id}/")
         else:
             form.add_error(None, "Hay errores en el formulario.")
             status = 422

@@ -5,12 +5,12 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>Historias de usuario</h1>
+            <h1>{{ titulo }}</h1>
         </div>
         <div>
             {% tiene_permiso_en_proyecto user 'pro_cargarUSalBacklog' proyecto as pro_cargarUSalBacklog %}
-            {% if pro_cargarUSalBacklog %}
-            <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Cargar US al product backlog</a>
+            {% if pro_cargarUSalBacklog and esBacklog %}
+                <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Cargar US al product backlog</a>
             {% endif %}
         </div>
     </div>
@@ -38,12 +38,19 @@
                     <td>{{ historia.usuarioAsignado }}</td>
                     <td>
                         {% if historia.estado == historia.Estado.ACTIVO %}
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal"
+                            data-bs-target="#modalVer{{ historia.id }}"><span 
+                            class="material-icons">visibility</span>
+                        </button>
                         <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
                             class="material-icons">create</span></a>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></button>
                         <a href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
-                            class="material-icons">comments_disabled</span></a>
+                            class="material-icons">comment</span></a>
                         {% endif %}
+                        
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
+
                     </td>
                 </tr>
                 {% endfor %}
@@ -55,22 +62,73 @@
             <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Estas seguro que desea eliminar?</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Estas seguro que desea cancelar?</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Esta seguro que desea eliminar la historia de usuario {{ historia.nombre }}?</p>
+                    <p>¿Esta a punto de cancelar la historia de usuario {{ historia.nombre }}, quiere continuar?</p>
                 </div>
                 <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                 <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
                     {% csrf_token %}
-                    <input type="submit" class="btn btn-danger" value="Eliminar">
+                    <input type="submit" class="btn btn-primary" value="Continuar">
+                    <input type="hidden" name="url" value="{{ request.path }}">
                 </form>
                 </div>
             </div>
             </div>
         </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="modalVer{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Descripción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h2 style="margin-bottom: 25px;">{{ historia.nombre }}</h2>
+                    <p>{{ historia.descripcion }}</p>
+                    <p>Creado: {{ historia.fecha_creacion }}</p>
+                    {% if historia.fechar_modificacion %}
+                    <p>Modificado: {{ historia.fechar_modificacion }}</p>
+                    {% endif %}
+                    <p>Etapa: {{ historia.etapa.nombre }}</p>
+                    <p>Encargado: {{ historia.usuarioAsignado }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalEtapa{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Estas seguro que desea mover a la siguente etapa?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Esta seguro que desea mover {{ historia.nombre }} a la etapa {% siguente_etapa historia %}?</p>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <form method="post" action="{% url 'config_historias_usuario' proyecto.id historia.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="url" value="{{ request.path }}">
+                <input type="submit" class="btn btn-primary" value="mover">
+            </form>
+            </div>
+        </div>
+        </div>
+    </div>
+
     {% endfor %}
 </div>
 {% endblock %}
