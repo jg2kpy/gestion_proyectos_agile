@@ -22,6 +22,7 @@ from django.conf.urls import include
 from .views import Home, error_404_view
 from usuarios import views as usuarios_views
 from proyectos import views as proyectos_views
+from historias_usuario import views as historias_usuario_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -47,6 +48,11 @@ urlpatterns = [
     path('rolesglobales/<int:id>/editar/', usuarios_views.rol_global_editar, name='rol_global_editar'),
     path('rolesglobales/<int:id>/usuarios/', usuarios_views.rol_global_usuarios, name='rol_global_usuarios'),
     path('usuarios/', include('usuarios.urls'), name='usuarios'),
-    path('perfil/', usuarios_views.perfil, name='perfil')
+    path('perfil/', usuarios_views.perfil, name='perfil'),
+
+
+    path('proyectos/<int:id_proyecto>/historias/', historias_usuario_views.verHistoriasAsignadas, name='ver_historias_usuario'),
+    path('proyectos/<int:id_proyecto>/historias/<int:id_historia>', historias_usuario_views.configHistoriasPendientes, name='config_historias_usuario'),
+
 ]
 handler404 = 'gestion_proyectos_agile.views.error_404_view'

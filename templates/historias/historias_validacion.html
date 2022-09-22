@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block contenido %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mx-auto mb-4">
+            <div class="section-title text-center ">
+                {% if estado == 'vacio' %}
+                <h1>Error! No ha seleccionado ningun usuario</h1>
+                {% endif %}
+
+                {% if estado == 'ya_asignado' %}
+                <h1>El usuario {{ usuario.username }} ya está vinculado con el US: {{ historia.nombre }}</h1>
+                {% endif %}
+
+                {% if estado == 'inexistente' %}
+                <h1>El usuario {{ usuario.username }} no forma parte del US <b>{{ historia.nombre }}</b> que se quiere remover</h1>
+                {% endif %}
+
+                {% if estado == 'asignado' or estado == 'removido' %}
+                <h1>Se ha {{ estado }} el US <b>{{ historia.nombre }}</b> al usuario <b>{{ usuario.username }}</b></h1>
+                {% endif %}
+
+                {% if estado == 'movido' or estado == 'movido_terminar'%}
+                <h1>Se ha {{ estado }} el US <b>{{ historia.nombre }}</b> a la Etapa <b>{{ historia.etapa.nombre }}</b></h1>
+                {% endif %}
+            </div>
+        </div>
+        <div class="mb-3">
+            {% if estado != 'movido_terminar' %}
+            <a href="{% url 'config_historias_usuario' proyecto.id historia.id %}" class="btn btn-light" class="mb-3"><b>Continuar
+                    Configurando</b></a>
+            <br><br>
+            {% endif %}
+            <a href="{% url 'ver_historias_usuario' proyecto.id %}" class="btn btn-light" class="mb-3"><b>Volver a Historias de Usuario</b></a>
+        </div>
+    </div>
+</div>
+{% endblock %}
