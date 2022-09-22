@@ -10,7 +10,7 @@
         <div>
             {% tiene_permiso_en_proyecto user 'pro_cargarUSalBacklog' proyecto as pro_cargarUSalBacklog %}
             {% if pro_cargarUSalBacklog and esBacklog %}
-                <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Cargar US al product backlog</a>
+                <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Agregar US al Product Backlog</a>
             {% endif %}
         </div>
     </div>
@@ -122,7 +122,7 @@
                 <p>Esta seguro que desea mover {{ historia.nombre }} a la etapa {% siguente_etapa historia %}?</p>
             </div>
             <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
             <form method="post" action="{% url 'config_historias_usuario' proyecto.id historia.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="url" value="{{ request.path }}">
