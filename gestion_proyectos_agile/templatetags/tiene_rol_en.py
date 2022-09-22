@@ -134,5 +134,13 @@ def tiene_permiso_en_sistema(usuario, permiso):
 
 @register.simple_tag
 def siguente_etapa(historia):
+    """Funcion para determinar la siguente etapa de un historia de usuario
+
+    :param historia: Objeto historia a determinar su siguente etapa
+    :type usuario: historia
+
+    :return: Se retorna el nombre de la siguente etapa o en caso de ser la ultima, se retorna 'terminado'
+    :rtype: str
+    """
     siguiente = historia.etapa.orden + 1 if historia.etapa else 1
     return historia.tipo.etapas.all()[siguiente].nombre if siguiente < historia.tipo.etapas.count() else 'terminado'
