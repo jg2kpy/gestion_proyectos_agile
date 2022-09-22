@@ -1,15 +1,12 @@
-from warnings import catch_warnings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.db import IntegrityError
+from django.views.decorators.cache import never_cache
 
-import usuarios
 from .models import Proyecto
 from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
-from django.views.decorators.cache import never_cache
 from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
-from django.http import HttpResponse
 
 """
     Enumerador de estados de Proyecto
@@ -629,7 +626,7 @@ def importar_rol(request, id_proyecto):
     :return: Renderiza la pagina para importar un rol de proyecto
     :rtype: HttpResponse
     """
-    
+
     request_user = request.user
 
     # Verificamos que el usuario este autenticado
