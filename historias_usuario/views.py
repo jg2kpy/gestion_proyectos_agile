@@ -642,6 +642,18 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
 
 @never_cache
 def restaurar_historia_historial(request, proyecto_id, historia_id):
+    """
+    Permite ver y restaurar versiones anteriores de una historia de usuario. La acción de restaurar a su vez se guarda otra vez en el historial.
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere crear un tipo de historia de usuario
+    :type proyecto_id: int
+    :param historia_id: Id de la historia de usuario de la cual se quiere visualizar el historial.
+    :type historia_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 422 con información adicional si el formulario no fue creado correctamente, 200 con un la lista de versiones anteriores en una tabla html en caso de éxito
+    :rtype: HttpResponse
+    """
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/", status=401)
 

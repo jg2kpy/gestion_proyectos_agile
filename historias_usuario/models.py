@@ -153,6 +153,13 @@ class HistoriaUsuario(models.Model):
     archivo = models.ManyToManyField(ArchivoAnexo, blank=True)
     
     def guardarConHistorial(self):
+        """
+        Guarda una copia de la version actual de la historia de usuario en el historial y lo conecta a la version actual.
+        Debe ser llamado antes de modificar y guardar la version actual.
+
+        Returns:
+            None
+        """
         # Clonar y guardar version original para historial
         versionPrevia = HistoriaUsuario.objects.get(id=self.id)
         versionPrevia.pk = None
@@ -165,6 +172,12 @@ class HistoriaUsuario(models.Model):
         self.save()
     
     def obtenerVersiones(self):
+        """
+        Retorna la lista de todas las versiones de la US en orden decreciente por fecha.
+
+        Returns:
+            List[HistoriaUsuario]: El historial completo en  orden decreciente por fecha.
+        """
         versiones = []
         version = self
         while version is not None:
