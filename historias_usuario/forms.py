@@ -109,6 +109,10 @@ class HistoriaUsuarioForm(forms.ModelForm):
             "tipo": "Tipo de Historia de Usuario",
             "usuarioAsignado": "Usuario asignado"
         }
+    
+    def set_tipos_usuarios(self, tipos, usuarios):
+        self.fields['tipo'].choices = tipos
+        self.fields['usuarioAsignado'].choices = usuarios
 
 
 class HistoriaUsuarioEditarForm(forms.ModelForm):
@@ -140,6 +144,9 @@ class HistoriaUsuarioEditarForm(forms.ModelForm):
             "up": "User Points",
             "usuarioAsignado": "Usuario asignado"
         }
+    
+    def set_usuarios(self, usuarios):
+        self.fields['usuarioAsignado'].choices = usuarios
 
 
 class ComentarioForm(forms.ModelForm):
