@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from django.forms import inlineformset_factory
 
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto
+from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
 from usuarios.models import Usuario
 from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarConUserForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, TipoHistoriaUsuarioForm
 
@@ -343,6 +343,9 @@ def configHistoriasPendientes(request, id_proyecto, id_historia):
     except HistoriaUsuario.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró la historia de usuario."}, status=404)
 
+    if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto) and not historia.usuarioAsignado == request.user:
+        return HttpResponseRedirect("/", status=422)
+
 
     if request.method == 'POST':
 
@@ -577,8 +580,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             historia.bv = form.cleaned_data['bv']
             historia.up = form.cleaned_data['up']
 
-            if form.cleaned_data['usuarioAsignado'] != None:
-                historia.usuarioAsignado = form.cleaned_data['usuarioAsignado']
+            historia.usuarioAsignado = form.cleaned_data['usuarioAsignado']
 
             historia.save()
 
@@ -587,12 +589,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
     else:
-
-        if not tiene_permiso_en_proyecto(request.user, "pro_cambiarUsuarioAsignadoUS", proyecto):
-            form = HistoriaUsuarioEditarForm(initial={
-                                             'nombre': historia.nombre, 'descripcion': historia.descripcion, 'bv': historia.bv, 'up': historia.up})
-        else:
-            form = HistoriaUsuarioEditarConUserForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion,
+        form = HistoriaUsuarioEditarConUserForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion,
                                                     'bv': historia.bv, 'up': historia.up, 'usuarioAsignado': historia.usuarioAsignado})
     return render(request, 'historias/editar_historia.html', {'form': form, 'proyecto': proyecto, 'historia': historia}, status=status)
 
