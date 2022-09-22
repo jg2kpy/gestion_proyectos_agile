@@ -27,32 +27,18 @@ from historias_usuario import views as historias_usuario_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    path('', include('historias_usuario.urls')),
-    path('<int:id_proyecto>/', proyectos_views.proyecto_home, name='proyecto_home'),
-    path('proyectos/', proyectos_views.proyectos, name='proyectos'),
-    path('proyectos/crear/', proyectos_views.crear_proyecto, name='crear_proyecto'),
-    path('proyectos/<int:id_proyecto>/editar/', proyectos_views.editar_proyecto, name='editar_proyecto'),
-    path('proyectos/cancelar/<int:id_proyecto>/', proyectos_views.cancelar_proyecto, name='cancelar_proyecto'),
-    path('proyectos/roles_proyecto/', proyectos_views.roles_proyecto, name='roles_proyecto'),
-    path('proyectos/roles_proyecto/crear/', proyectos_views.crear_rol_proyecto, name='crear_rol_proyecto'),
-    path('proyectos/roles_proyecto/<int:id_rol_proyecto>/', proyectos_views.ver_rol_proyecto, name='ver_rol_proyecto'),
-    path('proyectos/roles_proyecto/editar/<int:id_rol_proyecto>/', proyectos_views.modificar_rol_proyecto, name='modificar_rol_proyecto'),
-    path('proyectos/roles_proyecto/eliminar/<int:id_rol_proyecto>/', proyectos_views.eliminar_rol_proyecto, name='eliminar_rol_proyecto'),
-    path('proyectos/<int:id_proyecto>/roles/', proyectos_views.ver_roles_asignados, name='rol_proyecto_asignado'),
-    path('proyectos/<int:id_proyecto>/roles/crear/', proyectos_views.crear_rol_a_proyecto, name='crear_rol_a_proyecto'),
-    path('proyectos/<int:id_proyecto>/roles/import/', proyectos_views.importar_rol, name='importar_rol'),
     path('', Home.as_view(), name='home'),
+
+    path('perfil/', usuarios_views.perfil, name='perfil'),
+
+    path('proyecto/', include('historias_usuario.urls')),
+    path('proyecto/', include('usuarios.urls'), name='usuarios'),
+    path('proyecto/', include('proyectos.urls')),
 
     path('rolesglobales/', usuarios_views.rol_global_list, name='rol_global_list'),
     path('rolesglobales/crear/', usuarios_views.rol_global_crear, name='rol_global_crear'),
     path('rolesglobales/<int:id>/editar/', usuarios_views.rol_global_editar, name='rol_global_editar'),
-    path('rolesglobales/<int:id>/usuarios/', usuarios_views.rol_global_usuarios, name='rol_global_usuarios'),
-    path('usuarios/', include('usuarios.urls'), name='usuarios'),
-    path('perfil/', usuarios_views.perfil, name='perfil'),
-
-
-    path('proyectos/<int:id_proyecto>/historias/', historias_usuario_views.verHistoriasAsignadas, name='ver_historias_usuario'),
-    path('proyectos/<int:id_proyecto>/historias/<int:id_historia>', historias_usuario_views.configHistoriasPendientes, name='config_historias_usuario'),
+    path('rolesglobales/<int:id>/usuarios/', usuarios_views.rol_global_usuarios, name='rol_global_usuarios'),    
 
 ]
 handler404 = 'gestion_proyectos_agile.views.error_404_view'
