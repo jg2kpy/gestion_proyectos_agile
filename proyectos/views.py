@@ -1,15 +1,12 @@
-from warnings import catch_warnings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.db import IntegrityError
+from django.views.decorators.cache import never_cache
 
-import usuarios
 from .models import Proyecto
 from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
-from django.views.decorators.cache import never_cache
 from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
-from django.http import HttpResponse
 
 """
     Enumerador de estados de Proyecto
@@ -26,8 +23,9 @@ ESTADOS_PROYECTO = (
 )
 
 
-"""
-    Vista para renderizar la lista de proyectos
+@never_cache
+def proyectos(request):
+    """Vista para renderizar la lista de proyectos
     Se renderiza la lista de proyectos que hay en el sistema
     y se muestra el boton para crear un nuevo proyecto
 
@@ -36,11 +34,7 @@ ESTADOS_PROYECTO = (
 
     :return: Renderiza la lista de proyectos
     :rtype: HttpResponse
-"""
-
-
-@never_cache
-def proyectos(request):
+    """
 
     request_user = request.user
 
@@ -55,14 +49,14 @@ def proyectos(request):
 
 @never_cache
 def proyecto_home(request, id_proyecto):
-    """
-    Vista de inicio de proyecto
+    """Vista de inicio de proyecto
 
     :param request: Peticion HTTP
     :type request: HttpRequest
     :return: Renderiza la vista de inicio de proyecto
     :rtype: HttpResponse
     """
+
     if not request.user.is_authenticated:
         return HttpResponseRedirect("/", status=401)
 
@@ -77,18 +71,16 @@ def proyecto_home(request, id_proyecto):
     return render(request, 'proyectos/home.html', {'proyecto': proyecto})
 
 
-"""
-    Funcion para crear un nuevo proyecto
+
+@never_cache
+def crear_proyecto(request):
+    """Funcion para crear un nuevo proyecto
     Renderiza la pagina para crear un nuevo proyecto, recibe una llamada POST con los datos de un proyecto
     y guarda el proyecto, tambien asigna al scrum Master que sera el scrum master del proyecto.
 
     :param request: Peticion HTTP
     :type request: HttpRequest
-"""
-
-
-@never_cache
-def crear_proyecto(request):
+    """
 
     request_user = request.user
 
@@ -149,8 +141,11 @@ def crear_proyecto(request):
     return render(request, 'proyectos/crear_proyecto.html', {'form': form})
 
 
-"""
-    Funcion para editar un proyecto
+
+# Editar un proyecto
+@never_cache
+def editar_proyecto(request, id_proyecto):
+    """Funcion para editar un proyecto
     Renderiza la pagina para editar un proyecto, recibe una llamada POST con los datos de un proyecto
     y guarda el proyecto.
 
@@ -162,12 +157,7 @@ def crear_proyecto(request):
 
     :return: Renderiza la pagina para editar un proyecto
     :rtype: HttpResponse
-"""
-# Editar un proyecto
-
-
-@never_cache
-def editar_proyecto(request, id_proyecto):
+    """
 
     request_user = request.user
 
@@ -210,8 +200,11 @@ def editar_proyecto(request, id_proyecto):
     return render(request, 'proyectos/editar_proyecto.html', {'form': form})
 
 
-"""
-    Cancelar Proyecto
+
+# Recibimos una peticion POST para cancelar un proyecto
+@never_cache
+def cancelar_proyecto(request, id_proyecto):
+    """Cancelar Proyecto
     Cambia el estado del proyecto a cancelado, se recibe el nombre del proyecto a cancelar, se verifica que el proyecto coincida con
     el nombre introducido y se cambia el estado a cancelado.
 
@@ -223,12 +216,8 @@ def editar_proyecto(request, id_proyecto):
 
     :return: Renderiza la pagina de proyectos
     :rtype: HttpResponse
-"""
-# Recibimos una peticion POST para cancelar un proyecto
+    """
 
-
-@never_cache
-def cancelar_proyecto(request, id_proyecto):
     request_user = request.user
 
     if not request_user.is_authenticated:
@@ -271,13 +260,13 @@ def cancelar_proyecto(request, id_proyecto):
 
 @never_cache
 def roles_proyecto(request):
-    """
-        Ver Roles de Proyecto
-        Renderiza la pagina para ver los roles de un proyecto, recibe el id del proyecto y muestra los roles de ese proyecto
+    """ Ver Roles de Proyecto
+    Renderiza la pagina para ver los roles de un proyecto, recibe el id del proyecto y muestra los roles de ese proyecto
 
-        :param request: Peticion HTTP
-        :type request: HttpRequest
+    :param request: Peticion HTTP
+    :type request: HttpRequest
     """
+
     request_user = request.user
 
     if not request_user.is_authenticated:
@@ -294,17 +283,17 @@ def roles_proyecto(request):
 
 @never_cache
 def crear_rol_proyecto(request):
-    """
-        Crear Rol de Proyecto
-        Renderiza la pagina para crear un rol de proyecto, recibe una llamada POST con los datos del rol de proyecto,
-        trae los permisos de la base de datos y los muestra en la pagina y guarda el rol de proyecto con sus permisos correspondientes.
+    """Crear Rol de Proyecto
+    Renderiza la pagina para crear un rol de proyecto, recibe una llamada POST con los datos del rol de proyecto,
+    trae los permisos de la base de datos y los muestra en la pagina y guarda el rol de proyecto con sus permisos correspondientes.
 
-        :param request: Peticion HTTP donde se recibe la informacion del rol de proyecto a crear
-        :type request: HttpRequest
+    :param request: Peticion HTTP donde se recibe la informacion del rol de proyecto a crear
+    :type request: HttpRequest
 
-        :return: Renderiza la pagina para crear un rol de proyecto
-        :rtype: HttpResponse
+    :return: Renderiza la pagina para crear un rol de proyecto
+    :rtype: HttpResponse
     """
+
     request_user = request.user
 
     if not request_user.is_authenticated:
@@ -352,19 +341,18 @@ def crear_rol_proyecto(request):
 
 @never_cache
 def ver_rol_proyecto(request, id_rol_proyecto):
-    """
-        Ver rol de proyecto
-        Renderiza la pagina para ver un rol de proyecto, recibe el id del rol de proyecto y muestra la informacion del rol de proyecto
-        trae los permisos asociados con el rol indicado
+    """Ver rol de proyecto
+    Renderiza la pagina para ver un rol de proyecto, recibe el id del rol de proyecto y muestra la informacion del rol de proyecto
+    trae los permisos asociados con el rol indicado
 
-        :param request: Peticion HTTP
-        :type request: HttpRequest
+    :param request: Peticion HTTP
+    :type request: HttpRequest
 
-        :param id_rol_proyecto: ID del rol de proyecto a ver
-        :type id_rol_proyecto: int
+    :param id_rol_proyecto: ID del rol de proyecto a ver
+    :type id_rol_proyecto: int
 
-        :return: Renderiza la pagina para ver un rol de proyecto
-        :rtype: HttpResponse
+    :return: Renderiza la pagina para ver un rol de proyecto
+    :rtype: HttpResponse
     """
 
     request_user = request.user
@@ -392,19 +380,18 @@ def ver_rol_proyecto(request, id_rol_proyecto):
 # Modificar un rol de un proyecto
 @ never_cache
 def modificar_rol_proyecto(request, id_rol_proyecto):
-    """
-        Modificar rol de proyecto
-        Renderiza la pagina para modificar un rol de proyecto, recibe una llamada POST con los datos del rol de proyecto,
-        trae los permisos de la base de datos los modifica y guarda el rol de proyecto.
+    """Modificar rol de proyecto
+    Renderiza la pagina para modificar un rol de proyecto, recibe una llamada POST con los datos del rol de proyecto,
+    trae los permisos de la base de datos los modifica y guarda el rol de proyecto.
 
-        :param request: Peticion HTTP donde se recibe la informacion del rol de proyecto a modificar
-        :type request: HttpRequest
+    :param request: Peticion HTTP donde se recibe la informacion del rol de proyecto a modificar
+    :type request: HttpRequest
 
-        :param id_rol_proyecto: ID del rol de proyecto a modificar
-        :type id_rol_proyecto: int
+    :param id_rol_proyecto: ID del rol de proyecto a modificar
+    :type id_rol_proyecto: int
 
-        :return: Renderiza la pagina para modificar un rol de proyecto
-        :rtype: HttpResponse
+    :return: Renderiza la pagina para modificar un rol de proyecto
+    :rtype: HttpResponse
     """
 
     request_user = request.user
@@ -467,18 +454,18 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
 
 @ never_cache
 def eliminar_rol_proyecto(request, id_rol_proyecto):
+    """Eliminar rol de proyecto
+    Elimina un rol de proyecto, recibe el id del rol de proyecto a eliminar y lo elimina de la base de datos
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param id_rol_proyecto: ID del rol de proyecto a eliminar
+    :type id_rol_proyecto: int
+
+    :return: Renderiza la pagina para ver los roles de proyecto
     """
-        Eliminar rol de proyecto
-        Elimina un rol de proyecto, recibe el id del rol de proyecto a eliminar y lo elimina de la base de datos
 
-        :param request: Peticion HTTP
-        :type request: HttpRequest
-
-        :param id_rol_proyecto: ID del rol de proyecto a eliminar
-        :type id_rol_proyecto: int
-
-        :return: Renderiza la pagina para ver los roles de proyecto
-    """
     request_user = request.user
 
     if not request_user.is_authenticated:
@@ -512,18 +499,17 @@ def eliminar_rol_proyecto(request, id_rol_proyecto):
 @ never_cache
 # Ver roles asignados a un proyecto
 def ver_roles_asignados(request, id_proyecto):
-    """
-        ver roles de un proyecto especifico
-        Renderiza la pagina para ver los roles de proyecto asignados a un proyecto, recibe el id del proyecto
+    """Ver roles de un proyecto especifico
+    Renderiza la pagina para ver los roles de proyecto asignados a un proyecto, recibe el id del proyecto
 
-        :param request: Peticion HTTP
-        :type request: HttpRequest
+    :param request: Peticion HTTP
+    :type request: HttpRequest
 
-        :param id_usuario: ID del usuario a ver los roles de proyecto asignados
-        :type id_usuario: int
+    :param id_usuario: ID del usuario a ver los roles de proyecto asignados
+    :type id_usuario: int
 
-        :return: Renderiza la pagina para ver los roles de proyecto asignados a un usuario
-        :rtype: HttpResponse
+    :return: Renderiza la pagina para ver los roles de proyecto asignados a un usuario
+    :rtype: HttpResponse
     """
 
     request_user = request.user
@@ -553,20 +539,18 @@ def ver_roles_asignados(request, id_proyecto):
 
 @ never_cache
 def crear_rol_a_proyecto(request, id_proyecto):
-    """
-        Crear y asignar rol de proyecto a un proyecto especifico
-        Renderiza la pagina para crear un rol de proyecto y asignarlo a un proyecto especifico, recibe una llamada POST con los datos del rol de proyecto,
-        trae los permisos de la base de datos y los muestra en la pagina y guarda el rol de proyecto.
+    """Crear y asignar rol de proyecto a un proyecto especifico
+    Renderiza la pagina para crear un rol de proyecto y asignarlo a un proyecto especifico, recibe una llamada POST con los datos del rol de proyecto,
+    trae los permisos de la base de datos y los muestra en la pagina y guarda el rol de proyecto.
 
-        :param request: Peticion HTTP donde se recibe la informacion del rol de proyecto a crear
-        :type request: HttpRequest
+    :param request: Peticion HTTP donde se recibe la informacion del rol de proyecto a crear
+    :type request: HttpRequest
 
-        :param id_proyecto: ID del proyecto al que se le asignara el rol de proyecto
-        :type id_proyecto: int
+    :param id_proyecto: ID del proyecto al que se le asignara el rol de proyecto
+    :type id_proyecto: int
 
-        :return: Renderiza la pagina para crear un rol de proyecto y asignarlo a un proyecto especifico
-        :rtype: HttpResponse
-
+    :return: Renderiza la pagina para crear un rol de proyecto y asignarlo a un proyecto especifico
+    :rtype: HttpResponse
     """
 
     request_user = request.user
@@ -628,21 +612,21 @@ def crear_rol_a_proyecto(request, id_proyecto):
 
 @ never_cache
 def importar_rol(request, id_proyecto):
+    """Importar rol de proyecto
+    Renderiza la pagina para importar un rol de proyecto.
+    Recibe una llamada GET para renderizar la pantalla pero con los roles del proyecto a importar.
+    Recibe una llamada POST para importar el rol de proyecto seleccionado.
+
+    :param request: Peticion HTTP donde se recibe la informacion del rol de proyecto a importar
+    :type request: HttpRequest
+
+    :param id_proyecto: ID del proyecto al que se le importara el rol de proyecto
+    :type id_proyecto: int
+
+    :return: Renderiza la pagina para importar un rol de proyecto
+    :rtype: HttpResponse
     """
-        Importar rol de proyecto
-        Renderiza la pagina para importar un rol de proyecto.
-        Recibe una llamada GET para renderizar la pantalla pero con los roles del proyecto a importar.
-        Recibe una llamada POST para importar el rol de proyecto seleccionado.
 
-        :param request: Peticion HTTP donde se recibe la informacion del rol de proyecto a importar
-        :type request: HttpRequest
-
-        :param id_proyecto: ID del proyecto al que se le importara el rol de proyecto
-        :type id_proyecto: int
-
-        :return: Renderiza la pagina para importar un rol de proyecto
-        :rtype: HttpResponse
-    """
     request_user = request.user
 
     # Verificamos que el usuario este autenticado
