@@ -18,8 +18,6 @@
                 {% if pro_importarRol %}
                     <a href="{% url 'importar_rol' proyecto.id %}" class="btn btn-primary">Importar de otros proyectos </a>
                 {% endif %}
-            {% else %}
-                    <a href="{% url 'crear_rol_proyecto' %}" class="btn btn-primary">Crear rol de proyecto</a>
             {% endif %}
         </div>
     </div>

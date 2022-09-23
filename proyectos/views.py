@@ -185,7 +185,6 @@ def editar_proyecto(request, id_proyecto):
                 proyecto.save()
                 return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
             except Exception as e:
-                print(e, 'asdfasdf')
                 return HttpResponse('Error al editar el proyecto', status=500)
         else:
             return HttpResponse('Formulario invalido', status=422)
@@ -235,10 +234,8 @@ def cancelar_proyecto(request, id_proyecto):
         if form.is_valid():
             # Cancelamos el proyecto
             # verificamos que el nombre del proyecto sea correcto
-            if form.cleaned_data['nombre'] == Proyecto.objects.get(id=id_proyecto).nombre:
-                proyecto = Proyecto.objects.get(id=id_proyecto)
+            if form.cleaned_data['nombre'] == proyecto.nombre:
                 proyecto.estado = 'Cancelado'
-                proyecto.save()
                 return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
             else:
                 return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()}, status=422)
