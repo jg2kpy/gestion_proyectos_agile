@@ -10,16 +10,16 @@
         </div>
         <div>
             {% if proyecto %}
-            {% tiene_permiso_en_proyecto user 'pro_crearRolProyecto' proyecto as pro_crearRolProyecto %}
-            {% if pro_crearRolProyecto %}
-            <a href="{% url 'crear_rol_a_proyecto' proyecto.id %}" class="btn btn-primary">Crear rol de proyecto</a>
-            {% endif %}
-            {% tiene_permiso_en_proyecto user 'pro_importarRol' proyecto as pro_importarRol %}
-            {% if pro_importarRol %}
-            <a href="{% url 'importar_rol' proyecto.id %}" class="btn btn-primary">Importar de otros proyectos </a>
-            {% endif %}
+                {% tiene_permiso_en_proyecto user 'pro_crearRolProyecto' proyecto as pro_crearRolProyecto %}
+                {% if pro_crearRolProyecto %}
+                    <a href="{% url 'crear_rol_a_proyecto' proyecto.id %}" class="btn btn-primary">Crear rol de proyecto</a>
+                {% endif %}
+                {% tiene_permiso_en_proyecto user 'pro_importarRol' proyecto as pro_importarRol %}
+                {% if pro_importarRol %}
+                    <a href="{% url 'importar_rol' proyecto.id %}" class="btn btn-primary">Importar de otros proyectos </a>
+                {% endif %}
             {% else %}
-            <a href="{% url 'crear_rol_proyecto' %}" class="btn btn-primary">Crear rol de proyecto</a>
+                    <a href="{% url 'crear_rol_proyecto' %}" class="btn btn-primary">Crear rol de proyecto</a>
             {% endif %}
         </div>
     </div>

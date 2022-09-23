@@ -41,16 +41,21 @@
                     <td>
                         {% tiene_permiso_en_sistema user 'sys_crearproyectos' as sys_crearproyectos %}
                         {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
-                        {% if sys_crearproyectos or pro_cambiarEstadoProyecto %}
-                            {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
-                            {% if pro_cambiarEstadoProyecto %}
-                            <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn btn-link"><span
-                                    class="material-icons">create</span></a>
-                            <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span
-                                    class="material-icons">cancel</span></a>
+                        {% if proyecto.estado != 'Cancelado' %}
+                            {% if sys_crearproyectos or pro_cambiarEstadoProyecto %}
+                                {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
+                                {% if pro_cambiarEstadoProyecto %}
+                                <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn btn-link"><span
+                                        class="material-icons">create</span></a>
+                                <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span
+                                        class="material-icons">cancel</span></a>
+                                {% endif %}
+                                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-link"><span
+                                        class="material-icons">visibility</span></a>
                             {% endif %}
-                            <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-link"><span
-                                    class="material-icons">visibility</span></a>
+                        {% else %}
+                        <a class="btn btn-link"><span
+                            class="material-icons"></span></a>
                         {% endif %}
                     </td>
                 </tr>
@@ -58,7 +63,4 @@
             </tbody>
     </div>
 </div>
-
-
-
 {% endblock %}

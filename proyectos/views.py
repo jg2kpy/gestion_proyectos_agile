@@ -42,7 +42,7 @@ def proyectos(request):
         return HttpResponse('Usuario no autenticado', status=401)
 
     if tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
-        return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})        
+        return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
 
     return render(request, 'proyectos/base.html', {'proyectos': [rol.proyecto for rol in request_user.roles_proyecto.filter(permisos__nombre='pro_cambiarEstadoProyecto')]})
 
@@ -69,7 +69,6 @@ def proyecto_home(request, id_proyecto):
         return HttpResponseRedirect("/", status=422)
 
     return render(request, 'proyectos/home.html', {'proyecto': proyecto})
-
 
 
 @never_cache
@@ -99,7 +98,8 @@ def crear_proyecto(request):
                 proyecto = Proyecto()
                 proyecto.nombre = form.cleaned_data['nombre']
                 proyecto.descripcion = form.cleaned_data['descripcion']
-                proyecto.estado = ESTADOS_PROYECTO.__getitem__(0)[0]  # Automaticamente el estado se queda en planificado
+                # Automaticamente el estado se queda en planificado
+                proyecto.estado = ESTADOS_PROYECTO.__getitem__(0)[0]
                 id_scrum_master = form.cleaned_data['scrum_master']
                 scrum_master = Usuario.objects.get(id=id_scrum_master)
                 proyecto.scrumMaster = scrum_master
@@ -128,7 +128,8 @@ def crear_proyecto(request):
                         permiso.rol.add(rol_nuevo)
                         permiso.save()
 
-                scrum_master.roles_proyecto.add(RolProyecto.objects.get(nombre="Scrum Master", proyecto=proyecto))
+                scrum_master.roles_proyecto.add(RolProyecto.objects.get(
+                    nombre="Scrum Master", proyecto=proyecto))
                 scrum_master.save()
             except Exception as e:
                 return HttpResponse('Error al crear el proyecto', status=500)
@@ -139,7 +140,6 @@ def crear_proyecto(request):
     else:
         form = ProyectoForm()
     return render(request, 'proyectos/crear_proyecto.html', {'form': form})
-
 
 
 # Editar un proyecto
@@ -164,14 +164,14 @@ def editar_proyecto(request, id_proyecto):
     if not request_user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
 
-    # Verificar que solo el administrador puede editar proyectos
-    if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
-        return HttpResponse('No tiene permisos para editar proyectos', status=403)
-
     try:
         proyecto = Proyecto.objects.get(id=id_proyecto)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    # Verificar que solo con el permiso de cambiar estado de proyecto
+    if not tiene_permiso_en_proyecto(request_user, 'pro_cambiarEstadoProyecto', proyecto):
+        return HttpResponse('No tiene permisos para editar proyectos', status=403)
 
     # Verificamos que el usuario tenga permisos rol de moderador o es el scrum master del proyecto
     if request.method == 'POST':
@@ -182,11 +182,10 @@ def editar_proyecto(request, id_proyecto):
                 proyecto = Proyecto.objects.get(id=id_proyecto)
                 proyecto.nombre = form.cleaned_data['nombre']
                 proyecto.descripcion = form.cleaned_data['descripcion']
-                proyecto.fecha_inicio = form.cleaned_data['fecha_inicio']
-                proyecto.fecha_fin = form.cleaned_data['fecha_fin']
                 proyecto.save()
                 return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
             except Exception as e:
+                print(e, 'asdfasdf')
                 return HttpResponse('Error al editar el proyecto', status=500)
         else:
             return HttpResponse('Formulario invalido', status=422)
@@ -198,7 +197,6 @@ def editar_proyecto(request, id_proyecto):
         form.fields['descripcion'].initial = proyecto.descripcion
 
     return render(request, 'proyectos/editar_proyecto.html', {'form': form})
-
 
 
 # Recibimos una peticion POST para cancelar un proyecto
@@ -223,14 +221,14 @@ def cancelar_proyecto(request, id_proyecto):
     if not request_user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
 
-    # Verificar que solo el administrador puede cancelar proyectos
-    if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
-        return HttpResponse('No tiene permisos para cancelar proyectos', status=403)
-
     try:
         proyecto = Proyecto.objects.get(id=id_proyecto)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    # Verificar que solo con el permiso de cambiar estado de proyecto
+    if not tiene_permiso_en_proyecto(request_user, 'pro_cambiarEstadoProyecto', proyecto):
+        return HttpResponse('No tiene permisos para editar proyectos', status=403)
 
     if request.method == 'POST':
         form = ProyectoCancelForm(request.POST)
@@ -255,9 +253,8 @@ def cancelar_proyecto(request, id_proyecto):
 
     return render(request, 'proyectos/cancelar_proyecto.html', {'form': form})
 
+
 # Creamos una vista para ver los roles de proyectos
-
-
 @never_cache
 def roles_proyecto(request):
     """ Ver Roles de Proyecto
@@ -278,9 +275,8 @@ def roles_proyecto(request):
 
     return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all()})
 
+
 # Creamos un rol en un proyecto
-
-
 @never_cache
 def crear_rol_proyecto(request):
     """Crear Rol de Proyecto
@@ -336,9 +332,8 @@ def crear_rol_proyecto(request):
         form = RolProyectoForm()
     return render(request, 'proyectos/roles_proyecto/crear_rol_proyecto.html', {'form': form}, status=200)
 
+
 # Ver la informacion de un rol de un proyecto en especifico
-
-
 @never_cache
 def ver_rol_proyecto(request, id_rol_proyecto):
     """Ver rol de proyecto
@@ -365,10 +360,7 @@ def ver_rol_proyecto(request, id_rol_proyecto):
     if not request_user.is_authenticated:
         return HttpResponse('Usuario no autenticado', status=401)
 
-    # Si es proyecto None entonces si o si tiene que ser un gpa_admin
-    if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
-        return HttpResponse('No tiene permisos para ver roles de proyectos', status=403)
-    elif proyecto is not None and not tiene_rol_en_proyecto(request.user, 'Scrum Master', proyecto)  and not tiene_permiso_en_sistema(request.user, 'sys_crearproyectos'):
+    if not request.user.equipo.filter(id=proyecto.id).exists():
         return HttpResponse('No tiene permisos para ver roles de proyectos', status=403)
 
     # Traemos los permisos del rol
@@ -408,10 +400,7 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
 
     proyecto = rol.proyecto
 
-    # Si es proyecto None entonces si o si tiene que ser un gpa_admin
-    if proyecto is None and not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
-        return HttpResponse('No tiene permisos para modificar roles de proyectos', status=403)
-    elif proyecto is not None and not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto):
+    if not tiene_permiso_en_proyecto(request_user, 'pro_editarRolProyecto', proyecto):
         return HttpResponse('No tiene permisos para modificar roles de proyectos', status=403)
 
     # Traemos los permisos del rol
@@ -446,12 +435,12 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
         else:
             return redirect('rol_proyecto_asignado', id_proyecto=rol.proyecto.id)
     else:
-        form = RolProyectoForm(initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
+        form = RolProyectoForm(
+            initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
     return render(request, 'proyectos/roles_proyecto/modificar_rol_proyecto.html', {'form': form, 'rol': rol, 'permisos': permisos, 'proyecto': proyecto})
 
+
 # Eliminar un rol de un proyecto
-
-
 @ never_cache
 def eliminar_rol_proyecto(request, id_rol_proyecto):
     """Eliminar rol de proyecto
@@ -480,10 +469,7 @@ def eliminar_rol_proyecto(request, id_rol_proyecto):
 
     proyecto = rol.proyecto
 
-    # Si es proyecto None entonces si o si tiene que ser un gpa_admin
-    if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
-        return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
-    elif proyecto is not None and not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto):
+    if not tiene_permiso_en_proyecto(request_user, 'pro_editarRolProyecto', proyecto):
         return HttpResponse('No tiene permisos para eliminar roles de proyectos', status=403)
 
     if request.method == 'POST':
@@ -496,8 +482,8 @@ def eliminar_rol_proyecto(request, id_rol_proyecto):
     return render(request, 'proyectos/roles_proyecto/eliminar_rol_proyecto.html', {'rol_proyecto': RolProyecto.objects.get(id=id_rol_proyecto), 'proyecto': proyecto})
 
 
-@ never_cache
 # Ver roles asignados a un proyecto
+@ never_cache
 def ver_roles_asignados(request, id_proyecto):
     """Ver roles de un proyecto especifico
     Renderiza la pagina para ver los roles de proyecto asignados a un proyecto, recibe el id del proyecto
@@ -523,7 +509,7 @@ def ver_roles_asignados(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
 
     # Verificar que solo el administrador puede crear roles de proyectos
-    if not tiene_rol_en_proyecto(request.user, 'Scrum Master', proyecto) and not tiene_permiso_en_sistema(request.user, 'sys_crearproyectos'):
+    if not tiene_permiso_en_proyecto(request.user, 'pro_cambiarEstadoProyecto', proyecto) and not tiene_permiso_en_sistema(request.user, 'sys_crearproyectos'):
         return HttpResponse('No tiene permisos para ver los roles de este proyecto', status=403)
 
     # Traemos los roles que tengan el id del proyecto
@@ -534,9 +520,8 @@ def ver_roles_asignados(request, id_proyecto):
 
     return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': roles, 'proyecto': proyecto})
 
+
 # Creamos un rol en un proyecto a un proyecto especifico
-
-
 @ never_cache
 def crear_rol_a_proyecto(request, id_proyecto):
     """Crear y asignar rol de proyecto a un proyecto especifico
@@ -563,10 +548,7 @@ def crear_rol_a_proyecto(request, id_proyecto):
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
-    # Si es proyecto None entonces si o si tiene que ser un gpa_admin
-    if proyecto is None and not tiene_rol_en_sistema(request_user, 'gpa_admin'):
-        return HttpResponse('No tiene permisos para crear roles de proyectos', status=403)
-    elif proyecto is not None and not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto):
+    if not tiene_permiso_en_proyecto(request_user, 'pro_crearRolProyecto', proyecto):
         return HttpResponse('No tiene permisos para crear roles de proyectos', status=403)
 
     status = 200
@@ -607,9 +589,8 @@ def crear_rol_a_proyecto(request, id_proyecto):
         form = RolProyectoForm()
     return render(request, 'proyectos/roles_proyecto/crear_rol_proyecto.html', {'form': form, 'proyecto': proyecto}, status=status)
 
+
 # Importar Rol de otros proyectos
-
-
 @ never_cache
 def importar_rol(request, id_proyecto):
     """Importar rol de proyecto
@@ -639,13 +620,14 @@ def importar_rol(request, id_proyecto):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     # Verificacion que o es SrumMaster o es admin del sistema
-    if not tiene_rol_en_proyecto(request_user, 'Scrum Master', proyecto):
+    if not tiene_permiso_en_proyecto(request_user, 'pro_importarRol', proyecto):
         return HttpResponse('No tiene permisos para importar roles de proyecto', status=403)
 
     if request.method == 'POST':
         # id_proyecto: Proyecto a donde se VA A IMPORTAR
         roles = []  # Lista de los id de los roles a importar
-        proyecto_seleccionado = Proyecto.objects.get(id=int(request.POST.get('proyecto_seleccionado')))  # Proyecto de donde SE IMPORTA los roles
+        proyecto_seleccionado = Proyecto.objects.get(id=int(request.POST.get(
+            'proyecto_seleccionado')))  # Proyecto de donde SE IMPORTA los roles
         for rol in proyecto_seleccionado.roles.all():
             if request.POST.get(f'{rol.id}') != None:
                 roles.append(rol)
@@ -674,8 +656,10 @@ def importar_rol(request, id_proyecto):
     else:
         proyectos = Proyecto.objects.exclude(id=id_proyecto)
         # proyecto_objetivo = Proyecto.objects.get(nombre = request.GET.get('proyectos'))
-        if request.GET.get('proyectos'):  # Este es el GET cuando solicita ver los roles de proyectos de un proyecto en especifico
-            proyecto = Proyecto.objects.get(nombre=request.GET.get('proyectos'))
+        # Este es el GET cuando solicita ver los roles de proyectos de un proyecto en especifico
+        if request.GET.get('proyectos'):
+            proyecto = Proyecto.objects.get(
+                nombre=request.GET.get('proyectos'))
             roles = RolProyecto.objects.filter(proyecto=proyecto)
         else:  # Este es el GET cuando se llama desde otra pagina
             if proyectos.count() == 0:
