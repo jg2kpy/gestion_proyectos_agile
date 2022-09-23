@@ -86,7 +86,7 @@
                     <p>¿Esta a punto de cancelar la historia de usuario {{ historia.nombre }}, quiere continuar?</p>
                 </div>
                 <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Abortar</button>
                 <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
                     {% csrf_token %}
                     <input type="submit" class="btn btn-primary" value="Continuar">
