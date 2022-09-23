@@ -194,7 +194,7 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
     return render(request, 'tipos-us/editar_tipo.html', {'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
 
 
-@ never_cache
+@never_cache
 def importar_tipoUS(request, proyecto_id):
     """
         Importar tipo de historia de usuario desde otro proyecto
