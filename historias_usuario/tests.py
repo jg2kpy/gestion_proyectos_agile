@@ -1,3 +1,9 @@
+import os
+from django import setup
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_proyectos_agile.settings")
+setup()
+
+
 from phonenumber_field.modelfields import PhoneNumber
 from historias_usuario.views import tiposHistoriaUsuario
 from usuarios.models import RolProyecto, Usuario
@@ -8,10 +14,6 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth import get_user_model
 from django.test.client import RequestFactory
 from django.test import TestCase
-import os
-from django import setup
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_proyectos_agile.settings")
-setup()
 
 class TiposHistoriasUsuarioTest(TestCase):
     """
