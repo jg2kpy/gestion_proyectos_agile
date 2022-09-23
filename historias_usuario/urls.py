@@ -20,5 +20,5 @@ urlpatterns = [
     path('<int:proyecto_id>/historia-usuario/<int:historia_id>/comentarios/', comentarios_historiaUsuario, name='comentarios_historiaUsuario'),
 
     path('<int:id_proyecto>/historias/<int:id_historia>/', configHistoriasPendientes, name='config_historias_usuario'),
-    path('historial/<int:proyecto_id>/<int:historia_id>/', restaurar_historia_historial, name='restaurar_historia_historial'),
+    path('<int:proyecto_id>/historial/<int:historia_id>/', restaurar_historia_historial, name='restaurar_historia_historial'),
 ]
