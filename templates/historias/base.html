@@ -26,8 +26,6 @@
                     <th>Usuario</th>
                     {% if esBacklog %}
                         <th>Acciones</th>
-                    {% else %}
-                        <th>Fecha de modificacion</th>
                     {% endif %}
                 </tr>
             </thead>
@@ -63,11 +61,10 @@
                                 class="material-icons">comment</span></a>
                             <a href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}" class="btn btn-link"><span 
                                 class="material-icons">history</span></a>
-                                
-                        {% endif %}
-                        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
-                        {% if master or historia.usuarioAsignado == user %}
-                            <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
+                                {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+                            {% if master or historia.usuarioAsignado == user %}
+                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>
