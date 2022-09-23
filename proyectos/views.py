@@ -236,6 +236,7 @@ def cancelar_proyecto(request, id_proyecto):
             # verificamos que el nombre del proyecto sea correcto
             if form.cleaned_data['nombre'] == proyecto.nombre:
                 proyecto.estado = 'Cancelado'
+                proyecto.save()
                 return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
             else:
                 return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()}, status=422)
