@@ -40,12 +40,22 @@
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
                     <td>{{ historia.usuarioAsignado }}</td>
-                    {% if esBacklog %}
-                        <td>
-                            <button type="button" class="btn btn-link" data-bs-toggle="modal"
-                                data-bs-target="#modalVer{{ historia.id }}"><span 
-                                class="material-icons">visibility</span>
-                            </button>
+                    <td>
+                        {% if historia.estado == historia.Estado.ACTIVO %}
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal"
+                            data-bs-target="#modalVer{{ historia.id }}"><span 
+                            class="material-icons">visibility</span>
+                        </button>
+                        <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
+                            class="material-icons">create</span></a>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></button>
+                        <a href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
+                            class="material-icons">comment</span></a>
+                        <a href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}" class="btn btn-link"><span 
+                            class="material-icons">history</span></a>
+                        {% endif %}
+                        
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
 
                             {% tiene_permiso_en_proyecto user 'pro_modificarUS' proyecto as pro_modificarUS %}
                             {% if pro_modificarUS %}
