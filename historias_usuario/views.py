@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
 from django.http import HttpResponse, HttpResponseRedirect
+from datetime import datetime
 
 
 from proyectos.models import Proyecto
@@ -194,7 +195,7 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
     return render(request, 'tipos-us/editar_tipo.html', {'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
 
 
-@ never_cache
+@never_cache
 def importar_tipoUS(request, proyecto_id):
     """
         Importar tipo de historia de usuario desde otro proyecto
@@ -342,7 +343,7 @@ def configHistoriasPendientes(request, id_proyecto, id_historia):
         return HttpResponseRedirect("/", status=422)
 
     if request.method == 'POST':
-
+        historia.guardarConHistorial()
         sigOrden = historia.etapa.orden + 1 if historia.etapa else 1
         if sigOrden == historia.tipo.etapas.count():
             historia.estado = HistoriaUsuario.Estado.TERMINADO
@@ -350,6 +351,7 @@ def configHistoriasPendientes(request, id_proyecto, id_historia):
             sigEtapa = EtapaHistoriaUsuario.objects.get(
                 orden=sigOrden, TipoHistoriaUsusario=historia.tipo)
             historia.etapa = sigEtapa
+
         historia.save()
 
         return redirect(request.POST.get('url'))
@@ -581,7 +583,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
     if request.method == 'POST':
         form = HistoriaUsuarioEditarForm(request.POST)
         if form.is_valid():
-
+            historia.guardarConHistorial()
             historia.descripcion = form.cleaned_data['descripcion']
             historia.bv = form.cleaned_data['bv']
             historia.up = form.cleaned_data['up']
@@ -644,3 +646,46 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
     else:
         form = ComentarioForm()
     return render(request, 'historias/comentarios.html', {'form': form, 'proyecto': proyecto, 'historia': historia, 'comentarios': historia.comentarios.all()}, status=status)
+
+@never_cache
+def restaurar_historia_historial(request, proyecto_id, historia_id):
+    """
+    Permite ver y restaurar versiones anteriores de una historia de usuario. La acción de restaurar a su vez se guarda otra vez en el historial.
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere crear un tipo de historia de usuario
+    :type proyecto_id: int
+    :param historia_id: Id de la historia de usuario de la cual se quiere visualizar el historial.
+    :type historia_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 422 con información adicional si el formulario no fue creado correctamente, 200 con un la lista de versiones anteriores en una tabla html en caso de éxito
+    :rtype: HttpResponse
+    """
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect("/", status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    try:
+        historia = HistoriaUsuario.objects.get(id=historia_id)
+    except HistoriaUsuario.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
+    
+    if request.method == 'POST':
+        try:
+            versionPrevia = HistoriaUsuario.objects.get(id=request.POST.get('version'))
+        except HistoriaUsuario.DoesNotExist:
+            return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
+
+        historia.guardarConHistorial()
+        historia.nombre = versionPrevia.nombre
+        historia.descripcion = versionPrevia.descripcion
+        historia.bv = versionPrevia.bv
+        historia.up = versionPrevia.up
+        historia.usuarioAsignado = versionPrevia.usuarioAsignado
+        historia.save()
+    
+    return render(request, 'historias/historial.html', {'proyecto': proyecto, 'version_ori': historia_id, 'versiones': historia.obtenerVersiones()}, status=200)

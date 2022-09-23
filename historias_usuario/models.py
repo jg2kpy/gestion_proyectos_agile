@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from proyectos.models import Proyecto, Sprint
 from usuarios.models import Usuario
+from datetime import datetime
+from django.utils.timezone import now
 
 
 class TipoHistoriaUsusario(models.Model):
@@ -125,7 +127,7 @@ class HistoriaUsuario(models.Model):
     """
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_creacion = models.DateTimeField(default=now)
     fecha_modificacion = models.DateTimeField(auto_now=True)
     sprint = models.ForeignKey(Sprint, related_name='historias', on_delete=models.PROTECT, blank=True, null=True)
     etapa = models.ForeignKey(EtapaHistoriaUsuario, related_name='historias', on_delete=models.PROTECT, blank=True, null=True)
@@ -142,6 +144,7 @@ class HistoriaUsuario(models.Model):
         ACTIVO = 'A', _('Activo')
         TERMINADO = 'T', _('Terminado')
         CANCELADO = 'C', _('Cancelado')
+        HISTORIAL = 'H', _('Historial')
 
     estado = models.CharField(
         max_length=1,
@@ -149,11 +152,39 @@ class HistoriaUsuario(models.Model):
         default=Estado.ACTIVO,
     )
     archivo = models.ManyToManyField(ArchivoAnexo, blank=True)
+    
+    def guardarConHistorial(self):
+        """
+        Guarda una copia de la version actual de la historia de usuario en el historial y lo conecta a la version actual.
+        Debe ser llamado antes de modificar y guardar la version actual.
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['nombre', 'proyecto'], name='constraint_historia_usuario_nombre_proyecto')
-        ]
+        Returns:
+            None
+        """
+        # Clonar y guardar version original para historial
+        versionPrevia = HistoriaUsuario.objects.get(id=self.id)
+        versionPrevia.pk = None
+        versionPrevia.estado = HistoriaUsuario.Estado.HISTORIAL
+        versionPrevia.save()
+
+        self.versionPrevia = versionPrevia
+        self.fecha_creacion = datetime.now()
+        self.fecha_modificacion = datetime.now()
+        self.save()
+    
+    def obtenerVersiones(self):
+        """
+        Retorna la lista de todas las versiones de la US en orden decreciente por fecha.
+
+        Returns:
+            List[HistoriaUsuario]: El historial completo en  orden decreciente por fecha.
+        """
+        versiones = []
+        version = self
+        while version is not None:
+            versiones.append(version)
+            version = version.versionPrevia
+        return versiones
 
     def __str__(self):
         """

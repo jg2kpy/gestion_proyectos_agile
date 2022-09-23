@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Historial US{% endblock %}
+{% block contenido %}
+{% load tiene_rol_en %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{{ titulo }}</h1>
+        </div>
+        <div>
+            {% tiene_permiso_en_proyecto user 'pro_cargarUSalBacklog' proyecto as pro_cargarUSalBacklog %}
+            {% if pro_cargarUSalBacklog and esBacklog %}
+                <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Cargar US al product backlog</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Fecha creación</th>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>User Points</th>
+                    <th>Business Value</th>
+                    <th>Usuario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for historia in versiones %}
+                <tr>
+                    <th>{{ historia.fecha_creacion|date:'Y-m-d H:i:s' }}</th>
+                    <td>{{ historia.nombre }}</td>
+                    <td>{{ historia.tipo }}</td>
+                    <td>{{ historia.up }}</td>
+                    <td>{{ historia.bv }}</td>
+                    <td>{{ historia.usuarioAsignado }}</td>
+                    <td>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal"
+                            data-bs-target="#modalVer{{ historia.id }}"><span 
+                            class="material-icons">visibility</span>
+                        </button>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">history</span></button>
+
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </div>
+    {% for historia in versiones %}
+        <!-- Modal -->
+        <div class="modal fade" id="modal{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Estas seguro que desea cancelar?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Seguro que  quiere restaurar version del {{ historia.fecha_modifciacion }}?</p>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'restaurar_historia_historial' proyecto.id version_ori %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="version" value="{{ historia.id }}">
+                    <input type="submit" class="btn btn-primary" value="Restaurar">
+                </form>
+                </div>
+            </div>
+            </div>
+        </div>
+        
+        <!-- Modal -->
+        <div class="modal fade" id="modalVer{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Descripción</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h2 style="margin-bottom: 25px;">{{ historia.nombre }}</h2>
+                        <p>{{ historia.descripcion }}</p>
+                        <p>Creado: {{ historia.fecha_creacion }}</p>
+                        {% if historia.fechar_modificacion %}
+                        <p>Modificado: {{ historia.fechar_modificacion }}</p>
+                        {% endif %}
+                        <p>Etapa: {{ historia.etapa.nombre }}</p>
+                        <p>Encargado: {{ historia.usuarioAsignado }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- End Modal -->
+    {% endfor %}
+</div>
+{% endblock %}
