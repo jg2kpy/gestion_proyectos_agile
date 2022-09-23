@@ -17,6 +17,7 @@ from usuarios.models import RolProyecto, Usuario
 from proyectos.views import cancelar_proyecto, crear_rol_a_proyecto, importar_rol, modificar_rol_proyecto, proyectos,crear_proyecto, editar_proyecto, roles_proyecto, ver_roles_asignados
 from proyectos.views import eliminar_rol_proyecto as eliminar_rol_proyecto_view
 from phonenumber_field.modelfields import PhoneNumber
+
 # Create your tests here.
 
 class ProyectoTests(TestCase):
@@ -123,16 +124,7 @@ class ProyectoTests(TestCase):
         """
         Prueba que el usuario puede editar un proyecto
         """
-        # Iniciamos seccion con acceso de Admin
-        master = Usuario(username="master",
-                         email='master@user.com', password='foo')
-        master.save()
-        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
-
         master = self.user
-
-        # Creamos un proyecto y lo guardamos en la base de datos
-
         proyecto = self.proyecto
 
         # Creamos un usuario que no este logueado
@@ -181,12 +173,7 @@ class ProyectoTests(TestCase):
         """
         Prueba que el usuario puede cancelar un proyecto
         """
-
-        # Creamos un usuario gpa_admin
-
         master = self.user
-        # Creamos un proyecto de prueba
-
         proyecto = self.proyecto
 
         # Verificamos que un usuario no logueado no puede cancelar un proyecto
@@ -214,8 +201,6 @@ class ProyectoTests(TestCase):
         # self.assertEqual(proyecto.estado, 'Cancelado', 'El estado del proyecto al cancelar no es el correcto')
         self.assertEqual(response.status_code, 200,
                          'La respuesta no fue un estado HTTP 200 a una petición correcta')
-
-        # Verificamos que el proyecto se cancelo correctamente
 
         # Verificamos que no se puede cancelar un proyecto cuando no tiene nombre correcto
 
@@ -269,14 +254,6 @@ class ProyectoTests(TestCase):
         """
         Prueba que el usuario puede modificar un rol de proyecto
         """
-        # Creamos un usuario gpa_admin
-        master = Usuario(username="master",
-                         email="master@master.com", password="foo")
-        master.save()
-        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
-
-        master = self.user
-
         # Creamos un usuario normal
         usuarioTest = Usuario(
             username="test", email="test@user.com", password="foo")
@@ -354,15 +331,6 @@ class ProyectoTests(TestCase):
         """
         Prueba que el usuario puede eliminar un rol de proyecto
         """
-
-        # Creamos un usuario gpa_admin
-        master = Usuario(username="master",
-                         email="master@master.com", password="foo")
-        master.save()
-        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
-
-        master = self.user
-
         # Creamos un usuario normal
         usuarioTest = Usuario(
             username="test", email="test@user.com", password="foo")
@@ -443,13 +411,6 @@ class ProyectoTests(TestCase):
         """
         Prueba que solamente usuario Scrum Master puede ver los roles de un proyecto
         """
-
-        # Creamos un usuario gpa_admin
-        master = Usuario(username="master",
-                         email="master@master.com", password="foo")
-        master.save()
-        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
-
         # Creamos un usuario normal
         usuarioTest = Usuario(
             username="test", email="test@user.com", password="foo")
@@ -506,12 +467,6 @@ class ProyectoTests(TestCase):
         """
             Prueba que el usuario puede crear un rol de proyecto opcion para admin
         """
-        # Creamos un usuario gpa_admin
-        master = Usuario(username="master",
-                         email="master@master.com", password="foo")
-        master.save()
-        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
-
         # Creamos un usuario normal
         usuarioTest = Usuario(
             username="test", email="test@user.com", password="foo")
@@ -578,12 +533,6 @@ class ProyectoTests(TestCase):
         """
             Prueba que el usuario puede importar un rol de proyecto
         """
-        # Creamos un usuario gpa_admin
-        master = Usuario(username="master",
-                         email="master@master.com", password="foo")
-        master.save()
-        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
-
         # Creamos un usuario normal
         usuarioTest = Usuario(
             username="test", email="test@user.com", password="foo")
