@@ -23,8 +23,7 @@
                     <th>#</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Fecha de inicio</th>
-                    <th>Fecha de fin</th>
+                    <th>Fecha de creacion</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -35,8 +34,7 @@
                     <th>{{ proyecto.id }}</th>
                     <td>{{ proyecto.nombre }}</td>
                     <td>{{ proyecto.descripcion }}</td>
-                    <td>{{ proyecto.fecha_inicio }}</td>
-                    <td>{{ proyecto.fecha_fin }}</td>
+                    <td>{{ proyecto.fecha_creacion }}</td>
                     <td>{{ proyecto.estado }}</td>
                     <td>
                         {% tiene_permiso_en_sistema user 'sys_crearproyectos' as sys_crearproyectos %}
