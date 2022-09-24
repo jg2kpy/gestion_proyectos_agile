@@ -42,7 +42,7 @@
                                 class="material-icons">create</span></a>
                         {% endif %}
                         {% tiene_permiso_en_proyecto user 'pro_eliminarTipoUS' proyecto as pro_eliminarTipoUS %}
-                        {% if pro_eliminarTipoUS %}
+                        {% if pro_eliminarTipoUS and tipo.historias.count == 0 %}
                         <a href="{% url 'borrarTipoHistoriaUsuario' proyecto.id tipo.id %}" class="btn btn-link"><span
                                 class="material-icons">delete</span></a>
                         {% endif %}

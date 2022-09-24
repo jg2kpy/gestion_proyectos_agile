@@ -32,6 +32,7 @@ def tiposHistoriaUsuario(request, proyecto_id):
     if not tiene_permiso_en_proyecto(request.user, "pro_crearTipoUS", proyecto):
         return HttpResponseRedirect("/", status=422)
 
+    request.session['cancelar_volver_a'] = request.path
     return render(request, 'tipos-us/base.html', {'tipos': TipoHistoriaUsusario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
 
 
@@ -88,7 +89,9 @@ def crear_tipoHistoriaUsuario(request, proyecto_id):
     else:
         form = TipoHistoriaUsuarioForm()
         formset = formset_factory()
-    return render(request, 'tipos-us/crear_tipo.html', {'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
+
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'tipos-us/crear_tipo.html', {"volver_a": volver_a, 'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
 
 
 @never_cache
@@ -125,11 +128,12 @@ def borrar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
             tipo = TipoHistoriaUsusario.objects.get(id=tipo_id)
             tipo.delete()
         except TipoHistoriaUsusario.DoesNotExist:
-            pass
+            pass 
         status = 200
-        return redirect('tiposHistoriaUsuario', proyecto_id=proyecto_id)
+        return redirect(request.session['cancelar_volver_a'] or 'tiposHistoriaUsuario', proyecto_id=proyecto_id)
 
-    return render(request, 'tipos-us/eliminar_tipo.html', {'tipo': tipo, 'proyecto': proyecto, }, status=status)
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'tipos-us/eliminar_tipo.html', {"volver_a": volver_a, 'tipo': tipo, 'proyecto': proyecto, }, status=status)
 
 
 @never_cache
@@ -191,7 +195,9 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
     else:
         form = TipoHistoriaUsuarioForm(instance=tipo)
         formset = formset_factory(instance=tipo)
-    return render(request, 'tipos-us/editar_tipo.html', {'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
+
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'tipos-us/editar_tipo.html', {"volver_a": volver_a, 'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
 
 
 @never_cache
@@ -262,7 +268,8 @@ def importar_tipoUS(request, proyecto_id):
     else:
         tipos = None
 
-    return render(request, 'tipos-us/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'tipos-us/importar_rol.html', {"volver_a": volver_a, 'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
 
 
 # TODO: Adaptar nombre
@@ -353,8 +360,9 @@ def configHistoriasPendientes(request, id_proyecto, id_historia):
 
         historia.save()
 
-        return redirect(request.POST.get('url'))
+        return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', id_proyecto)
 
+    request.session['cancelar_volver_a'] = request.path
     return render(request, '404.html', {'info_adicional': "No se encontró la historia de usuario."}, status=404)
 
 
@@ -380,6 +388,7 @@ def historiaUsuarioBacklog(request, proyecto_id):
     if not proyecto.usuario.filter(id=request.user.id).exists():
         return HttpResponseRedirect("/", status=422)
 
+    request.session['cancelar_volver_a'] = request.path
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=None, estado=HistoriaUsuario.Estado.ACTIVO).order_by('nombre'), 'proyecto': proyecto, 'esBacklog': True, 'titulo': 'Backlog'})
 
 
@@ -405,6 +414,7 @@ def historiaUsuarioCancelado(request, proyecto_id):
     if not proyecto.usuario.filter(id=request.user.id).exists():
         return HttpResponseRedirect("/", status=422)
 
+    request.session['cancelar_volver_a'] = request.path
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.CANCELADO).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Historias Canceladas'})
 
 
@@ -430,6 +440,7 @@ def historiaUsuarioTerminado(request, proyecto_id):
     if not proyecto.usuario.filter(id=request.user.id).exists():
         return HttpResponseRedirect("/", status=422)
 
+    request.session['cancelar_volver_a'] = request.path
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.TERMINADO).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Historias Terminadas'})
 
 
@@ -455,6 +466,7 @@ def historiaUsuarioAsignado(request, proyecto_id):
     if not proyecto.usuario.filter(id=request.user.id).exists():
         return HttpResponseRedirect("/", status=422)
 
+    request.session['cancelar_volver_a'] = request.path
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.ACTIVO, usuarioAsignado=request.user).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Mis Historias'})
 
 
@@ -508,7 +520,7 @@ def crear_historiaUsuario(request, proyecto_id):
                         historia.archivos.add(nuevoArchivo)
                 
                 status = 200
-                return redirect('historiaUsuarioBacklog', proyecto_id=proyecto_id)
+                return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', proyecto_id=proyecto_id)
         else:
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
@@ -519,7 +531,8 @@ def crear_historiaUsuario(request, proyecto_id):
         form.set_tipos_usuarios(tipos, usuarios)
         archivoForm = SubirArchivoForm()
 
-    return render(request, 'historias/crear_historia.html', {'form': form, 'archivo_form': archivoForm, 'proyecto': proyecto}, status=status)
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'historias/crear_historia.html', {"volver_a": volver_a, 'form': form, 'archivo_form': archivoForm, 'proyecto': proyecto}, status=status)
 
 
 @never_cache
@@ -559,9 +572,10 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
         except HistoriaUsuario.DoesNotExist:
             pass
         status = 200
-        return HttpResponseRedirect(request.POST.get('url'))
+        return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', proyecto_id=proyecto_id)
 
-    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto}, status=status)
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'historias/base.html', {"volver_a": volver_a, 'historias': HistoriaUsuario.objects.filter(proyecto=proyecto), 'proyecto': proyecto}, status=status)
 
 
 @never_cache
@@ -604,7 +618,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
 
             historia.save()
 
-            return redirect('historiaUsuarioBacklog', proyecto_id=proyecto_id)
+            return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', proyecto_id=proyecto_id)
         else:
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
@@ -613,7 +627,9 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
         form = HistoriaUsuarioEditarForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion,
                                                   'bv': historia.bv, 'up': historia.up, 'usuarioAsignado': historia.usuarioAsignado})
         form.set_usuarios(usuarios)
-    return render(request, 'historias/editar_historia.html', {'form': form, 'proyecto': proyecto, 'historia': historia}, status=status)
+        
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'historias/editar_historia.html', {'form': form, 'proyecto': proyecto, 'historia': historia, "volver_a": volver_a}, status=status)
 
 
 @never_cache
@@ -647,17 +663,21 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
         form = ComentarioForm(request.POST)
         if form.is_valid():
 
-            comentario = Comentario(
-                contenido=form.cleaned_data['contenido'], historiaUsuario=historia, usuario=request.user)
-
+            comentario = Comentario()
+            comentario.usuario = request.user
+            comentario.contenido = form.cleaned_data['contenido']
             comentario.save()
+            historia.comentarios.add(comentario)
+
             return redirect('comentarios_historiaUsuario', proyecto_id=proyecto_id, historia_id=historia.id)
         else:
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
     else:
         form = ComentarioForm()
-    return render(request, 'historias/comentarios.html', {'form': form, 'proyecto': proyecto, 'historia': historia, 'comentarios': historia.comentarios.all()}, status=status)
+
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'historias/comentarios.html', {'form': form, 'proyecto': proyecto, 'historia': historia, 'comentarios': historia.comentarios.all(), "volver_a": volver_a}, status=status)
 
 @never_cache
 def restaurar_historia_historial(request, proyecto_id, historia_id):
@@ -698,16 +718,69 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
         historia.bv = versionPrevia.bv
         historia.up = versionPrevia.up
         historia.usuarioAsignado = versionPrevia.usuarioAsignado
-        
+        historia.etapa = versionPrevia.etapa
+
+        for comentario in historia.comentarios.all():
+            historia.comentarios.remove(comentario)
+        for comentario in versionPrevia.comentarios.all():
+            historia.comentarios.add(comentario)
+
         for archivo in historia.archivos.all():
             historia.archivos.remove(archivo)
         for archivo in versionPrevia.archivos.all():
             historia.archivos.add(archivo)
 
         historia.save()
-    
-    return render(request, 'historias/historial.html', {'proyecto': proyecto, 'version_ori': historia_id, 'versiones': historia.obtenerVersiones()}, status=200)
 
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'historias/historial.html', {"volver_a": volver_a, 'proyecto': proyecto, 'version_ori': historia_id, 'versiones': historia.obtenerVersiones()}, status=200)
+
+
+@ never_cache
+def verTablero(request, proyecto_id, tipo_id):
+    """
+        Ver el tablero de tipo tipo_id en el proyecto proyecto_id
+
+        :param request: Peticion HTTP donde se recibe la informacion
+        :type request: HttpRequest
+
+        :param proyecto_id: ID del proyecto del cual se quiere visualizar el tablero
+        :type proyecto_id: int
+
+        :param proyecto_id: ID del proyecto del cual se quiere visualizar el tablero
+        :type proyecto_id: int
+
+        :return: Renderiza el tablero del tipo de historia de usuario seleccionado
+        :rtype: HttpResponse
+    """
+
+    if not request.user.is_authenticated:
+        return HttpResponse('Usuario no autenticado', status=401)
+        
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not proyecto.usuario.filter(id=request.user.id).exists():
+        return HttpResponse('No tiene permisos para ver tableros de tipos de historias de usuario en este proyecto', status=403)
+
+    try:
+        tipo = TipoHistoriaUsusario.objects.get(id=tipo_id)
+    except TipoHistoriaUsusario.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
+
+    if tipo.proyecto != proyecto:
+        return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
+
+    etapas = []
+    for etapa in tipo.etapas.all().order_by('orden'):
+        aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
+        aux_etapa["historias"] = etapa.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO)
+        etapas.append(aux_etapa)
+
+    request.session['cancelar_volver_a'] = request.path
+    return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo})
 
 @never_cache
 def ver_archivos(request, proyecto_id, historia_id):
