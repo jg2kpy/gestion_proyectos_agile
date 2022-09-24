@@ -67,6 +67,9 @@ class EtapaHistoriaUsuario(models.Model):
         return self.nombre
 
 
+def pathDinamico(instance, filename):
+    return 'archivos_US/{0}'.format(filename)
+
 class ArchivoAnexo(models.Model):
     """
     Archivos anexos a una historia de usuario.
@@ -78,10 +81,13 @@ class ArchivoAnexo(models.Model):
     :type fecha_subida: datetime
     :param subido_por: Usuario que subió el archivo.
     :type subido_por: Usuario
+    :param archivo: Archivo que subió el usuario.
+    :type archivo: file
     """
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
     subido_por = models.ForeignKey(Usuario, related_name='archivos', null=True, on_delete=models.SET_NULL)
+    archivo = models.FileField(upload_to=pathDinamico, null=True)
 
     def __str__(self):
         """
@@ -151,7 +157,7 @@ class HistoriaUsuario(models.Model):
         choices=Estado.choices,
         default=Estado.ACTIVO,
     )
-    archivo = models.ManyToManyField(ArchivoAnexo, blank=True)
+    archivos = models.ManyToManyField(ArchivoAnexo, related_name="historia_usuario", blank=True)
     
     def guardarConHistorial(self):
         """
@@ -166,6 +172,8 @@ class HistoriaUsuario(models.Model):
         versionPrevia.pk = None
         versionPrevia.estado = HistoriaUsuario.Estado.HISTORIAL
         versionPrevia.save()
+        for archivo in self.archivos.all():
+            versionPrevia.archivos.add(archivo)
 
         for comentario in self.comentarios.all():
             versionPrevia.comentarios.add(comentario)
@@ -222,3 +230,12 @@ class Comentario(models.Model):
             str: Contenido del comentario.
         """
         return self.contenido
+
+class SubirArchivo(models.Model):
+    """
+    Archivos subidos que van a ser anexados
+
+    :param archivo: Archivo que subió el usuario.
+    :type archivo: file
+    """
+    archivo = models.FileField(blank=True, null=True)

@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.utils import ErrorList
 
-from historias_usuario.models import Comentario, EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.models import Comentario, EtapaHistoriaUsuario, HistoriaUsuario, SubirArchivo, TipoHistoriaUsusario
 
 class DivErrorList(ErrorList):
     """ Lista de errores de un form estilizados
@@ -80,7 +80,6 @@ class HistoriaUsuarioForm(forms.ModelForm):
     """
     class Meta:
         """ Meta
-
         :param model: HistoriaUsusario
         :type model: HistoriaUsusario
         :param fields: [nombre', 'descripcion', 'bv', 'up', 'tipo', 'usuarioAsignado']
@@ -169,4 +168,29 @@ class ComentarioForm(forms.ModelForm):
         }
         labels = {
             "contenido": "Comentario"
+        }
+
+class SubirArchivoForm(forms.ModelForm):
+    """
+    Formulario para agregar a la base de datos un archivo
+    """
+    class Meta:
+        # TODO: Arreglar docstring
+        """ Meta
+        :param model: HistoriaUsusario
+        :type model: HistoriaUsusario
+        :param fields: [nombre', 'descripcion', 'bv', 'up', 'tipo', 'usuarioAsignado']
+        :type fields: list
+        :param widgets: TextInput, Textarea, NumberInput, forms.Select con clase form-control
+        :type widgets: dict
+        :param labels: archivo
+        :type widgets: dict
+        """
+        model = SubirArchivo
+        fields = ('archivo',)
+        widgets = {
+            'archivo': forms.ClearableFileInput(attrs={'multiple': True}),
+        }
+        labels = {
+            'archivo': 'Archivo'
         }

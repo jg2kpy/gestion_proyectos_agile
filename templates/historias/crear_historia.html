@@ -5,10 +5,11 @@
     </div>
     <div class="col-lg-8 col-md-10">
         <h3>Nueva historia de usuario</h3>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.non_form_errors }}
             {{ form.as_p }}
+            {{ archivo_form.as_p }}
             <input type="submit" class="btn btn-primary" value="Guardar">
             <a href="{{ volver_a }}" class="btn btn-danger">Cancelar</a>
         </form>

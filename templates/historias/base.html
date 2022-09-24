@@ -59,8 +59,10 @@
 
                             <a href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
                                 class="material-icons">comment</span></a>
-                            <a href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}" class="btn btn-link"><span 
-                                class="material-icons">history</span></a>
+                                <a href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}" class="btn btn-link"><span 
+                                    class="material-icons">history</span></a>
+                            <a href="{% url 'ver_archivos' proyecto.id historia.id %}" class="btn btn-link"><span 
+                                class="material-icons">description</span></a>
                                 {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                             {% if master or historia.usuarioAsignado == user %}
                                 <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
@@ -119,6 +121,12 @@
                             {{ historia.comentarios.count}} comentarios
                         {% else %}
                             No hay comentarios
+                    <p>Encargado: {{ historia.usuarioAsignado }}</p>
+                    <p>
+                        {% if historia.archivos.count > 0 %}
+                            {{ historia.archivos.count}} archivos
+                        {% else %}
+                            No hay archivos
                         {% endif %}
                     </p>
                 </div>
