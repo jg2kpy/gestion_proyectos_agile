@@ -652,10 +652,12 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
         form = ComentarioForm(request.POST)
         if form.is_valid():
 
-            comentario = Comentario(
-                contenido=form.cleaned_data['contenido'], historiaUsuario=historia, usuario=request.user)
-
+            comentario = Comentario()
+            comentario.usuario = request.user
+            comentario.contenido = form.cleaned_data['contenido']
             comentario.save()
+            historia.comentarios.add(comentario)
+
             return redirect('comentarios_historiaUsuario', proyecto_id=proyecto_id, historia_id=historia.id)
         else:
             form.add_error(None, "Hay errores en el formulario.")
@@ -706,6 +708,12 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
         historia.up = versionPrevia.up
         historia.usuarioAsignado = versionPrevia.usuarioAsignado
         historia.etapa = versionPrevia.etapa
+
+        for comentario in historia.comentarios.all():
+            historia.comentarios.remove(comentario)
+        for comentario in versionPrevia.comentarios.all():
+            historia.comentarios.add(comentario)
+
         historia.save()
 
     volver_a = request.session['cancelar_volver_a']

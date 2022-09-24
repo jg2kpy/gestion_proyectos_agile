@@ -102,19 +102,25 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="verModal">Descripción</h5>
+                    <h5 class="modal-title" id="verModal">{{ historia.nombre }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <h2 style="margin-bottom: 25px;">{{ historia.nombre }}</h2>
                     <p>{{ historia.descripcion }}</p>
                     <p>Creado: {{ historia.fecha_creacion }}</p>
                     {% if historia.fechar_modificacion %}
                     <p>Modificado: {{ historia.fechar_modificacion }}</p>
                     {% endif %}
                     <p>Etapa: {{ historia.etapa.nombre }}</p>
-                    <p>Encargado: {{ historia.usuarioAsignado }}</p>
+                    <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
+                    <p>
+                        {% if historia.comentarios.count > 0 %}
+                            {{ historia.comentarios.count}} comentarios
+                        {% else %}
+                            No hay comentarios
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>

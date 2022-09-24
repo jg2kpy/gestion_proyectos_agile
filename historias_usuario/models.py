@@ -167,6 +167,9 @@ class HistoriaUsuario(models.Model):
         versionPrevia.estado = HistoriaUsuario.Estado.HISTORIAL
         versionPrevia.save()
 
+        for comentario in self.comentarios.all():
+            versionPrevia.comentarios.add(comentario)
+
         self.versionPrevia = versionPrevia
         self.fecha_creacion = datetime.now()
         self.fecha_modificacion = datetime.now()
@@ -209,7 +212,7 @@ class Comentario(models.Model):
     """
     contenido = models.TextField(blank=True, null=True)
     usuario = models.ForeignKey('usuarios.Usuario', related_name='comentarios', null=True, on_delete=models.SET_NULL)
-    historiaUsuario = models.ForeignKey(HistoriaUsuario, related_name='comentarios', on_delete=models.CASCADE)
+    historiaUsuario = models.ManyToManyField(HistoriaUsuario, related_name='comentarios')
 
     def __str__(self):
         """
