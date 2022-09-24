@@ -2,13 +2,12 @@ from django.shortcuts import render, redirect
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
 from django.http import HttpResponse, HttpResponseRedirect
-from datetime import datetime
 
 
 from proyectos.models import Proyecto
-from .models import Comentario, EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
+from .models import ArchivoAnexo, Comentario, EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
 from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
-from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, TipoHistoriaUsuarioForm
+from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, SubirArchivoForm, TipoHistoriaUsuarioForm
 
 
 @never_cache
@@ -484,6 +483,8 @@ def crear_historiaUsuario(request, proyecto_id):
     status = 200
     if request.method == 'POST':
         form = HistoriaUsuarioForm(request.POST)
+        archivoForm = SubirArchivoForm(request.POST, request.FILES)
+
         if form.is_valid():
             historia = form.save(commit=False)
             if historia.nombre in [h.nombre for h in proyecto.backlog.all()]:
@@ -491,13 +492,23 @@ def crear_historiaUsuario(request, proyecto_id):
                     'nombre', "Ya existe una historia de usuario con este nombre en este proyecto.")
                 status = 422
             else:
-
                 historia.proyecto = proyecto
                 historia.etapa = historia.tipo.etapas.get(
                     orden=0, TipoHistoriaUsusario=historia.tipo)
-                historia.save()
-                status = 200
 
+                historia.save()
+                
+                # * Manejo de archivos
+                archivosSubidos = request.FILES.getlist('archivo')
+                if archivoForm.is_valid():
+
+                    if len(archivosSubidos) > 0:
+                        for archivoSubido in archivosSubidos:
+                            nuevoArchivo = ArchivoAnexo(nombre=archivoSubido.name, subido_por=request.user, archivo=archivoSubido, proyecto=historia.proyecto)
+                            nuevoArchivo.save()
+                            historia.archivo.add(nuevoArchivo)
+                
+                status = 200
                 return redirect('historiaUsuarioBacklog', proyecto_id=proyecto_id)
         else:
             form.add_error(None, "Hay errores en el formulario.")
@@ -507,7 +518,9 @@ def crear_historiaUsuario(request, proyecto_id):
         usuarios = [(usuario.id, usuario.email) for usuario in proyecto.usuario.all()]
         form = HistoriaUsuarioForm()
         form.set_tipos_usuarios(tipos, usuarios)
-    return render(request, 'historias/crear_historia.html', {'form': form, 'proyecto': proyecto}, status=status)
+        archivoForm = SubirArchivoForm()
+
+    return render(request, 'historias/crear_historia.html', {'form': form, 'archivo_form': archivoForm, 'proyecto': proyecto}, status=status)
 
 
 @never_cache
