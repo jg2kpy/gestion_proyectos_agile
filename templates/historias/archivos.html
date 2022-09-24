@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Archivos US{% endblock %}
+{% block contenido %}
+{% load tiene_rol_en %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{{ titulo }}</h1>
+        </div>
+    </div>
+    <h4>
+        Subir nuevos archivos
+    </h4>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ archivo_form.non_form_errors }}
+        {{ archivo_form.as_p }}
+        <input type="hidden" name="accion" value="subir">
+        <input type="submit" class="btn btn-primary" value="Subir">
+    </form>
+    <div class="row">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Fecha creación</th>
+                    <th>Nombre</th>
+                    <th>Subido por</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for archivo in archivos %}
+                <tr>
+                    <th>{{ archivo.fecha_subida|date:'Y-m-d' }}</th>
+                    <td>{{ archivo.nombre }}</td>
+                    <td>{{ archivo.subido_por }}</td>
+                    <td>
+                        <a href="{% url 'descargar' archivo.id %}"><span class="material-icons">download</span></a>
+                        <a href="#modal{{ historia.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </div>
+    {% for archivo in archivos %}
+    <div class="modal fade" id="modal{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Estas seguro que desea borrar?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Esta a punto de borrar el archivo {{ archivo.nombre }}, quiere continuar?</p>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+            <form method="post" action="{% url 'ver_archivos' proyecto.id historia.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="archivo_id" value="{{ archivo.id }}">
+                <input type="submit" class="btn btn-primary" value="Continuar">
+                <input type="hidden" name="url" value="{{ request.path }}">
+            </form>
+            </div>
+        </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
