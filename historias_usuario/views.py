@@ -832,5 +832,6 @@ def ver_archivos(request, proyecto_id, historia_id):
             else:
                 archivoForm.add_error(None, "El archivo no es válido.")
     
+    volver_a = request.session['cancelar_volver_a']
     return render(request, 'historias/archivos.html', {'proyecto': proyecto, 'historia': historia, 'archivos': historia.archivos.all(), \
-        "archivo_form": archivoForm, "titulo": f"Archivos anexos en '{historia.nombre}'"}, status=status)
+        "archivo_form": archivoForm, "titulo": f"Archivos anexos en '{historia.nombre}'", "volver_a": volver_a}, status=status)

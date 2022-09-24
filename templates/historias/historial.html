@@ -48,7 +48,11 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ volver_a }}" class="btn btn-primary">Volver</a>
+        <div class="row">
+            <div class="col-md-12">
+                <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
+            </div>
+        </div>
     </div>
     {% for historia in versiones %}
         <!-- Modal -->
@@ -63,12 +67,12 @@
                     <p>¿Seguro que  quiere restaurar version del {{ historia.fecha_modifciacion }}?</p>
                 </div>
                 <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <form method="post" action="{% url 'restaurar_historia_historial' proyecto.id version_ori %}">
                     {% csrf_token %}
                     <input type="hidden" name="version" value="{{ historia.id }}">
-                    <input type="submit" class="btn btn-primary" value="Restaurar">
+                    <input type="submit" class="btn btn-danger" value="Restaurar">
                 </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
                 </div>
             </div>
             </div>

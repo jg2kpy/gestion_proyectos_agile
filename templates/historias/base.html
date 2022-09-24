@@ -18,7 +18,6 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th>Nombre</th>
                     <th>Etapa</th>
                     <th>User Points</th>
@@ -32,7 +31,6 @@
             <tbody>
                 {% for historia in historias %}
                 <tr>
-                    <th>{{ historia.id }}</th>
                     <td>{{ historia.nombre }}</td>
                     <td>{{ historia.etapa }}</td>
                     <td>{{ historia.up }}</td>
@@ -54,15 +52,15 @@
 
                             {% tiene_permiso_en_proyecto user 'pro_cancelarUS' proyecto as pro_cancelarUS %}
                             {% if pro_cancelarUS %}
-                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></button>
+                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">cancel</span></button>
                             {% endif %}
 
                             <a href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
                                 class="material-icons">comment</span></a>
+                                <a href="{% url 'ver_archivos' proyecto.id historia.id %}" class="btn btn-link"><span 
+                                    class="material-icons">description</span></a>
                                 <a href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}" class="btn btn-link"><span 
                                     class="material-icons">history</span></a>
-                            <a href="{% url 'ver_archivos' proyecto.id historia.id %}" class="btn btn-link"><span 
-                                class="material-icons">description</span></a>
                                 {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                             {% if master or historia.usuarioAsignado == user %}
                                 <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
@@ -86,12 +84,12 @@
                     <p>¿Esta a punto de cancelar la historia de usuario {{ historia.nombre }}, quiere continuar?</p>
                 </div>
                 <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Abortar</button>
                 <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
                     {% csrf_token %}
-                    <input type="submit" class="btn btn-primary" value="Continuar">
+                    <input type="submit" class="btn btn-danger" value="Continuar">
                     <input type="hidden" name="url" value="{{ request.path }}">
                 </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                 </div>
             </div>
             </div>
@@ -148,12 +146,12 @@
                 <p>Esta seguro que desea mover {{ historia.nombre }} a la etapa {% siguente_etapa historia %}?</p>
             </div>
             <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
             <form method="post" action="{% url 'config_historias_usuario' proyecto.id historia.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="url" value="{{ request.path }}">
                 <input type="submit" class="btn btn-primary" value="Mover">
             </form>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
             </div>
         </div>
         </div>
