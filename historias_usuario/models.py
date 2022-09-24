@@ -68,7 +68,7 @@ class EtapaHistoriaUsuario(models.Model):
 
 
 def pathDinamico(instance, filename):
-    return 'archivos_US/{0}/{1}'.format(instance.proyecto.id ,filename)
+    return 'archivos_US/{0}'.format(filename)
 
 class ArchivoAnexo(models.Model):
     """
@@ -87,8 +87,7 @@ class ArchivoAnexo(models.Model):
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
     subido_por = models.ForeignKey(Usuario, related_name='archivos', null=True, on_delete=models.SET_NULL)
-    archivo = models.FileField(upload_to=pathDinamico)
-    proyecto = models.ForeignKey(Proyecto, related_name='archivos', on_delete=models.PROTECT)
+    archivo = models.FileField(upload_to=pathDinamico, null=True)
 
     def __str__(self):
         """
@@ -158,7 +157,7 @@ class HistoriaUsuario(models.Model):
         choices=Estado.choices,
         default=Estado.ACTIVO,
     )
-    archivo = models.ManyToManyField(ArchivoAnexo, blank=True)
+    archivos = models.ManyToManyField(ArchivoAnexo, related_name="historia_usuario", blank=True)
     
     def guardarConHistorial(self):
         """
@@ -173,6 +172,8 @@ class HistoriaUsuario(models.Model):
         versionPrevia.pk = None
         versionPrevia.estado = HistoriaUsuario.Estado.HISTORIAL
         versionPrevia.save()
+        for archivo in self.archivos.all():
+            versionPrevia.archivos.add(archivo)
 
         self.versionPrevia = versionPrevia
         self.fecha_creacion = datetime.now()

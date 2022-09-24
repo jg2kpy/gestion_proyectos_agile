@@ -1,4 +1,5 @@
 postgre-data/
+archivos_US/*
 migrations/
 env.desarrollo
 env.produccion
