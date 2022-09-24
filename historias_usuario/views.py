@@ -33,6 +33,7 @@ def tiposHistoriaUsuario(request, proyecto_id):
     if not tiene_permiso_en_proyecto(request.user, "pro_crearTipoUS", proyecto):
         return HttpResponseRedirect("/", status=422)
 
+    request.session['cancelar_volver_a'] = request.path
     return render(request, 'tipos-us/base.html', {'tipos': TipoHistoriaUsusario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
 
 
@@ -89,7 +90,9 @@ def crear_tipoHistoriaUsuario(request, proyecto_id):
     else:
         form = TipoHistoriaUsuarioForm()
         formset = formset_factory()
-    return render(request, 'tipos-us/crear_tipo.html', {'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
+
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'tipos-us/crear_tipo.html', {"volver_a": volver_a, 'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
 
 
 @never_cache
@@ -126,11 +129,12 @@ def borrar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
             tipo = TipoHistoriaUsusario.objects.get(id=tipo_id)
             tipo.delete()
         except TipoHistoriaUsusario.DoesNotExist:
-            pass
+            pass 
         status = 200
         return redirect(request.session['cancelar_volver_a'] or 'tiposHistoriaUsuario', proyecto_id=proyecto_id)
 
-    return render(request, 'tipos-us/eliminar_tipo.html', {'tipo': tipo, 'proyecto': proyecto, }, status=status)
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'tipos-us/eliminar_tipo.html', {"volver_a": volver_a, 'tipo': tipo, 'proyecto': proyecto, }, status=status)
 
 
 @never_cache
@@ -192,7 +196,9 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
     else:
         form = TipoHistoriaUsuarioForm(instance=tipo)
         formset = formset_factory(instance=tipo)
-    return render(request, 'tipos-us/editar_tipo.html', {'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
+
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'tipos-us/editar_tipo.html', {"volver_a": volver_a, 'historiaformset': formset, 'form': form, 'proyecto': proyecto}, status=status)
 
 
 @never_cache
@@ -263,7 +269,8 @@ def importar_tipoUS(request, proyecto_id):
     else:
         tipos = None
 
-    return render(request, 'tipos-us/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'tipos-us/importar_rol.html', {"volver_a": volver_a, 'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
 
 
 # TODO: Adaptar nombre
@@ -698,6 +705,7 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
         historia.bv = versionPrevia.bv
         historia.up = versionPrevia.up
         historia.usuarioAsignado = versionPrevia.usuarioAsignado
+        historia.etapa = versionPrevia.etapa
         historia.save()
 
     volver_a = request.session['cancelar_volver_a']
