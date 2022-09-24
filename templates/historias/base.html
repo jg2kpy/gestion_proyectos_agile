@@ -73,11 +73,11 @@
     </div>
     {% for historia in historias %}
         <!-- Modal -->
-        <div class="modal fade" id="modal{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="modal{{ historia.id }}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
             <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Estas seguro que desea cancelar?</h5>
+                <h5 class="modal-title" id="cancelarModal">Estas seguro que desea cancelar?</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -97,12 +97,12 @@
 
 
         <!-- Modal -->
-        <div class="modal fade" id="modalVer{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+        <div class="modal fade" id="modalVer{{ historia.id }}" tabindex="-1" aria-labelledby="verModal"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Descripción</h5>
+                    <h5 class="modal-title" id="verModal">Descripción</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
@@ -122,11 +122,11 @@
     <!-- End Modal -->
 
     <!-- Modal -->
-    <div class="modal fade" id="modalEtapa{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="modalEtapa{{ historia.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
         <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Estas seguro que desea mover a la siguente etapa?</h5>
+            <h5 class="modal-title" id="etapaModal">Estas seguro que desea mover a la siguente etapa?</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">

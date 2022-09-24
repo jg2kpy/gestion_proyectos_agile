@@ -43,11 +43,12 @@
                             class="material-icons">visibility</span>
                         </button>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">history</span></button>
-
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
+        </table>
+        <a href="{{ volver_a }}" class="btn btn-primary">Volver</a>
     </div>
     {% for historia in versiones %}
         <!-- Modal -->

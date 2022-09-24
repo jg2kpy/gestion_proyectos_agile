@@ -44,7 +44,7 @@
             
                                         {% tiene_permiso_en_proyecto user 'pro_cancelarUS' us.proyecto as pro_cancelarUS %}
                                         {% if pro_cancelarUS %}
-                                            <a href="#modal{{ historia.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></a>
+                                            <a href="#modal{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ us.id }}"><span class="material-icons">delete</span></a>
                                         {% endif %}
                                         <span>
                                             <a href="{% url 'comentarios_historiaUsuario' etapa.proyecto us.id %}"><span 
@@ -55,7 +55,7 @@
                                             class="material-icons">history</span></a>
                                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                                         {% if master or us.usuarioAsignado == user %}
-                                            <a href="#modalEtapa{{ historia.id }}" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></a>
+                                            <a href="#modalEtapa{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ us.id }}"><span class="material-icons">arrow_forward</span></a>
                                         {% endif %}
                                     </div>
                                     {% else %}
@@ -66,6 +66,50 @@
                             </div>
                         </div>
                         <div class="dropzone rounded"> &nbsp; </div>
+
+                        <div class="modal fade" id="modal{{ us.id }}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="cancelarModal">Estas seguro que desea cancelar?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Esta a punto de cancelar la historia de usuario {{ us.nombre }}, quiere continuar?</p>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Abortar</button>
+                                <form method="post" action="{% url 'borrar_historiaUsuario' us.proyecto.id us.id %}">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-primary" value="Continuar">
+                                    <input type="hidden" name="url" value="{{ request.path }}">
+                                </form>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="modalEtapa{{ us.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="etapaModal">Estas seguro que desea mover a la siguente etapa?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Esta seguro que desea mover {{ us.nombre }} a la etapa {% siguente_etapa us %}?</p>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                                <form method="post" action="{% url 'config_historias_usuario' us.proyecto.id us.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="url" value="{{ request.path }}">
+                                    <input type="submit" class="btn btn-primary" value="Mover">
+                                </form>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
