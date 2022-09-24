@@ -689,3 +689,49 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
         historia.save()
     
     return render(request, 'historias/historial.html', {'proyecto': proyecto, 'version_ori': historia_id, 'versiones': historia.obtenerVersiones()}, status=200)
+
+
+@ never_cache
+def verTablero(request, proyecto_id, tipo_id):
+    """
+        Ver el tablero de tipo tipo_id en el proyecto proyecto_id
+
+        :param request: Peticion HTTP donde se recibe la informacion
+        :type request: HttpRequest
+
+        :param proyecto_id: ID del proyecto del cual se quiere visualizar el tablero
+        :type proyecto_id: int
+
+        :param proyecto_id: ID del proyecto del cual se quiere visualizar el tablero
+        :type proyecto_id: int
+
+        :return: Renderiza el tablero del tipo de historia de usuario seleccionado
+        :rtype: HttpResponse
+    """
+
+    if not request.user.is_authenticated:
+        return HttpResponse('Usuario no autenticado', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not proyecto.usuario.filter(id=request.user.id).exists():
+        return HttpResponse('No tiene permisos para ver tableros de tipos de historias de usuario en este proyecto', status=403)
+
+    try:
+        tipo = TipoHistoriaUsusario.objects.get(id=tipo_id)
+    except TipoHistoriaUsusario.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
+
+    if tipo.proyecto != proyecto:
+        return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
+
+    etapas = []
+    for etapa in tipo.etapas.all().order_by('orden'):
+        aux_etapa = {"nombre": etapa.nombre, "historias": []}
+        aux_etapa["historias"] = etapa.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO)
+        etapas.append(aux_etapa)
+
+    return render(request, 'tablero/tablero.html', {'etapas': etapas})

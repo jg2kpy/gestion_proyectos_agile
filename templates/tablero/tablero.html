@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+{% block contenido %}
+{% load tiene_rol_en %}
+<link rel="stylesheet" href="{% static 'test.css' %}">
+<div class="board">
+    {% for etapa in etapas %}
+    <div class="tasks">
+        <h5 class="mt-0 task-header">{{ etapa.nombre }}{% if etapa.count > 0 %} ({{etapa.count}}){% endif %}</h5>
+        
+        <div id="task-list-one" class="task-list-items">
+            {% for us in etapa.historias %}
+            <!-- Task Item -->
+            <div class="card mb-0">
+                <div class="card-body p-3">
+                    <small class="float-end text-muted">{{ us.fecha_modificacion}}</small>
+                    <span class="badge bg-danger">High</span>
+
+                    <h5 class="mt-2 mb-2">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#task-detail-modal" class="text-body">{{ us.nombre }}</a>
+                    </h5>
+
+                    <p class="mb-0">
+                        <span class="pe-2 text-nowrap mb-2 d-inline-block">
+                            <i class="mdi mdi-briefcase-outline text-muted"></i>
+                            BV: {{ us.bv}}
+                        </span>
+                        <span class="pe-2 text-nowrap mb-2 d-inline-block">
+                            <i class="mdi mdi-briefcase-outline text-muted"></i>
+                            UP: {{ us.up}}
+                        </span>
+                        <span class="text-nowrap mb-2 d-inline-block">
+                            <i class="mdi mdi-comment-multiple-outline text-muted"></i>
+                            <b>74</b> Comments
+                        </span>
+                    </p>
+
+                    <div class="dropdown float-end">
+                        <a href="#" class="dropdown-toggle text-muted arrow-none" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="mdi mdi-dots-vertical font-18"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <!-- item-->
+                            <a href="javascript:void(0);" class="dropdown-item"><i class="mdi mdi-pencil me-1"></i>Editar</a>
+                            <!-- item-->
+                            <a href="javascript:void(0);" class="dropdown-item"><i class="mdi mdi-delete me-1"></i>Cancelar</a>
+                            <!-- item-->
+                            <a href="javascript:void(0);" class="dropdown-item"><i class="mdi mdi-plus-circle-outline me-1"></i>Siguiente Etapa</a>
+                            <!-- item-->
+                            <a href="javascript:void(0);" class="dropdown-item"><i class="mdi mdi-exit-to-app me-1"></i>Leave</a>
+                        </div>
+                    </div>
+
+                    {% if us.asignado %}
+                    <p class="mb-0">
+                        <img src="assets/images/users/avatar-2.jpg" alt="user-img" class="avatar-xs rounded-circle me-1">
+                        <span class="align-middle">Robert Carlile</span>
+                    </p>
+                    {% else %}
+                    <p class="mb-0">
+                        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="user-img" class="avatar-xs rounded-circle me-1">
+                        <span class="align-middle">No asignado</span>
+                    </p>
+                    {% endif %}
+                </div> <!-- end card-body -->
+            </div>
+            <!-- Task Item End -->
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
