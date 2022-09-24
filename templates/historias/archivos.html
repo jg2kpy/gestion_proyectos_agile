@@ -8,19 +8,16 @@
         <div class="col-md-12">
             <h1>{{ titulo }}</h1>
         </div>
-        <div>
-            {% tiene_permiso_en_proyecto user 'pro_cargarUSalBacklog' proyecto as pro_cargarUSalBacklog %}
-            {% if pro_cargarUSalBacklog and esBacklog %}
-                <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Cargar US al product backlog</a>
-            {% endif %}
-        </div>
     </div>
+    <h4>
+        Subir nuevos archivos
+    </h4>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ archivo_form.non_form_errors }}
         {{ archivo_form.as_p }}
         <input type="hidden" name="accion" value="subir">
-        <input type="submit" class="btn btn-primary" value="Guardar">
+        <input type="submit" class="btn btn-primary" value="Subir">
     </form>
     <div class="row">
         <table class="table table-striped">

@@ -759,4 +759,5 @@ def ver_archivos(request, proyecto_id, historia_id):
             else:
                 archivoForm.add_error(None, "El archivo no es válido.")
     
-    return render(request, 'historias/archivos.html', {'proyecto': proyecto, 'historia': historia, 'archivos': historia.archivos.all(), "archivo_form": archivoForm}, status=status)
+    return render(request, 'historias/archivos.html', {'proyecto': proyecto, 'historia': historia, 'archivos': historia.archivos.all(), \
+        "archivo_form": archivoForm, "titulo": f"Archivos anexos en '{historia.nombre}'"}, status=status)
