@@ -730,8 +730,8 @@ def verTablero(request, proyecto_id, tipo_id):
 
     etapas = []
     for etapa in tipo.etapas.all().order_by('orden'):
-        aux_etapa = {"nombre": etapa.nombre, "historias": []}
+        aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
         aux_etapa["historias"] = etapa.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO)
         etapas.append(aux_etapa)
 
-    return render(request, 'tablero/tablero.html', {'etapas': etapas})
+    return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo})
