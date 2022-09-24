@@ -67,6 +67,9 @@ class EtapaHistoriaUsuario(models.Model):
         return self.nombre
 
 
+def pathDinamico(instance, filename):
+    return 'archivos_US/{0}/{1}'.format(instance.proyecto.id ,filename)
+
 class ArchivoAnexo(models.Model):
     """
     Archivos anexos a una historia de usuario.
@@ -78,10 +81,14 @@ class ArchivoAnexo(models.Model):
     :type fecha_subida: datetime
     :param subido_por: Usuario que subió el archivo.
     :type subido_por: Usuario
+    :param archivo: Archivo que subió el usuario.
+    :type archivo: file
     """
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
     subido_por = models.ForeignKey(Usuario, related_name='archivos', null=True, on_delete=models.SET_NULL)
+    archivo = models.FileField(upload_to=pathDinamico)
+    proyecto = models.ForeignKey(Proyecto, related_name='archivos', on_delete=models.PROTECT)
 
     def __str__(self):
         """
@@ -219,3 +226,12 @@ class Comentario(models.Model):
             str: Contenido del comentario.
         """
         return self.contenido
+
+class SubirArchivo(models.Model):
+    """
+    Archivos subidos que van a ser anexados
+
+    :param archivo: Archivo que subió el usuario.
+    :type archivo: file
+    """
+    archivo = models.FileField(blank=True, null=True)
