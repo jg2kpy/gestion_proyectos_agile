@@ -233,7 +233,7 @@ class Comentario(models.Model):
 
 class SubirArchivo(models.Model):
     """
-    Archivos subidos que van a ser anexados
+    Archivos subidos por el usuario que van a ser anexados
 
     :param archivo: Archivo que subió el usuario.
     :type archivo: file
