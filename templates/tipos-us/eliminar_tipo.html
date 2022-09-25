@@ -15,6 +15,7 @@
                 {% csrf_token %}
                 <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
                 <button type="submit" class="btn btn-primary">Borrar</button>
+                <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="btn btn-secondary">Volver</a>
             </form>
         </div>
     </div>
