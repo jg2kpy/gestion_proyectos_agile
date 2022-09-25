@@ -39,7 +39,7 @@
                         {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
                         {% if proyecto.estado != 'Cancelado' %}
                             {% if sys_crearproyectos or pro_cambiarEstadoProyecto %}
-                                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-link"><span
+                                <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-link"><span
                                     class="material-icons">visibility</span></a>
                                 {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
                                 {% if pro_cambiarEstadoProyecto %}

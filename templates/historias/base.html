@@ -13,6 +13,7 @@
             {% if pro_cargarUSalBacklog and esBacklog %}
                 <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Agregar US al Product Backlog</a>
             {% endif %}
+            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu</a>
         </div>
     </div>
     <div class="row">

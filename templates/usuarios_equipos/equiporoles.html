@@ -66,7 +66,7 @@
             <input name="usuario_a_eliminar" id="usuario_a_eliminar" hidden value="{{ miembros.email }}">
             <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
             {% if user != miembros %}
-            <button type="submit" class="btn btn-secondary">Eliminar Usuario</button>
+            <button type="submit" class="btn btn-danger">Eliminar Usuario</button>
             {% endif %}
         </form>
     </div>
@@ -89,7 +89,7 @@
             <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
             <input name="rol_id" id="rol_id" hidden value="{{ r.id }}">
             {% if not miembros == user or not r.nombre == "Scrum Master" %}
-            <button type="submit" class="btn btn-primary">Desasignar rol</button>
+            <button type="submit" class="btn btn-secondary">Desasignar rol</button>
             {% endif %}
         </form>
     </div>
@@ -126,5 +126,7 @@
 </div>
 {% endif %}
 {% endfor %}
+
+<a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary mt-4">Volver al menu</a>
 
 {% endblock %}
