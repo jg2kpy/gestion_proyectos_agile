@@ -44,7 +44,7 @@ def proyectos(request):
     if tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
 
-    return render(request, 'proyectos/base.html', {'proyectos': [rol.proyecto for rol in request_user.roles_proyecto.filter(permisos__nombre='pro_cambiarEstadoProyecto')]})
+    return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.filter(usuario=request_user)})
 
 
 @never_cache
