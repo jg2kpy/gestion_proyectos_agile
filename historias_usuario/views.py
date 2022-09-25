@@ -266,6 +266,7 @@ def importar_tipoUS(request, proyecto_id):
         proyecto_seleccionado = proyectos[0]
         tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyectos[0])
     else:
+        proyecto_seleccionado = None
         tipos = None
 
     volver_a = request.session['cancelar_volver_a']
