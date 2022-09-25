@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Gestion de miembros de {{ proyecto.nombre }}{% endblock %}
 {% block contenido %}
 {% load tiene_rol_en %}
 {% tiene_rol_en_proyecto user "Scrum Master" proyecto.id as es_master %}
