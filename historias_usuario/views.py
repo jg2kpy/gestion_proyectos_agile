@@ -271,15 +271,17 @@ def importar_tipoUS(request, proyecto_id):
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'tipos-us/importar_rol.html', {"volver_a": volver_a, 'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
 
-def configHistoriasPendientes(request, id_proyecto, id_historia):
+def moverSiguienteEtapa(request, id_proyecto, id_historia):
     """
-    Obtener vista de historia de usuario terminadas para un determinado proyecto
+    Mover historia de usuario a la siguiente etapa
 
     :param request: HttpRequest
     :type request: HttpRequest
-    :param proyecto_id: Id del proyecto del cual se quiere ver las historia de usuario
+    :param proyecto_id: Id del proyecto del cual se quiere pasar las historia de usuario a la siguiente etapa
     :type proyecto_id: int
-    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 200 con una tabla de los permisos si todo esta bien
+    :param proyecto_id: Id de la historia de usuario de la cual se quiere pasar a la siguiente etapa
+    :type proyecto_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto o historia de usuario, 422 si no tiene rol necesario en proyecto
     :rtype: HttpResponse
     """
     status = 200
