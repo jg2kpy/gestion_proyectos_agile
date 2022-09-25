@@ -66,7 +66,7 @@ def proyecto_home(request, id_proyecto):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not request.user.equipo.filter(id=proyecto.id).exists():
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para ver este proyecto'}, status=403)
 
     return render(request, 'proyectos/home.html', {'proyecto': proyecto})
 
