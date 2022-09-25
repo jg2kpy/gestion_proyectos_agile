@@ -42,7 +42,12 @@
                             data-bs-target="#modalVer{{ historia.id }}"><span 
                             class="material-icons">visibility</span>
                         </button>
+
+                        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+                        {% if master or historia.usuarioAsignado == user %}
                         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">history</span></button>
+                        {% endif %}
+                        
                     </td>
                 </tr>
                 {% endfor %}
@@ -94,13 +99,20 @@
                         {% if historia.fechar_modificacion %}
                         <p>Modificado: {{ historia.fechar_modificacion }}</p>
                         {% endif %}
-                        <p>Etapa: {{ historia.etapa.nombre }}</p>
                         <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
+                        <p>Etapa: {{ historia.etapa.nombre }}</p>
                         <p>
                             {% if historia.comentarios.count > 0 %}
                                 {{ historia.comentarios.count}} comentarios
                             {% else %}
                                 No hay comentarios
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% if historia.archivos.count > 0 %}
+                                {{ historia.archivos.count}} archivos
+                            {% else %}
+                                No hay archivos
                             {% endif %}
                         </p>
                     </div>

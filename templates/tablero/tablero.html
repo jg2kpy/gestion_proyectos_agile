@@ -52,10 +52,12 @@
                                                 class="material-icons">comment</span></a>
                                             {{ us.comentarios.count }}
                                         </span>
+                                        <a href="{% url 'ver_archivos' proyecto.id us.id %}"><span 
+                                            class="material-icons">description</span></a>
+                                        <a href="{% url 'restaurar_historia_historial' etapa.proyecto us.id %}"><span 
+                                            class="material-icons">history</span></a>
                                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                                         {% if master or us.usuarioAsignado == user %}
-                                            <a href="{% url 'restaurar_historia_historial' etapa.proyecto us.id %}"><span 
-                                                class="material-icons">history</span></a>
                                             <a href="#modalEtapa{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ us.id }}"><span class="material-icons">arrow_forward</span></a>
                                         {% endif %}
                                     </div>
