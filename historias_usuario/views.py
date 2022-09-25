@@ -780,7 +780,7 @@ def verTablero(request, proyecto_id, tipo_id):
         etapas.append(aux_etapa)
 
     request.session['cancelar_volver_a'] = request.path
-    return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo})
+    return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo, 'proyecto': proyecto})
 
 @never_cache
 def ver_archivos(request, proyecto_id, historia_id):
