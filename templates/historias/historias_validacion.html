@@ -27,7 +27,7 @@
         </div>
         <div class="mb-3">
             {% if estado != 'movido_terminar' %}
-            <a href="{% url 'config_historias_usuario' proyecto.id historia.id %}" class="btn btn-light" class="mb-3"><b>Continuar
+            <a href="{% url 'mover_historias_usuario' proyecto.id historia.id %}" class="btn btn-light" class="mb-3"><b>Continuar
                     Configurando</b></a>
             <br><br>
             {% endif %}
