@@ -478,7 +478,7 @@ def crear_historiaUsuario(request, proyecto_id):
             status = 422
     else:
         tipos = [(tipo.id, tipo.nombre) for tipo in proyecto.tiposHistoriaUsuario.all()]
-        usuarios = [(usuario.id, usuario.email) for usuario in proyecto.usuario.all()]
+        usuarios = [(usuario.id, f"{usuario.get_full_name()} ({usuario.email})") for usuario in proyecto.usuario.all()]
         form = HistoriaUsuarioForm()
         form.set_tipos_usuarios(tipos, usuarios)
         archivoForm = SubirArchivoForm()

@@ -51,14 +51,13 @@
                     {% endif %}
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
-                    <td>{{ historia.usuarioAsignado }}</td>
+                    <td>{{ historia.usuarioAsignado.get_full_name }}</td>
                     <td>
-                        {% if historia.estado == historia.Estado.ACTIVO %}
-
-                            <button type="button" class="btn btn-link" data-bs-toggle="modal"
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal"
                                 data-bs-target="#modalVer{{ historia.id }}"><span 
                                 class="material-icons">visibility</span>
                             </button>
+                        {% if historia.estado == historia.Estado.ACTIVO %}
 
                             {% tiene_permiso_en_proyecto user 'pro_modificarUS' proyecto as pro_modificarUS %}
                             {% if pro_modificarUS %}
