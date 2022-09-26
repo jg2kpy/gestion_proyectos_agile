@@ -14,7 +14,7 @@ from usuarios.models import RolSistema
 from proyectos.models import Proyecto
 from usuarios.views import vista_equipo
 from usuarios.models import RolProyecto, Usuario
-from proyectos.views import cancelar_proyecto, crear_rol_a_proyecto, importar_rol, modificar_rol_proyecto, proyectos,crear_proyecto, editar_proyecto, roles_proyecto, ver_roles_asignados
+from proyectos.views import *
 from proyectos.views import eliminar_rol_proyecto as eliminar_rol_proyecto_view
 from phonenumber_field.modelfields import PhoneNumber
 
@@ -35,7 +35,7 @@ class ProyectoTests(TestCase):
 
         self.client.login(email='testemail@example.com', password='A123B456c.')
         res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD",
-                               "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id})
+                               "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id}, follow=True)
         self.assertEqual(res.status_code, 200)
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
 
@@ -106,8 +106,8 @@ class ProyectoTests(TestCase):
             '/proyectos/crear/', {'nombre': 'Proyecto de prueba', 'descripcion': 'Descripcion de prueba', 'scrum_master': master.id})
         request.user = master
         response = crear_proyecto(request)
-        self.assertEqual(response.status_code, 200,
-                         'La respuesta no fue un estado HTTP 200 de la creacion de un proyecto')
+        self.assertEqual(response.status_code, 302,
+                         'La respuesta no fue un estado HTTP 302 de la creacion de un proyecto')
 
         # Verificamos que el proyecto se creo correctamente
         proyecto = Proyecto.objects.get(nombre='Proyecto de prueba')
@@ -199,8 +199,8 @@ class ProyectoTests(TestCase):
         request.user = master
         response = cancelar_proyecto(request, proyecto.id)
         # self.assertEqual(proyecto.estado, 'Cancelado', 'El estado del proyecto al cancelar no es el correcto')
-        self.assertEqual(response.status_code, 200,
-                         'La respuesta no fue un estado HTTP 200 a una petición correcta')
+        self.assertEqual(response.status_code, 302,
+                         'La respuesta no fue un estado HTTP 302 a una petición correcta')
 
         # Verificamos que no se puede cancelar un proyecto cuando no tiene nombre correcto
 
@@ -216,39 +216,6 @@ class ProyectoTests(TestCase):
 
         self.assertEqual(proyecto.estado, 'Planificacion',
                          'Se cancelo el proyecto por mas que introdujo un nombre incorrecto')
-
-    def test_ver_roles_proyecto(self):
-        """
-        Prueba que el usuario puede ver la pantalla de los roles de un proyecto
-        """
-        # Creamos un usuario gpa_admin
-        master = Usuario(username="master",
-                         email='master@user.com', password='foo')
-        master.save()
-        RolSistema.objects.get(nombre="gpa_admin").usuario.add(master)
-
-        # Verificamos que el usuario no logueado no puede ver los roles de un proyecto
-        request_factory = RequestFactory()
-        request = request_factory.get(f'proyecto/roles_proyecto/{master.id}/')
-        request.user = AnonymousUser()
-        response = roles_proyecto(request)
-        self.assertEqual(response.status_code, 401,
-                         'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
-
-        # Verificamos que el usuario sin permisos no puede ver los roles de un proyecto
-        usuarioTest = Usuario(
-            username="test", email="test@user.com", password="foo")
-        usuarioTest.save()
-        request.user = usuarioTest
-        response = roles_proyecto(request)
-        self.assertEqual(response.status_code, 403,
-                         'La respuesta no fue un estado HTTP 403 a un usuario sin permisos')
-
-        # Verificamos que el usuario con permisos puede ver los roles de un proyecto
-        request.user = master
-        response = roles_proyecto(request)
-        self.assertEqual(response.status_code, 200,
-                         'La respuesta no fue un estado HTTP 200 a una petición correcta')
 
     def test_modificar_rol_proyecto(self):
         """

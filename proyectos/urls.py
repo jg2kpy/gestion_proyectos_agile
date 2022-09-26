@@ -1,6 +1,6 @@
 from django.urls import path
 
-from proyectos.views import cancelar_proyecto, crear_proyecto, crear_rol_a_proyecto, crear_rol_proyecto,  editar_proyecto, eliminar_rol_proyecto, importar_rol, modificar_rol_proyecto, proyecto_home, proyectos, roles_proyecto, ver_rol_proyecto, ver_roles_asignados
+from proyectos.views import *
 
 urlpatterns = [
     path('', proyectos, name='proyectos'),

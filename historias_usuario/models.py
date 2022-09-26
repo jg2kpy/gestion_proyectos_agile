@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from proyectos.models import Proyecto, Sprint
 from usuarios.models import Usuario
-from datetime import datetime
+from django.utils import timezone
 from django.utils.timezone import now
 
 
@@ -179,8 +179,8 @@ class HistoriaUsuario(models.Model):
             versionPrevia.comentarios.add(comentario)
 
         self.versionPrevia = versionPrevia
-        self.fecha_creacion = datetime.now()
-        self.fecha_modificacion = datetime.now()
+        self.fecha_creacion = timezone.now()
+        self.fecha_modificacion = timezone.now()
         self.save()
     
     def obtenerVersiones(self):

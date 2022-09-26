@@ -252,28 +252,6 @@ def cancelar_proyecto(request, id_proyecto):
     return render(request, 'proyectos/cancelar_proyecto.html', {'form': form})
 
 
-# Creamos una vista para ver los roles de proyectos
-@never_cache
-def roles_proyecto(request):
-    """ Ver Roles de Proyecto
-    Renderiza la pagina para ver los roles de un proyecto, recibe el id del proyecto y muestra los roles de ese proyecto
-
-    :param request: Peticion HTTP
-    :type request: HttpRequest
-    """
-
-    request_user = request.user
-
-    if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
-
-    # Verificar que solo el administrador puede ver los roles de proyectos
-    if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
-        return render(request, '403.html', {'info_adicional': 'No tiene permisos para ver los roles de proyectos'}, status=403)
-
-    return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all()})
-
-
 # Creamos un rol en un proyecto
 @never_cache
 def crear_rol_proyecto(request):
