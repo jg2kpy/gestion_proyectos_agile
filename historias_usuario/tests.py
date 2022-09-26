@@ -277,7 +277,7 @@ class HistoriasUsuarioTest(TestCase):
         creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
         self.assertEqual(self.user, creado.usuarioAsignado)
 
-        res = self.client.get(f"/proyecto/{self.proyecto.id}/backlog/", follow=True)
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/mis-historias/", follow=True)
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, '<td>Test US 1</td>', 1, 200, "No se puede visualizar la historia asignada")
         
