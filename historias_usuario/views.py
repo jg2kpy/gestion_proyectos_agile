@@ -463,8 +463,6 @@ def crear_historiaUsuario(request, proyecto_id):
                     orden=0, TipoHistoriaUsusario=historia.tipo)
 
                 historia.save()
-                
-                # * Manejo de archivos
                 archivosSubidos = request.FILES.getlist('archivo')
                 if archivoForm.is_valid():
 
