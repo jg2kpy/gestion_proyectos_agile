@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Tipo de historia de usuario{% endblock %}
 {% block contenido %}
 {% load tiene_rol_en %}
 <div class="container">
@@ -17,13 +18,13 @@
             <a href="{% url 'importarTipoHistoriaUsuario' proyecto.id %}" class="btn btn-primary">Importar Tipo de Historia de
                 Usuario</a>
             {% endif %}
+            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver</a>
         </div>
     </div>
     <div class="row">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
                     <th>Acciones</th>
@@ -32,7 +33,6 @@
             <tbody>
                 {% for tipo in tipos %}
                 <tr>
-                    <th>{{ tipo.id }}</th>
                     <td>{{ tipo.nombre }}</td>
                     <td>{{ tipo.descripcion }}</td>
                     <td>

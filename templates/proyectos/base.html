@@ -20,7 +20,6 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
                     <th>Fecha de creacion</th>
@@ -31,7 +30,6 @@
             <tbody>
                 {% for proyecto in proyectos %}
                 <tr>
-                    <th>{{ proyecto.id }}</th>
                     <td>{{ proyecto.nombre }}</td>
                     <td>{{ proyecto.descripcion }}</td>
                     <td>{{ proyecto.fecha_creacion }}</td>
@@ -41,6 +39,8 @@
                         {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
                         {% if proyecto.estado != 'Cancelado' %}
                             {% if sys_crearproyectos or pro_cambiarEstadoProyecto %}
+                                <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-link"><span
+                                    class="material-icons">visibility</span></a>
                                 {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
                                 {% if pro_cambiarEstadoProyecto %}
                                 <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn btn-link"><span
@@ -48,8 +48,6 @@
                                 <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span
                                         class="material-icons">cancel</span></a>
                                 {% endif %}
-                                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-link"><span
-                                        class="material-icons">visibility</span></a>
                             {% endif %}
                         {% else %}
                         <a class="btn btn-link"><span

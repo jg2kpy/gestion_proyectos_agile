@@ -225,7 +225,7 @@ def importar_tipoUS(request, proyecto_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not tiene_permiso_en_proyecto(request_user, 'pro_importarTipoUS', proyecto):
-        return HttpResponse('No tiene permisos para importar tipos de historias de usuario', status=403)
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para importar tipos de historias de usuario'}, status=403)
 
     mensaje = None
     if request.method == 'POST':
@@ -266,6 +266,7 @@ def importar_tipoUS(request, proyecto_id):
         proyecto_seleccionado = proyectos[0]
         tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyectos[0])
     else:
+        proyecto_seleccionado = None
         tipos = None
 
     volver_a = request.session['cancelar_volver_a']
@@ -763,7 +764,7 @@ def verTablero(request, proyecto_id, tipo_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not proyecto.usuario.filter(id=request.user.id).exists():
-        return HttpResponse('No tiene permisos para ver tableros de tipos de historias de usuario en este proyecto', status=403)
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para ver tableros de tipos de historias de usuario en este proyecto'}, status=403)
 
     try:
         tipo = TipoHistoriaUsusario.objects.get(id=tipo_id)
@@ -780,7 +781,7 @@ def verTablero(request, proyecto_id, tipo_id):
         etapas.append(aux_etapa)
 
     request.session['cancelar_volver_a'] = request.path
-    return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo})
+    return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo, 'proyecto': proyecto})
 
 @never_cache
 def ver_archivos(request, proyecto_id, historia_id):
@@ -805,7 +806,7 @@ def ver_archivos(request, proyecto_id, historia_id):
         return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
 
     if not proyecto.usuario.filter(id=request.user.id).exists():
-        return render(request, '403.html', {'info_adicional': "No tiene permisos para ver esta historia de usuario."}, status=403)
+        return render(request, '403.html', {'info_adicional': "No tiene permisos para ver estos archivos."}, status=403)
 
     status = 200
     archivoForm = SubirArchivoForm(request.POST, request.FILES)
@@ -832,5 +833,6 @@ def ver_archivos(request, proyecto_id, historia_id):
             else:
                 archivoForm.add_error(None, "El archivo no es válido.")
     
+    volver_a = request.session['cancelar_volver_a']
     return render(request, 'historias/archivos.html', {'proyecto': proyecto, 'historia': historia, 'archivos': historia.archivos.all(), \
-        "archivo_form": archivoForm, "titulo": f"Archivos anexos en '{historia.nombre}'"}, status=status)
+        "archivo_form": archivoForm, "titulo": f"Archivos anexos en '{historia.nombre}'", "volver_a": volver_a}, status=status)

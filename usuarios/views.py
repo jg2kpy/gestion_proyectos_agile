@@ -248,7 +248,7 @@ def vista_equipo(request, proyecto_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not request.user.equipo.filter(id=proyecto_id):
-        return HttpResponse('Usuario no pertenece al proyecto', status=403)
+        return render(request, '403.html', {'info_adicional': 'Usuario no pertenece al proyecto'}, status=403)
     
     proyecto = Proyecto.objects.get(id=proyecto_id)
 
@@ -321,7 +321,7 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto):
     """
 
     if not tiene_permiso_en_proyecto(request_user, "pro_asignarMiembros", proyecto):
-        return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
+        return render(request, '403.html', {'info_adicional': 'Usuario no posee el permiso de realizar esta accion'}, status=403)
 
     try:
         usuario_email = form.get('usuario_a_agregar')

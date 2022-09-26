@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Editar proyecto {{ proyecto.nombre }}{% endblock %}
 {% block contenido %}
 
 <!-- Formulario para crear proyectos Django forms -->
@@ -15,7 +16,7 @@
                 {{ form.as_div }}
                 <br>
                 <button type="submit" class="btn btn-primary">Editar proyecto</button>
-                <a href="{% url 'proyectos' %}" class="btn btn-danger">Cancelar</a>
+                <a href="{% url 'proyectos' %}" class="btn btn-secondary">Volver</a>
             </form>
         </div>
     </div>

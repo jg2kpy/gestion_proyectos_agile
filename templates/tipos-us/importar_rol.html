@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% block title %}Importar tipo de historia de usuario{% endblock %}
 {% block contenido %}
 
 <!-- Formulario para modificar rol de proyectos Django forms -->
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>Importar rol de un proyecto</h1>
+            <h1>Importar tipo de historia de usuario de un proyecto</h1>
         </div>
     </div>
     {% if proyectos %}
@@ -49,7 +50,6 @@
                 {% endfor %}
                 <input hidden name="proyecto_seleccionado" value="{{proyecto_seleccionado.id}}">
                 <button type="submit" class="btn btn-primary">Importar estos tipos</button>
-                <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="btn btn-danger">Cancelar</a>
             </form>
         </div>
     </div>
@@ -60,4 +60,5 @@
         </div>
     </div>
     {% endif %}
+    <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="btn btn-secondary">Volver</a>
     {% endblock %}

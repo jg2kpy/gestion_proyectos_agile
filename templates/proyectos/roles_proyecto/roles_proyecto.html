@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Roles de proyecto{% endblock %}
 {% block contenido %}
 {% load tiene_rol_en %}
 
@@ -19,6 +20,7 @@
                     <a href="{% url 'importar_rol' proyecto.id %}" class="btn btn-primary">Importar de otros proyectos </a>
                 {% endif %}
             {% endif %}
+            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver</a>
         </div>
     </div>
     <div class="row">
@@ -26,7 +28,6 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th>Nombre</th>
                     <th>Proyecto</th>
                     <th>Acciones</th>
@@ -37,10 +38,11 @@
                 {% if proyecto.id %}
                 {% if rol_proyecto.proyecto %}
                 <tr>
-                    <th>{{ rol_proyecto.id }}</th>
                     <td>{{ rol_proyecto.nombre }}</td>
                     <td>{{ rol_proyecto.proyecto }}</td>
                     <td>
+                        <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                            class="material-icons">visibility</span></a>
                         {% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
                         {% if pro_editarRolProyecto %}
                         <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
@@ -50,8 +52,6 @@
                                 class="material-icons">cancel</span></a>
                         {% endif %}
                         {% endif %}
-                        <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
-                                class="material-icons">visibility</span></a>
                     </td>
                 </tr>
                 {% endif %}
@@ -60,7 +60,5 @@
             </tbody>
     </div>
 </div>
-
-
 
 {% endblock %}

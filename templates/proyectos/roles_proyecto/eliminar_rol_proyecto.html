@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Eliminar rol de proyecto{% endblock %}
 {% block contenido %}
 
 <!-- Formulario para cancelar proyecto Django forms -->
@@ -18,8 +19,8 @@
             <form action="." method="POST">
                 {% csrf_token %}
                 <br>
-                <button type="submit" class="btn btn-primary">Eliminar rol</button>
-                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-danger">Cancelar</a>
+                <button type="submit" class="btn btn-danger">Eliminar rol</button>
+                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-secondary">Volver</a>
             </form>
         </div>
     </div>

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Tablero de {{ tipo.nombre }}{% endblock %}
 {% load static %}
 {% block contenido %}
 {% load tiene_rol_en %}
@@ -44,13 +45,15 @@
             
                                         {% tiene_permiso_en_proyecto user 'pro_cancelarUS' us.proyecto as pro_cancelarUS %}
                                         {% if pro_cancelarUS %}
-                                            <a href="#modal{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ us.id }}"><span class="material-icons">delete</span></a>
+                                            <a href="#modal{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ us.id }}"><span class="material-icons">cancel</span></a>
                                         {% endif %}
                                         <span>
                                             <a href="{% url 'comentarios_historiaUsuario' etapa.proyecto us.id %}"><span 
                                                 class="material-icons">comment</span></a>
                                             {{ us.comentarios.count }}
                                         </span>
+                                        <a href="{% url 'ver_archivos' proyecto.id us.id %}"><span 
+                                            class="material-icons">description</span></a>
                                         <a href="{% url 'restaurar_historia_historial' etapa.proyecto us.id %}"><span 
                                             class="material-icons">history</span></a>
                                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
@@ -78,10 +81,10 @@
                                     <p>¿Esta a punto de cancelar la historia de usuario {{ us.nombre }}, quiere continuar?</p>
                                 </div>
                                 <div class="modal-footer">
-                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Abortar</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                                 <form method="post" action="{% url 'borrar_historiaUsuario' us.proyecto.id us.id %}">
                                     {% csrf_token %}
-                                    <input type="submit" class="btn btn-primary" value="Continuar">
+                                    <input type="submit" class="btn btn-danger" value="Continuar">
                                     <input type="hidden" name="url" value="{{ request.path }}">
                                 </form>
                                 </div>
