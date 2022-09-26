@@ -4,7 +4,7 @@
         "pk": 1,
         "fields": {
             "nombre": "Scrum Master",
-            "descripcion": "Un Scrum Master es un facilitador para un equipo de desarrollo Agile. Son responsables de gestionar el intercambio de información entre los miembros del equipo. Scrum es un marco de gestión de proyectos que permite a un equipo comunicarse y autoorganizarse para realizar cambios rápidamente, de acuerdo con los principios ágiles.",
+            "descripcion": "Un Scrum Master es un facilitador para un equipo de desarrollo Agile.",
             "proyecto": null,
             "usuario": []
         }
