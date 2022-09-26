@@ -20,7 +20,7 @@
                     <a href="{% url 'importar_rol' proyecto.id %}" class="btn btn-primary">Importar de otros proyectos </a>
                 {% endif %}
             {% endif %}
-            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver</a>
+            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
         </div>
     </div>
     <div class="row">
@@ -29,7 +29,7 @@
             <thead>
                 <tr>
                     <th>Nombre</th>
-                    <th>Proyecto</th>
+                    <th>Descripcion</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -39,16 +39,16 @@
                 {% if rol_proyecto.proyecto %}
                 <tr>
                     <td>{{ rol_proyecto.nombre }}</td>
-                    <td>{{ rol_proyecto.proyecto }}</td>
+                    <td>{{ rol_proyecto.descripcion }}</td>
                     <td>
-                        <a href="{% url 'ver_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                        <a href="{% url 'ver_rol_proyecto' proyecto.id rol_proyecto.id %}" class="btn btn-link"><span
                             class="material-icons">visibility</span></a>
                         {% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
                         {% if pro_editarRolProyecto %}
-                        <a href="{% url 'modificar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                        <a href="{% url 'modificar_rol_proyecto' proyecto.id rol_proyecto.id %}" class="btn btn-link"><span
                                 class="material-icons">create</span></a>
                         {% if not rol_proyecto.nombre == 'Scrum Master' %}
-                        <a href="{% url 'eliminar_rol_proyecto' rol_proyecto.id %}" class="btn btn-link"><span
+                        <a href="{% url 'eliminar_rol_proyecto' proyecto.id rol_proyecto.id %}" class="btn btn-link"><span
                                 class="material-icons">cancel</span></a>
                         {% endif %}
                         {% endif %}

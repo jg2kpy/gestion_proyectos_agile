@@ -44,10 +44,11 @@
                         </button>
 
                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
-                        {% if master or historia.usuarioAsignado == user %}
-                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">history</span></button>
+                        {% if version_ori.estado == version_ori.Estado.ACTIVO %}
+                            {% if master or version_ori.usuarioAsignado == user %}
+                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">history</span></button>
+                            {% endif %}
                         {% endif %}
-                        
                     </td>
                 </tr>
                 {% endfor %}
@@ -72,12 +73,12 @@
                     <p>¿Seguro que  quiere restaurar version del {{ historia.fecha_modifciacion }}?</p>
                 </div>
                 <div class="modal-footer">
-                <form method="post" action="{% url 'restaurar_historia_historial' proyecto.id version_ori %}">
+                <form method="post" action="{% url 'restaurar_historia_historial' proyecto.id version_ori.id %}">
                     {% csrf_token %}
                     <input type="hidden" name="version" value="{{ historia.id }}">
                     <input type="submit" class="btn btn-danger" value="Restaurar">
                 </form>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                 </div>
             </div>
             </div>
