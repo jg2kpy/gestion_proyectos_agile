@@ -19,7 +19,7 @@ urlpatterns = [
     path('<int:proyecto_id>/historia-usuario/<int:historia_id>/editar/', editar_historiaUsuario, name='editar_historiaUsuario'),
     path('<int:proyecto_id>/historia-usuario/<int:historia_id>/comentarios/', comentarios_historiaUsuario, name='comentarios_historiaUsuario'),
 
-    path('<int:id_proyecto>/historias/<int:id_historia>/', configHistoriasPendientes, name='config_historias_usuario'),
+    path('<int:id_proyecto>/historias/<int:id_historia>/', moverSiguienteEtapa, name='mover_historias_usuario'),
     path('<int:proyecto_id>/historial/<int:historia_id>/', restaurar_historia_historial, name='restaurar_historia_historial'),
     path('<int:proyecto_id>/tablero/<int:tipo_id>/', verTablero, name='verTablero'),
     path('<int:proyecto_id>/archivos/<int:historia_id>/', ver_archivos, name='ver_archivos'),

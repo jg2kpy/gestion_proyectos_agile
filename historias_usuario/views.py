@@ -272,63 +272,17 @@ def importar_tipoUS(request, proyecto_id):
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'tipos-us/importar_rol.html', {"volver_a": volver_a, 'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
 
-
-# TODO: Adaptar nombre
-@never_cache
-def verHistoriasAsignadas(request, id_proyecto):
+def moverSiguienteEtapa(request, id_proyecto, id_historia):
     """
-    Obtener vista de historia de usuario asignadas para un determinado usuario dentro de un proyecto
+    Mover historia de usuario a la siguiente etapa
 
     :param request: HttpRequest
     :type request: HttpRequest
-    :param proyecto_id: Id del proyecto del cual se quiere ver las historia de usuario
+    :param proyecto_id: Id del proyecto del cual se quiere pasar las historia de usuario a la siguiente etapa
     :type proyecto_id: int
-    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 200 con una tabla de los permisos si todo esta bien
-    :rtype: HttpResponse
-    """
-    mostrarPendiente = True
-
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect("/", status=401)
-
-    try:
-        proyecto = Proyecto.objects.get(id=id_proyecto)
-    except Proyecto.DoesNotExist:
-        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
-
-    if not proyecto.usuario.filter(id=request.user.id).exists():
-        return HttpResponseRedirect("/", status=422)
-
-    if request.method == 'POST':
-        if 'finalizado' in request.POST:
-            mostrarPendiente = False
-
-    return render(request, 'historias/historias_list.html',
-                  {
-                      'historias_usr': HistoriaUsuario.objects.filter(proyecto=proyecto).filter(usuarioAsignado=request.user),
-                      'historias_pro': HistoriaUsuario.objects.filter(proyecto=proyecto),
-                      'proyecto': proyecto,
-                      'mostrar_pendiente': mostrarPendiente
-                  })
-
-    # * Para historias de usuario terminadas
-    # TODO: Cambiar etapa__nombre__contains='Terminar' por nombre apropiado de etapa final
-    # return render(request, 'historias/historias_list.html',
-    #     {
-    #         'historias': HistoriaUsuario.objects.filter(proyecto=proyecto).filter(etapa__nombre__contains='terminar'),
-    #         'proyecto': proyecto
-    #     })
-
-
-def configHistoriasPendientes(request, id_proyecto, id_historia):
-    """
-    Obtener vista de historia de usuario terminadas para un determinado proyecto
-
-    :param request: HttpRequest
-    :type request: HttpRequest
-    :param proyecto_id: Id del proyecto del cual se quiere ver las historia de usuario
+    :param proyecto_id: Id de la historia de usuario de la cual se quiere pasar a la siguiente etapa
     :type proyecto_id: int
-    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 200 con una tabla de los permisos si todo esta bien
+    :return: 401 si no esta logueado, 404 si no existe el proyecto o historia de usuario, 422 si no tiene rol necesario en proyecto
     :rtype: HttpResponse
     """
     status = 200
@@ -510,8 +464,6 @@ def crear_historiaUsuario(request, proyecto_id):
                     orden=0, TipoHistoriaUsusario=historia.tipo)
 
                 historia.save()
-                
-                # * Manejo de archivos
                 archivosSubidos = request.FILES.getlist('archivo')
                 if archivoForm.is_valid():
 

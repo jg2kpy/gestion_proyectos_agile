@@ -147,7 +147,7 @@
                 <p>Esta seguro que desea mover {{ historia.nombre }} a la etapa {% siguente_etapa historia %}?</p>
             </div>
             <div class="modal-footer">
-            <form method="post" action="{% url 'config_historias_usuario' proyecto.id historia.id %}">
+            <form method="post" action="{% url 'mover_historias_usuario' proyecto.id historia.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="url" value="{{ request.path }}">
                 <input type="submit" class="btn btn-primary" value="Mover">

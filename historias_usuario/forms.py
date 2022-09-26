@@ -172,16 +172,15 @@ class ComentarioForm(forms.ModelForm):
 
 class SubirArchivoForm(forms.ModelForm):
     """
-    Formulario para agregar a la base de datos un archivo
+    Formulario para subir un archivo
     """
     class Meta:
-        # TODO: Arreglar docstring
         """ Meta
-        :param model: HistoriaUsusario
-        :type model: HistoriaUsusario
-        :param fields: [nombre', 'descripcion', 'bv', 'up', 'tipo', 'usuarioAsignado']
+        :param model: SubirArchivo
+        :type model: SubirArchivo
+        :param fields: ['archivo']
         :type fields: list
-        :param widgets: TextInput, Textarea, NumberInput, forms.Select con clase form-control
+        :param widgets: ClearableFileInput
         :type widgets: dict
         :param labels: archivo
         :type widgets: dict

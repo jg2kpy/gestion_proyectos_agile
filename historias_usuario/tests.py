@@ -181,7 +181,7 @@ class HistoriasUsuarioTest(TestCase):
             }, follow=True)
         self.assertEqual(res.status_code, 200)
 
-        actualizado = HistoriaUsuario.objects.get(nombre='Test US 1')
+        actualizado = HistoriaUsuario.objects.get(nombre='Test US 1', descripcion='Des de Test US 1 actualizado')
         self.assertIsNotNone(actualizado, 'La historia de usuario modificada no existe')
         self.assertEqual(actualizado.descripcion, 'Des de Test US 1 actualizado', 'La descripcion de la historia de usuario no fue actualizada')
         self.assertEqual(actualizado.bv, 5, 'Los BV de la historia de usuario no fue actualizada')
@@ -207,4 +207,77 @@ class HistoriasUsuarioTest(TestCase):
         self.assertIsNotNone(cancelado)
         self.assertEqual(cancelado.estado, 'A', 'La historia de usuario no se paso a estado cancelado')
     
-## TODO: Test de verificar si llego a la etapa de terminado
+    def test_visualiarHistorial(self):
+        """
+        Prueba de visualizar una historia de usuario en el historial
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historia-usuario/crear/", 
+            {
+                'nombre': 'Test US 1', 'descripcion': 'Des de Test US 1', 'bv': '10', 'up': '10',
+                'tipo': TipoHistoriaUsusario.objects.get(nombre='Test tipo 1').id,
+                'usuarioAsignado': Usuario.objects.get(email='testemail@example.com').id
+            }, follow=True)
+        self.assertEqual(res.status_code, 200)
+
+        creado = HistoriaUsuario.objects.get(nombre='Test US 1')
+
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/historial/{creado.id}", follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, '<td>Test US 1</td>', 1, 200, "No se puede visualizar el rol en el historial")
+
+    def test_terminarHistoriaUsuario(self):
+        """
+        Prueba de terminar una historia de usuario.
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historia-usuario/crear/", 
+            {
+                'nombre': 'Test US 1', 'descripcion': 'Des de Test US 1', 'bv': '10', 'up': '10',
+                'tipo': TipoHistoriaUsusario.objects.get(nombre='Test tipo 1').id,
+                'usuarioAsignado': Usuario.objects.get(email='testemail@example.com').id
+            }, follow=True)
+
+        for _ in range(3):
+            actual = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+            res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{actual.id}/", follow=True)
+            self.assertEqual(res.status_code, 200)
+
+        terminado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='T')
+        self.assertIsNotNone(terminado)
+
+    def test_moverHistoriaSigEtapa(self):
+        """
+        Prueba de mover una historia de usuario a su siguiente etapa.
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historia-usuario/crear/", 
+            {
+                'nombre': 'Test US 1', 'descripcion': 'Des de Test US 1', 'bv': '10', 'up': '10',
+                'tipo': TipoHistoriaUsusario.objects.get(nombre='Test tipo 1').id,
+                'usuarioAsignado': Usuario.objects.get(email='testemail@example.com').id
+            }, follow=True)
+
+        creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", follow=True)
+        self.assertEqual(res.status_code, 200)
+
+        movido = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        self.assertEqual(movido.etapa.nombre, 'Etapa 2', f'La historia de usuario no se movió. Está en etapa: {movido.etapa.nombre}')
+
+    def test_visualizarHistoriaUsuarioAsignada(self):
+        """
+        Prueba de visualizar una historia de usuario asignada a dicho usuario.
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historia-usuario/crear/", 
+            {
+                'nombre': 'Test US 1', 'descripcion': 'Des de Test US 1', 'bv': '10', 'up': '10',
+                'tipo': TipoHistoriaUsusario.objects.get(nombre='Test tipo 1').id,
+                'usuarioAsignado': Usuario.objects.get(email='testemail@example.com').id
+            }, follow=True)
+        self.assertEqual(res.status_code, 200)
+
+        creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        self.assertEqual(self.user, creado.usuarioAsignado)
+
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/mis-historias/", follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, '<td>Test US 1</td>', 1, 200, "No se puede visualizar la historia asignada")
+        
