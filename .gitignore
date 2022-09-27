@@ -7,6 +7,7 @@ bash_dev.sh
 dev.sh
 pro.sh
 databasedump_junior.json
+app/staticfiles/*
 
 # Created by https://www.toptal.com/developers/gitignore/api/django,python,linux,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=django,python,linux,windows
