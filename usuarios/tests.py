@@ -92,8 +92,8 @@ class RolesGlobalesTests(TestCase):
         permisos = PermisoSistema.objects.all()
         res = self.client.post('/rolesglobales/crear/',
                                data={'nombre': 'rol_global_test22', 'descripcion': 'Esto es un test', 'permisos': [permisos[0].id, permisos[1].id]}, follow=True)
-        self.assertContains(res, '<h5 class="rolEncontrado">rol_global_test22</h5>', 1, 200, "No recibe el nombre del rol correctamente")
-        self.assertContains(res, 'Esto es un test', 1, 200, "No recibe la descripcion del rol correctamente")
+        self.assertContains(res, '<td>rol_global_test22</td>', 1, 200, 'No recibe el nombre del rol correctamente')
+        self.assertContains(res, 'Esto es un test', 1, 200, 'No recibe la descripcion del rol correctamente')
 
     def test_visualizar_roles(self):
         """
@@ -102,7 +102,7 @@ class RolesGlobalesTests(TestCase):
         self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.', username='test')
         self.client.login(email='testemail@example.com', password='A123B456c.', username='test')
         res = self.client.get('/rolesglobales/')
-        self.assertContains(res, '<h5 class="rolEncontrado">', 1, 200, "No se carga correctamente la página")
+        self.assertContains(res, '<td>gpa_admin</td>' , 1, 200, 'No se carga correctamente la página')
 
     def test_eliminar_rol(self):
         """
@@ -113,7 +113,7 @@ class RolesGlobalesTests(TestCase):
         rolTest = RolSistema(nombre='test', descripcion='descripcion test')
         rolTest.save()
         res = self.client.post('/rolesglobales/', data={'accion': 'eliminar', 'nombre':'test'}, follow=True)
-        self.assertContains(res, '<h5 class="rolEncontrado">test</h5>', 0, 200, "No se elimina el rol")
+        self.assertContains(res, '<td>test</td>', 0, 200, 'No se elimina el rol')
 
     def test_editar_rol(self):
         """
@@ -126,9 +126,9 @@ class RolesGlobalesTests(TestCase):
         permisos = PermisoSistema.objects.all()
         res = self.client.post(f'/rolesglobales/{rolTest.id}/editar/', data={
                             'nombre': 'rol_global_test_editado', 'descripcion': 'Esto es un test editado', 'permisos': [permisos[0].id, permisos[1].id]}, follow=True)
-        self.assertContains(res, '<h5 class="rolEncontrado">rol_global_test_editado</h5>', 1, 200, "No recibe el nombre del rol editado correctamente")
+        self.assertContains(res, '<td>rol_global_test_editado</td>', 1, 200, 'No recibe el nombre del rol editado correctamente')
         self.assertContains(res, 'Esto es un test editado', 1, 200,
-                            "No recibe la descripcion del rol editado correctamente")
+                            'No recibe la descripcion del rol editado correctamente')
 
     def test_vincular_rol(self):
         """
@@ -141,8 +141,8 @@ class RolesGlobalesTests(TestCase):
         testuser = get_user_model().objects.create_user(email='testuser@example.com', password='A123B456c.', username='testuser')
         testuser.save()
         res = self.client.post(f'/rolesglobales/{rolTest.id}/usuarios/',
-                               data={"usuarios": testuser.email, "vincular": "Vincular"}, follow=True)
-        self.assertContains(res, 'Se ha vinculado el rol', 1, 200, "No se vincula correctamente el rol")
+                               data={'usuarios': testuser.email, 'vincular': 'Vincular'}, follow=True)
+        self.assertContains(res, 'Se ha vinculado el rol', 1, 200, 'No se vincula correctamente el rol')
 
     def test_desvincular_rol(self):
         """
@@ -155,10 +155,10 @@ class RolesGlobalesTests(TestCase):
         testuser = get_user_model().objects.create_user(email='testuser@example.com', password='A123B456c.', username='testuser')
         testuser.save()
         self.client.post(f'/rolesglobales/{rolTest.id}/usuarios/',
-                         data={"usuarios": testuser.email, "vincular": "Vincular"}, follow=True)
+                         data={'usuarios': testuser.email, 'vincular': 'Vincular'}, follow=True)
         res = self.client.post(f'/rolesglobales/{rolTest.id}/usuarios/',
-                               data={"usuarios": testuser.email, "desvincular": "Desvincular"}, follow=True)
-        self.assertContains(res, 'Se ha desvinculado el rol', 1, 200, "No se desvincula correctamente el rol")
+                               data={'usuarios': testuser.email, 'desvincular': 'Desvincular'}, follow=True)
+        self.assertContains(res, 'Se ha desvinculado el rol', 1, 200, 'No se desvincula correctamente el rol')
 
 class MiembrosRolesTest(TestCase):
     """
