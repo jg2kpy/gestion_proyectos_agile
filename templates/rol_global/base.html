@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block contenido %}
+{% load tiene_rol_en %}
+
+<!-- Redirigir a home si no tiene los permisos para ver esta pantalla -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Roles Globales</h1>
+        </div>
+        <div>
+            {% tiene_permiso_en_sistema user 'sys_crearrolsistema' as sys_crearrolsistema %}
+            {% if sys_crearrolsistema %}
+            <a href="{% url 'rol_global_crear' %}" class="btn btn-primary">Crear rol global</a>
+            {% endif %}
+            <a href="{% url 'home' %}" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Traemos en una tabla los proyectos -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rol in roles %}
+                <tr>
+                    <td>{{ rol.nombre }}</td>
+                    <td>
+                        {% tiene_permiso_en_sistema user 'sys_crearrolsistema' as sys_crearrolsistema %}
+                        {% if sys_crearrolsistema %}
+                            <a  class="btn btn-link"><span
+                                class="material-icons" data-toggle="tooltip" data-placement="top"
+                                title="Ver rol global" data-bs-toggle="modal" data-bs-target="#modalVer{{ rol.id }}">visibility</span></a>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="modalVer{{ rol.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Descripción</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h2 style="margin-bottom: 25px;">{{ rol.nombre }}</h2>
+                                            <p>{{ rol.descripcion }}</p>
+                                            <ul>
+                                                {% for permiso in rol.permisos.all %}
+                                                <li>{{ permiso.nombre }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End Modal -->
+
+                            <a href="{% url 'rol_global_editar' rol.id %}" class="btn btn-link"><span
+                                    class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar rol global">create</span></a>
+                            <a href="{% url 'rol_global_usuarios' rol.id %}" class="btn btn-link"><span
+                                    class="material-icons" data-toggle="tooltip" data-placement="top" title="Manejo de usuarios">person</span></a>
+                            {% if not rol.nombre == 'gpa_admin' %}
+                                <a class="btn btn-link"><span
+                                        class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar rol global"
+                                        data-bs-toggle="modal" data-bs-target="#modalEliminar{{ rol.id }}">cancel</span></a>
+                            {% endif %}
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="modalEliminar{{ rol.id }}" tabindex="-1"
+                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Eliminar</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Está seguro que desea eliminar <b>{{ rol.nombre }}</b>?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form action="" method="post">
+                                                {% csrf_token %}
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Volver</button>
+                                                <input type="hidden" name="accion" value="eliminar">
+                                                <button type="submit" class="btn btn-primary" name="nombre"
+                                                    value="{{ rol.nombre }}">Aceptar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End Modal -->
+                        {% else %}
+                        <a class="btn btn-link"><span
+                            class="material-icons"></span></a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
