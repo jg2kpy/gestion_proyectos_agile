@@ -238,7 +238,7 @@ class HistoriasUsuarioTest(TestCase):
 
         for _ in range(3):
             actual = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
-            res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{actual.id}/", follow=True)
+            res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{actual.id}/", {'siguiente':'siguiente'} ,follow=True)
             self.assertEqual(res.status_code, 200)
 
         terminado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='T')
@@ -256,11 +256,17 @@ class HistoriasUsuarioTest(TestCase):
             }, follow=True)
 
         creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
-        res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", follow=True)
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", {'siguiente':'siguiente'}, follow=True)
         self.assertEqual(res.status_code, 200)
 
-        movido = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
-        self.assertEqual(movido.etapa.nombre, 'Etapa 2', f'La historia de usuario no se movió. Está en etapa: {movido.etapa.nombre}')
+        movidoSig = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        self.assertEqual(movidoSig.etapa.nombre, 'Etapa 2', f'La historia de usuario no se movió. Está en etapa: {movidoSig.etapa.nombre}')
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", {'anterior':'anterior'}, follow=True)
+        self.assertEqual(res.status_code, 200)
+
+        movidoAnt = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        self.assertEqual(movidoAnt.etapa.nombre, 'Etapa 1', f'La historia de usuario no se movió. Está en etapa: {movidoAnt.etapa.nombre}')
 
     def test_visualizarHistoriaUsuarioAsignada(self):
         """
