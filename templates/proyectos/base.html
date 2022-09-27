@@ -40,13 +40,13 @@
                         {% if proyecto.estado != 'Cancelado' %}
                             {% if sys_crearproyectos or pro_cambiarEstadoProyecto %}
                                 <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-link"><span
-                                    class="material-icons">visibility</span></a>
+                                    class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver proyecto">visibility</span></a>
                                 {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
                                 {% if pro_cambiarEstadoProyecto %}
                                 <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn btn-link"><span
-                                        class="material-icons">create</span></a>
+                                        class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar proyecto">create</span></a>
                                 <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span
-                                        class="material-icons">cancel</span></a>
+                                        class="material-icons" data-toggle="tooltip" data-placement="top" title="Cancelar proyecto">cancel</span></a>
                                 {% endif %}
                             {% endif %}
                         {% else %}
