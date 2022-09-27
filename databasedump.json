@@ -174,7 +174,7 @@
     "pk": 16,
     "fields": {
       "nombre": "pro_modificarUS",
-      "descripcion": "Modificar una historia de Usuaior",
+      "descripcion": "Modificar una historia de Usuario",
       "rol": [1]
     }
   },
