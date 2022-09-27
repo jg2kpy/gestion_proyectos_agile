@@ -155,7 +155,6 @@ def crear_proyecto(request):
                     tipo_nuevo.save()
 
             except Exception as e:
-                print(e,'adfasafasfdd')
                 return HttpResponse('Error al crear el proyecto', status=500)
 
             return redirect('proyectos')
