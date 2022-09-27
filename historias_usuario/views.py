@@ -272,7 +272,7 @@ def importar_tipoUS(request, proyecto_id):
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'tipos-us/importar_rol.html', {"volver_a": volver_a, 'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
 
-def moverSiguienteEtapa(request, id_proyecto, id_historia):
+def moverEtapa(request, id_proyecto, id_historia):
     """
     Mover historia de usuario a la siguiente etapa
 
