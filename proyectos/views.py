@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
 
+from historias_usuario.models import EtapaHistoriaUsuario, TipoHistoriaUsusario
+
 from .models import Proyecto
 from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
@@ -131,7 +133,29 @@ def crear_proyecto(request):
                 scrum_master.roles_proyecto.add(RolProyecto.objects.get(
                     nombre="Scrum Master", proyecto=proyecto))
                 scrum_master.save()
+
+                tipos = TipoHistoriaUsusario.objects.filter(proyecto__isnull=True)
+
+                for tipo in tipos:
+                    tipo_nuevo = TipoHistoriaUsusario()
+                    tipo_nuevo.nombre = tipo.nombre
+                    tipo_nuevo.descripcion = tipo.descripcion
+                    tipo_nuevo.proyecto = proyecto
+                    tipo_nuevo.save()
+
+                    etapas = EtapaHistoriaUsuario.objects.filter(TipoHistoriaUsusario=tipo)
+                    for etapa in etapas:
+                        etapa_nuevo = EtapaHistoriaUsuario()
+                        etapa_nuevo.nombre = etapa.nombre
+                        etapa_nuevo.descripcion = etapa.descripcion
+                        etapa_nuevo.orden = etapa.orden
+                        etapa_nuevo.TipoHistoriaUsusario_id = tipo_nuevo.id
+                        etapa_nuevo.save()
+                    
+                    tipo_nuevo.save()
+
             except Exception as e:
+                print(e,'adfasafasfdd')
                 return HttpResponse('Error al crear el proyecto', status=500)
 
             return redirect('proyectos')
