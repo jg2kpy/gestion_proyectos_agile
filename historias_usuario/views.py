@@ -305,14 +305,22 @@ def moverSiguienteEtapa(request, id_proyecto, id_historia):
 
     if request.method == 'POST':
         historia.guardarConHistorial()
-        sigOrden = historia.etapa.orden + 1 if historia.etapa else 1
-        if sigOrden == historia.tipo.etapas.count():
-            historia.estado = HistoriaUsuario.Estado.TERMINADO
-        else:
-            sigEtapa = EtapaHistoriaUsuario.objects.get(
-                orden=sigOrden, TipoHistoriaUsusario=historia.tipo)
-            historia.etapa = sigEtapa
 
+        if 'siguiente' in request.POST:
+            sigOrden = historia.etapa.orden + 1 if historia.etapa else 1
+            if sigOrden == historia.tipo.etapas.count():
+                historia.estado = HistoriaUsuario.Estado.TERMINADO
+            else:
+                sigEtapa = EtapaHistoriaUsuario.objects.get(
+                    orden=sigOrden, TipoHistoriaUsusario=historia.tipo)
+                historia.etapa = sigEtapa
+        else:
+            antOrden = historia.etapa.orden - 1 if historia.etapa and historia.etapa.orden > 1 else 0
+
+            antEtapa = EtapaHistoriaUsuario.objects.get(
+                orden=antOrden, TipoHistoriaUsusario=historia.tipo)
+            historia.etapa = antEtapa
+    
         historia.save()
 
         return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', id_proyecto)
