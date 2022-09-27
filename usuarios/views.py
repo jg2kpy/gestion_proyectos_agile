@@ -68,7 +68,7 @@ def rol_global_list(request):
 
     else:
         roles = RolSistema.objects.all()
-        return render(request, 'rol_global/rol_global_list.html', {'roles': roles}, status=status)
+        return render(request, 'rol_global/base.html', {'roles': roles}, status=status)
 
 
 @never_cache
