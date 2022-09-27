@@ -58,7 +58,10 @@
                                             class="material-icons">history</span></a>
                                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                                         {% if master or us.usuarioAsignado == user %}
-                                            <a href="#modalEtapa{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ us.id }}"><span class="material-icons">arrow_forward</span></a>
+                                            {% if us.etapa.orden != 0 %}
+                                                <a href="#modalEtapaAnterior{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalEtapaAnterior{{ us.id }}"><span class="material-icons">arrow_back</span></a>
+                                            {% endif %}
+                                            <a href="#modalEtapaSiguiente{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalEtapaSiguiente{{ us.id }}"><span class="material-icons">arrow_forward</span></a>
                                         {% endif %}
                                     </div>
                                     {% else %}
@@ -92,11 +95,33 @@
                             </div>
                         </div>
 
-                        <div class="modal fade" id="modalEtapa{{ us.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
+                        <div class="modal fade" id="modalEtapaAnterior{{ us.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
                             <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 class="modal-title" id="etapaModal">Estas seguro que desea mover a la siguente etapa?</h5>
+                                <h5 class="modal-title" id="etapaModal">Está seguro que desea mover a la etapa anterior?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Esta seguro que desea mover {{ us.nombre }} a la etapa {% anterior_etapa us %}?</p>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                                <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="url" value="{{ request.path }}">
+                                    <input type="submit" class="btn btn-primary" name="anterior" value="anterior">
+                                </form>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="modalEtapaSiguiente{{ us.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="etapaModal">Está seguro que desea mover a la siguente etapa?</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
@@ -107,7 +132,7 @@
                                 <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="url" value="{{ request.path }}">
-                                    <input type="submit" class="btn btn-primary" value="Mover">
+                                    <input type="submit" class="btn btn-primary" name="siguiente" value="siguiente">
                                 </form>
                                 </div>
                             </div>
