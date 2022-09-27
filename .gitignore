@@ -9,6 +9,7 @@ pro.sh
 doc.sh
 test.sh
 reload.sh
+nuke.sh
 databasedump_junior.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/django,python,linux,windows
