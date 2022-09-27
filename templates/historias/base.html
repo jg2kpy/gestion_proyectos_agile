@@ -40,7 +40,7 @@
                     <td>{{ historia.nombre }}</td>
                     {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
                         {% if historia.etapa %}
-                            <td>Etapa: {{ historia.etapa }}</td>
+                            <td>{{ historia.etapa }}</td>
                         {% else %}
                             <td>Planificado</td>
                         {% endif %}
