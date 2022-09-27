@@ -50,7 +50,37 @@
 <div class="container">
     <div class="row">
         <section>
-        <h3 class="text-center mb-4 pb-2 text-primary fw-bold">FAQ</h3>
+        <h3 class="text-center mb-4 pb-2 text-primary fw-bold">FAQ
+            <a  class="btn btn-link"><span
+                class="material-icons" data-toggle="tooltip" data-placement="top"
+                title="Contactos" data-bs-toggle="modal" data-bs-target="#modalVer{{ rol.id }}">alternate_email</span></a>
+        </h3>
+        <!-- Modal -->
+        <div class="modal fade" id="modalVer{{ rol.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Contactos</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul>
+                        {% lista_adm as administradores %}
+                        {% for administrador in administradores %}
+                            {% if not administrador.first_name %}
+                            <li style="margin-bottom: 25px;">{{ administrador.username }}: {{administrador.email}}</li>
+                            {% else %}
+                            <li style="margin-bottom: 25px;">{{ administrador.first_name }}: {{administrador.email}}</li>
+                            {% endif %}
+                            {% endfor %}
+                        <ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Modal -->
         <p class="text-center mb-5">
             Consultas Frecuentes
         </p>
@@ -59,6 +89,9 @@
             <div class="col-md-6 col-lg-4 mb-4">
             <h6 class="mb-3 text-primary"><i class="far fa-paper-plane text-primary pe-2"></i> ¿Con quién puedo
                 contactarme?</h6>
+            <p>
+                Si no se encuentra en ningún proyecto, puede dar click en el símbolo <b>@</b> (arroba) para acceder a la lista de contactos.
+            </p>
             <p>
                 En caso de tener alguna consulta respecto a un proyecto, debajo de <b>Mis Proyectos</b>, dar click en el ícono
                 presente bajo la columna <b>Acciones</b>, luego seleccione la opción <b>Miembros</b>. Por último, en la
