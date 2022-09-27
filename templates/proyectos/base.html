@@ -32,7 +32,7 @@
                 {% for proyecto in proyectos %}
                 <tr>
                     <td>{{ proyecto.nombre }}</td>
-                    <td>{{ proyecto.fecha_creacion }}</td>
+                    <td>{{ proyecto.fecha_creacion|date:"Y/m/d" }}</td>
                     <td>{{ proyecto.estado }}</td>
                     <td>{{ proyecto.scrumMaster.get_full_name }} ({{ proyecto.scrumMaster.email }})</td>
                     <td>

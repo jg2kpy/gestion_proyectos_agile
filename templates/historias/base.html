@@ -40,14 +40,14 @@
                     <td>{{ historia.nombre }}</td>
                     {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
                         {% if historia.etapa %}
-                            <td>{{ historia.etapa }}</td>
+                            <td>Etapa: {{ historia.etapa }}</td>
                         {% else %}
                             <td>Planificado</td>
                         {% endif %}
                     {% elif titulo == 'Historias Terminadas' %}
-                        <td>{{ historia.fecha_modificacion }}</td>
+                        <td>{{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}</td>
                     {% elif titulo == 'Historias Canceladas'%}
-                        <td>{{ historia.fecha_modificacion }}</td>
+                        <td>{{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}</td>
                     {% endif %}
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
@@ -120,13 +120,13 @@
                 </div>
                 <div class="modal-body">
                     <p>{{ historia.descripcion }}</p>
-                    <p>Creado: {{ historia.fecha_creacion }}</p>
+                    <p>Creado: {{ historia.fecha_creacion|date:'Y-m-d H:i:s'}}</p>
                     {% if historia.fecha_modificacion %}
-                    <p>Modificado: {{ historia.fecha_modificacion }}</p>
+                    <p>Modificado: {{ historia.fecha_modificacion|date:'Y-m-d H:i:s'}}</p>
                     {% endif %}
                     <p>Tipo: {{ historia.tipo }}</p>
                     {% if historia.etapa %}
-                        <p>{{ historia.etapa }}</p>
+                        <p>Etapa: {{ historia.etapa }}</p>
                     {% else %}
                         <p>Planificado</p>
                     {% endif %}

@@ -70,7 +70,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Seguro que  quiere restaurar version del {{ historia.fecha_modifciacion }}?</p>
+                    <p>¿Seguro que quiere restaurar version del {{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}?</p>
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -97,13 +97,13 @@
                     </div>
                     <div class="modal-body">
                         <p>{{ historia.descripcion }}</p>
-                        <p>Creado: {{ historia.fecha_creacion }}</p>
+                        <p>Creado: {{ historia.fecha_creacion|date:'Y-m-d H:i:s'  }}</p>
                         {% if historia.fechar_modificacion %}
-                        <p>Modificado: {{ historia.fechar_modificacion }}</p>
+                        <p>Modificado: {{ historia.fechar_modificacion|date:'Y-m-d H:i:s'  }}</p>
                         {% endif %}
                         <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
                         {% if historia.etapa %}
-                            <p>{{ historia.etapa }}</p>
+                            <p>Etapa: {{ historia.etapa }}</p>
                         {% else %}
                             <p>Planificado</p>
                         {% endif %}
