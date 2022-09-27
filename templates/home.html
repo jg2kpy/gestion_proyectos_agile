@@ -10,9 +10,11 @@
             <h1>Mis Proyectos</h1>
         </div>
     </div>
+    {% if user.equipo.all %}
     <br>
     <div class="row">
         <!-- Traemos en una tabla los proyectos -->
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -44,8 +46,10 @@
             </tbody>
         </table>
     </div>
+    <br><br>
+    {% endif %}
 </div>
-<br><br><br>
+<br>
 <!--Section: FAQ-->
 <div class="container">
     <div class="row">
