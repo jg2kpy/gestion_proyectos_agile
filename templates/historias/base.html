@@ -13,7 +13,7 @@
             {% if pro_cargarUSalBacklog and esBacklog %}
                 <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Agregar US al Product Backlog</a>
             {% endif %}
-            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu de proyecto</a>
+            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
         </div>
     </div>
     <div class="row">
@@ -95,12 +95,13 @@
                     <p>¿Esta a punto de cancelar la historia de usuario {{ historia.nombre }}, quiere continuar?</p>
                 </div>
                 <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                 <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
                     {% csrf_token %}
                     <input type="submit" class="btn btn-danger" value="Continuar">
                     <input type="hidden" name="url" value="{{ request.path }}">
                 </form>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                
                 </div>
             </div>
             </div>
@@ -124,7 +125,11 @@
                     <p>Modificado: {{ historia.fecha_modificacion }}</p>
                     {% endif %}
                     <p>Tipo: {{ historia.tipo }}</p>
-                    <p>Etapa: {{ historia.etapa.nombre }}</p>
+                    {% if historia.etapa %}
+                        <p>{{ historia.etapa }}</p>
+                    {% else %}
+                        <p>Planificado</p>
+                    {% endif %}
                     <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
                     <p>
                         {% if historia.comentarios.count > 0 %}
@@ -157,12 +162,13 @@
                 <p>Esta seguro que desea mover {{ historia.nombre }} a la etapa {% siguente_etapa historia %}?</p>
             </div>
             <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
             <form method="post" action="{% url 'mover_historias_usuario' proyecto.id historia.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="url" value="{{ request.path }}">
                 <input type="submit" class="btn btn-primary" value="Mover">
             </form>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+            
             </div>
         </div>
         </div>

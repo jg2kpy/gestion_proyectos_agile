@@ -575,7 +575,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
     else:
-        usuarios = [(usuario.id, usuario.email) for usuario in proyecto.usuario.all()]
+        usuarios = [(usuario.id, f"{usuario.get_full_name()} ({usuario.email})") for usuario in proyecto.usuario.all()]
         form = HistoriaUsuarioEditarForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion,
                                                   'bv': historia.bv, 'up': historia.up, 'usuarioAsignado': historia.usuarioAsignado})
         form.set_usuarios(usuarios)

@@ -36,7 +36,7 @@
                     <td>{{ historia.tipo }}</td>
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
-                    <td>{{ historia.usuarioAsignado }}</td>
+                    <td>{{ historia.usuarioAsignado.get_full_name }}</td>
                     <td>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal"
                             data-bs-target="#modalVer{{ historia.id }}"><span 
@@ -73,12 +73,13 @@
                     <p>¿Seguro que  quiere restaurar version del {{ historia.fecha_modifciacion }}?</p>
                 </div>
                 <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                 <form method="post" action="{% url 'restaurar_historia_historial' proyecto.id version_ori.id %}">
                     {% csrf_token %}
                     <input type="hidden" name="version" value="{{ historia.id }}">
                     <input type="submit" class="btn btn-danger" value="Restaurar">
                 </form>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                
                 </div>
             </div>
             </div>
@@ -101,7 +102,11 @@
                         <p>Modificado: {{ historia.fechar_modificacion }}</p>
                         {% endif %}
                         <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
-                        <p>Etapa: {{ historia.etapa.nombre }}</p>
+                        {% if historia.etapa %}
+                            <p>{{ historia.etapa }}</p>
+                        {% else %}
+                            <p>Planificado</p>
+                        {% endif %}
                         <p>
                             {% if historia.comentarios.count > 0 %}
                                 {{ historia.comentarios.count}} comentarios
