@@ -102,7 +102,7 @@ class HistoriaUsuarioForm(forms.ModelForm):
         }
         labels = {
             "nombre": "Nombre",
-            "descripcion": "Descripcion",
+            "descripcion": "Descripción",
             "bv": "Business Value",
             "up": "User Point",
             "tipo": "Tipo de Historia de Usuario",
@@ -138,7 +138,7 @@ class HistoriaUsuarioEditarForm(forms.ModelForm):
             'usuarioAsignado': forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
-            "descripcion": "Descripcion",
+            "descripcion": "Descripción",
             "bv": "Business Value",
             "up": "User Points",
             "usuarioAsignado": "Usuario asignado"

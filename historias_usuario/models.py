@@ -68,7 +68,7 @@ class EtapaHistoriaUsuario(models.Model):
 
 
 def pathDinamico(instance, filename):
-    return 'archivos_US/{0}'.format(filename)
+    return 'app/staticfiles/{0}'.format(filename)
 
 class ArchivoAnexo(models.Model):
     """

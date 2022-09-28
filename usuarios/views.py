@@ -9,33 +9,9 @@ from usuarios.models import RolProyecto, Usuario
 from .models import PermisoSistema, Usuario
 
 from usuarios.models import RolSistema, Usuario
-from django import forms
 from django.shortcuts import redirect
 
-# Crea forms
-
-class RolSistemaForm(forms.Form):
-    """
-        Formulario para crear un rol de sistema
-
-        :param nombre: Nombre del rol de sistema
-        :type nombre: Texto
-        :param descripcion: Descripcion del rol de sistema
-        :type descripcion: Texto
-        :param permisos: Permisos del rol de sistema
-        :type permisos: Lista de permisos
-
-        :return: Formulario para crear un rol de sistema
-        :rtype: Formulario
-    """
-    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
-    permisos = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple())
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['permisos'].queryset = PermisoSistema.objects.all()
-
+from usuarios.forms import RolSistemaForm, UsuarioForm
 
 @never_cache
 def rol_global_list(request):
@@ -68,7 +44,7 @@ def rol_global_list(request):
 
     else:
         roles = RolSistema.objects.all()
-        return render(request, 'rol_global/rol_global_list.html', {'roles': roles}, status=status)
+        return render(request, 'rol_global/base.html', {'roles': roles}, status=status)
 
 
 @never_cache
@@ -405,20 +381,6 @@ def asignar_rol_proyecto(form, request_user, proyecto):
         return HttpResponse('Usuario no existe', status=422)
 
     return redirect('vista_equipo', proyecto_id=proyecto.id)
-
-
-class UsuarioForm(ModelForm):
-    """
-    Clase que representa el formulario de usuario. Ver Django ModelForm documentación para más información.
-    """
-    class Meta:
-        model = Usuario
-        fields = ['email', 'first_name', 'last_name', 'direccion', 'telefono', 'avatar_url']
-
-    def __init__(self, *args, **kwargs):
-        super(UsuarioForm, self).__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
 
 
 @never_cache
