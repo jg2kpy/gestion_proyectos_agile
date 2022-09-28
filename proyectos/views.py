@@ -433,7 +433,7 @@ def modificar_rol_proyecto(request, proyecto_id, id_rol_proyecto):
         if (rol.proyecto is None):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
         else:
-            return redirect('rol_proyecto_asignado', proyecto_id=proyecto.id)
+            return redirect('roles_de_proyecto', proyecto_id=proyecto.id)
     else:
         form = RolProyectoForm(
             initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
@@ -478,13 +478,13 @@ def eliminar_rol_proyecto(request, proyecto_id, id_rol_proyecto):
         if (rol.proyecto is None):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
         else:
-            return redirect('rol_proyecto_asignado', proyecto_id=proyecto.id)
+            return redirect('roles_de_proyecto', proyecto_id=proyecto.id)
     return render(request, 'proyectos/roles_proyecto/eliminar_rol_proyecto.html', {'rol_proyecto': RolProyecto.objects.get(id=id_rol_proyecto), 'proyecto': proyecto})
 
 
 # Ver roles asignados a un proyecto
 @ never_cache
-def ver_roles_asignados(request, proyecto_id):
+def roles_de_proyecto(request, proyecto_id):
     """Ver roles de un proyecto especifico
     Renderiza la pagina para ver los roles de proyecto asignados a un proyecto, recibe el id del proyecto
 
@@ -581,7 +581,7 @@ def crear_rol_a_proyecto(request, proyecto_id):
                     permiso.rol.add(rol)
                     permiso.save()
 
-            return redirect('rol_proyecto_asignado', proyecto_id=proyecto.id)
+            return redirect('roles_de_proyecto', proyecto_id=proyecto.id)
         else:
             status = 422
 
@@ -651,7 +651,7 @@ def importar_rol(request, proyecto_id):
                     permiso.rol.add(rol_nuevo)
                     permiso.save()
 
-        return redirect('rol_proyecto_asignado', proyecto_id=proyecto.id)
+        return redirect('roles_de_proyecto', proyecto_id=proyecto.id)
 
     else:
         proyectos = Proyecto.objects.exclude(id=proyecto_id)

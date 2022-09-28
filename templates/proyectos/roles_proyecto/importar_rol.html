@@ -40,7 +40,7 @@
                 {% endfor %}
                 <input hidden name="proyecto_seleccionado" value="{{proyecto_seleccionado.id}}">
                 <button type="submit" class="btn btn-primary">Importar estos roles</button>
-                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-secondary">Volver</a>
+                <a href="{% url 'roles_de_proyecto' proyecto.id %}" class="btn btn-secondary">Volver</a>
             </form>
         </div>
     </div>
@@ -50,6 +50,6 @@
                 <h3>No hay proyectos de cuales importar roles</h3>
             </div>
         </div>
-        <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-secondary">Volver</a>
+        <a href="{% url 'roles_de_proyecto' proyecto.id %}" class="btn btn-secondary">Volver</a>
     {% endif %}
     {% endblock %}
