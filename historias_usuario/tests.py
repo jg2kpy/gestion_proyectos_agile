@@ -1,3 +1,4 @@
+import email
 import os
 from django import setup
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_proyectos_agile.settings")
@@ -280,4 +281,169 @@ class HistoriasUsuarioTest(TestCase):
         res = self.client.get(f"/proyecto/{self.proyecto.id}/mis-historias/", follow=True)
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, '<td>Test US 1</td>', 1, 200, "No se puede visualizar la historia asignada")
-        
+
+class TableroTest(TestCase):
+    """
+    Pruebas de tablero.
+    """
+
+    fixtures = [
+       "databasedump.json",
+    ]
+
+    def setUp(self):
+        """
+        Configuración de pruebas.
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
+        self.assertIsNotNone(self.proyecto)
+        self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists())
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tipo-historia-usuario/crear/", {'nombre': 'Test tipo 1', 'descripcion': 'Des de Test tipo 1', 'etapas-TOTAL_FORMS': '3', 'etapas-INITIAL_FORMS': '0',
+                        'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000', 'etapas-0-nombre': 'Etapa 1', 'etapas-0-descripcion': "descripcion1", 'etapas-1-nombre': 'Etapa 2', 'etapas-1-descripcion': "descripcion2", 'etapas-2-nombre': 'Etapa 3', 'etapas-2-descripcion': "descripcion3"}, follow=True)
+        self.assertEqual(res.status_code, 200)
+
+        self.creado = TipoHistoriaUsusario.objects.get(nombre='Test tipo 1')
+        self.assertIsNotNone(self.creado, 'El tipo de historia de usuario no existe')
+        self.assertEqual(self.creado.nombre, 'Test tipo 1', 'El tipo de historia de usuario no tiene el nombre correspondiente')
+        self.assertEqual(self.creado.descripcion, 'Des de Test tipo 1', 'El tipo de historia de usuario no tiene la descripcion correspondiente')
+    
+    def test_visualizarTablero(self):
+        """
+        Prueba de visualizar el tablero de un proyecto.
+        """
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/tablero/{self.creado.id}", follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, f'<h3>{self.creado.nombre}</h3>', 1, 200, "Se puede visualizar el tablero")
+    
+    def test_visualizarTableroNoExistente(self):
+        """
+        Prueba de visualizar el tablero de un proyecto no existente.
+        """
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/tablero/{self.creado.id+2}", follow=True)
+        self.assertEqual(res.status_code, 404, "Se redirecciona a la página de error 404 para tableros no existentes")
+    
+    def test_visualizarTableroVacio(self):
+        """
+        Prueba de visualizar el tablero de un proyecto sin historias de usuario.
+        """
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/tablero/{self.creado.id}", follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'class="card shadow-sm"', 0, 200, "Se puede visualizar el tablero vacío")
+    
+    def test_tableroNoMuestraEtapaNull(self):
+        """
+        Prueba de visualizar el tablero de un proyecto sin historias de usuario, pero existen historias en backlog.
+        """
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/tablero/{self.creado.id}", follow=True)
+        self.assertEqual(res.status_code, 200)
+        historia = HistoriaUsuario.objects.create(tipo=self.creado, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1, usuarioAsignado=self.user)
+        historia.save()
+        self.assertContains(res, 'class="card shadow-sm"', 0, 200, "Se puede visualizar el tablero vacío")
+    
+    def test_tableroMuestraHistoriaEnEtapa1(self):
+        """
+        Prueba de visualizar el tablero con historias de usuario activo.
+        """
+        historia = HistoriaUsuario.objects.create(tipo=self.creado, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1, usuarioAsignado=self.user)
+        historia.etapa = self.creado.etapas.all()[0]
+        historia.estado = HistoriaUsuario.Estado.ACTIVO
+        historia.save()
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/tablero/{self.creado.id}", follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'class="card shadow-sm"', 1, 200, "Se puede visualizar el tablero con una historia en la etapa 1")
+
+    def test_tableroNoMuestraEtapaCancelado(self):
+        """
+        Prueba de visualizar el tablero de un proyecto sin historias de usuario, pero existen historias canceladas.
+        """
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/tablero/{self.creado.id}", follow=True)
+        self.assertEqual(res.status_code, 200)
+        historia = HistoriaUsuario.objects.create(tipo=self.creado, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1, usuarioAsignado=self.user)
+        historia.etapa = self.creado.etapas.all()[0]
+        historia.estado = HistoriaUsuario.Estado.CANCELADO
+        historia.save()
+        self.assertContains(res, 'class="card shadow-sm"', 0, 200, "Se puede visualizar el tablero vacío")
+
+    def test_tableroNoMuestraEtapaTerminado(self):
+        """
+        Prueba de visualizar el tablero de un proyecto sin historias de usuario, pero existen historias canceladas.
+        """
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/tablero/{self.creado.id}", follow=True)
+        self.assertEqual(res.status_code, 200)
+        historia = HistoriaUsuario.objects.create(tipo=self.creado, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1, usuarioAsignado=self.user)
+        historia.etapa = self.creado.etapas.all()[0]
+        historia.estado = HistoriaUsuario.Estado.TERMINADO
+        historia.save()
+        self.assertContains(res, 'class="card shadow-sm"', 0, 200, "Se puede visualizar el tablero vacío")
+
+class HistorialTest(TestCase):
+    """
+    Pruebas de historial.
+    """
+
+    fixtures = [
+       "databasedump.json",
+    ]
+
+    def setUp(self):
+        """
+        Configuración de pruebas.
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+                                                        
+        get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738041'))
+
+
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
+        self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists())
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tipo-historia-usuario/crear/", {'nombre': 'Test tipo 1', 'descripcion': 'Des de Test tipo 1', 'etapas-TOTAL_FORMS': '3', 'etapas-INITIAL_FORMS': '0',
+                        'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000', 'etapas-0-nombre': 'Etapa 1', 'etapas-0-descripcion': "descripcion1", 'etapas-1-nombre': 'Etapa 2', 'etapas-1-descripcion': "descripcion2", 'etapas-2-nombre': 'Etapa 3', 'etapas-2-descripcion': "descripcion3"}, follow=True)
+        self.assertEqual(res.status_code, 200)
+
+        self.tipoTest = TipoHistoriaUsusario.objects.get(nombre='Test tipo 1')
+        self.assertIsNotNone(self.tipoTest, 'El tipo de historia de usuario no existe')
+        self.assertEqual(self.tipoTest.nombre, 'Test tipo 1', 'El tipo de historia de usuario no tiene el nombre correspondiente')
+        self.assertEqual(self.tipoTest.descripcion, 'Des de Test tipo 1', 'El tipo de historia de usuario no tiene la descripcion correspondiente')
+        self.historiaTest = HistoriaUsuario.objects.create(tipo=self.tipoTest, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1, usuarioAsignado=self.user)
+        self.historiaTest.estado = HistoriaUsuario.Estado.CANCELADO
+        self.historiaTest.save()
+        self.assertEqual(HistoriaUsuario.objects.filter(tipo=self.tipoTest).count(), 1, 'Se creo la historia de usuario')
+
+    def test_guardarConHistorial(self):
+        """
+        Prueba de guardar un tipo de historia de usuario con historial.
+        """
+        self.historiaTest.guardarConHistorial()
+        self.assertEqual(HistoriaUsuario.objects.filter(tipo=self.tipoTest).count(), 2, 'Se creo una copia de la historia de usuario')
+        historiaHistorial = HistoriaUsuario.objects.filter(tipo=self.tipoTest).get(estado=HistoriaUsuario.Estado.HISTORIAL)
+        self.assertIsNotNone(historiaHistorial, 'Se creo la historia de usuario historial')
+        self.assertEqual(self.historiaTest.nombre, historiaHistorial.nombre, 'El nombre de la historia de usuario historial es igual al original')
+        self.assertEqual(self.historiaTest.descripcion, historiaHistorial.descripcion, 'La descripcion de la historia de usuario historial es igual al original')
+        self.assertEqual(self.historiaTest.proyecto, historiaHistorial.proyecto, 'El proyecto de la historia de usuario historial es igual al original')
+        self.assertEqual(self.historiaTest.usuarioAsignado, historiaHistorial.usuarioAsignado, 'El usuario asignado de la historia de usuario historial es igual al original')
+    
+    def test_restaurarHistorial(self):
+        """
+        Prueba de restaurar un tipo de historia de usuario con historial.
+        """
+        self.historiaTest.guardarConHistorial()
+        self.historiaTest.nombre = self.historiaTest.nombre + " modificado"
+        self.historiaTest.save()
+        historiaHistorial = HistoriaUsuario.objects.filter(tipo=self.tipoTest).get(estado=HistoriaUsuario.Estado.HISTORIAL)
+        self.assertNotEqual(self.historiaTest.nombre, historiaHistorial.nombre, 'El nombre de la historia de usuario es diferente al historial')
+        self.historiaTest.restaurarDelHistorial(historiaHistorial)
+        self.assertEqual(HistoriaUsuario.objects.filter(tipo=self.tipoTest).count(), 3, 'Restaurar la historia de usuario a su vez se guarda en el historial')
+        self.assertEqual(self.historiaTest.nombre, historiaHistorial.nombre, 'El nombre de la historia de usuario es igual al historial restaurado')
