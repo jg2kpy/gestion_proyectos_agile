@@ -16,26 +16,19 @@
                 <hr class="my-4">
                 <ul class="list-group list-group-flush">
                     <h4>Proyectos</h4>
+                    {% for proyecto in user.equipo.all %}
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                        <h6>Proyecto 1</h6>
+                        <h6>{{ proyecto.nombre }}</h6>
                         <div>
-                            <span>Desarrollador</span>
-                        </div>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                        <h6>Proyecto 2</h6>
-                        <div>
-                            <span>Scrum Master</span>
+                            {% for rol in user.roles_proyecto.all %}
+                            {% if rol.proyecto == proyecto %}
+                            <span>{{ rol.nombre }}</span>
                             <br>
-                            <span>Desarrollador</span>
+                            {% endif %}
+                            {% endfor %}
                         </div>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                        <h6>Proyecto 3</h6>
-                        <div>
-                            <span>Scrum Master</span>
-                        </div>
-                    </li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>

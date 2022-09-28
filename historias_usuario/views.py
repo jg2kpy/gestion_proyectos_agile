@@ -258,19 +258,20 @@ def importar_tipoUS(request, proyecto_id):
                 mensaje = 'Ya existe un tipo de historia de usuario con ese nombre'
 
     proyectos = Proyecto.objects.exclude(id=proyecto_id)
-    if request.GET.get('proyectos'):
-        proyecto_seleccionado = Proyecto.objects.get(
-            nombre=request.GET.get('proyectos'))
-        tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyecto)
-    elif proyectos.count() > 0:
-        proyecto_seleccionado = proyectos[0]
-        tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyectos[0])
-    else:
-        proyecto_seleccionado = None
-        tipos = None
+    if request.method == 'GET':
+        if request.GET.get('proyectos'):
+            proyecto_seleccionado = Proyecto.objects.get(
+                nombre=request.GET.get('proyectos'))
+            tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyecto_seleccionado)
+        elif proyectos.count() > 0:
+            proyecto_seleccionado = proyectos[0]
+            tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyecto_seleccionado)
+        else:
+            proyecto_seleccionado = None
+            tipos = None
 
     volver_a = request.session['cancelar_volver_a']
-    return render(request, 'tipos-us/importar_rol.html', {"volver_a": volver_a, 'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
+    return render(request, 'tipos-us/importar_tipo.html', {"volver_a": volver_a, 'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
 
 def moverEtapa(request, id_proyecto, id_historia):
     """
@@ -671,25 +672,7 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
         except HistoriaUsuario.DoesNotExist:
             return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
 
-        historia.guardarConHistorial()
-        historia.nombre = versionPrevia.nombre
-        historia.descripcion = versionPrevia.descripcion
-        historia.bv = versionPrevia.bv
-        historia.up = versionPrevia.up
-        historia.usuarioAsignado = versionPrevia.usuarioAsignado
-        historia.etapa = versionPrevia.etapa
-
-        for comentario in historia.comentarios.all():
-            historia.comentarios.remove(comentario)
-        for comentario in versionPrevia.comentarios.all():
-            historia.comentarios.add(comentario)
-
-        for archivo in historia.archivos.all():
-            historia.archivos.remove(archivo)
-        for archivo in versionPrevia.archivos.all():
-            historia.archivos.add(archivo)
-
-        historia.save()
+        historia.restaurarDelHistorial(versionPrevia)
 
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'historias/historial.html', {"volver_a": volver_a, 'proyecto': proyecto, 'version_ori': historia, 'versiones': historia.obtenerVersiones()}, status=200)

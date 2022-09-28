@@ -183,6 +183,27 @@ class HistoriaUsuario(models.Model):
         self.fecha_modificacion = timezone.now()
         self.save()
     
+    def restaurarDelHistorial(self, versionPrevia):
+        self.guardarConHistorial()
+        self.nombre = versionPrevia.nombre
+        self.descripcion = versionPrevia.descripcion
+        self.bv = versionPrevia.bv
+        self.up = versionPrevia.up
+        self.usuarioAsignado = versionPrevia.usuarioAsignado
+        self.etapa = versionPrevia.etapa
+
+        for comentario in self.comentarios.all():
+            self.comentarios.remove(comentario)
+        for comentario in versionPrevia.comentarios.all():
+            self.comentarios.add(comentario)
+
+        for archivo in self.archivos.all():
+            self.archivos.remove(archivo)
+        for archivo in versionPrevia.archivos.all():
+            self.archivos.add(archivo)
+
+        self.save()
+    
     def obtenerVersiones(self):
         """
         Retorna la lista de todas las versiones de la US en orden decreciente por fecha.
