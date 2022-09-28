@@ -45,8 +45,8 @@
                     <td>{{ historia.bv }}</td>
                     <td>{{ historia.fecha_modificacion|date:'Y-M-d' }}</td>
                     <td>{{ historia.usuarioAsignado }}</td>
+                    {% if historia.estado == historia.Estado.ACTIVO %}
                     <td>
-                        {% if historia.estado == historia.Estado.ACTIVO %}
 
                             <button type="button" class="btn btn-link" data-bs-toggle="modal"
                                 data-bs-target="#modalVer{{ historia.id }}"><span 
@@ -74,8 +74,8 @@
                             {% if master or historia.usuarioAsignado == user %}
                                 <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
                             {% endif %}
-                        {% endif %}
                     </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
