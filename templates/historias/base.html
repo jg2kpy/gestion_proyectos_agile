@@ -79,7 +79,7 @@
                             {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                             {% if master or historia.usuarioAsignado == user %}
                                 {% if not historia.etapa %}
-                                    <button href="#modalEtapa{{ historia.id }}" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
+                                    <button href="#modalEtapa{{ historia.id }}" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}" data-toggle="tooltip" data-placement="top" title="Mover a la siguiente etapa"><span class="material-icons">arrow_forward</span></button>
                                 {% endif %}
                             {% endif %}
                         {% endif %}
