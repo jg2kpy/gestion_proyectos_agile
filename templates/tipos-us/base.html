@@ -37,7 +37,7 @@
                     <td>{{ tipo.descripcion }}</td>
                     <td>
                         {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
-                        {% if pro_crearTipoUS %}
+                        {% if pro_crearTipoUS and tipo.historias.count == 0 %}
                         <a href="{% url 'editarTipoHistoriaUsuario' proyecto.id tipo.id %}" class="btn btn-link"><span
                                 class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar tipo de historia">create</span></a>
                         {% endif %}
