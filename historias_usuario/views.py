@@ -277,7 +277,7 @@ def importar_tipoUS(request, proyecto_id):
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'tipos-us/importar_tipo.html', {"volver_a": volver_a, 'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
 
-def moverEtapa(request, id_proyecto, id_historia):
+def moverEtapa(request, proyecto_id, historia_id):
     """
     Mover historia de usuario a la siguiente etapa
 
@@ -296,12 +296,12 @@ def moverEtapa(request, id_proyecto, id_historia):
         return HttpResponseRedirect("/", status=401)
 
     try:
-        proyecto = Proyecto.objects.get(id=id_proyecto)
+        proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     try:
-        historia = HistoriaUsuario.objects.get(id=id_historia)
+        historia = HistoriaUsuario.objects.get(id=historia_id)
     except HistoriaUsuario.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró la historia de usuario."}, status=404)
 
@@ -327,7 +327,7 @@ def moverEtapa(request, id_proyecto, id_historia):
     
         historia.save()
 
-        return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', id_proyecto)
+        return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', proyecto_id)
 
     request.session['cancelar_volver_a'] = request.path
     return render(request, '404.html', {'info_adicional': "No se encontró la historia de usuario."}, status=404)

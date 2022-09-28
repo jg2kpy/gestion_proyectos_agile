@@ -50,7 +50,7 @@ def proyectos(request):
 
 
 @never_cache
-def proyecto_home(request, id_proyecto):
+def proyecto_home(request, proyecto_id):
     """Vista de inicio de proyecto
 
     :param request: Peticion HTTP
@@ -63,7 +63,7 @@ def proyecto_home(request, id_proyecto):
         return HttpResponseRedirect("/", status=401)
 
     try:
-        proyecto = Proyecto.objects.get(id=id_proyecto)
+        proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
@@ -167,7 +167,7 @@ def crear_proyecto(request):
 
 # Editar un proyecto
 @never_cache
-def editar_proyecto(request, id_proyecto):
+def editar_proyecto(request, proyecto_id):
     """Funcion para editar un proyecto
     Renderiza la pagina para editar un proyecto, recibe una llamada POST con los datos de un proyecto
     y guarda el proyecto.
@@ -175,8 +175,8 @@ def editar_proyecto(request, id_proyecto):
     :param request: Peticion HTTP donde se recibe la informacion del proyecto a editar
     :type request: HttpRequest
 
-    :param id_proyecto: ID del proyecto a editar
-    :type id_proyecto: int
+    :param proyecto_id: ID del proyecto a editar
+    :type proyecto_id: int
 
     :return: Renderiza la pagina para editar un proyecto
     :rtype: HttpResponse
@@ -188,7 +188,7 @@ def editar_proyecto(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
 
     try:
-        proyecto = Proyecto.objects.get(id=id_proyecto)
+        proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
@@ -202,7 +202,7 @@ def editar_proyecto(request, id_proyecto):
         if form.is_valid():
             try:
                 # Editamos el proyecto
-                proyecto = Proyecto.objects.get(id=id_proyecto)
+                proyecto = Proyecto.objects.get(id=proyecto_id)
                 proyecto.nombre = form.cleaned_data['nombre']
                 proyecto.descripcion = form.cleaned_data['descripcion']
                 proyecto.save()
@@ -214,7 +214,7 @@ def editar_proyecto(request, id_proyecto):
     else:
         form = ProyectoForm()
         # cargamos los datos del proyecto
-        proyecto = Proyecto.objects.get(id=id_proyecto)
+        proyecto = Proyecto.objects.get(id=proyecto_id)
         form.fields['nombre'].initial = proyecto.nombre
         form.fields['descripcion'].initial = proyecto.descripcion
 
@@ -223,7 +223,7 @@ def editar_proyecto(request, id_proyecto):
 
 # Recibimos una peticion POST para cancelar un proyecto
 @never_cache
-def cancelar_proyecto(request, id_proyecto):
+def cancelar_proyecto(request, proyecto_id):
     """Cancelar Proyecto
     Cambia el estado del proyecto a cancelado, se recibe el nombre del proyecto a cancelar, se verifica que el proyecto coincida con
     el nombre introducido y se cambia el estado a cancelado.
@@ -231,8 +231,8 @@ def cancelar_proyecto(request, id_proyecto):
     :param request: Peticion HTTP
     :type request: HttpRequest
 
-    :param id_proyecto: ID del proyecto a cancelar
-    :type id_proyecto: int
+    :param proyecto_id: ID del proyecto a cancelar
+    :type proyecto_id: int
 
     :return: Renderiza la pagina de proyectos
     :rtype: HttpResponse
@@ -244,7 +244,7 @@ def cancelar_proyecto(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
 
     try:
-        proyecto = Proyecto.objects.get(id=id_proyecto)
+        proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
@@ -269,7 +269,7 @@ def cancelar_proyecto(request, id_proyecto):
         form = ProyectoCancelForm()
 
     # Si el proyecto ya esta cancelado no se puede cancelar de nuevo
-    if Proyecto.objects.get(id=id_proyecto).estado == ESTADOS_PROYECTO.__getitem__(3)[0]:
+    if Proyecto.objects.get(id=proyecto_id).estado == ESTADOS_PROYECTO.__getitem__(3)[0]:
         return redirect('proyectos')
 
     return render(request, 'proyectos/cancelar_proyecto.html', {'form': form})
@@ -335,7 +335,7 @@ def crear_rol_proyecto(request):
 
 # Ver la informacion de un rol de un proyecto en especifico
 @never_cache
-def ver_rol_proyecto(request, id_proyecto, id_rol_proyecto):
+def ver_rol_proyecto(request, proyecto_id, id_rol_proyecto):
     """Ver rol de proyecto
     Renderiza la pagina para ver un rol de proyecto, recibe el id del rol de proyecto y muestra la informacion del rol de proyecto
     trae los permisos asociados con el rol indicado
@@ -371,7 +371,7 @@ def ver_rol_proyecto(request, id_proyecto, id_rol_proyecto):
 
 # Modificar un rol de un proyecto
 @ never_cache
-def modificar_rol_proyecto(request, id_proyecto, id_rol_proyecto):
+def modificar_rol_proyecto(request, proyecto_id, id_rol_proyecto):
     """Modificar rol de proyecto
     Renderiza la pagina para modificar un rol de proyecto, recibe una llamada POST con los datos del rol de proyecto,
     trae los permisos de la base de datos los modifica y guarda el rol de proyecto.
@@ -433,7 +433,7 @@ def modificar_rol_proyecto(request, id_proyecto, id_rol_proyecto):
         if (rol.proyecto is None):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
         else:
-            return redirect('rol_proyecto_asignado', id_proyecto=proyecto.id)
+            return redirect('rol_proyecto_asignado', proyecto_id=proyecto.id)
     else:
         form = RolProyectoForm(
             initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
@@ -442,7 +442,7 @@ def modificar_rol_proyecto(request, id_proyecto, id_rol_proyecto):
 
 # Eliminar un rol de un proyecto
 @ never_cache
-def eliminar_rol_proyecto(request, id_proyecto, id_rol_proyecto):
+def eliminar_rol_proyecto(request, proyecto_id, id_rol_proyecto):
     """Eliminar rol de proyecto
     Elimina un rol de proyecto, recibe el id del rol de proyecto a eliminar y lo elimina de la base de datos
 
@@ -478,13 +478,13 @@ def eliminar_rol_proyecto(request, id_proyecto, id_rol_proyecto):
         if (rol.proyecto is None):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
         else:
-            return redirect('rol_proyecto_asignado', id_proyecto=proyecto.id)
+            return redirect('rol_proyecto_asignado', proyecto_id=proyecto.id)
     return render(request, 'proyectos/roles_proyecto/eliminar_rol_proyecto.html', {'rol_proyecto': RolProyecto.objects.get(id=id_rol_proyecto), 'proyecto': proyecto})
 
 
 # Ver roles asignados a un proyecto
 @ never_cache
-def ver_roles_asignados(request, id_proyecto):
+def ver_roles_asignados(request, proyecto_id):
     """Ver roles de un proyecto especifico
     Renderiza la pagina para ver los roles de proyecto asignados a un proyecto, recibe el id del proyecto
 
@@ -500,7 +500,7 @@ def ver_roles_asignados(request, id_proyecto):
 
     request_user = request.user
     try:
-        proyecto = Proyecto.objects.get(id=id_proyecto)
+        proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
@@ -514,7 +514,7 @@ def ver_roles_asignados(request, id_proyecto):
 
     # Traemos los roles que tengan el id del proyecto
     try:
-        roles = RolProyecto.objects.filter(proyecto=id_proyecto)
+        roles = RolProyecto.objects.filter(proyecto=proyecto_id)
     except RolProyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
@@ -523,7 +523,7 @@ def ver_roles_asignados(request, id_proyecto):
 
 # Creamos un rol en un proyecto a un proyecto especifico
 @ never_cache
-def crear_rol_a_proyecto(request, id_proyecto):
+def crear_rol_a_proyecto(request, proyecto_id):
     """Crear y asignar rol de proyecto a un proyecto especifico
     Renderiza la pagina para crear un rol de proyecto y asignarlo a un proyecto especifico, recibe una llamada POST con los datos del rol de proyecto,
     trae los permisos de la base de datos y los muestra en la pagina y guarda el rol de proyecto.
@@ -531,8 +531,8 @@ def crear_rol_a_proyecto(request, id_proyecto):
     :param request: Peticion HTTP donde se recibe la informacion del rol de proyecto a crear
     :type request: HttpRequest
 
-    :param id_proyecto: ID del proyecto al que se le asignara el rol de proyecto
-    :type id_proyecto: int
+    :param proyecto_id: ID del proyecto al que se le asignara el rol de proyecto
+    :type proyecto_id: int
 
     :return: Renderiza la pagina para crear un rol de proyecto y asignarlo a un proyecto especifico
     :rtype: HttpResponse
@@ -544,7 +544,7 @@ def crear_rol_a_proyecto(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
 
     try:
-        proyecto = Proyecto.objects.get(id=id_proyecto)
+        proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
@@ -560,7 +560,7 @@ def crear_rol_a_proyecto(request, id_proyecto):
             rol = RolProyecto()
             rol.nombre = form.cleaned_data['nombre']
             rol.descripcion = form.cleaned_data['descripcion']
-            rol.proyecto = Proyecto.objects.get(id=id_proyecto)
+            rol.proyecto = Proyecto.objects.get(id=proyecto_id)
             try:
                 rol.save()
             except IntegrityError:
@@ -581,7 +581,7 @@ def crear_rol_a_proyecto(request, id_proyecto):
                     permiso.rol.add(rol)
                     permiso.save()
 
-            return redirect('rol_proyecto_asignado', id_proyecto=proyecto.id)
+            return redirect('rol_proyecto_asignado', proyecto_id=proyecto.id)
         else:
             status = 422
 
@@ -592,7 +592,7 @@ def crear_rol_a_proyecto(request, id_proyecto):
 
 # Importar Rol de otros proyectos
 @ never_cache
-def importar_rol(request, id_proyecto):
+def importar_rol(request, proyecto_id):
     """Importar rol de proyecto
     Renderiza la pagina para importar un rol de proyecto.
     Recibe una llamada GET para renderizar la pantalla pero con los roles del proyecto a importar.
@@ -601,8 +601,8 @@ def importar_rol(request, id_proyecto):
     :param request: Peticion HTTP donde se recibe la informacion del rol de proyecto a importar
     :type request: HttpRequest
 
-    :param id_proyecto: ID del proyecto al que se le importara el rol de proyecto
-    :type id_proyecto: int
+    :param proyecto_id: ID del proyecto al que se le importara el rol de proyecto
+    :type proyecto_id: int
 
     :return: Renderiza la pagina para importar un rol de proyecto
     :rtype: HttpResponse
@@ -615,7 +615,7 @@ def importar_rol(request, id_proyecto):
         return HttpResponse('Usuario no autenticado', status=401)
 
     try:
-        proyecto = Proyecto.objects.get(id=id_proyecto)
+        proyecto = Proyecto.objects.get(id=proyecto_id)
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
@@ -624,7 +624,7 @@ def importar_rol(request, id_proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para importar roles de proyecto'}, status=403)
 
     if request.method == 'POST':
-        # id_proyecto: Proyecto a donde se VA A IMPORTAR
+        # proyecto_id: Proyecto a donde se VA A IMPORTAR
         roles = []  # Lista de los id de los roles a importar
         proyecto_seleccionado = Proyecto.objects.get(id=int(request.POST.get(
             'proyecto_seleccionado')))  # Proyecto de donde SE IMPORTA los roles
@@ -634,12 +634,12 @@ def importar_rol(request, id_proyecto):
 
         # Recorremos los roles y creamos nuevos roles con los mismos permisos
         for rol in roles:
-            if rol.nombre not in RolProyecto.objects.filter(proyecto=id_proyecto).values_list('nombre', flat=True):
+            if rol.nombre not in RolProyecto.objects.filter(proyecto=proyecto_id).values_list('nombre', flat=True):
                 # Creamos el rol
                 rol_nuevo = RolProyecto()
                 rol_nuevo.nombre = rol.nombre
                 rol_nuevo.descripcion = rol.descripcion
-                rol_nuevo.proyecto = Proyecto.objects.get(id=id_proyecto)
+                rol_nuevo.proyecto = Proyecto.objects.get(id=proyecto_id)
                 rol_nuevo.save()
 
                 # Traemos los permisos del rol
@@ -651,10 +651,10 @@ def importar_rol(request, id_proyecto):
                     permiso.rol.add(rol_nuevo)
                     permiso.save()
 
-        return redirect('rol_proyecto_asignado', id_proyecto=proyecto.id)
+        return redirect('rol_proyecto_asignado', proyecto_id=proyecto.id)
 
     else:
-        proyectos = Proyecto.objects.exclude(id=id_proyecto)
+        proyectos = Proyecto.objects.exclude(id=proyecto_id)
         # proyecto_objetivo = Proyecto.objects.get(nombre = request.GET.get('proyectos'))
         # Este es el GET cuando solicita ver los roles de proyectos de un proyecto en especifico
         if request.GET.get('proyectos'):
@@ -670,7 +670,7 @@ def importar_rol(request, id_proyecto):
                 roles = RolProyecto.objects.filter(proyecto=proyectos[0])
         
         if roles:
-            rolesPropios = RolProyecto.objects.filter(proyecto=id_proyecto).values_list('nombre', flat=True)
+            rolesPropios = RolProyecto.objects.filter(proyecto=proyecto_id).values_list('nombre', flat=True)
             roles = roles.exclude(nombre__in=rolesPropios)
 
 
