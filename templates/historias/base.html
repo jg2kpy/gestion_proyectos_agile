@@ -83,7 +83,7 @@
                                 {% endif %}
                             {% endif %}
                         {% endif %}
-                        <a class="btn btn-link" href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span 
+                        <a class="btn btn-link" data-toggle="tooltip" data-placement="top" title="Ver historial" href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span 
                             class="material-icons">history</span></a>
                     </td>
                 </tr>
