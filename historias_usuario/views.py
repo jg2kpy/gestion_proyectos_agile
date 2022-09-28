@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from proyectos.models import Proyecto
 from .models import *
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
+from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
 from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, SubirArchivoForm, TipoHistoriaUsuarioForm
 
 

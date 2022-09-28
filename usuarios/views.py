@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.forms import ModelForm
 from django.views.decorators.cache import never_cache
 
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
+from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
 from proyectos.models import Proyecto
 from usuarios.models import RolProyecto, Usuario
 from .models import PermisoSistema, Usuario
