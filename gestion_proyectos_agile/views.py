@@ -15,7 +15,7 @@ class NeverCacheMixin(object):
 
 
 class Home(NeverCacheMixin, TemplateView):
-    template_name = 'base.html'
+    template_name = 'home.html'
 
 def error_404_view(request, exception):
    

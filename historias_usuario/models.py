@@ -23,7 +23,7 @@ class TipoHistoriaUsusario(models.Model):
     """
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
-    proyecto = models.ForeignKey(Proyecto, related_name='tiposHistoriaUsuario', on_delete=models.CASCADE)
+    proyecto = models.ForeignKey(Proyecto, related_name='tiposHistoriaUsuario', on_delete=models.CASCADE, null=True)
 
     class Meta:
         constraints = [
@@ -68,7 +68,7 @@ class EtapaHistoriaUsuario(models.Model):
 
 
 def pathDinamico(instance, filename):
-    return 'archivos_US/{0}'.format(filename)
+    return 'app/staticfiles/{0}'.format(filename)
 
 class ArchivoAnexo(models.Model):
     """

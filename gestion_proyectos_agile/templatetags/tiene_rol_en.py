@@ -132,6 +132,7 @@ def tiene_permiso_en_sistema(usuario, permiso):
     """
     return usuario.roles_sistema.filter(permisos__nombre=permiso).exists()
 
+
 @register.simple_tag
 def siguente_etapa(historia):
     """Funcion para determinar la siguente etapa de un historia de usuario
@@ -142,5 +143,30 @@ def siguente_etapa(historia):
     :return: Se retorna el nombre de la siguente etapa o en caso de ser la ultima, se retorna 'terminado'
     :rtype: str
     """
-    siguiente = historia.etapa.orden + 1 if historia.etapa else 1
+    siguiente = historia.etapa.orden + 1 if historia.etapa else 0
     return historia.tipo.etapas.all()[siguiente].nombre if siguiente < historia.tipo.etapas.count() else 'terminado'
+
+
+@register.simple_tag
+def anterior_etapa(historia):
+    """Funcion para determinar la etapa anterior de un historia de usuario
+
+    :param historia: Objeto historia a determinar su etapa anterior
+    :type usuario: historia
+
+    :return: Se retorna el nombre de la etapa anterior
+    :rtype: str
+    """
+    anterior = historia.etapa.orden - 1 if historia.etapa and historia.etapa.orden > 1 else 0
+    return historia.tipo.etapas.all()[anterior].nombre
+
+
+@register.simple_tag
+def lista_adm():
+    """Funcion que retorna una lista de los administradores
+
+    :return: Se retorna una lista con los administradores
+    :rtype: list
+    """
+    adminRol = RolSistema.objects.get(nombre="gpa_admin")
+    return adminRol.usuario.all()

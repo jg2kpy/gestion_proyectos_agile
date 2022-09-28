@@ -18,7 +18,7 @@
             {% if pro_cargarUSalBacklog and esBacklog %}
                 <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Agregar US al Product Backlog</a>
             {% endif %}
-            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver</a>
+            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
         </div>
     </div>
     <div class="row">
@@ -26,32 +26,44 @@
             <thead>
                 <tr>
                     <th>Nombre</th>
-                    <th>Etapa</th>
+                    {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
+                        <th>Etapa</th>
+                    {% elif titulo == 'Historias Terminadas' %}
+                        <th>Fecha de terminación</th>
+                    {% elif titulo == 'Historias Canceladas'%}
+                        <th>Fecha de cancelación</th>
+                    {% endif %}
                     <th>User Points</th>
                     <th>Business Value</th>
-                    <th>Fecha modificación</th>
-                    <th>Usuario</th>
-                    {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
-                        <th>Acciones</th>
-                    {% endif %}
+                    <th>Encargado</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for historia in historias %}
                 <tr>
                     <td>{{ historia.nombre }}</td>
-                    <td>{{ historia.etapa }}</td>
+                    {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
+                        {% if historia.etapa %}
+                            <td>{{ historia.etapa }}</td>
+                        {% else %}
+                            <td>Planificado</td>
+                        {% endif %}
+                    {% elif titulo == 'Historias Terminadas' %}
+                        <td>{{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}</td>
+                    {% elif titulo == 'Historias Canceladas'%}
+                        <td>{{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}</td>
+                    {% endif %}
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
                     <td>{{ historia.fecha_modificacion|date:'Y-M-d' }}</td>
-                    <td>{{ historia.usuarioAsignado }}</td>
-                    {% if historia.estado == historia.Estado.ACTIVO %}
+                    <td>{{ historia.usuarioAsignado.get_full_name }}</td>
                     <td>
-
-                            <button type="button" class="btn btn-link" data-bs-toggle="modal"
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal"
                                 data-bs-target="#modalVer{{ historia.id }}"><span 
                                 class="material-icons">visibility</span>
                             </button>
+                        {% if historia.estado == historia.Estado.ACTIVO %}
 
                             {% tiene_permiso_en_proyecto user 'pro_modificarUS' proyecto as pro_modificarUS %}
                             {% if pro_modificarUS %}
@@ -64,18 +76,16 @@
                                 <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">cancel</span></button>
                             {% endif %}
 
-                            <a href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
-                                class="material-icons">comment</span></a>
-                                <a href="{% url 'ver_archivos' proyecto.id historia.id %}" class="btn btn-link"><span 
-                                    class="material-icons">description</span></a>
-                                <a href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}" class="btn btn-link"><span 
-                                    class="material-icons">history</span></a>
-                                {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+                            {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                             {% if master or historia.usuarioAsignado == user %}
-                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
+                                {% if not historia.etapa %}
+                                    <button href="#modalEtapa{{ historia.id }}" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
+                                {% endif %}
                             {% endif %}
+                        {% endif %}
+                        <a class="btn btn-link" href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span 
+                            class="material-icons">history</span></a>
                     </td>
-                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -93,12 +103,13 @@
                     <p>¿Esta a punto de cancelar la historia de usuario {{ historia.nombre }}, quiere continuar?</p>
                 </div>
                 <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                 <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
                     {% csrf_token %}
                     <input type="submit" class="btn btn-danger" value="Continuar">
                     <input type="hidden" name="url" value="{{ request.path }}">
                 </form>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                
                 </div>
             </div>
             </div>
@@ -117,11 +128,16 @@
                 </div>
                 <div class="modal-body">
                     <p>{{ historia.descripcion }}</p>
-                    <p>Creado: {{ historia.fecha_creacion }}</p>
-                    {% if historia.fechar_modificacion %}
-                    <p>Modificado: {{ historia.fechar_modificacion }}</p>
+                    <p>Creado: {{ historia.fecha_creacion|date:'Y-m-d H:i:s'}}</p>
+                    {% if historia.fecha_modificacion %}
+                    <p>Modificado: {{ historia.fecha_modificacion|date:'Y-m-d H:i:s'}}</p>
                     {% endif %}
-                    <p>Etapa: {{ historia.etapa.nombre }}</p>
+                    <p>Tipo: {{ historia.tipo }}</p>
+                    {% if historia.etapa %}
+                        <p>Etapa: {{ historia.etapa }}</p>
+                    {% else %}
+                        <p>Planificado</p>
+                    {% endif %}
                     <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
                     <p>
                         {% if historia.comentarios.count > 0 %}
@@ -154,12 +170,13 @@
                 <p>Esta seguro que desea mover {{ historia.nombre }} a la etapa {% siguente_etapa historia %}?</p>
             </div>
             <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
             <form method="post" action="{% url 'mover_historias_usuario' proyecto.id historia.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="url" value="{{ request.path }}">
                 <input type="submit" class="btn btn-primary" value="Mover">
             </form>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+            
             </div>
         </div>
         </div>

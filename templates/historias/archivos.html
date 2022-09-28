@@ -37,8 +37,8 @@
                     <td>{{ archivo.nombre }}</td>
                     <td>{{ archivo.subido_por }}</td>
                     <td>
-                        <a href="{% url 'descargar' archivo.id %}"><span class="material-icons">download</span></a>
-                        <a href="#modal{{ historia.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">delete</span></a>
+                        <a href="{% url 'descargar' archivo.id %}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Descargar archivo">download</span></a>
+                        <a href="#modal{{ historia.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar archivo">delete</span></a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -56,7 +56,7 @@
                 <p>¿Esta a punto de borrar el archivo {{ archivo.nombre }}, quiere continuar?</p>
             </div>
             <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
             <form method="post" action="{% url 'ver_archivos' proyecto.id historia.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="archivo_id" value="{{ archivo.id }}">
