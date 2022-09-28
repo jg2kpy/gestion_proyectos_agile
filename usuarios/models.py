@@ -137,7 +137,7 @@ class PermisoProyecto(models.Model):
         Returns:
             str: El nombre del permiso.
         """
-        return self.nombre
+        return self.descripcion
 
 
 class PermisoSistema(models.Model):
@@ -161,7 +161,7 @@ class PermisoSistema(models.Model):
         Returns:
             str: El nombre del permiso.
         """
-        return self.nombre
+        return self.descripcion
 
 
 @receiver(post_save, sender=Usuario)

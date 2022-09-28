@@ -265,13 +265,13 @@ class ProyectoTests(TestCase):
         })
 
         request.user = AnonymousUser()
-        response = modificar_rol_proyecto(request, rol.id)
+        response = modificar_rol_proyecto(request, proyecto.id, rol.id)
         self.assertEqual(response.status_code, 401,
                          'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
 
         # Editamos el rol de proyecto con un usuario Scrum Master
         request.user = usuarioTest2
-        response = modificar_rol_proyecto(request, rol.id)
+        response = modificar_rol_proyecto(request, proyecto.id, rol.id)
         self.assertEqual(response.status_code, 302,
                          'La respuesta no fue un estado HTTP 302 a una petición correcta')
 
@@ -290,7 +290,7 @@ class ProyectoTests(TestCase):
 
         # Verificamos que solo el gpa_admin puede editar un rol de proyecto sin proyecto
         request.user = usuarioTest
-        response = modificar_rol_proyecto(request, rol2.id)
+        response = eliminar_rol_proyecto_view(request, proyecto.id, rol2.id)
         self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 403 a una petición de un usuario sin permisos')
 
@@ -340,13 +340,13 @@ class ProyectoTests(TestCase):
         request = request_factory.post(
             f'proyecto/roles_proyecto/eliminar/{rol.id}/')
         request.user = AnonymousUser()
-        response = eliminar_rol_proyecto_view(request, rol.id)
+        response = eliminar_rol_proyecto_view(request, proyecto.id, rol.id)
         self.assertEqual(response.status_code, 401,
                          'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
 
         # Eliminamos el rol de proyecto con un usuario Scrum Master
         request.user = usuarioTest2
-        response = eliminar_rol_proyecto_view(request, rol.id)
+        response = eliminar_rol_proyecto_view(request, proyecto.id, rol.id)
         self.assertEqual(response.status_code, 302,
                          'La respuesta no fue un estado HTTP 302 a una petición correcta')
 
@@ -364,13 +364,13 @@ class ProyectoTests(TestCase):
 
         # Un usuario sin permisos no puede eliminar un rol de proyecto sin proyecto
         request.user = usuarioTest
-        response = eliminar_rol_proyecto_view(request, rol2.id)
+        response = eliminar_rol_proyecto_view(request, proyecto.id, rol2.id)
         self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 403 a una petición de un usuario sin permisos')
 
         # el scrum master no puede eliminar un rol de proyecto sin proyecto
         request.user = usuarioTest
-        response = eliminar_rol_proyecto_view(request, rol2.id)
+        response = eliminar_rol_proyecto_view(request, proyecto.id, rol2.id)
         self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 403 a una petición de un usuario sin permisos')
 
@@ -548,5 +548,5 @@ class ProyectoTests(TestCase):
 
         request.user = usuarioTest2
         response = importar_rol(request, proyecto.id)
-        self.assertEqual(response.status_code, 302,
-                         'La respuesta no fue un estado HTTP 302 a un usuario Scrum Master')
+        self.assertEqual(response.status_code, 200,
+                         'La respuesta no fue un estado HTTP 200 a un usuario Scrum Master')
