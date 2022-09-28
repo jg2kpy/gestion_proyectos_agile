@@ -50,6 +50,7 @@
                 {% endfor %}
                 <input hidden name="proyecto_seleccionado" value="{{proyecto_seleccionado.id}}">
                 <button type="submit" class="btn btn-primary">Importar estos tipos</button>
+                <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="btn btn-secondary">Volver</a>
             </form>
         </div>
     </div>
@@ -59,6 +60,6 @@
             <p>No hay proyectos de cuales importar</p>
         </div>
     </div>
-    {% endif %}
     <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="btn btn-secondary">Volver</a>
+    {% endif %}
     {% endblock %}
