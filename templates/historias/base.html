@@ -72,7 +72,9 @@
 
                             {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                             {% if master or historia.usuarioAsignado == user %}
-                                <button href="#modalEtapa{{ us.id }}" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
+                                {% if not historia.etapa %}
+                                    <button href="#modalEtapa{{ historia.id }}" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                         <a class="btn btn-link" href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span 

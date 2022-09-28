@@ -5,12 +5,12 @@
 
 <!-- Redirigir a home si no tiene los permisos para ver esta pantalla -->
 <div class="container">
+    {% if user.equipo.all %}
     <div class="row">
         <div class="col-md-12" style="text-align:center">
             <h1>Mis Proyectos</h1>
         </div>
     </div>
-    {% if user.equipo.all %}
     <br>
     <div class="row">
         <!-- Traemos en una tabla los proyectos -->
@@ -73,10 +73,10 @@
                         <ul>
                         {% lista_adm as administradores %}
                         {% for administrador in administradores %}
-                            {% if not administrador.first_name %}
-                            <li style="margin-bottom: 25px;">{{ administrador.username }}: {{administrador.email}}</li>
+                            {% if administrador.get_full_name %}
+                            <li style="margin-bottom: 25px;">{{ administrador.get_full_name }}: {{administrador.email}}</li>
                             {% else %}
-                            <li style="margin-bottom: 25px;">{{ administrador.first_name }}: {{administrador.email}}</li>
+                            <li style="margin-bottom: 25px;">{{administrador.email}}</li>
                             {% endif %}
                             {% endfor %}
                         <ul>

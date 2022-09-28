@@ -55,8 +55,6 @@
                                         </span>
                                         <a href="{% url 'ver_archivos' proyecto.id us.id %}"><span 
                                             class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver archivos">description</span></a>
-                                        <a href="{% url 'restaurar_historia_historial' etapa.proyecto us.id %}"><span 
-                                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver historial">history</span></a>
                                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                                         {% if master or us.usuarioAsignado == user %}
                                             {% if us.etapa.orden != 0 %}
