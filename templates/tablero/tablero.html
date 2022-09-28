@@ -6,6 +6,7 @@
 <div class="container-fluid pt-3 overflow-auto">
     <h3>{{ tipo.nombre }}</h3>
     <div class="small">{{ tipo.descripcion }}</div>
+    <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
     <div class="row flex-row flex-sm-nowrap py-3">
         {% for etapa in etapas %}
         <div class="col-sm-6 col-md-4 col-xl-3">

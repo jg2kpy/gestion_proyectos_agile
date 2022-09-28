@@ -36,7 +36,7 @@
                     <td>{{ historia.tipo }}</td>
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
-                    <td>{{ historia.usuarioAsignado }}</td>
+                    <td>{{ historia.usuarioAsignado.get_full_name }}</td>
                     <td>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal"
                             data-bs-target="#modalVer{{ historia.id }}"><span 
@@ -44,10 +44,11 @@
                         </button>
 
                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
-                        {% if master or historia.usuarioAsignado == user %}
-                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Restaurar historia">history</span></button>
+                        {% if version_ori.estado == version_ori.Estado.ACTIVO %}
+                            {% if master or version_ori.usuarioAsignado == user %}
+                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">history</span></button>
+                            {% endif %}
                         {% endif %}
-                        
                     </td>
                 </tr>
                 {% endfor %}
@@ -69,15 +70,16 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Seguro que  quiere restaurar version del {{ historia.fecha_modifciacion }}?</p>
+                    <p>¿Seguro que quiere restaurar version del {{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}?</p>
                 </div>
                 <div class="modal-footer">
-                <form method="post" action="{% url 'restaurar_historia_historial' proyecto.id version_ori %}">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                <form method="post" action="{% url 'restaurar_historia_historial' proyecto.id version_ori.id %}">
                     {% csrf_token %}
                     <input type="hidden" name="version" value="{{ historia.id }}">
                     <input type="submit" class="btn btn-danger" value="Restaurar">
                 </form>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+                
                 </div>
             </div>
             </div>
@@ -95,12 +97,16 @@
                     </div>
                     <div class="modal-body">
                         <p>{{ historia.descripcion }}</p>
-                        <p>Creado: {{ historia.fecha_creacion }}</p>
+                        <p>Creado: {{ historia.fecha_creacion|date:'Y-m-d H:i:s'  }}</p>
                         {% if historia.fechar_modificacion %}
-                        <p>Modificado: {{ historia.fechar_modificacion }}</p>
+                        <p>Modificado: {{ historia.fechar_modificacion|date:'Y-m-d H:i:s'  }}</p>
                         {% endif %}
                         <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
-                        <p>Etapa: {{ historia.etapa.nombre }}</p>
+                        {% if historia.etapa %}
+                            <p>Etapa: {{ historia.etapa }}</p>
+                        {% else %}
+                            <p>Planificado</p>
+                        {% endif %}
                         <p>
                             {% if historia.comentarios.count > 0 %}
                                 {{ historia.comentarios.count}} comentarios

@@ -74,7 +74,7 @@ def rol_global_crear(request):
             rol.descripcion = form.cleaned_data['descripcion']
             try:
                 rol.save()
-                [rol.permisos.add(PermisoSistema.objects.get(nombre=permiso_nombre)) for permiso_nombre in form.cleaned_data['permisos']]
+                [rol.permisos.add(PermisoSistema.objects.get(descripcion=permiso_nombre)) for permiso_nombre in form.cleaned_data['permisos']]
             except RolSistema.DuplicateEntry:
                 status = 422
                 form.add_error("nombre", "Ya existe un rol con ese nombre")

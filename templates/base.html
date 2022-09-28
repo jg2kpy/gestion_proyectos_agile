@@ -17,7 +17,7 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
     <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}"/>
     <!-- Core theme CSS (includes Bootstrap)-->
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <!-- Material Icons-->
@@ -59,11 +59,11 @@
                 </li>
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
-                        data-bs-target="#us-collapse" aria-expanded="false">
+                        data-bs-target="#us-collapse" aria-expanded="true">
                         <i class="material-icons  align-text-bottom">checklist</i>
                         Historias de Usuario
                     </button>
-                    <div class="collapse" id="us-collapse">
+                    <div class="collapse show" id="us-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                             {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
                             {% tiene_permiso_en_proyecto user 'pro_eliminarTipoUS' proyecto as pro_eliminarTipoUS %}

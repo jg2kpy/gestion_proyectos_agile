@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
 
+from historias_usuario.models import EtapaHistoriaUsuario, TipoHistoriaUsusario
+
 from .models import Proyecto
 from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
@@ -131,6 +133,27 @@ def crear_proyecto(request):
                 scrum_master.roles_proyecto.add(RolProyecto.objects.get(
                     nombre="Scrum Master", proyecto=proyecto))
                 scrum_master.save()
+
+                tipos = TipoHistoriaUsusario.objects.filter(proyecto__isnull=True)
+
+                for tipo in tipos:
+                    tipo_nuevo = TipoHistoriaUsusario()
+                    tipo_nuevo.nombre = tipo.nombre
+                    tipo_nuevo.descripcion = tipo.descripcion
+                    tipo_nuevo.proyecto = proyecto
+                    tipo_nuevo.save()
+
+                    etapas = EtapaHistoriaUsuario.objects.filter(TipoHistoriaUsusario=tipo)
+                    for etapa in etapas:
+                        etapa_nuevo = EtapaHistoriaUsuario()
+                        etapa_nuevo.nombre = etapa.nombre
+                        etapa_nuevo.descripcion = etapa.descripcion
+                        etapa_nuevo.orden = etapa.orden
+                        etapa_nuevo.TipoHistoriaUsusario_id = tipo_nuevo.id
+                        etapa_nuevo.save()
+                    
+                    tipo_nuevo.save()
+
             except Exception as e:
                 return HttpResponse('Error al crear el proyecto', status=500)
 
@@ -312,7 +335,7 @@ def crear_rol_proyecto(request):
 
 # Ver la informacion de un rol de un proyecto en especifico
 @never_cache
-def ver_rol_proyecto(request, id_rol_proyecto):
+def ver_rol_proyecto(request, id_proyecto, id_rol_proyecto):
     """Ver rol de proyecto
     Renderiza la pagina para ver un rol de proyecto, recibe el id del rol de proyecto y muestra la informacion del rol de proyecto
     trae los permisos asociados con el rol indicado
@@ -348,7 +371,7 @@ def ver_rol_proyecto(request, id_rol_proyecto):
 
 # Modificar un rol de un proyecto
 @ never_cache
-def modificar_rol_proyecto(request, id_rol_proyecto):
+def modificar_rol_proyecto(request, id_proyecto, id_rol_proyecto):
     """Modificar rol de proyecto
     Renderiza la pagina para modificar un rol de proyecto, recibe una llamada POST con los datos del rol de proyecto,
     trae los permisos de la base de datos los modifica y guarda el rol de proyecto.
@@ -419,7 +442,7 @@ def modificar_rol_proyecto(request, id_rol_proyecto):
 
 # Eliminar un rol de un proyecto
 @ never_cache
-def eliminar_rol_proyecto(request, id_rol_proyecto):
+def eliminar_rol_proyecto(request, id_proyecto, id_rol_proyecto):
     """Eliminar rol de proyecto
     Elimina un rol de proyecto, recibe el id del rol de proyecto a eliminar y lo elimina de la base de datos
 
@@ -639,9 +662,12 @@ def importar_rol(request, id_proyecto):
                 nombre=request.GET.get('proyectos'))
             roles = RolProyecto.objects.filter(proyecto=proyecto)
         else:  # Este es el GET cuando se llama desde otra pagina
+            roles = None
             if proyectos.count() == 0:
-                return redirect('proyectos')
-            proyecto = proyectos[0]
-            roles = RolProyecto.objects.filter(proyecto=proyectos[0])
+                proyecto_seleccionado = None
+            else:
+                proyecto_seleccionado = proyectos[0]
+                roles = RolProyecto.objects.filter(proyecto=proyectos[0])
+            
 
-    return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto, 'roles': roles, 'proyecto': proyecto})
+    return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'roles': roles, 'proyecto': proyecto})

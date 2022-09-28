@@ -23,7 +23,7 @@ class TipoHistoriaUsusario(models.Model):
     """
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
-    proyecto = models.ForeignKey(Proyecto, related_name='tiposHistoriaUsuario', on_delete=models.CASCADE)
+    proyecto = models.ForeignKey(Proyecto, related_name='tiposHistoriaUsuario', on_delete=models.CASCADE, null=True)
 
     class Meta:
         constraints = [

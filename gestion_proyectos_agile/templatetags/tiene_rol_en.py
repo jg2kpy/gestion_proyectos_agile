@@ -143,7 +143,7 @@ def siguente_etapa(historia):
     :return: Se retorna el nombre de la siguente etapa o en caso de ser la ultima, se retorna 'terminado'
     :rtype: str
     """
-    siguiente = historia.etapa.orden + 1 if historia.etapa else 1
+    siguiente = historia.etapa.orden + 1 if historia.etapa else 0
     return historia.tipo.etapas.all()[siguiente].nombre if siguiente < historia.tipo.etapas.count() else 'terminado'
 
 
