@@ -24,6 +24,7 @@
                     <th>Etapa</th>
                     <th>User Points</th>
                     <th>Business Value</th>
+                    <th>Fecha modificación</th>
                     <th>Usuario</th>
                     {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
                         <th>Acciones</th>
@@ -37,6 +38,7 @@
                     <td>{{ historia.etapa }}</td>
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
+                    <td>{{ historia.fecha_modificacion|date:'Y-M-d' }}</td>
                     <td>{{ historia.usuarioAsignado }}</td>
                     <td>
                         {% if historia.estado == historia.Estado.ACTIVO %}
