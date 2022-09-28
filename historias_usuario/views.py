@@ -306,7 +306,7 @@ def moverSiguienteEtapa(request, id_proyecto, id_historia):
 
     if request.method == 'POST':
         historia.guardarConHistorial()
-        sigOrden = historia.etapa.orden + 1 if historia.etapa else 1
+        sigOrden = historia.etapa.orden + 1 if historia.etapa else 0
         if sigOrden == historia.tipo.etapas.count():
             historia.estado = HistoriaUsuario.Estado.TERMINADO
         else:
@@ -461,8 +461,7 @@ def crear_historiaUsuario(request, proyecto_id):
                 status = 422
             else:
                 historia.proyecto = proyecto
-                historia.etapa = historia.tipo.etapas.get(
-                    orden=0, TipoHistoriaUsusario=historia.tipo)
+                historia.etapa = None
 
                 historia.save()
                 archivosSubidos = request.FILES.getlist('archivo')
@@ -480,7 +479,7 @@ def crear_historiaUsuario(request, proyecto_id):
             status = 422
     else:
         tipos = [(tipo.id, tipo.nombre) for tipo in proyecto.tiposHistoriaUsuario.all()]
-        usuarios = [(usuario.id, usuario.email) for usuario in proyecto.usuario.all()]
+        usuarios = [(usuario.id, f"{usuario.get_full_name()} ({usuario.email})") for usuario in proyecto.usuario.all()]
         form = HistoriaUsuarioForm()
         form.set_tipos_usuarios(tipos, usuarios)
         archivoForm = SubirArchivoForm()
@@ -577,7 +576,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
     else:
-        usuarios = [(usuario.id, usuario.email) for usuario in proyecto.usuario.all()]
+        usuarios = [(usuario.id, f"{usuario.get_full_name()} ({usuario.email})") for usuario in proyecto.usuario.all()]
         form = HistoriaUsuarioEditarForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion,
                                                   'bv': historia.bv, 'up': historia.up, 'usuarioAsignado': historia.usuarioAsignado})
         form.set_usuarios(usuarios)
@@ -669,7 +668,7 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
         historia.restaurarDelHistorial(versionPrevia)
 
     volver_a = request.session['cancelar_volver_a']
-    return render(request, 'historias/historial.html', {"volver_a": volver_a, 'proyecto': proyecto, 'version_ori': historia_id, 'versiones': historia.obtenerVersiones()}, status=200)
+    return render(request, 'historias/historial.html', {"volver_a": volver_a, 'proyecto': proyecto, 'version_ori': historia, 'versiones': historia.obtenerVersiones()}, status=200)
 
 
 @ never_cache

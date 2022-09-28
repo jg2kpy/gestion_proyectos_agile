@@ -56,7 +56,7 @@
                 <p>¿Esta a punto de borrar el archivo {{ archivo.nombre }}, quiere continuar?</p>
             </div>
             <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
             <form method="post" action="{% url 'ver_archivos' proyecto.id historia.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="archivo_id" value="{{ archivo.id }}">

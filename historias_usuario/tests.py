@@ -237,7 +237,7 @@ class HistoriasUsuarioTest(TestCase):
                 'usuarioAsignado': Usuario.objects.get(email='testemail@example.com').id
             }, follow=True)
 
-        for _ in range(3):
+        for _ in range(4):
             actual = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
             res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{actual.id}/", follow=True)
             self.assertEqual(res.status_code, 200)
@@ -259,6 +259,7 @@ class HistoriasUsuarioTest(TestCase):
         creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
         res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", follow=True)
         self.assertEqual(res.status_code, 200)
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", follow=True)
 
         movido = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
         self.assertEqual(movido.etapa.nombre, 'Etapa 2', f'La historia de usuario no se movió. Está en etapa: {movido.etapa.nombre}')
