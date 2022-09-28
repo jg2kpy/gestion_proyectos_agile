@@ -668,6 +668,10 @@ def importar_rol(request, id_proyecto):
             else:
                 proyecto_seleccionado = proyectos[0]
                 roles = RolProyecto.objects.filter(proyecto=proyectos[0])
-            
+        
+        if roles:
+            rolesPropios = RolProyecto.objects.filter(proyecto=id_proyecto).values_list('nombre', flat=True)
+            roles = roles.exclude(nombre__in=rolesPropios)
+
 
     return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'roles': roles, 'proyecto': proyecto})
