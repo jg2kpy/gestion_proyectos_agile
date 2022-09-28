@@ -106,7 +106,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                 <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
                     {% csrf_token %}
-                    <input type="submit" class="btn btn-danger" value="Continuar">
+                    <input type="submit" class="btn btn-danger" value="Confirmar">
                     <input type="hidden" name="url" value="{{ request.path }}">
                 </form>
                 
