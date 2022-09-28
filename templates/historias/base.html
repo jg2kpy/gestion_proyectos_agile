@@ -3,7 +3,12 @@
 {% block contenido %}
 {% load tiene_rol_en %}
 
-<div class="container">
+<div>
+    <style>
+        thead input {
+            width: 100%;
+        }
+    </style>
     <div class="row">
         <div class="col-md-12">
             <h1>{{ titulo }}</h1>
@@ -17,7 +22,7 @@
         </div>
     </div>
     <div class="row">
-        <table class="table table-striped">
+        <table class="table table-striped" id="tablaHistorias" style="width:100%">
             <thead>
                 <tr>
                     <th>Nombre</th>
@@ -162,4 +167,60 @@
 
     {% endfor %}
 </div>
+<script>
+    $(document).ready(function () {
+        $('#tablaHistorias thead tr')
+            .clone(true)
+            .addClass('filters')
+            .appendTo('#tablaHistorias thead');
+        $('#tablaHistorias').DataTable({
+            paging: false,
+            orderCellsTop: true,
+            fixedHeader: true,
+            initComplete: function () {
+                var api = this.api();
+                api
+                    .columns()
+                    .eq(0)
+                    .each(function (colIdx) {
+                        var cell = $('.filters th').eq(
+                            $(api.column(colIdx).header()).index()
+                        );
+                        var title = $(cell).text();
+                        $(cell).html('<input type="text" placeholder="' + title + '" />');
+    
+                        $(
+                            'input',
+                            $('.filters th').eq($(api.column(colIdx).header()).index())
+                        )
+                            .off('keyup change')
+                            .on('change', function (e) {
+                                $(this).attr('title', $(this).val());
+                                var regexr = '({search})';
+    
+                                var cursorPosition = this.selectionStart;
+                                api
+                                    .column(colIdx)
+                                    .search(
+                                        this.value != ''
+                                            ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                            : '',
+                                        this.value != '',
+                                        this.value == ''
+                                    )
+                                    .draw();
+                            })
+                            .on('keyup', function (e) {
+                                e.stopPropagation();
+    
+                                $(this).trigger('change');
+                                $(this)
+                                    .focus()[0]
+                                    .setSelectionRange(cursorPosition, cursorPosition);
+                            });
+                    });
+            },
+        });
+    });
+</script>
 {% endblock %}
