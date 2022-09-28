@@ -273,7 +273,7 @@ def importar_tipoUS(request, proyecto_id):
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'tipos-us/importar_tipo.html', {"volver_a": volver_a, 'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
 
-def moverSiguienteEtapa(request, id_proyecto, id_historia):
+def moverEtapa(request, id_proyecto, id_historia):
     """
     Mover historia de usuario a la siguiente etapa
 
@@ -306,14 +306,21 @@ def moverSiguienteEtapa(request, id_proyecto, id_historia):
 
     if request.method == 'POST':
         historia.guardarConHistorial()
-        sigOrden = historia.etapa.orden + 1 if historia.etapa else 0
-        if sigOrden == historia.tipo.etapas.count():
-            historia.estado = HistoriaUsuario.Estado.TERMINADO
+        if 'siguiente' in request.POST:
+            sigOrden = historia.etapa.orden + 1 if historia.etapa else 0
+            if sigOrden == historia.tipo.etapas.count():
+                historia.estado = HistoriaUsuario.Estado.TERMINADO
+            else:
+                sigEtapa = EtapaHistoriaUsuario.objects.get(
+                    orden=sigOrden, TipoHistoriaUsusario=historia.tipo)
+                historia.etapa = sigEtapa
         else:
-            sigEtapa = EtapaHistoriaUsuario.objects.get(
-                orden=sigOrden, TipoHistoriaUsusario=historia.tipo)
-            historia.etapa = sigEtapa
+            antOrden = historia.etapa.orden - 1 if historia.etapa and historia.etapa.orden > 1 else 0
 
+            antEtapa = EtapaHistoriaUsuario.objects.get(
+                orden=antOrden, TipoHistoriaUsusario=historia.tipo)
+            historia.etapa = antEtapa
+    
         historia.save()
 
         return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', id_proyecto)
