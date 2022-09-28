@@ -60,19 +60,20 @@
                     <td>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal"
                                 data-bs-target="#modalVer{{ historia.id }}"><span 
-                                class="material-icons">visibility</span>
+                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver proyecto">visibility</span>
                             </button>
                         {% if historia.estado == historia.Estado.ACTIVO %}
 
                             {% tiene_permiso_en_proyecto user 'pro_modificarUS' proyecto as pro_modificarUS %}
                             {% if pro_modificarUS %}
                                 <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
-                                class="material-icons">create</span></a>
+                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar proyecto">create</span></a>
                             {% endif %}
 
                             {% tiene_permiso_en_proyecto user 'pro_cancelarUS' proyecto as pro_cancelarUS %}
                             {% if pro_cancelarUS %}
-                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">cancel</span></button>
+                                <button type="button" data-toggle="tooltip" data-placement="top" title="Cancelar proyecto" 
+                                class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">cancel</span></button>
                             {% endif %}
 
                             {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
