@@ -58,9 +58,19 @@
                                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                                         {% if master or us.usuarioAsignado == user %}
                                             {% if us.etapa.orden != 0 %}
-                                                <a href="#modalEtapaAnterior{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalEtapaAnterior{{ us.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a etapa anterior">arrow_back</span></a>
+                                                <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_anterior">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="url" value="{{ request.path }}">
+                                                    <input type="hidden" name="anterior" value="anterior">
+                                                    <a href="javascript:{}" onclick="document.getElementById('form_anterior').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa anterior">arrow_back</span></a>
+                                                </form>
                                             {% endif %}
-                                            <a href="#modalEtapaSiguiente{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalEtapaSiguiente{{ us.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a siguiente etapa">arrow_forward</span></a>
+                                            <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_siguiente">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="url" value="{{ request.path }}">
+                                                <input type="hidden" name="siguiente" value="siguiente">
+                                                <a href="javascript:{}" onclick="document.getElementById('form_siguiente').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa siguiente">arrow_forward</span></a>
+                                            </form>
                                         {% endif %}
                                     </div>
                                     {% else %}
