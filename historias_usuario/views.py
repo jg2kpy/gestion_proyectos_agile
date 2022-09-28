@@ -305,16 +305,8 @@ def moverEtapa(request, id_proyecto, id_historia):
 
     if request.method == 'POST':
         historia.guardarConHistorial()
-        sigOrden = historia.etapa.orden + 1 if historia.etapa else 0
-        if sigOrden == historia.tipo.etapas.count():
-            historia.estado = HistoriaUsuario.Estado.TERMINADO
-        else:
-            sigEtapa = EtapaHistoriaUsuario.objects.get(
-                orden=sigOrden, TipoHistoriaUsusario=historia.tipo)
-            historia.etapa = sigEtapa
-
         if 'siguiente' in request.POST:
-            sigOrden = historia.etapa.orden + 1 if historia.etapa else 1
+            sigOrden = historia.etapa.orden + 1 if historia.etapa else 0
             if sigOrden == historia.tipo.etapas.count():
                 historia.estado = HistoriaUsuario.Estado.TERMINADO
             else:
