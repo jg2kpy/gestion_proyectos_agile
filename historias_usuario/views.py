@@ -252,23 +252,27 @@ def importar_tipoUS(request, proyecto_id):
                     etapa_nueva.TipoHistoriaUsusario = tipoUS_nuevo
                     etapa_nueva.save()
 
-                return redirect('tiposHistoriaUsuario', proyecto_id=proyecto_id)
-
             else:
                 mensaje = 'Ya existe un tipo de historia de usuario con ese nombre'
 
+        if not mensaje:
+            return redirect('tiposHistoriaUsuario', proyecto_id=proyecto_id)
+
     proyectos = Proyecto.objects.exclude(id=proyecto_id)
-    if request.method == 'GET':
-        if request.GET.get('proyectos'):
-            proyecto_seleccionado = Proyecto.objects.get(
-                nombre=request.GET.get('proyectos'))
-            tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyecto_seleccionado)
-        elif proyectos.count() > 0:
-            proyecto_seleccionado = proyectos[0]
-            tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyecto_seleccionado)
-        else:
-            proyecto_seleccionado = None
-            tipos = None
+    if request.GET.get('proyectos'):
+        proyecto_seleccionado = Proyecto.objects.get(
+            nombre=request.GET.get('proyectos'))
+        tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyecto_seleccionado)
+    elif proyectos.count() > 0:
+        proyecto_seleccionado = proyectos[0]
+        tipos = TipoHistoriaUsusario.objects.filter(proyecto=proyecto_seleccionado)
+    else:
+        proyecto_seleccionado = None
+        tipos = None
+    
+    if tipos:
+        tiposPropios = TipoHistoriaUsusario.objects.filter(proyecto=proyecto_id).values_list('nombre', flat=True)
+        tipos = tipos.exclude(nombre__in=tiposPropios)
 
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'tipos-us/importar_tipo.html', {"volver_a": volver_a, 'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'tipos': tipos, 'proyecto': proyecto, "mensaje": mensaje})
