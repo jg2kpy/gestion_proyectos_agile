@@ -243,6 +243,9 @@
                             });
                     });
             },
+            "drawCallback": function( settings ) {
+                $('body').tooltip({selector: '[data-toggle="tooltip"]'});
+            }
         });
     });
 </script>
