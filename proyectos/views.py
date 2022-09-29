@@ -205,6 +205,17 @@ def editar_proyecto(request, proyecto_id):
                 proyecto = Proyecto.objects.get(id=proyecto_id)
                 proyecto.nombre = form.cleaned_data['nombre']
                 proyecto.descripcion = form.cleaned_data['descripcion']
+
+                proyecto.scrumMaster.roles_proyecto.remove(RolProyecto.objects.get(
+                    nombre="Scrum Master", proyecto=proyecto))
+
+                id_scrum_master = form.cleaned_data['scrum_master']
+                scrum_master = Usuario.objects.get(id=id_scrum_master)
+
+                scrum_master.roles_proyecto.add(RolProyecto.objects.get(
+                    nombre="Scrum Master", proyecto=proyecto))
+
+                proyecto.scrumMaster = scrum_master
                 proyecto.save()
                 return redirect('proyectos')
             except Exception as e:
