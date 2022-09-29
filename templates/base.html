@@ -120,12 +120,17 @@
                                     Miembros
                                 </a>
                             </li>
+                            {% tiene_permiso_en_proyecto user 'pro_crearRolProyecto' proyecto as pro_crearRolProyecto %}
+                            {% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
+                            {% tiene_permiso_en_proyecto user 'pro_importarRolProyecto' proyecto as pro_importarRolProyecto %}
+                            {% if pro_crearRolProyecto or pro_editarRolProyecto or pro_importarRolProyecto %}
                             <li>
                                 <a href="{% url 'roles_de_proyecto' proyecto.id %}" class="link-dark rounded">
                                     <i class="material-icons  align-text-bottom">manage_accounts</i>
                                     Roles de proyecto
                                 </a>
                             </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </li>

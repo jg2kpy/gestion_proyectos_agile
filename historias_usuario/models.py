@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -140,8 +141,8 @@ class HistoriaUsuario(models.Model):
     tipo = models.ForeignKey(TipoHistoriaUsusario, related_name='historias', on_delete=models.PROTECT)
     versionPrevia = models.ForeignKey('HistoriaUsuario', related_name='versionSiguiente',
                                       blank=True, null=True, on_delete=models.PROTECT)
-    up = models.IntegerField(blank=False)
-    bv = models.IntegerField(blank=False)
+    up = models.IntegerField(blank=False, default=0)
+    bv = models.IntegerField(blank=False, default=0)
     usuarioAsignado = models.ForeignKey('usuarios.Usuario', related_name='usuarioAsignado',
                                         blank=True, null=True, on_delete=models.SET_NULL)
     proyecto = models.ForeignKey(Proyecto, related_name='backlog', on_delete=models.PROTECT)

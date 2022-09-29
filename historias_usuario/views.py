@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from proyectos.models import Proyecto
 from .models import *
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
-from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, SubirArchivoForm, TipoHistoriaUsuarioForm
+from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, HistoriaUsuarioProductOwnerForm, SubirArchivoForm, TipoHistoriaUsuarioForm
 
 
 @never_cache
@@ -456,7 +456,7 @@ def crear_historiaUsuario(request, proyecto_id):
     except Proyecto.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
-    if not tiene_permiso_en_proyecto(request.user, "pro_cargarUSalBacklog", proyecto):
+    if not tiene_permiso_en_proyecto(request.user, "pro_cargarUSalBacklog", proyecto) and not tiene_permiso_en_proyecto(request.user, "pro_verproyecto", proyecto):
         return HttpResponseRedirect("/", status=422)
 
     status = 200
@@ -489,11 +489,16 @@ def crear_historiaUsuario(request, proyecto_id):
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
     else:
+        archivoForm = None
         tipos = [(tipo.id, tipo.nombre) for tipo in proyecto.tiposHistoriaUsuario.all()]
-        usuarios = [(usuario.id, f"{usuario.get_full_name()} ({usuario.email})") for usuario in proyecto.usuario.all()]
-        form = HistoriaUsuarioForm()
-        form.set_tipos_usuarios(tipos, usuarios)
-        archivoForm = SubirArchivoForm()
+        if tiene_permiso_en_proyecto(request.user, "pro_verproyecto", proyecto):
+            form = HistoriaUsuarioProductOwnerForm()
+            form.set_tipos(tipos)
+        else:
+            usuarios = [(usuario.id, f"{usuario.get_full_name()} ({usuario.email})") for usuario in proyecto.usuario.all()]
+            form = HistoriaUsuarioForm()
+            form.set_tipos_usuarios(tipos, usuarios)
+            archivoForm = SubirArchivoForm()
 
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'historias/crear_historia.html', {"volver_a": volver_a, 'form': form, 'archivo_form': archivoForm, 'proyecto': proyecto}, status=status)
