@@ -30,7 +30,7 @@ def tiposHistoriaUsuario(request, proyecto_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not tiene_permiso_en_proyecto(request.user, "pro_crearTipoUS", proyecto):
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para gestionar tipos de historias de usuario'}, status=403)
 
     request.session['cancelar_volver_a'] = request.path
     return render(request, 'tipos-us/base.html', {'tipos': TipoHistoriaUsusario.objects.filter(proyecto=proyecto), 'proyecto': proyecto})
@@ -56,7 +56,7 @@ def crear_tipoHistoriaUsuario(request, proyecto_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not tiene_permiso_en_proyecto(request.user, "pro_crearTipoUS", proyecto):
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear tipos de historias de usuario'}, status=403)
 
     status = 200
     formset_factory = inlineformset_factory(
@@ -120,7 +120,7 @@ def borrar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
 
     if not tiene_permiso_en_proyecto(request.user, "pro_eliminarTipoUS", proyecto):
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para eliminar tipos de historias de usuario'}, status=403)
 
     status = 200
     if request.method == 'POST':
@@ -158,7 +158,7 @@ def editar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
 
     if not tiene_permiso_en_proyecto(request.user, "pro_crearTipoUS", proyecto):
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para editar tipos de historias de usuario'}, status=403)
 
     status = 200
     formset_factory = inlineformset_factory(
@@ -306,7 +306,7 @@ def moverEtapa(request, proyecto_id, historia_id):
         return render(request, '404.html', {'info_adicional': "No se encontró la historia de usuario."}, status=404)
 
     if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto) and not historia.usuarioAsignado == request.user:
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para mover historias de usuario'}, status=403)
 
     if request.method == 'POST':
         historia.guardarConHistorial()
@@ -353,7 +353,7 @@ def historiaUsuarioBacklog(request, proyecto_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not proyecto.usuario.filter(id=request.user.id).exists():
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No pertenece a este proyecto, no tiene permisos para ver este backlog'}, status=403)
 
     request.session['cancelar_volver_a'] = request.path
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=None, estado=HistoriaUsuario.Estado.ACTIVO).order_by('nombre'), 'proyecto': proyecto, 'esBacklog': True, 'titulo': 'Backlog'})
@@ -379,7 +379,7 @@ def historiaUsuarioCancelado(request, proyecto_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not proyecto.usuario.filter(id=request.user.id).exists():
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No pertenece a este proyecto, no tiene permisos para ver estas historias canceladas'}, status=403)
 
     request.session['cancelar_volver_a'] = request.path
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.CANCELADO).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Historias Canceladas'})
@@ -405,7 +405,7 @@ def historiaUsuarioTerminado(request, proyecto_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not proyecto.usuario.filter(id=request.user.id).exists():
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No pertenece a este proyecto, no tiene permisos para ver estas historias terminadas'}, status=403)
 
     request.session['cancelar_volver_a'] = request.path
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.TERMINADO).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Historias Terminadas'})
@@ -431,7 +431,7 @@ def historiaUsuarioAsignado(request, proyecto_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not proyecto.usuario.filter(id=request.user.id).exists():
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No pertenece a este proyecto, no tiene permisos para ver estas historias'}, status=403)
 
     request.session['cancelar_volver_a'] = request.path
     return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.ACTIVO, usuarioAsignado=request.user).order_by('nombre'), 'proyecto': proyecto, 'titulo': 'Mis Historias'})
@@ -457,7 +457,7 @@ def crear_historiaUsuario(request, proyecto_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not tiene_permiso_en_proyecto(request.user, "pro_cargarUSalBacklog", proyecto) and not tiene_permiso_en_proyecto(request.user, "pro_verproyecto", proyecto):
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para cargar una historia de usuario al backlog'}, status=403)
 
     status = 200
     if request.method == 'POST':
@@ -526,7 +526,7 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not tiene_permiso_en_proyecto(request.user, "pro_cancelarUS", proyecto):
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'NO tiene permisos para cancelar una historia de usuario'}, status=403)
 
     try:
         historia = HistoriaUsuario.objects.get(id=historia_id)
@@ -567,7 +567,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not tiene_permiso_en_proyecto(request.user, "pro_modificarUS", proyecto):
-        return HttpResponseRedirect("/", status=422)
+        return render(request, '403.html', {'info_adicional': 'NO tiene permisos para modificar una historia de usuario'}, status=403)
 
     try:
         historia = HistoriaUsuario.objects.get(id=historia_id)
@@ -714,7 +714,7 @@ def verTablero(request, proyecto_id, tipo_id):
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not proyecto.usuario.filter(id=request.user.id).exists():
-        return render(request, '403.html', {'info_adicional': 'No tiene permisos para ver tableros de tipos de historias de usuario en este proyecto'}, status=403)
+        return render(request, '403.html', {'info_adicional': 'No pertenece a este proyecto, no tiene permisos para ver tableros de tipos de historias de usuario en este proyecto'}, status=403)
 
     try:
         tipo = TipoHistoriaUsusario.objects.get(id=tipo_id)
@@ -756,7 +756,7 @@ def ver_archivos(request, proyecto_id, historia_id):
         return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
 
     if not proyecto.usuario.filter(id=request.user.id).exists():
-        return render(request, '403.html', {'info_adicional': "No tiene permisos para ver estos archivos."}, status=403)
+        return render(request, '403.html', {'info_adicional': "No pertenece a este proyecto, no tiene permisos para ver estos archivos."}, status=403)
 
     status = 200
     archivoForm = SubirArchivoForm(request.POST, request.FILES)
