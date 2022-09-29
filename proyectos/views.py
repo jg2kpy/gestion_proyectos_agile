@@ -479,7 +479,7 @@ def eliminar_rol_proyecto(request, proyecto_id, id_rol_proyecto):
             return render(request, 'proyectos/roles_proyecto/roles_proyecto.html', {'roles_proyecto': RolProyecto.objects.all(), 'usuario': request.user})
         else:
             return redirect('roles_de_proyecto', proyecto_id=proyecto.id)
-    return render(request, 'proyectos/roles_proyecto/eliminar_rol_proyecto.html', {'rol_proyecto': RolProyecto.objects.get(id=id_rol_proyecto), 'proyecto': proyecto})
+    return redirect('roles_de_proyecto', proyecto_id=proyecto.id)
 
 
 # Ver roles asignados a un proyecto

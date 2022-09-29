@@ -133,7 +133,7 @@ def borrar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
         return redirect(request.session['cancelar_volver_a'] or 'tiposHistoriaUsuario', proyecto_id=proyecto_id)
 
     volver_a = request.session['cancelar_volver_a']
-    return render(request, 'tipos-us/eliminar_tipo.html', {"volver_a": volver_a, 'tipo': tipo, 'proyecto': proyecto, }, status=status)
+    return redirect(request.session['cancelar_volver_a'] or 'tiposHistoriaUsuario', proyecto_id=proyecto_id)
 
 
 @never_cache

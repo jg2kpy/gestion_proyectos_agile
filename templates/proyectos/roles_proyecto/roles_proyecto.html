@@ -46,10 +46,11 @@
                         {% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
                         {% if pro_editarRolProyecto %}
                         <a href="{% url 'modificar_rol_proyecto' proyecto.id rol_proyecto.id %}" class="btn btn-link"><span
-                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Modificar rol de proyecto">create</span></a>
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Modificar rol de proyecto">create</span></a>
                         {% if not rol_proyecto.nombre == 'Scrum Master' %}
-                        <a href="{% url 'eliminar_rol_proyecto' proyecto.id rol_proyecto.id %}" class="btn btn-link"><span
-                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar rol de proyecto">delete</span></a>
+                        <a class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ rol_proyecto.id }}"><span 
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar rol de proyecto">
+                            delete</span></a>
                         {% endif %}
                         {% endif %}
                     </td>
@@ -60,5 +61,31 @@
             </tbody>
     </div>
 </div>
-
+{% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
+{% if pro_editarRolProyecto %}
+{% for rol_proyecto in roles_proyecto %}
+<!-- Modal -->
+<div class="modal fade" id="modalEliminar{{rol_proyecto.id}}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="cancelarModal">Eliminar rol de proyecto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p>Esta a punto de eliminar el rol de proyecto {{ rol_proyecto.nombre }}, ¿quiere continuar?</p>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+        <form method="post" action="{% url 'eliminar_rol_proyecto' proyecto.id rol_proyecto.id %}">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-danger" value="Eliminar rol">
+            <input type="hidden" name="url" value="{{ request.path }}">
+        </form>
+        </div>
+    </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
 {% endblock %}
