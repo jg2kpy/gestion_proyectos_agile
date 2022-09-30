@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Crear historia de usuario{% endblock %}
+{% block contenido %}
+<div class="row">
+    <div class="col-lg-2 col-md-1">
+    </div>
+    <div class="col-lg-8 col-md-10">
+        <h3>Nueva historia de usuario</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_form_errors }}
+            {{ form.as_p }}
+            {{ archivo_form.as_p }}
+            <input type="submit" class="btn btn-primary" value="Guardar">
+            <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

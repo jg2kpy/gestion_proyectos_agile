@@ -3,39 +3,15 @@ from django.shortcuts import render, redirect
 from django.forms import ModelForm
 from django.views.decorators.cache import never_cache
 
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
+from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
 from proyectos.models import Proyecto
 from usuarios.models import RolProyecto, Usuario
 from .models import PermisoSistema, Usuario
 
 from usuarios.models import RolSistema, Usuario
-from django import forms
 from django.shortcuts import redirect
 
-# Crea forms
-
-class RolSistemaForm(forms.Form):
-    """
-        Formulario para crear un rol de sistema
-
-        :param nombre: Nombre del rol de sistema
-        :type nombre: Texto
-        :param descripcion: Descripcion del rol de sistema
-        :type descripcion: Texto
-        :param permisos: Permisos del rol de sistema
-        :type permisos: Lista de permisos
-
-        :return: Formulario para crear un rol de sistema
-        :rtype: Formulario
-    """
-    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
-    permisos = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple())
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['permisos'].queryset = PermisoSistema.objects.all()
-
+from usuarios.forms import RolSistemaForm, UsuarioForm
 
 @never_cache
 def rol_global_list(request):
@@ -53,7 +29,7 @@ def rol_global_list(request):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponseRedirect('Usuario no autenticado', status=401)
+        return render(request, '401.html', status=401)
 
     if request.POST.get('accion') == 'eliminar':
         try:
@@ -68,7 +44,7 @@ def rol_global_list(request):
 
     else:
         roles = RolSistema.objects.all()
-        return render(request, 'rol_global/rol_global_list.html', {'roles': roles}, status=status)
+        return render(request, 'rol_global/base.html', {'roles': roles}, status=status)
 
 
 @never_cache
@@ -87,7 +63,7 @@ def rol_global_crear(request):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponseRedirect('Usuario no autenticado', status=401)
+        return render(request, '401.html', status=401)
 
     if request.method == 'POST':
         form = RolSistemaForm(request.POST)
@@ -98,7 +74,7 @@ def rol_global_crear(request):
             rol.descripcion = form.cleaned_data['descripcion']
             try:
                 rol.save()
-                [rol.permisos.add(PermisoSistema.objects.get(nombre=permiso_nombre)) for permiso_nombre in form.cleaned_data['permisos']]
+                [rol.permisos.add(PermisoSistema.objects.get(descripcion=permiso_nombre)) for permiso_nombre in form.cleaned_data['permisos']]
             except RolSistema.DuplicateEntry:
                 status = 422
                 form.add_error("nombre", "Ya existe un rol con ese nombre")
@@ -133,7 +109,7 @@ def rol_global_editar(request, id):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponseRedirect('Usuario no autenticado', status=401)
+        return render(request, '401.html', status=401)
     
     try:
         rol = RolSistema.objects.get(id=id)
@@ -188,7 +164,7 @@ def rol_global_usuarios(request, id):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponseRedirect('Usuario no autenticado', status=401)
+        return render(request, '401.html', status=401)
 
     try:
         rol = RolSistema.objects.get(id=id)
@@ -242,13 +218,13 @@ def vista_equipo(request, proyecto_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return render(request, '401.html', status=401)
 
     if Proyecto.objects.filter(id=proyecto_id).count() == 0:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
 
     if not request.user.equipo.filter(id=proyecto_id):
-        return HttpResponse('Usuario no pertenece al proyecto', status=403)
+        return render(request, '403.html', {'info_adicional': 'Usuario no pertenece al proyecto'}, status=403)
     
     proyecto = Proyecto.objects.get(id=proyecto_id)
 
@@ -298,7 +274,7 @@ def eliminar_miembro_proyecto(form, request_user, proyecto):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'/usuarios/{proyecto.id}')
+    return redirect('vista_equipo', proyecto_id=proyecto.id)
 
 
 def agregar_miembro_proyecto(request, form, request_user, proyecto):
@@ -321,7 +297,7 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto):
     """
 
     if not tiene_permiso_en_proyecto(request_user, "pro_asignarMiembros", proyecto):
-        return HttpResponse('Usuario no posee el permiso de realizar esta accion', status=403)
+        return render(request, '403.html', {'info_adicional': 'Usuario no posee el permiso de realizar esta accion'}, status=403)
 
     try:
         usuario_email = form.get('usuario_a_agregar')
@@ -329,7 +305,7 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto):
         usuario_a_agregar_miembro_proyecto = Usuario.objects.get(email=usuario_email)
 
         if usuario_a_agregar_miembro_proyecto.equipo.filter(id=proyecto.id).count() != 0:
-            return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario ya pertenece al proyecto', 'proyecto_id': proyecto_id}, status=422)
+            return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario ya pertenece al proyecto', 'proyecto': proyecto}, status=422)
 
         usuario_a_agregar_miembro_proyecto.equipo.add(proyecto)
         rol_proyecto = RolProyecto.objects.get(id=rol_id)
@@ -338,7 +314,7 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto):
     except Usuario.DoesNotExist:
         return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario no existe', 'proyecto': proyecto}, status=422)
 
-    return redirect(f'/usuarios/{proyecto.id}')
+    return redirect('vista_equipo', proyecto_id=proyecto.id)
 
 
 def eliminar_rol_proyecto(form, request_user, proyecto):
@@ -371,7 +347,7 @@ def eliminar_rol_proyecto(form, request_user, proyecto):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'/usuarios/{proyecto.id}')
+    return redirect('vista_equipo', proyecto_id=proyecto.id)
 
 
 def asignar_rol_proyecto(form, request_user, proyecto):
@@ -404,21 +380,7 @@ def asignar_rol_proyecto(form, request_user, proyecto):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
-    return redirect(f'/usuarios/{proyecto.id}')
-
-
-class UsuarioForm(ModelForm):
-    """
-    Clase que representa el formulario de usuario. Ver Django ModelForm documentación para más información.
-    """
-    class Meta:
-        model = Usuario
-        fields = ['email', 'first_name', 'last_name', 'direccion', 'telefono', 'avatar_url']
-
-    def __init__(self, *args, **kwargs):
-        super(UsuarioForm, self).__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
+    return redirect('vista_equipo', proyecto_id=proyecto.id)
 
 
 @never_cache
@@ -434,7 +396,7 @@ def perfil(request):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return HttpResponseRedirect("/", status=401)
+        return render(request, '401.html', status=401)
 
     status = 200
     if request.method == "POST":

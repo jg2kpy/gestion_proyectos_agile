@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Importar rol de proyecto{% endblock %}
 {% block contenido %}
 
 <!-- Formulario para modificar rol de proyectos Django forms -->
@@ -8,6 +9,7 @@
             <h1>Importar rol de un proyecto</h1>
         </div>
     </div>
+    {% if proyecto_seleccionado %}
     <div class="row">
         <div class="col-md-12">
             <form method="GET">
@@ -38,8 +40,16 @@
                 {% endfor %}
                 <input hidden name="proyecto_seleccionado" value="{{proyecto_seleccionado.id}}">
                 <button type="submit" class="btn btn-primary">Importar estos roles</button>
-                <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn btn-danger">Cancelar</a>
+                <a href="{% url 'roles_de_proyecto' proyecto.id %}" class="btn btn-secondary">Volver</a>
             </form>
         </div>
     </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <h3>No hay proyectos de cuales importar roles</h3>
+            </div>
+        </div>
+        <a href="{% url 'roles_de_proyecto' proyecto.id %}" class="btn btn-secondary">Volver</a>
+    {% endif %}
     {% endblock %}

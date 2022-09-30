@@ -58,4 +58,4 @@ class Sprint(models.Model):
         ]
 
     def __str__(self):
-        return self.nombre
+        return self.estado

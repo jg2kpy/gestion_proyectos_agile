@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Gestión de Proyectos Ágil{% endblock %}
+{% block contenido %}
+{% load gpa_tags %}
+
+<!-- Redirigir a home si no tiene los permisos para ver esta pantalla -->
+<div class="container">
+    {% if user.equipo.all %}
+    <div class="row">
+        <div class="col-md-12" style="text-align:center">
+            <h1>Mis Proyectos</h1>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <!-- Traemos en una tabla los proyectos -->
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Fecha de creación</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proyecto in user.equipo.all %}
+                <tr>
+                    <td>{{ proyecto.nombre }}</td>
+                    <td>{{ proyecto.descripcion }}</td>
+                    <td>{{ proyecto.fecha_creacion }}</td>
+                    <td>{{ proyecto.estado }}</td>
+                    <td>
+                        {% if proyecto.estado != 'Cancelado' %}
+                            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-link"><span
+                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver proyecto">visibility</span></a>
+                        {% else %}
+                        <a class="btn btn-link"><span
+                            class="material-icons"></span></a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br><br>
+    {% endif %}
+</div>
+<br>
+<!--Section: FAQ-->
+<div class="container">
+    <div class="row">
+        <section>
+        <h3 class="text-center mb-4 pb-2 text-primary fw-bold">FAQ
+            <a  class="btn btn-link"><span
+                class="material-icons" data-toggle="tooltip" data-placement="top"
+                title="Contactos" data-bs-toggle="modal" data-bs-target="#modalVer{{ rol.id }}">alternate_email</span></a>
+        </h3>
+        <!-- Modal -->
+        <div class="modal fade" id="modalVer{{ rol.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Contactos</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul>
+                        {% lista_adm as administradores %}
+                        {% for administrador in administradores %}
+                            {% if administrador.get_full_name %}
+                            <li style="margin-bottom: 25px;">{{ administrador.get_full_name }}: {{administrador.email}}</li>
+                            {% else %}
+                            <li style="margin-bottom: 25px;">{{administrador.email}}</li>
+                            {% endif %}
+                            {% endfor %}
+                        <ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Modal -->
+        <p class="text-center mb-5">
+            Consultas Frecuentes
+        </p>
+
+        <div class="row">
+            <div class="col-md-6 col-lg-4 mb-4">
+            <h6 class="mb-3 text-primary"><i class="far fa-paper-plane text-primary pe-2"></i> ¿Con quién puedo
+                contactarme?</h6>
+            <p>
+                Si no se encuentra en ningún proyecto, puede dar click en el símbolo <b>@</b> (arroba) para acceder a la lista de contactos.
+            </p>
+            <p>
+                En caso de tener alguna consulta respecto a un proyecto, debajo de <b>Mis Proyectos</b>, dar click en el ícono
+                presente bajo la columna <b>Acciones</b>, luego seleccione la opción <b>Miembros</b>. Por último, en la
+                lista de miembros busque <b>Scrum Master</b> y junto a ese tag podrá visualizar el nombre y correo del responsable.
+            </p>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+            <h6 class="mb-3 text-primary"><i class="fas fa-pen-alt text-primary pe-2"></i> ¿Cómo puedo editar
+                mi perfil?</h6>
+            <p>
+                Para editar su perfil, dé click en el menú vertical donde aparezca <b>Cuenta</b>. A continuación se desplegarán
+                dos opciones, seleccione la que tenga el nombre <b>Perfil</b>. Luego será redireccionado al menú de perfil donde
+                podrá realizar los cambios necesarios.
+            </p>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+            <h6 class="mb-3 text-primary"><i class="fas fa-user text-primary pe-2"></i> ¿Cómo accedo a un proyecto?
+            </h6>
+            <p>
+                Primero debe seleccionar el proyecto que quiere visualizar, para ello, debajo de <b>Mis Proyectos</b>, dar click en el ícono
+                presente bajo la columna <b>Acciones</b>. O en el menú vertical dar click a <b>Proyectos</b> y luego seleccione el proyecto
+                a querer visualizar.
+            </p>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+            <h6 class="mb-3 text-primary"><i class="fas fa-rocket text-primary pe-2"></i> ¿Cómo puedo ver las
+                historias que me corresponden?
+            </h6>
+            <p>
+                Una vez dentro del proyecto, puede visualizar las historias en forma de tablero dando
+                click a <b>Tablero</b> en el menú lateral y luego seleccionando un tablero entre las opciones desplegadas. Para visualizar en forma
+                de tabla, dar click a <b>Historias de Usuario</b> en el menú lateral y luego seleccione <b>Mis Historias</b>.
+            </p>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+            <h6 class="mb-3 text-primary"><i class="fas fa-home text-primary pe-2"></i> ¿Cómo cierro mi sesión?
+            </h6>
+            <p>
+                Para cerrar la sesión, dé click en el menú vertical donde aparezca <b>Cuenta</b>. A continuación se desplegarán
+                dos opciones, seleccione la que tenga el nombre <b>Cerrar Sesión</b>. Luego será redireccionado al menú de inicio
+                de sesión.
+            </p>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+            <h6 class="mb-3 text-primary"><i class="fas fa-book-open text-primary pe-2"></i> ¿Por qué no puedo visualizar mi historia?</h6>
+            <p>
+                Primero, dentro del proyecto dé click a <b>Historias de Usuario</b> en el menú vertical. Luego seleccione la opción <b>Historias
+                Terminadas</b> o intente seleccionar <b>Historias Canceladas</b>. Como última opción, comuníquese con el <b>Scrum Master</b>
+                en caso de haberse asignado a otro usuario u otro problema relacionado al proyecto.
+            </p>
+            </div>
+        </div>
+        </section>
+    </div>
+</div>
+<!--Section: FAQ-->
+{% endblock %}

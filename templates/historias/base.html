@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block title %}Historias{% endblock %}
+{% block contenido %}
+{% load gpa_tags %}
+
+<div>
+    <style>
+        thead input {
+            width: 100%;
+        }
+    </style>
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{{ titulo }}</h1>
+        </div>
+        <div>
+            {% tiene_permiso_en_proyecto user 'pro_cargarUSalBacklog' proyecto as pro_cargarUSalBacklog %}
+            {% if pro_cargarUSalBacklog and esBacklog %}
+                <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Agregar US al Product Backlog</a>
+            {% endif %}
+            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-striped" id="tablaHistorias" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
+                        <th>Etapa</th>
+                    {% elif titulo == 'Historias Terminadas' %}
+                        <th>Fecha de terminación</th>
+                    {% elif titulo == 'Historias Canceladas'%}
+                        <th>Fecha de cancelación</th>
+                    {% endif %}
+                    <th>User Points</th>
+                    <th>Business Value</th>
+                    <th>Encargado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for historia in historias %}
+                <tr>
+                    <td>{{ historia.nombre }}</td>
+                    {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
+                        {% if historia.etapa %}
+                            <td>{{ historia.etapa }}</td>
+                        {% else %}
+                            <td>Planificado</td>
+                        {% endif %}
+                    {% elif titulo == 'Historias Terminadas' %}
+                        <td>{{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}</td>
+                    {% elif titulo == 'Historias Canceladas'%}
+                        <td>{{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}</td>
+                    {% endif %}
+                    <td>{{ historia.up }}</td>
+                    <td>{{ historia.bv }}</td>
+                    {% if historia.usuarioAsignado %}
+                        <td>{{ historia.usuarioAsignado.get_full_name }}</td>
+                    {% else %}
+                        <td>AUN NO TIENE ENCARGADO</td>
+                    {% endif %}
+                    <td>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal"
+                                data-bs-target="#modalVer{{ historia.id }}"><span 
+                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver historia">visibility</span>
+                            </button>
+                        {% if historia.estado == historia.Estado.ACTIVO %}
+
+                            {% tiene_permiso_en_proyecto user 'pro_modificarUS' proyecto as pro_modificarUS %}
+                            {% if pro_modificarUS %}
+                                <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
+                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar historia">create</span></a>
+                            {% endif %}
+
+                            {% tiene_permiso_en_proyecto user 'pro_cancelarUS' proyecto as pro_cancelarUS %}
+                            {% if pro_cancelarUS %}
+                                <button type="button" data-toggle="tooltip" data-placement="top" title="Cancelar historia" 
+                                class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">cancel</span></button>
+                            {% endif %}
+
+                            {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+                            {% if master or historia.usuarioAsignado == user %}
+                                {% if not historia.etapa and historia.usuarioAsignado %}
+                                    <button href="#modalEtapa{{ historia.id }}" class="btn btn-link" data-bs-toggle="modal" 
+                                    data-bs-target="#modalEtapa{{ historia.id }}" data-toggle="tooltip" data-placement="top" 
+                                    title="Mover a la siguiente etapa"><span class="material-icons">arrow_forward</span></button>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                        <a class="btn btn-link" data-toggle="tooltip" data-placement="top" title="Ver historial" href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span 
+                            class="material-icons">history</span></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </div>
+    {% for historia in historias %}
+        <!-- Modal -->
+        <div class="modal fade" id="modal{{ historia.id }}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="cancelarModal">Cancelar Historia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Esta a punto de cancelar la historia de usuario {{ historia.nombre }}, ¿quiere continuar?</p>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-danger" value="Cancelar Historia">
+                    <input type="hidden" name="url" value="{{ request.path }}">
+                </form>
+                
+                </div>
+            </div>
+            </div>
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="modalVer{{ historia.id }}" tabindex="-1" aria-labelledby="verModal"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="verModal">{{ historia.nombre }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ historia.descripcion }}</p>
+                    <p>Creado: {{ historia.fecha_creacion|date:'Y-m-d H:i:s'}}</p>
+                    {% if historia.fecha_modificacion %}
+                    <p>Modificado: {{ historia.fecha_modificacion|date:'Y-m-d H:i:s'}}</p>
+                    {% endif %}
+                    <p>Tipo: {{ historia.tipo }}</p>
+                    {% if historia.etapa %}
+                        <p>Etapa: {{ historia.etapa }}</p>
+                    {% else %}
+                        <p>Planificado</p>
+                    {% endif %}
+                    <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
+                    <p>
+                        {% if historia.comentarios.count > 0 %}
+                            {{ historia.comentarios.count}} comentarios
+                        {% else %}
+                            No hay comentarios
+                        {% endif %}
+                    <p>
+                        {% if historia.archivos.count > 0 %}
+                            {{ historia.archivos.count}} archivos
+                        {% else %}
+                            No hay archivos
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalEtapa{{ historia.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="etapaModal">Estas seguro que desea mover a la siguente etapa?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Esta seguro que desea mover {{ historia.nombre }} a la etapa {% siguente_etapa historia %}?</p>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+            <form method="post" action="{% url 'mover_historias_usuario' proyecto.id historia.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="url" value="{{ request.path }}">
+                <input type="submit" class="btn btn-primary" value="Mover">
+            </form>
+            
+            </div>
+        </div>
+        </div>
+    </div>
+
+    {% endfor %}
+</div>
+<script>
+    $(document).ready(function () {
+        $('#tablaHistorias thead tr')
+            .clone(true)
+            .addClass('filters')
+            .appendTo('#tablaHistorias thead');
+        $('#tablaHistorias').DataTable({
+            paging: false,
+            orderCellsTop: true,
+            fixedHeader: true,
+            initComplete: function () {
+                var api = this.api();
+                api
+                    .columns()
+                    .eq(0)
+                    .each(function (colIdx) {
+                        var cell = $('.filters th').eq(
+                            $(api.column(colIdx).header()).index()
+                        );
+                        var title = $(cell).text();
+                        $(cell).html('<input type="text" placeholder="' + title + '" />');
+    
+                        $(
+                            'input',
+                            $('.filters th').eq($(api.column(colIdx).header()).index())
+                        )
+                            .off('keyup change')
+                            .on('change', function (e) {
+                                $(this).attr('title', $(this).val());
+                                var regexr = '({search})';
+    
+                                var cursorPosition = this.selectionStart;
+                                api
+                                    .column(colIdx)
+                                    .search(
+                                        this.value != ''
+                                            ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                            : '',
+                                        this.value != '',
+                                        this.value == ''
+                                    )
+                                    .draw();
+                            })
+                            .on('keyup', function (e) {
+                                e.stopPropagation();
+    
+                                $(this).trigger('change');
+                                $(this)
+                                    .focus()[0]
+                                    .setSelectionRange(cursorPosition, cursorPosition);
+                            });
+                    });
+            },
+            "drawCallback": function( settings ) {
+                $('body').tooltip({selector: '[data-toggle="tooltip"]'});
+            }
+        });
+    });
+</script>
+{% endblock %}

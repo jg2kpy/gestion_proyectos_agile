@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Tablero de {{ tipo.nombre }}{% endblock %}
+{% load static %}
+{% block contenido %}
+{% load gpa_tags %}
+<div class="container-fluid pt-3 overflow-auto">
+    <h3>{{ tipo.nombre }}</h3>
+    <div class="small">{{ tipo.descripcion }}</div>
+    <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
+    <div class="row flex-row flex-sm-nowrap py-3">
+        {% for etapa in etapas %}
+        <div class="col-sm-6 col-md-4 col-xl-3">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase text-truncate py-2">{{ etapa.nombre }}{% if etapa.historias %} ({{etapa.historias.count}}){% endif %}</h6>
+                    <div class="items border border-light">
+                        {% for us in etapa.historias %}
+                        <div class="card shadow-sm" id="cd1">
+                            <div class="card-body p-2">
+                                <div class="card-title">
+                                    <span class="lead font-weight-light fw-bold">{{ us.id }}</span>
+                                    <span class="lead font-weight-light">{{ us.nombre }}</span>
+                                    <br>
+                                    <span class="badge bg-secondary">UP {{ us.up }}</span>
+                                    <span class="badge bg-secondary">BV {{ us.bv }}</span>
+                                    <br>
+                                    <span>{{us.fecha_modificacion|date:"Y/m/d"}}</span>
+                                </div>
+                                <div>
+                                    <p>
+                                        {{ us.descripcion }}
+                                    </p>
+                                    {% if us.usuarioAsignado %}
+                                    <p>
+                                        <img src="{{ us.usuarioAsignado.avatar_url }}" alt="{{ user.get_full_name }}" width="30" height="30"
+                                            class="rounded-circle" style="margin-right: 10px;" />
+                                        {{us.usuarioAsignado.get_full_name}}
+                                    </p>
+                                    <br>
+                                    <div class="d-flex justify-content-evenly">
+                                        {% tiene_permiso_en_proyecto user 'pro_modificarUS' us.proyecto as pro_modificarUS %}
+                                        {% if pro_modificarUS %}
+                                            <a href="{% url 'editar_historiaUsuario' us.proyecto.id us.id %}"><span 
+                                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar historia">create</span></a>
+                                        {% endif %}
+            
+                                        {% tiene_permiso_en_proyecto user 'pro_cancelarUS' us.proyecto as pro_cancelarUS %}
+                                        {% if pro_cancelarUS %}
+                                            <a href="#modal{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ us.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Cancelar historia">cancel</span></a>
+                                        {% endif %}
+                                        <span>
+                                            <a href="{% url 'comentarios_historiaUsuario' etapa.proyecto us.id %}"><span 
+                                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Agregar un comentario">comment</span></a>
+                                            {{ us.comentarios.count }}
+                                        </span>
+                                        <a href="{% url 'ver_archivos' proyecto.id us.id %}"><span 
+                                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver archivos">description</span></a>
+                                        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+                                        {% if master or us.usuarioAsignado == user %}
+                                            {% if us.etapa.orden != 0 %}
+                                                <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_anterior{{us.id}}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="url" value="{{ request.path }}">
+                                                    <input type="hidden" name="anterior" value="anterior">
+                                                    <a href="javascript:{}" onclick="document.getElementById('form_anterior{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa anterior">arrow_back</span></a>
+                                                </form>
+                                            {% endif %}
+                                            <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_siguiente{{us.id}}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="url" value="{{ request.path }}">
+                                                <input type="hidden" name="siguiente" value="siguiente">
+                                                <a href="javascript:{}" onclick="document.getElementById('form_siguiente{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa siguiente">arrow_forward</span></a>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                    {% else %}
+                                    <p>
+                                        <span class="fw-bold">Sin asignar</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropzone rounded"> &nbsp; </div>
+
+                        <div class="modal fade" id="modal{{ us.id }}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="cancelarModal">Cancelar Historia</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Esta a punto de cancelar la historia de usuario {{ us.nombre }}, ¿quiere continuar?</p>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                                <form method="post" action="{% url 'borrar_historiaUsuario' us.proyecto.id us.id %}">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-danger" value="Cancelar Historia">
+                                    <input type="hidden" name="url" value="{{ request.path }}">
+                                </form>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="modalEtapaAnterior{{ us.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="etapaModal">Está seguro que desea mover a la etapa anterior?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Esta seguro que desea mover {{ us.nombre }} a la etapa {% anterior_etapa us %}?</p>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                                <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="url" value="{{ request.path }}">
+                                    <input type="submit" class="btn btn-primary" name="anterior" value="anterior">
+                                </form>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="modalEtapaSiguiente{{ us.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="etapaModal">Está seguro que desea mover a la siguente etapa?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Esta seguro que desea mover {{ us.nombre }} a la etapa {% siguente_etapa us %}?</p>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                                <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="url" value="{{ request.path }}">
+                                    <input type="submit" class="btn btn-primary" name="siguiente" value="siguiente">
+                                </form>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

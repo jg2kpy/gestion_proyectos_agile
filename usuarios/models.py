@@ -76,7 +76,7 @@ class RolProyecto(models.Model):
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
     usuario = models.ManyToManyField(Usuario, blank=True, related_name="roles_proyecto")
-    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, null=True, related_name='proyecto_rol')
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, null=True, related_name='roles')
 
     class Meta:
         constraints = [
@@ -137,7 +137,7 @@ class PermisoProyecto(models.Model):
         Returns:
             str: El nombre del permiso.
         """
-        return self.nombre
+        return self.descripcion
 
 
 class PermisoSistema(models.Model):
@@ -161,7 +161,7 @@ class PermisoSistema(models.Model):
         Returns:
             str: El nombre del permiso.
         """
-        return self.nombre
+        return self.descripcion
 
 
 @receiver(post_save, sender=Usuario)

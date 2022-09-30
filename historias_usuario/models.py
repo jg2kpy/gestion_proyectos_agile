@@ -1,6 +1,11 @@
+from email.policy import default
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 from proyectos.models import Proyecto, Sprint
 from usuarios.models import Usuario
+from django.utils import timezone
+from django.utils.timezone import now
 
 
 class TipoHistoriaUsusario(models.Model):
@@ -19,7 +24,7 @@ class TipoHistoriaUsusario(models.Model):
     """
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
-    proyecto = models.ForeignKey(Proyecto, related_name='tiposHistoriaUsuario', on_delete=models.CASCADE)
+    proyecto = models.ForeignKey(Proyecto, related_name='tiposHistoriaUsuario', on_delete=models.CASCADE, null=True)
 
     class Meta:
         constraints = [
@@ -63,6 +68,9 @@ class EtapaHistoriaUsuario(models.Model):
         return self.nombre
 
 
+def pathDinamico(instance, filename):
+    return 'app/staticfiles/{0}'.format(filename)
+
 class ArchivoAnexo(models.Model):
     """
     Archivos anexos a una historia de usuario.
@@ -74,10 +82,13 @@ class ArchivoAnexo(models.Model):
     :type fecha_subida: datetime
     :param subido_por: Usuario que subió el archivo.
     :type subido_por: Usuario
+    :param archivo: Archivo que subió el usuario.
+    :type archivo: file
     """
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
     subido_por = models.ForeignKey(Usuario, related_name='archivos', null=True, on_delete=models.SET_NULL)
+    archivo = models.FileField(upload_to=pathDinamico, null=True)
 
     def __str__(self):
         """
@@ -123,24 +134,90 @@ class HistoriaUsuario(models.Model):
     """
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_creacion = models.DateTimeField(default=now)
     fecha_modificacion = models.DateTimeField(auto_now=True)
-    sprint = models.ForeignKey(Sprint, related_name='historias', on_delete=models.PROTECT)
-    etapa = models.ForeignKey(EtapaHistoriaUsuario, related_name='historias', on_delete=models.PROTECT)
+    sprint = models.ForeignKey(Sprint, related_name='historias', on_delete=models.PROTECT, blank=True, null=True)
+    etapa = models.ForeignKey(EtapaHistoriaUsuario, related_name='historias', on_delete=models.PROTECT, blank=True, null=True)
     tipo = models.ForeignKey(TipoHistoriaUsusario, related_name='historias', on_delete=models.PROTECT)
     versionPrevia = models.ForeignKey('HistoriaUsuario', related_name='versionSiguiente',
                                       blank=True, null=True, on_delete=models.PROTECT)
-    up = models.IntegerField(blank=False)
-    bv = models.IntegerField(blank=False)
+    up = models.IntegerField(blank=False, default=0)
+    bv = models.IntegerField(blank=False, default=0)
     usuarioAsignado = models.ForeignKey('usuarios.Usuario', related_name='usuarioAsignado',
                                         blank=True, null=True, on_delete=models.SET_NULL)
     proyecto = models.ForeignKey(Proyecto, related_name='backlog', on_delete=models.PROTECT)
-    archivo = models.ManyToManyField(ArchivoAnexo, blank=True)
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['nombre', 'proyecto'], name='constraint_historia_usuario_nombre_proyecto')
-        ]
+    class Estado(models.TextChoices):
+        ACTIVO = 'A', _('Activo')
+        TERMINADO = 'T', _('Terminado')
+        CANCELADO = 'C', _('Cancelado')
+        HISTORIAL = 'H', _('Historial')
+
+    estado = models.CharField(
+        max_length=1,
+        choices=Estado.choices,
+        default=Estado.ACTIVO,
+    )
+    archivos = models.ManyToManyField(ArchivoAnexo, related_name="historia_usuario", blank=True)
+    
+    def guardarConHistorial(self):
+        """
+        Guarda una copia de la version actual de la historia de usuario en el historial y lo conecta a la version actual.
+        Debe ser llamado antes de modificar y guardar la version actual.
+
+        Returns:
+            None
+        """
+        # Clonar y guardar version original para historial
+        versionPrevia = HistoriaUsuario.objects.get(id=self.id)
+        versionPrevia.pk = None
+        versionPrevia.estado = HistoriaUsuario.Estado.HISTORIAL
+        versionPrevia.save()
+        for archivo in self.archivos.all():
+            versionPrevia.archivos.add(archivo)
+
+        for comentario in self.comentarios.all():
+            versionPrevia.comentarios.add(comentario)
+
+        self.versionPrevia = versionPrevia
+        self.fecha_creacion = timezone.now()
+        self.fecha_modificacion = timezone.now()
+        self.save()
+    
+    def restaurarDelHistorial(self, versionPrevia):
+        self.guardarConHistorial()
+        self.nombre = versionPrevia.nombre
+        self.descripcion = versionPrevia.descripcion
+        self.bv = versionPrevia.bv
+        self.up = versionPrevia.up
+        self.usuarioAsignado = versionPrevia.usuarioAsignado
+        self.etapa = versionPrevia.etapa
+
+        for comentario in self.comentarios.all():
+            self.comentarios.remove(comentario)
+        for comentario in versionPrevia.comentarios.all():
+            self.comentarios.add(comentario)
+
+        for archivo in self.archivos.all():
+            self.archivos.remove(archivo)
+        for archivo in versionPrevia.archivos.all():
+            self.archivos.add(archivo)
+
+        self.save()
+    
+    def obtenerVersiones(self):
+        """
+        Retorna la lista de todas las versiones de la US en orden decreciente por fecha.
+
+        Returns:
+            List[HistoriaUsuario]: El historial completo en  orden decreciente por fecha.
+        """
+        versiones = []
+        version = self
+        while version is not None:
+            versiones.append(version)
+            version = version.versionPrevia
+        return versiones
 
     def __str__(self):
         """
@@ -165,7 +242,7 @@ class Comentario(models.Model):
     """
     contenido = models.TextField(blank=True, null=True)
     usuario = models.ForeignKey('usuarios.Usuario', related_name='comentarios', null=True, on_delete=models.SET_NULL)
-    historiaUsuario = models.ForeignKey(HistoriaUsuario, related_name='comentarios', on_delete=models.CASCADE)
+    historiaUsuario = models.ManyToManyField(HistoriaUsuario, related_name='comentarios')
 
     def __str__(self):
         """
@@ -175,3 +252,12 @@ class Comentario(models.Model):
             str: Contenido del comentario.
         """
         return self.contenido
+
+class SubirArchivo(models.Model):
+    """
+    Archivos subidos por el usuario que van a ser anexados
+
+    :param archivo: Archivo que subió el usuario.
+    :type archivo: file
+    """
+    archivo = models.FileField(blank=True, null=True)

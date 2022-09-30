@@ -1,10 +1,12 @@
 {% extends "base.html" %}
+{% block title %}Proyecto {{ proyecto.nombre }}{% endblock %}
 {% block contenido %}
-{% load tiene_rol_en %}
+{% load gpa_tags %}
 <div class="d-flex align-items-center justify-content-center h-75 d-inline-block">
     <div class="box text-center">
         <h1>{{ proyecto.nombre }}</h1>
-        <a href="{% url 'vista_equipo' proyecto.id %}" class="btn-primary btn-lg ms-3">
+        <br>
+        <a href="{% url 'vista_equipo' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
             <span class="material-icons  align-text-bottom">
                 groups
             </span>
@@ -14,7 +16,7 @@
         {% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
         {% tiene_permiso_en_proyecto user 'pro_importarRolProyecto' proyecto as pro_importarRolProyecto %}
         {% if pro_crearRolProyecto or pro_editarRolProyecto or pro_importarRolProyecto %}
-        <a href="{% url 'rol_proyecto_asignado' proyecto.id %}" class="btn-primary btn-lg ms-3">
+        <a href="{% url 'roles_de_proyecto' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
             <span class="material-icons  align-text-bottom">
                 manage_accounts
             </span>
@@ -24,13 +26,19 @@
         {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
         {% tiene_permiso_en_proyecto user 'pro_eliminarTipoUS' proyecto as pro_eliminarTipoUS %}
         {% if pro_crearTipoUS or pro_eliminarTipoUS %}
-        <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="btn-primary btn-lg ms-3">
+        <a href="{% url 'tiposHistoriaUsuario' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
             <span class="material-icons  align-text-bottom">
                 checklist
             </span>
             Tipos US
         </a>
         {% endif %}
+        <a href="{% url 'historiaUsuarioBacklog' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
+            <span class="material-icons  align-text-bottom">
+                production_quantity_limits
+            </span>
+            Product Backlog
+        </a>
     </div>
 </div>
 {% endblock %}
