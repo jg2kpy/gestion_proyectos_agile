@@ -2,7 +2,7 @@
 {% block title %}Tablero de {{ tipo.nombre }}{% endblock %}
 {% load static %}
 {% block contenido %}
-{% load tiene_rol_en %}
+{% load gpa_tags %}
 <div class="container-fluid pt-3 overflow-auto">
     <h3>{{ tipo.nombre }}</h3>
     <div class="small">{{ tipo.descripcion }}</div>
@@ -58,9 +58,19 @@
                                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                                         {% if master or us.usuarioAsignado == user %}
                                             {% if us.etapa.orden != 0 %}
-                                                <a href="#modalEtapaAnterior{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalEtapaAnterior{{ us.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a etapa anterior">arrow_back</span></a>
+                                                <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_anterior{{us.id}}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="url" value="{{ request.path }}">
+                                                    <input type="hidden" name="anterior" value="anterior">
+                                                    <a href="javascript:{}" onclick="document.getElementById('form_anterior{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa anterior">arrow_back</span></a>
+                                                </form>
                                             {% endif %}
-                                            <a href="#modalEtapaSiguiente{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalEtapaSiguiente{{ us.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a siguiente etapa">arrow_forward</span></a>
+                                            <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_siguiente{{us.id}}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="url" value="{{ request.path }}">
+                                                <input type="hidden" name="siguiente" value="siguiente">
+                                                <a href="javascript:{}" onclick="document.getElementById('form_siguiente{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa siguiente">arrow_forward</span></a>
+                                            </form>
                                         {% endif %}
                                     </div>
                                     {% else %}
@@ -76,17 +86,17 @@
                             <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 class="modal-title" id="cancelarModal">Estas seguro que desea cancelar?</h5>
+                                <h5 class="modal-title" id="cancelarModal">Cancelar Historia</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>¿Esta a punto de cancelar la historia de usuario {{ us.nombre }}, quiere continuar?</p>
+                                    <p>Esta a punto de cancelar la historia de usuario {{ us.nombre }}, ¿quiere continuar?</p>
                                 </div>
                                 <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                                 <form method="post" action="{% url 'borrar_historiaUsuario' us.proyecto.id us.id %}">
                                     {% csrf_token %}
-                                    <input type="submit" class="btn btn-danger" value="Continuar">
+                                    <input type="submit" class="btn btn-danger" value="Cancelar Historia">
                                     <input type="hidden" name="url" value="{{ request.path }}">
                                 </form>
                                 </div>

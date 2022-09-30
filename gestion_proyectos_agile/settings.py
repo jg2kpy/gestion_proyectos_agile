@@ -88,7 +88,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
             ],
             'libraries':{
-                'tiene_rol_en': 'gestion_proyectos_agile.templatetags.tiene_rol_en',
+                'gpa_tags': 'gestion_proyectos_agile.templatetags.gpa_tags',
 
             },
         },

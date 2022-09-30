@@ -374,7 +374,7 @@ class ProyectoTests(TestCase):
         self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 403 a una petición de un usuario sin permisos')
 
-    def test_ver_roles_asignados_a_un_proyecto(self):
+    def test_roles_de_proyecto_a_un_proyecto(self):
         """
         Prueba que solamente usuario Scrum Master puede ver los roles de un proyecto
         """
@@ -414,19 +414,19 @@ class ProyectoTests(TestCase):
         request_factory = RequestFactory()
         request = request_factory.get(f'proyecto/{proyecto.id}/roles/')
         request.user = AnonymousUser()
-        response = ver_roles_asignados(request, proyecto.id)
+        response = roles_de_proyecto(request, proyecto.id)
         self.assertEqual(response.status_code, 401,
                          'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
 
         # Un usuario normal no puede ver los roles de un proyecto
         request.user = usuarioTest
-        response = ver_roles_asignados(request, proyecto.id)
+        response = roles_de_proyecto(request, proyecto.id)
         self.assertEqual(response.status_code, 403,
                          'La respuesta no fue un estado HTTP 403 a un usuario normal')
 
         # Un usuario Scrum Master puede ver los roles de un proyecto
         request.user = usuarioTest2
-        response = ver_roles_asignados(request, proyecto.id)
+        response = roles_de_proyecto(request, proyecto.id)
         self.assertEqual(response.status_code, 200,
                          'La respuesta no fue un estado HTTP 200 a un usuario Scrum Master')
 

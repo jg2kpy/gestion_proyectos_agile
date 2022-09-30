@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Historias{% endblock %}
 {% block contenido %}
-{% load tiene_rol_en %}
+{% load gpa_tags %}
 
 <div>
     <style>
@@ -56,34 +56,40 @@
                     {% endif %}
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
-                    <td>{{ historia.fecha_modificacion|date:'Y-M-d' }}</td>
-                    <td>{{ historia.usuarioAsignado.get_full_name }}</td>
+                    {% if historia.usuarioAsignado %}
+                        <td>{{ historia.usuarioAsignado.get_full_name }}</td>
+                    {% else %}
+                        <td>AUN NO TIENE ENCARGADO</td>
+                    {% endif %}
                     <td>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal"
                                 data-bs-target="#modalVer{{ historia.id }}"><span 
-                                class="material-icons">visibility</span>
+                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver historia">visibility</span>
                             </button>
                         {% if historia.estado == historia.Estado.ACTIVO %}
 
                             {% tiene_permiso_en_proyecto user 'pro_modificarUS' proyecto as pro_modificarUS %}
                             {% if pro_modificarUS %}
                                 <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
-                                class="material-icons">create</span></a>
+                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar historia">create</span></a>
                             {% endif %}
 
                             {% tiene_permiso_en_proyecto user 'pro_cancelarUS' proyecto as pro_cancelarUS %}
                             {% if pro_cancelarUS %}
-                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">cancel</span></button>
+                                <button type="button" data-toggle="tooltip" data-placement="top" title="Cancelar historia" 
+                                class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">cancel</span></button>
                             {% endif %}
 
                             {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                             {% if master or historia.usuarioAsignado == user %}
-                                {% if not historia.etapa %}
-                                    <button href="#modalEtapa{{ historia.id }}" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEtapa{{ historia.id }}"><span class="material-icons">arrow_forward</span></button>
+                                {% if not historia.etapa and historia.usuarioAsignado %}
+                                    <button href="#modalEtapa{{ historia.id }}" class="btn btn-link" data-bs-toggle="modal" 
+                                    data-bs-target="#modalEtapa{{ historia.id }}" data-toggle="tooltip" data-placement="top" 
+                                    title="Mover a la siguiente etapa"><span class="material-icons">arrow_forward</span></button>
                                 {% endif %}
                             {% endif %}
                         {% endif %}
-                        <a class="btn btn-link" href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span 
+                        <a class="btn btn-link" data-toggle="tooltip" data-placement="top" title="Ver historial" href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span 
                             class="material-icons">history</span></a>
                     </td>
                 </tr>
@@ -96,17 +102,17 @@
             <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="cancelarModal">Estas seguro que desea cancelar?</h5>
+                <h5 class="modal-title" id="cancelarModal">Cancelar Historia</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Esta a punto de cancelar la historia de usuario {{ historia.nombre }}, quiere continuar?</p>
+                    <p>Esta a punto de cancelar la historia de usuario {{ historia.nombre }}, ¿quiere continuar?</p>
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                 <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
                     {% csrf_token %}
-                    <input type="submit" class="btn btn-danger" value="Continuar">
+                    <input type="submit" class="btn btn-danger" value="Cancelar Historia">
                     <input type="hidden" name="url" value="{{ request.path }}">
                 </form>
                 
@@ -237,6 +243,9 @@
                             });
                     });
             },
+            "drawCallback": function( settings ) {
+                $('body').tooltip({selector: '[data-toggle="tooltip"]'});
+            }
         });
     });
 </script>

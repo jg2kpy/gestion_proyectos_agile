@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 from historias_usuario.models import ArchivoAnexo, HistoriaUsuario 
 from django.shortcuts import render, redirect
-from django.http import FileResponse, HttpResponseRedirect
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 
 
 class NeverCacheMixin(object):
@@ -36,7 +36,7 @@ def descargar(request, archivo_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return HttpResponseRedirect("/", status=401)
+        return render(request, '401.html', status=401)
 
     try:
         archivo = ArchivoAnexo.objects.get(id=archivo_id)

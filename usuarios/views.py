@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.forms import ModelForm
 from django.views.decorators.cache import never_cache
 
-from gestion_proyectos_agile.templatetags.tiene_rol_en import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
+from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
 from proyectos.models import Proyecto
 from usuarios.models import RolProyecto, Usuario
 from .models import PermisoSistema, Usuario
@@ -29,7 +29,7 @@ def rol_global_list(request):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponseRedirect('Usuario no autenticado', status=401)
+        return render(request, '401.html', status=401)
 
     if request.POST.get('accion') == 'eliminar':
         try:
@@ -63,7 +63,7 @@ def rol_global_crear(request):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponseRedirect('Usuario no autenticado', status=401)
+        return render(request, '401.html', status=401)
 
     if request.method == 'POST':
         form = RolSistemaForm(request.POST)
@@ -109,7 +109,7 @@ def rol_global_editar(request, id):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponseRedirect('Usuario no autenticado', status=401)
+        return render(request, '401.html', status=401)
     
     try:
         rol = RolSistema.objects.get(id=id)
@@ -164,7 +164,7 @@ def rol_global_usuarios(request, id):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponseRedirect('Usuario no autenticado', status=401)
+        return render(request, '401.html', status=401)
 
     try:
         rol = RolSistema.objects.get(id=id)
@@ -218,7 +218,7 @@ def vista_equipo(request, proyecto_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return render(request, '401.html', status=401)
 
     if Proyecto.objects.filter(id=proyecto_id).count() == 0:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
@@ -396,7 +396,7 @@ def perfil(request):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return HttpResponseRedirect("/", status=401)
+        return render(request, '401.html', status=401)
 
     status = 200
     if request.method == "POST":

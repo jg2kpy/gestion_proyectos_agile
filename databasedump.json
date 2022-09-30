@@ -93,7 +93,7 @@
     "pk": 7,
     "fields": {
       "nombre": "pro_asignarMiembros",
-      "descripcion": "Agregar miembros al equipo durante su la planificacion/ejecucion del Proyecto",
+      "descripcion": "Agregar miembros al equipo durante la planificacion/ejecucion del Proyecto",
       "rol": [1]
     }
   },
@@ -184,7 +184,7 @@
     "fields": {
       "nombre": "pro_cargarUSalBacklog",
       "descripcion": "Cargar US al product backlog",
-      "rol": [1]
+      "rol": [1, 2]
     }
   },
   {

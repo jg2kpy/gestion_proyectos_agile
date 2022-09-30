@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Tipo de historia de usuario{% endblock %}
 {% block contenido %}
-{% load tiene_rol_en %}
+{% load gpa_tags %}
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -37,14 +37,15 @@
                     <td>{{ tipo.descripcion }}</td>
                     <td>
                         {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
-                        {% if pro_crearTipoUS %}
+                        {% if pro_crearTipoUS and tipo.historias.count == 0 %}
                         <a href="{% url 'editarTipoHistoriaUsuario' proyecto.id tipo.id %}" class="btn btn-link"><span
                                 class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar tipo de historia">create</span></a>
                         {% endif %}
                         {% tiene_permiso_en_proyecto user 'pro_eliminarTipoUS' proyecto as pro_eliminarTipoUS %}
                         {% if pro_eliminarTipoUS and tipo.historias.count == 0 %}
-                        <a href="{% url 'borrarTipoHistoriaUsuario' proyecto.id tipo.id %}" class="btn btn-link"><span
-                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar tipo de historia">delete</span></a>
+                        <a class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ tipo.id }}"><span 
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar tipo de historia">
+                            delete</span></a>
                         {% endif %}
                     </td>
                 </tr>
@@ -52,4 +53,29 @@
             </tbody>
     </div>
 </div>
+
+{% for tipo in tipos %}
+<!-- Modal -->
+<div class="modal fade" id="modalEliminar{{tipo.id}}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="cancelarModal">Eliminar tipo de historia de usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p>Esta a punto de eliminar el tipo de historia de usuario {{ tipo.nombre }}, ¿quiere continuar?</p>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+        <form method="post" action="{% url 'borrarTipoHistoriaUsuario' proyecto.id tipo.id  %}">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-danger" value="Eliminar tipo de Historia">
+            <input type="hidden" name="url" value="{{ request.path }}">
+        </form>
+        </div>
+    </div>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}
