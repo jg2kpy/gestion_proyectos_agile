@@ -29,7 +29,7 @@ def rol_global_list(request):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autorizado', status=401)
+        return render(request, '401.html', status=401)
 
     if request.POST.get('accion') == 'eliminar':
         try:
@@ -63,7 +63,7 @@ def rol_global_crear(request):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autorizado', status=401)
+        return render(request, '401.html', status=401)
 
     if request.method == 'POST':
         form = RolSistemaForm(request.POST)
@@ -109,7 +109,7 @@ def rol_global_editar(request, id):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autorizado', status=401)
+        return render(request, '401.html', status=401)
     
     try:
         rol = RolSistema.objects.get(id=id)
@@ -164,7 +164,7 @@ def rol_global_usuarios(request, id):
     status = 200
 
     if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autorizado', status=401)
+        return render(request, '401.html', status=401)
 
     try:
         rol = RolSistema.objects.get(id=id)
@@ -218,7 +218,7 @@ def vista_equipo(request, proyecto_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autorizado', status=401)
+        return render(request, '401.html', status=401)
 
     if Proyecto.objects.filter(id=proyecto_id).count() == 0:
         return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
@@ -396,7 +396,7 @@ def perfil(request):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autorizado', status=401)
+        return render(request, '401.html', status=401)
 
     status = 200
     if request.method == "POST":
