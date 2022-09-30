@@ -36,7 +36,7 @@ def descargar(request, archivo_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         archivo = ArchivoAnexo.objects.get(id=archivo_id)

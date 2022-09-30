@@ -22,7 +22,7 @@ def tiposHistoriaUsuario(request, proyecto_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -48,7 +48,7 @@ def crear_tipoHistoriaUsuario(request, proyecto_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -108,7 +108,7 @@ def borrar_tipoHistoriaUsuario(request, proyecto_id, tipo_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -217,7 +217,7 @@ def importar_tipoUS(request, proyecto_id):
     request_user = request.user
 
     if not request_user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -293,7 +293,7 @@ def moverEtapa(request, proyecto_id, historia_id):
     status = 200
 
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -345,7 +345,7 @@ def historiaUsuarioBacklog(request, proyecto_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -371,7 +371,7 @@ def historiaUsuarioCancelado(request, proyecto_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -397,7 +397,7 @@ def historiaUsuarioTerminado(request, proyecto_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -423,7 +423,7 @@ def historiaUsuarioAsignado(request, proyecto_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -449,7 +449,7 @@ def crear_historiaUsuario(request, proyecto_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -518,7 +518,7 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -559,7 +559,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -615,7 +615,7 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -663,7 +663,7 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -706,7 +706,7 @@ def verTablero(request, proyecto_id, tipo_id):
     """
 
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
         
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -743,7 +743,7 @@ def ver_archivos(request, proyecto_id, historia_id):
     :rtype: HttpResponse
     """
     if not request.user.is_authenticated:
-        return redirect("/", status=401)
+        return HttpResponse('Usuario no autorizado', status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
