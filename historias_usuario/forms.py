@@ -104,7 +104,7 @@ class HistoriaUsuarioForm(forms.ModelForm):
             "nombre": "Nombre",
             "descripcion": "Descripción",
             "bv": "Business Value (Prioridad de negocio)",
-            "up": "User Point (Prioridad tecnica, horas estimadas)",
+            "up": "User Point (Prioridad técnica)",
             "tipo": "Tipo de Historia de Usuario",
             "usuarioAsignado": "Usuario asignado"
         }
@@ -177,8 +177,8 @@ class HistoriaUsuarioEditarForm(forms.ModelForm):
         }
         labels = {
             "descripcion": "Descripción",
-            "bv": "Business Value",
-            "up": "User Points",
+            "bv": "Business Value (Prioridad de negocio)",
+            "up": "User Point (Prioridad técnica)",
             "usuarioAsignado": "Usuario asignado"
         }
     
