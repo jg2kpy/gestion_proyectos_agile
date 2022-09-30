@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 from historias_usuario.models import ArchivoAnexo, HistoriaUsuario 
 from django.shortcuts import render, redirect
-from django.http import FileResponse, HttpResponseRedirect
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 
 
 class NeverCacheMixin(object):
