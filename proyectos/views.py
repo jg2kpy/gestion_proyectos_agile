@@ -41,7 +41,7 @@ def proyectos(request):
     request_user = request.user
 
     if not request.user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     if tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
@@ -60,7 +60,7 @@ def proyecto_home(request, proyecto_id):
     """
 
     if not request.user.is_authenticated:
-        return HttpResponseRedirect("/", status=401)
+        return redirect("/", status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -86,7 +86,7 @@ def crear_proyecto(request):
     request_user = request.user
 
     if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     # Verificar que solo el administrador puede crear proyectos
     if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
@@ -185,7 +185,7 @@ def editar_proyecto(request, proyecto_id):
     request_user = request.user
 
     if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -252,7 +252,7 @@ def cancelar_proyecto(request, proyecto_id):
     request_user = request.user
 
     if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -303,7 +303,7 @@ def crear_rol_proyecto(request):
     request_user = request.user
 
     if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     # Verificar que solo el administrador puede crear roles de proyectos
     if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
@@ -369,7 +369,7 @@ def ver_rol_proyecto(request, proyecto_id, id_rol_proyecto):
     proyecto = rol.proyecto
 
     if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     if not request.user.equipo.filter(id=proyecto.id).exists():
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para ver roles de proyectos'}, status=403)
@@ -400,7 +400,7 @@ def modificar_rol_proyecto(request, proyecto_id, id_rol_proyecto):
     request_user = request.user
 
     if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     # Verificar que solo el administrador y el Scrum Master pueden modificar roles de proyectos
 
@@ -469,7 +469,7 @@ def eliminar_rol_proyecto(request, proyecto_id, id_rol_proyecto):
     request_user = request.user
 
     if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     # Verificar que solo el administrador y el Scrum Master pueden modificar roles de proyectos
 
@@ -517,7 +517,7 @@ def roles_de_proyecto(request, proyecto_id):
 
     # Verificacion que o es SrumMaster o es admin del sistema
     if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     # Verificar que solo el administrador puede crear roles de proyectos
     if not tiene_permiso_en_proyecto(request.user, 'pro_cambiarEstadoProyecto', proyecto) and not tiene_permiso_en_sistema(request.user, 'sys_crearproyectos'):
@@ -552,7 +552,7 @@ def crear_rol_a_proyecto(request, proyecto_id):
     request_user = request.user
     # Verificar si esta autenticado
     if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -623,7 +623,7 @@ def importar_rol(request, proyecto_id):
 
     # Verificamos que el usuario este autenticado
     if not request_user.is_authenticated:
-        return HttpResponse('Usuario no autenticado', status=401)
+        return redirect("/", status=401)
 
     try:
         proyecto = Proyecto.objects.get(id=proyecto_id)
