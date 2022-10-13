@@ -29,9 +29,9 @@
                     {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
                         <th>Etapa</th>
                     {% elif titulo == 'Historias Terminadas' %}
-                        <th>Fecha de terminación</th>
+                        <th>Fecha y hora de terminación</th>
                     {% elif titulo == 'Historias Canceladas'%}
-                        <th>Fecha de cancelación</th>
+                        <th>Fecha y hora de cancelación</th>
                     {% endif %}
                     <th>User Points</th>
                     <th>Business Value</th>
@@ -102,11 +102,11 @@
             <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="cancelarModal">Cancelar Historia</h5>
+                <h5 class="modal-title" id="cancelarModal">Cancelar Historia '{{ historia.nombre }}'</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Esta a punto de cancelar la historia de usuario {{ historia.nombre }}, ¿quiere continuar?</p>
+                    <p>Esta a punto de cancelar la historia de usuario '{{ historia.nombre }}', ¿quiere continuar?</p>
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -172,7 +172,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Esta seguro que desea mover {{ historia.nombre }} a la etapa {% siguente_etapa historia %}?</p>
+                <p>Esta seguro que desea mover '{{ historia.nombre }}' a la etapa {% siguente_etapa historia %}?</p>
             </div>
             <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
