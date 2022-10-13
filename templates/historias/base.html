@@ -134,7 +134,6 @@
                 </div>
                 <div class="modal-body">
                     <p>{{ historia.descripcion }}</p>
-                    <p>Creado: {{ historia.fecha_creacion|date:'Y-m-d H:i:s'}}</p>
                     {% if historia.fecha_modificacion %}
                     <p>Modificado: {{ historia.fecha_modificacion|date:'Y-m-d H:i:s'}}</p>
                     {% endif %}
