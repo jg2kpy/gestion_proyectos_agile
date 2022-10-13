@@ -60,7 +60,7 @@
             <form method="post" action="{% url 'ver_archivos' proyecto.id historia.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="archivo_id" value="{{ archivo.id }}">
-                <input type="submit" class="btn btn-primary" value="Borrar Archivo">
+                <input type="submit" class="btn btn-danger" value="Borrar Archivo">
                 <input type="hidden" name="url" value="{{ request.path }}">
             </form>
             </div>
