@@ -47,7 +47,7 @@
                         {% if pro_editarRolProyecto %}
                         <a href="{% url 'modificar_rol_proyecto' proyecto.id rol_proyecto.id %}" class="btn btn-link"><span
                             class="material-icons" data-toggle="tooltip" data-placement="top" title="Modificar rol de proyecto">create</span></a>
-                        {% if not rol_proyecto.nombre == 'Scrum Master' and not rol_proyecto.nombre == 'Member'%}
+                        {% if not rol_proyecto.nombre == 'Scrum Master' and not rol_proyecto.nombre == 'Member' and rol_proyecto.usuario.count == 0 %}
                         <a class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ rol_proyecto.id }}"><span 
                             class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar rol de proyecto">
                             delete</span></a>

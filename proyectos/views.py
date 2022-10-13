@@ -447,7 +447,7 @@ def modificar_rol_proyecto(request, proyecto_id, id_rol_proyecto):
             return redirect('roles_de_proyecto', proyecto_id=proyecto.id)
     else:
         form = RolProyectoForm(
-            initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
+            initial={'nombre': rol.nombre, 'descripcion': rol.descripcion, 'permisos': rol.permisos.all() })
     return render(request, 'proyectos/roles_proyecto/modificar_rol_proyecto.html', {'form': form, 'rol': rol, 'permisos': permisos, 'proyecto': proyecto})
 
 
@@ -669,9 +669,9 @@ def importar_rol(request, proyecto_id):
         # proyecto_objetivo = Proyecto.objects.get(nombre = request.GET.get('proyectos'))
         # Este es el GET cuando solicita ver los roles de proyectos de un proyecto en especifico
         if request.GET.get('proyectos'):
-            proyecto = Proyecto.objects.get(
+            proyecto_seleccionado = Proyecto.objects.get(
                 nombre=request.GET.get('proyectos'))
-            roles = RolProyecto.objects.filter(proyecto=proyecto)
+            roles = RolProyecto.objects.filter(proyecto=proyecto_seleccionado)
         else:  # Este es el GET cuando se llama desde otra pagina
             roles = None
             if proyectos.count() == 0:
