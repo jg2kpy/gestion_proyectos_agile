@@ -42,7 +42,7 @@
                     <td>{{ rol_proyecto.descripcion }}</td>
                     <td>
                         <a class="btn btn-link" href="#modalDetalles{{ rol_proyecto.id }}" data-bs-toggle="modal" data-bs-target="#modalDetalles{{ rol_proyecto.id }}"><span
-                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver rol de proyecto">visibility</span></a>
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span></a>
                         {% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
                         {% if pro_editarRolProyecto %}
                         <a href="{% url 'modificar_rol_proyecto' proyecto.id rol_proyecto.id %}" class="btn btn-link"><span
@@ -95,7 +95,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-            <h5 class="modal-title">Detalles de '{{rol_proyecto}}'</h5>
+            <h5 class="modal-title">Detalles de '{{rol_proyecto.nombre}}'</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
