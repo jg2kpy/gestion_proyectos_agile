@@ -82,12 +82,12 @@ class HistoriaUsuarioForm(forms.ModelForm):
         """ Meta
         :param model: HistoriaUsusario
         :type model: HistoriaUsusario
-        :param fields: [nombre', 'descripcion', 'bv', 'up', 'tipo', 'usuarioAsignado']
+        :param fields: [nombre', 'descripcion', 'bv', 'up', 'tipo']
         :type fields: list
         :param widgets: TextInput, Textarea, NumberInput, forms.Select con clase form-control
         :type widgets: dict
         :param labels: nombre, descripcion, bv, up, tipo
-        :type widgets: dict
+        :type labels: dict
         """
         model = HistoriaUsuario
         fields = ('nombre', 'descripcion', 'bv', 'up', 'tipo')
@@ -122,7 +122,7 @@ class HistoriaUsuarioEditarForm(forms.ModelForm):
 
         :param model: HistoriaUsusario
         :type model: HistoriaUsusario
-        :param fields: [nombre', 'descripcion', 'bv', 'up', 'usuarioAsignado']
+        :param fields: [nombre', 'descripcion', 'bv', 'up']
         :type fields: list
         :param widgets: TextInput, Textarea, NumberInput, forms.Select con clase form-control
         :type widgets: dict
