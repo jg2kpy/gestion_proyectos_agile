@@ -1,6 +1,6 @@
 from django import template
 from usuarios.models import RolSistema, RolProyecto, Usuario
-from proyectos.models import Proyecto
+from proyectos.models import Proyecto, Sprint
 
 """
 Los templares tags son funciones en python que podemos ejecutar en los templates HTML
@@ -174,11 +174,11 @@ def lista_adm():
 @register.simple_tag
 def check_sprint_desarrollo(cookieIndice, sprints):
     """Funcion para determinar si un sprint se encuentra en desarrollo
-    :param cookieIndice: Objeto historia a determinar su etapa anterior
-    :type usuario: historia
+    :param cookieIndice: Indice guardado en cookie
+    :type cookieIndice: str
 
     :param sprints: Lista con los sprints disponibles
-    :type list
+    :type sprints: list
 
     :return: Se retorna True si está en desarrollo caso contrario False
     :rtype: bool
@@ -188,3 +188,19 @@ def check_sprint_desarrollo(cookieIndice, sprints):
         return sprints[int(cookieIndice)].estado == "Desarrollo"
     else:
         return sprints[0].estado == "Desarrollo"
+
+@register.simple_tag
+def check_sprint_no_planificacion(tablero):
+    """Funcion para verificar si existe un sprint en desarrollo o ya terminado para el tablero
+    :param tablero: Objeto del tipo de historia
+    :type tablero: TipoHistoriaUsusario
+
+    :return: Se retorna True si existe un sprint en desarrollo o ya terminado
+    :rtype: bool
+    """
+    sprints = Sprint.objects.filter(proyecto=tablero.proyecto, historias__tipo=tablero).exclude(fecha_inicio__isnull=True)
+    
+    if sprints:
+        return True
+    else:
+        return False
