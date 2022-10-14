@@ -724,14 +724,34 @@ def verTablero(request, proyecto_id, tipo_id):
     if tipo.proyecto != proyecto:
         return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
 
-    etapas = []
-    for etapa in tipo.etapas.all().order_by('orden'):
-        aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
-        aux_etapa["historias"] = etapa.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO)
-        etapas.append(aux_etapa)
+    sprints = Sprint.objects.filter(proyecto=proyecto).exclude(fecha_inicio__isnull=True)
+    sprintDesc = sprints.order_by("-fecha_inicio")
+    sprintCookie = request.COOKIES.get('indiceActual')
 
+    etapas = []
+
+    if request.method == 'POST':
+        sprintId = request.POST.get('sprintId')
+
+        for etapa in tipo.etapas.all().order_by('orden'):
+            aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
+            aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintId)
+            etapas.append(aux_etapa)
+
+    else:
+        for etapa in tipo.etapas.all().order_by('orden'):
+            aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
+            
+            if sprintCookie:
+                aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id)
+
+            else:    
+                aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id)
+
+            etapas.append(aux_etapa)
+    
     request.session['cancelar_volver_a'] = request.path
-    return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo, 'proyecto': proyecto})
+    return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo, 'proyecto': proyecto, "sprints": sprintDesc})
 
 @never_cache
 def ver_archivos(request, proyecto_id, historia_id):
