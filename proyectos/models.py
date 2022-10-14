@@ -62,3 +62,9 @@ class Sprint(models.Model):
 
     def __str__(self):
         return self.estado
+
+class Feriado(models.Model):
+
+    proyecto = models.ForeignKey('proyectos.Proyecto', related_name="feriados", on_delete=models.DO_NOTHING)
+    descripcion = models.TextField(blank=True, null=True)
+    fecha = models.DateTimeField(blank=True, null=True)

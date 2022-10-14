@@ -81,7 +81,6 @@ def rol_global_crear(request):
             return redirect('rol_global_list')
 
         else:
-            print(form.errors)
             status = 422
 
     else:
