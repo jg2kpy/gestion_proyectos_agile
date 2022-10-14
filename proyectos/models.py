@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 
 
@@ -28,6 +29,8 @@ class Proyecto(models.Model):
     usuario = models.ManyToManyField('usuarios.Usuario', related_name="equipo", blank=True)
     scrumMaster = models.ForeignKey('usuarios.Usuario', related_name='scrumMaster', on_delete=models.PROTECT)
     estado = models.CharField(max_length=255, blank=True, null=True)
+    minimo_dias_sprint = models.IntegerField(default=15)
+    maximo_dias_sprint = models.IntegerField(default=30)
 
     def __str__(self):
         return self.nombre

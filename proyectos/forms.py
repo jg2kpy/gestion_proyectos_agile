@@ -42,11 +42,39 @@ class ProyectoForm(forms.Form):
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
     scrum_master = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
+    minimo_dias_sprint = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}), initial=15, required=False)
+    maximo_dias_sprint = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}), initial=30, required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['scrum_master'].choices = [
             (usuario.id, f'{usuario.get_full_name()} ({usuario.email})') for usuario in Usuario.objects.all()]
+
+
+class ProyectoConfigurarForm(forms.Form):
+    """
+        Formulario para configurar un proyecto
+        Se introduce el nombre del proyecto, la descripcion, las fechas de inicio y de fin
+        y se asigna un usuario como Scrum Master del proyecto
+
+        :param nombre: Nombre del proyecto
+        :type nombre: Texto
+        :param descripcion: Descripcion del proyecto
+        :type descripcion: Texto
+        :param fecha_inicio: Fecha de inicio del proyecto
+        :type fecha_inicio: Fecha
+        :param fecha_fin: Fecha de fin del proyecto
+        :type fecha_fin: Fecha
+        :param scrum_master: Usuario que sera el Scrum Master del proyecto
+        :type scrum_master: Usuario
+
+        :return: Formulario para crear un proyecto
+        :rtype: Proyecto
+    """
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
+    minimo_dias_sprint = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}), initial=15)
+    maximo_dias_sprint = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}), initial=30)
 
 
 class ProyectoCancelForm(forms.Form):

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Editar proyecto {{ proyecto.nombre }}{% endblock %}
+{% block title %}Configuración de proyecto {{ proyecto.nombre }}{% endblock %}
 {% block contenido %}
 
 <!-- Formulario para crear proyectos Django forms -->
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>Modificar proyecto</h1>
+            <h1>Configuración de proyecto</h1>
         </div>
     </div>
     <div class="row">
@@ -15,7 +15,7 @@
                 {% csrf_token %}
                 {{ form.as_div }}
                 <br>
-                <button type="submit" class="btn btn-primary">Editar proyecto</button>
+                <button type="submit" class="btn btn-primary">Aplicar cambios</button>
                 <a href="{% url 'proyectos' %}" class="btn btn-secondary">Volver</a>
             </form>
         </div>

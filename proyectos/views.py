@@ -6,7 +6,7 @@ from django.views.decorators.cache import never_cache
 from historias_usuario.models import EtapaHistoriaUsuario, TipoHistoriaUsusario
 
 from .models import Proyecto
-from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
+from .forms import ProyectoConfigurarForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
 
@@ -223,11 +223,13 @@ def editar_proyecto(request, proyecto_id):
         else:
             return HttpResponse('Formulario invalido', status=422)
     else:
-        form = ProyectoForm()
+        form = ProyectoConfigurarForm()
         # cargamos los datos del proyecto
         proyecto = Proyecto.objects.get(id=proyecto_id)
         form.fields['nombre'].initial = proyecto.nombre
         form.fields['descripcion'].initial = proyecto.descripcion
+        form.fields['minimo_dias_sprint'].initial = proyecto.minimo_dias_sprint
+        form.fields['maximo_dias_sprint'].initial = proyecto.maximo_dias_sprint
 
     return render(request, 'proyectos/editar_proyecto.html', {'form': form})
 
