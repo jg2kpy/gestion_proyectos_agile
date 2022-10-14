@@ -170,3 +170,21 @@ def lista_adm():
     """
     adminRol = RolSistema.objects.get(nombre="gpa_admin")
     return adminRol.usuario.all()
+
+@register.simple_tag
+def check_sprint_desarrollo(cookieIndice, sprints):
+    """Funcion para determinar si un sprint se encuentra en desarrollo
+    :param cookieIndice: Objeto historia a determinar su etapa anterior
+    :type usuario: historia
+
+    :param sprints: Lista con los sprints disponibles
+    :type list
+
+    :return: Se retorna True si está en desarrollo caso contrario False
+    :rtype: bool
+    """
+    
+    if cookieIndice:
+        return sprints[int(cookieIndice)].estado == "Desarrollo"
+    else:
+        return sprints[0].estado == "Desarrollo"
