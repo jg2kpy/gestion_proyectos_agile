@@ -1,3 +1,4 @@
+from django.forms import inlineformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.db import IntegrityError
@@ -5,8 +6,8 @@ from django.views.decorators.cache import never_cache
 
 from historias_usuario.models import EtapaHistoriaUsuario, TipoHistoriaUsusario
 
-from .models import Proyecto
-from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
+from .models import Feriado, Proyecto
+from .forms import ProyectoConfigurarForm, ProyectoFeriadosForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
 
@@ -92,77 +93,93 @@ def crear_proyecto(request):
     if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear proyectos'}, status=403)
 
+    formset_factory = inlineformset_factory(
+        Proyecto, Feriado, form=ProyectoFeriadosForm, extra=0, can_delete=False)
+
     if request.method == 'POST':
         form = ProyectoForm(request.POST)
+        formset = formset_factory(request.POST, instance=form.instance)
+
         if form.is_valid():
+            # Creamos el proyecto
+            proyecto = Proyecto()
+            proyecto.nombre = form.cleaned_data['nombre']
+            proyecto.descripcion = form.cleaned_data['descripcion']
+            # Automaticamente el estado se queda en planificado
+            proyecto.estado = ESTADOS_PROYECTO.__getitem__(0)[0]
+            scrum_master = form.cleaned_data['scrumMaster']
+            proyecto.scrumMaster = scrum_master
+            if form.cleaned_data['minimo_dias_sprint']:
+                proyecto.minimo_dias_sprint = form.cleaned_data['minimo_dias_sprint']
+            if form.cleaned_data['maximo_dias_sprint']:
+                proyecto.minimo_dias_sprint = form.cleaned_data['maximo_dias_sprint']
+            
             try:
-                # Creamos el proyecto
-                proyecto = Proyecto()
-                proyecto.nombre = form.cleaned_data['nombre']
-                proyecto.descripcion = form.cleaned_data['descripcion']
-                # Automaticamente el estado se queda en planificado
-                proyecto.estado = ESTADOS_PROYECTO.__getitem__(0)[0]
-                id_scrum_master = form.cleaned_data['scrum_master']
-                scrum_master = Usuario.objects.get(id=id_scrum_master)
-                proyecto.scrumMaster = scrum_master
                 proyecto.save()
 
                 scrum_master.equipo.add(proyecto)
 
-                # Traemos el ID del proyecto recien creado
-                # Traemos todos los roles que tenga null como proyecto_id
-                roles = RolProyecto.objects.filter(proyecto__isnull=True)
-                # Generamos una copia de este rol y el asignamos el id del proyecto
-                for rol in roles:
-                    # Creamos el rol
-                    rol_nuevo = RolProyecto()
-                    rol_nuevo.nombre = rol.nombre
-                    rol_nuevo.descripcion = rol.descripcion
-                    rol_nuevo.proyecto = Proyecto.objects.get(id=proyecto.id)
-                    rol_nuevo.save()
-
-                    # Traemos los permisos del rol
-                    permisos = PermisoProyecto.objects.filter(rol=rol)
-
-                    # Recorremos los permisos y los asignamos al rol
-                    for permiso in permisos:
-                        # Agregamos el rol al permiso
-                        permiso.rol.add(rol_nuevo)
-                        permiso.save()
-
-                scrum_master.roles_proyecto.add(RolProyecto.objects.get(
-                    nombre="Scrum Master", proyecto=proyecto))
-                scrum_master.save()
-
-                tipos = TipoHistoriaUsusario.objects.filter(proyecto__isnull=True)
-
-                for tipo in tipos:
-                    tipo_nuevo = TipoHistoriaUsusario()
-                    tipo_nuevo.nombre = tipo.nombre
-                    tipo_nuevo.descripcion = tipo.descripcion
-                    tipo_nuevo.proyecto = proyecto
-                    tipo_nuevo.save()
-
-                    etapas = EtapaHistoriaUsuario.objects.filter(TipoHistoriaUsusario=tipo)
-                    for etapa in etapas:
-                        etapa_nuevo = EtapaHistoriaUsuario()
-                        etapa_nuevo.nombre = etapa.nombre
-                        etapa_nuevo.descripcion = etapa.descripcion
-                        etapa_nuevo.orden = etapa.orden
-                        etapa_nuevo.TipoHistoriaUsusario_id = tipo_nuevo.id
-                        etapa_nuevo.save()
-                    
-                    tipo_nuevo.save()
+                for f in formset:
+                    feriado = f.save(commit=False)
+                    feriado.proyecto = proyecto
+                    feriado.save()
 
             except Exception as e:
                 return HttpResponse('Error al crear el proyecto', status=500)
+
+            # Traemos el ID del proyecto recien creado
+            # Traemos todos los roles que tenga null como proyecto_id
+            roles = RolProyecto.objects.filter(proyecto__isnull=True)
+            # Generamos una copia de este rol y el asignamos el id del proyecto
+            for rol in roles:
+                # Creamos el rol
+                rol_nuevo = RolProyecto()
+                rol_nuevo.nombre = rol.nombre
+                rol_nuevo.descripcion = rol.descripcion
+                rol_nuevo.proyecto = Proyecto.objects.get(id=proyecto.id)
+                rol_nuevo.save()
+
+                # Traemos los permisos del rol
+                permisos = PermisoProyecto.objects.filter(rol=rol)
+
+                # Recorremos los permisos y los asignamos al rol
+                for permiso in permisos:
+                    # Agregamos el rol al permiso
+                    permiso.rol.add(rol_nuevo)
+                    permiso.save()
+
+            scrum_master.roles_proyecto.add(RolProyecto.objects.get(
+                nombre="Scrum Master", proyecto=proyecto))
+            scrum_master.save()
+
+            tipos = TipoHistoriaUsusario.objects.filter(proyecto__isnull=True)
+
+            for tipo in tipos:
+                tipo_nuevo = TipoHistoriaUsusario()
+                tipo_nuevo.nombre = tipo.nombre
+                tipo_nuevo.descripcion = tipo.descripcion
+                tipo_nuevo.proyecto = proyecto
+                tipo_nuevo.save()
+
+                etapas = EtapaHistoriaUsuario.objects.filter(TipoHistoriaUsusario=tipo)
+                for etapa in etapas:
+                    etapa_nuevo = EtapaHistoriaUsuario()
+                    etapa_nuevo.nombre = etapa.nombre
+                    etapa_nuevo.descripcion = etapa.descripcion
+                    etapa_nuevo.orden = etapa.orden
+                    etapa_nuevo.TipoHistoriaUsusario_id = tipo_nuevo.id
+                    etapa_nuevo.save()
+                
+                tipo_nuevo.save()
+
 
             return redirect('proyectos')
         else:
             return HttpResponse('Formulario invalido', status=422)
     else:
         form = ProyectoForm()
-    return render(request, 'proyectos/crear_proyecto.html', {'form': form})
+        form_feriado = formset_factory()
+    return render(request, 'proyectos/crear_proyecto.html', {'form': form, 'form_feriado': form_feriado})
 
 
 # Editar un proyecto
@@ -223,11 +240,13 @@ def editar_proyecto(request, proyecto_id):
         else:
             return HttpResponse('Formulario invalido', status=422)
     else:
-        form = ProyectoForm()
+        form = ProyectoConfigurarForm()
         # cargamos los datos del proyecto
         proyecto = Proyecto.objects.get(id=proyecto_id)
         form.fields['nombre'].initial = proyecto.nombre
         form.fields['descripcion'].initial = proyecto.descripcion
+        form.fields['minimo_dias_sprint'].initial = proyecto.minimo_dias_sprint
+        form.fields['maximo_dias_sprint'].initial = proyecto.maximo_dias_sprint
 
     return render(request, 'proyectos/editar_proyecto.html', {'form': form})
 
@@ -447,7 +466,7 @@ def modificar_rol_proyecto(request, proyecto_id, id_rol_proyecto):
             return redirect('roles_de_proyecto', proyecto_id=proyecto.id)
     else:
         form = RolProyectoForm(
-            initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
+            initial={'nombre': rol.nombre, 'descripcion': rol.descripcion, 'permisos': rol.permisos.all() })
     return render(request, 'proyectos/roles_proyecto/modificar_rol_proyecto.html', {'form': form, 'rol': rol, 'permisos': permisos, 'proyecto': proyecto})
 
 
@@ -669,9 +688,9 @@ def importar_rol(request, proyecto_id):
         # proyecto_objetivo = Proyecto.objects.get(nombre = request.GET.get('proyectos'))
         # Este es el GET cuando solicita ver los roles de proyectos de un proyecto en especifico
         if request.GET.get('proyectos'):
-            proyecto = Proyecto.objects.get(
+            proyecto_seleccionado = Proyecto.objects.get(
                 nombre=request.GET.get('proyectos'))
-            roles = RolProyecto.objects.filter(proyecto=proyecto)
+            roles = RolProyecto.objects.filter(proyecto=proyecto_seleccionado)
         else:  # Este es el GET cuando se llama desde otra pagina
             roles = None
             if proyectos.count() == 0:

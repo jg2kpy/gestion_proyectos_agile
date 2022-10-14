@@ -35,7 +35,7 @@ class ProyectoTests(TestCase):
 
         self.client.login(email='testemail@example.com', password='A123B456c.')
         res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD",
-                               "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id}, follow=True)
+                               "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
         self.assertEqual(res.status_code, 200)
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
 
@@ -103,7 +103,7 @@ class ProyectoTests(TestCase):
 
         # Verfificamos la creacion de un proyecto
         request = request_factory.post(
-            '/proyectos/crear/', {'nombre': 'Proyecto de prueba', 'descripcion': 'Descripcion de prueba', 'scrum_master': master.id})
+            '/proyectos/crear/', {'nombre': 'Proyecto de prueba', 'descripcion': 'Descripcion de prueba', 'scrumMaster': master.id})
         request.user = master
         response = crear_proyecto(request)
         self.assertEqual(response.status_code, 302,
@@ -161,7 +161,7 @@ class ProyectoTests(TestCase):
 
         # Verficicamos la edicion correcta de un proyecto
         request = request_factory.post(f'/proyectos/{proyecto.id}/editar', {'nombre': 'Proyecto de prueba 22',
-                                       'descripcion': 'Descripcion de prueba 2', 'estado': 'Planificacion', 'scrumMaster': master.id})
+                                       'descripcion': 'Descripcion de prueba 2'})
         request.user = master
         response = editar_proyecto(request, proyecto.id)
         self.assertEqual(response.status_code, 422,

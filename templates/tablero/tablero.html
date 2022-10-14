@@ -122,11 +122,11 @@
                             <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 class="modal-title" id="cancelarModal">Cancelar Historia</h5>
+                                <h5 class="modal-title" id="cancelarModal">Cancelar Historia '{{ us.nombre }}'</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Esta a punto de cancelar la historia de usuario {{ us.nombre }}, ¿quiere continuar?</p>
+                                    <p>Esta a punto de cancelar la historia de usuario '{{ us.nombre }}', ¿quiere continuar?</p>
                                 </div>
                                 <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -148,7 +148,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Esta seguro que desea mover {{ us.nombre }} a la etapa {% anterior_etapa us %}?</p>
+                                    <p>Esta seguro que desea mover '{{ us.nombre }}' a la etapa {% anterior_etapa us %}?</p>
                                 </div>
                                 <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -170,7 +170,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Esta seguro que desea mover {{ us.nombre }} a la etapa {% siguente_etapa us %}?</p>
+                                    <p>Esta seguro que desea mover '{{ us.nombre }}' a la etapa {% siguente_etapa us %}?</p>
                                 </div>
                                 <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>

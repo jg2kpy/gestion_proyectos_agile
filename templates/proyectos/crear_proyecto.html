@@ -15,9 +15,34 @@
                 {% csrf_token %}
                 {{ form.as_div }}
                 <br>
+                <div id="feriados" class="mx-auto" align="center">
+                    <div id="form_set">
+
+                    </div>
+                    <button class="btn-dark  mt-3" id="add_more" type="button">
+                        <span class="material-icons" data-toggle="tooltip" data-placement="top" title="Agregar feriado">
+                            add
+                        </span>
+                    </button>
+                    <br>
+                </div>
+                <br>
                 <button type="submit" class="btn btn-primary">Crear proyecto</button>
                 <a href="{% url 'proyectos' %}" class="btn btn-secondary">Volver</a>
             </form>
+            <div id="empty_form" style="display:none">
+                <table class='no_error'>
+                    {{ form_feriado.empty_form.as_table }}
+                    <br>
+                </table>
+            </div>
+            <script>
+                $('#add_more').click(function () {
+                    var form_idx = $('#id_feriados-TOTAL_FORMS').val();
+                    $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+                    $('#id_feriados-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+                });
+            </script>
         </div>
     </div>
 </div>

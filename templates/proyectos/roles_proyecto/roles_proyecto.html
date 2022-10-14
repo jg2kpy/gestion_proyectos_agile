@@ -41,13 +41,13 @@
                     <td>{{ rol_proyecto.nombre }}</td>
                     <td>{{ rol_proyecto.descripcion }}</td>
                     <td>
-                        <a href="{% url 'ver_rol_proyecto' proyecto.id rol_proyecto.id %}" class="btn btn-link"><span
-                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver rol de proyecto">visibility</span></a>
+                        <a class="btn btn-link" href="#modalDetalles{{ rol_proyecto.id }}" data-bs-toggle="modal" data-bs-target="#modalDetalles{{ rol_proyecto.id }}"><span
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span></a>
                         {% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
                         {% if pro_editarRolProyecto %}
                         <a href="{% url 'modificar_rol_proyecto' proyecto.id rol_proyecto.id %}" class="btn btn-link"><span
                             class="material-icons" data-toggle="tooltip" data-placement="top" title="Modificar rol de proyecto">create</span></a>
-                        {% if not rol_proyecto.nombre == 'Scrum Master' %}
+                        {% if not rol_proyecto.nombre == 'Scrum Master' and not rol_proyecto.nombre == 'Member' and rol_proyecto.usuario.count == 0 %}
                         <a class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ rol_proyecto.id }}"><span 
                             class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar rol de proyecto">
                             delete</span></a>
@@ -69,11 +69,11 @@
     <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title" id="cancelarModal">Eliminar rol de proyecto</h5>
+        <h5 class="modal-title" id="cancelarModal">Eliminar rol de proyecto '{{ rol_proyecto.nombre }}'</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <p>Esta a punto de eliminar el rol de proyecto {{ rol_proyecto.nombre }}, ¿quiere continuar?</p>
+            <p>Esta a punto de eliminar el rol de proyecto '{{ rol_proyecto.nombre }}', ¿quiere continuar?</p>
         </div>
         <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -88,4 +88,28 @@
 </div>
 {% endfor %}
 {% endif %}
+
+{% for rol_proyecto in roles_proyecto %}
+<!-- Modal -->
+<div class="modal fade" id="modalDetalles{{rol_proyecto.id}}" tabindex="-1" aria-labelledby="modalDetalles" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title">Detalles de '{{rol_proyecto.nombre}}'</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>{{rol_proyecto.descripcion}}</h6>
+                <div class="row">
+                    <div class="col-md-12 mx-4">
+                        {% for permiso in rol_proyecto.permisos.all %}
+                            <li>{{ permiso.descripcion }}</li>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}
