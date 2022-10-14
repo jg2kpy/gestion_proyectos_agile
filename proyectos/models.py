@@ -49,11 +49,14 @@ class Sprint(models.Model):
     :type proyecto: Proyecto
     :param estado: Estado del sprint.
     :type estado: str
+    :param total_dias: Duración del sprint en días.
+    :type total_dias: int
     """
     fecha_inicio = models.DateTimeField(blank=True, null=True)
     fecha_fin = models.DateTimeField(blank=True, null=True)
     proyecto = models.ForeignKey(Proyecto, related_name='sprints', on_delete=models.PROTECT)
     estado = models.CharField(max_length=255, blank=True, null=True)
+    total_dias = models.IntegerField(blank=True, null=True)
 
     class Meta:
         constraints = [
