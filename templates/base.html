@@ -51,12 +51,15 @@
                     <div class="collapse show" id="tablero-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                             {% for tablero in proyecto.tiposHistoriaUsuario.all %}
-                            <li>
-                                <a href="{% url 'verTablero' proyecto.id tablero.id %}" class="link-dark rounded">
-                                    <i class="material-icons  align-text-bottom">table_chart</i>
-                                    {{ tablero.nombre }}
-                                </a>
-                            </li>
+                            {% check_sprint_no_planificacion tablero as habilitar_tablero %}
+                                {% if habilitar_tablero %}
+                                    <li>
+                                        <a href="{% url 'verTablero' proyecto.id tablero.id %}" class="link-dark rounded">
+                                            <i class="material-icons  align-text-bottom">table_chart</i>
+                                            {{ tablero.nombre }}
+                                        </a>
+                                    </li>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     </div>
