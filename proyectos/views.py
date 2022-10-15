@@ -100,7 +100,7 @@ def crear_proyecto(request):
         form = ProyectoForm(request.POST)
         formset = formset_factory(request.POST, instance=form.instance)
 
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid():
             # Creamos el proyecto
             proyecto = Proyecto()
             proyecto.nombre = form.cleaned_data['nombre']
@@ -112,7 +112,7 @@ def crear_proyecto(request):
             if form.cleaned_data['minimo_dias_sprint']:
                 proyecto.minimo_dias_sprint = form.cleaned_data['minimo_dias_sprint']
             if form.cleaned_data['maximo_dias_sprint']:
-                proyecto.minimo_dias_sprint = form.cleaned_data['maximo_dias_sprint']
+                proyecto.maximo_dias_sprint = form.cleaned_data['maximo_dias_sprint']
             
             try:
                 proyecto.save()
@@ -220,7 +220,6 @@ def editar_proyecto(request, proyecto_id):
     if request.method == 'POST':
         form = ProyectoConfigurarForm(request.POST, instance=proyecto)
         formset = formset_factory(request.POST, instance=form.instance)
-        print(formset,'asdfsd')
         if form.is_valid() and formset.is_valid():
             #try:
                 # Editamos el proyecto
