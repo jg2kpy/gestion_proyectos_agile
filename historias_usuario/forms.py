@@ -95,8 +95,8 @@ class HistoriaUsuarioForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
-            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-            'up': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 100}),
+            'up': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 100}),
             'tipo': forms.Select(attrs={'class': 'form-control'}),
             'usuarioAsignado': forms.Select(attrs={'class': 'form-control'}),
         }

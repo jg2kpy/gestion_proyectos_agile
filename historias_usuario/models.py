@@ -6,6 +6,7 @@ from proyectos.models import Proyecto, Sprint
 from usuarios.models import Usuario
 from django.utils import timezone
 from django.utils.timezone import now
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class TipoHistoriaUsusario(models.Model):
@@ -121,9 +122,9 @@ class HistoriaUsuario(models.Model):
     :type tipo: TipoHistoriaUsusario
     :param versionPrevia: Version anterior en el historial.
     :type versionPrevia: HistoriaUsuario
-    :param up: UserPoints de la historia de usuario.
+    :param up: UserPoints de la historia de usuario. Entre 1 y 100 inclusivo.
     :type up: int
-    :param bv: BuisnessValue de la historia de usuario.
+    :param bv: BuisnessValue de la historia de usuario. Entre 1 y 100 inclusivo.
     :type bv: int
     :param usuarioAsignado: Usuario asignado a la historia de usuario.
     :type usuarioAsignado: Usuario
@@ -141,8 +142,10 @@ class HistoriaUsuario(models.Model):
     tipo = models.ForeignKey(TipoHistoriaUsusario, related_name='historias', on_delete=models.PROTECT)
     versionPrevia = models.ForeignKey('HistoriaUsuario', related_name='versionSiguiente',
                                       blank=True, null=True, on_delete=models.PROTECT)
-    up = models.IntegerField(blank=False, default=0)
-    bv = models.IntegerField(blank=False, default=0)
+    up = models.IntegerField(blank=False, default=1, validators=[
+                             MaxValueValidator(100), MinValueValidator(1)])
+    bv = models.IntegerField(blank=False, default=1, validators=[
+                             MaxValueValidator(100), MinValueValidator(1)])
     usuarioAsignado = models.ForeignKey('usuarios.Usuario', related_name='usuarioAsignado',
                                         blank=True, null=True, on_delete=models.SET_NULL)
     proyecto = models.ForeignKey(Proyecto, related_name='backlog', on_delete=models.PROTECT)
