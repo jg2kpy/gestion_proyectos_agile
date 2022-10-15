@@ -64,7 +64,7 @@ class ProyectoForm(forms.ModelForm):
         self.fields['maximo_dias_sprint'].required = False
 
 
-class ProyectoConfigurarForm(forms.Form):
+class ProyectoConfigurarForm(forms.ModelForm):
     """
         Formulario para configurar un proyecto
         Se introduce el nombre del proyecto, la descripcion, las fechas de inicio y de fin
@@ -82,10 +82,21 @@ class ProyectoConfigurarForm(forms.Form):
         :return: Formulario para crear un proyecto
         :rtype: Form
     """
-    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
-    minimo_dias_sprint = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}), initial=15)
-    maximo_dias_sprint = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}), initial=30)
+
+    class Meta:
+        model = Proyecto
+        fields = ('descripcion', 'minimo_dias_sprint', 'maximo_dias_sprint')
+        widgets = {
+            # 'nombre': forms.TextInput(attrs={'class': 'form-control', 'disabled': 'disabled'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
+            'minimo_dias_sprint': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'maximo_dias_sprint': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['minimo_dias_sprint'].required = False
+        self.fields['maximo_dias_sprint'].required = False
 
 
 class ProyectoFeriadosForm(forms.ModelForm):
@@ -107,7 +118,7 @@ class ProyectoFeriadosForm(forms.ModelForm):
         fields = ('descripcion', 'fecha')
         widgets = {
             'descripcion': forms.TextInput(attrs={'class': 'form-control', 'required': 'requiered'}),
-            'fecha': forms.DateInput(format='%d/%m/%Y', attrs={'type':'date', 'class': 'form-control', 'required': 'requiered'})
+            'fecha': forms.DateInput(format='%Y-%m-%d', attrs={'type':'date', 'class': 'form-control', 'required': 'requiered'})
         }
         required={
             'descripcion': False,
