@@ -106,8 +106,8 @@ class ProyectoFeriadosForm(forms.ModelForm):
         model = Feriado
         fields = ('descripcion', 'fecha')
         widgets = {
-            'descripcion': forms.TextInput(),
-            'fecha': forms.DateInput(format='%d/%m/%Y', attrs={'type':'date'})
+            'descripcion': forms.TextInput(attrs={'class': 'form-control', 'required': 'requiered'}),
+            'fecha': forms.DateInput(format='%d/%m/%Y', attrs={'type':'date', 'class': 'form-control', 'required': 'requiered'})
         }
         required={
             'descripcion': False,

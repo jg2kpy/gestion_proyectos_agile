@@ -78,6 +78,6 @@ class Feriado(models.Model):
     :param fecha: Fecha del feriado.
     :type fecha: Fecha
     """
-    proyecto = models.ForeignKey('proyectos.Proyecto', related_name="feriados", on_delete=models.DO_NOTHING)
+    proyecto = models.ForeignKey(Proyecto, related_name="feriados", on_delete=models.DO_NOTHING)
     descripcion = models.TextField(blank=True, null=True)
     fecha = models.DateTimeField(blank=True, null=True)
