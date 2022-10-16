@@ -170,3 +170,12 @@ def lista_adm():
     """
     adminRol = RolSistema.objects.get(nombre="gpa_admin")
     return adminRol.usuario.all()
+
+@register.simple_tag
+def es_miembro(usuario, proyecto):
+    """Funcion para verificar que un miembro pertenece a un proyecto
+
+    :return: True si el usuario es miembro del proyecto
+    :rtype: bool
+    """
+    return usuario.equipo.filter(id=proyecto.id).exists()
