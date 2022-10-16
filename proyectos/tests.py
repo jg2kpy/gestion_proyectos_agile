@@ -36,7 +36,7 @@ class ProyectoTests(TestCase):
         self.client.login(email='testemail@example.com', password='A123B456c.')
         res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD",
                                "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, 200, 'La respuesta no fue un estado HTTP 200 al intentar crear un proyecto')
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
 
     def test_ver_proyectos(self):
@@ -577,6 +577,9 @@ class ProyectoTests(TestCase):
                 'La respuesta no fue un estado HTTP 200 a una creacion de proyecto con feriados')
             
     def test_editar_feriados_proyecto(self):
+        """
+            Prueba de editar un proyecto y sus feriados
+        """
         res = self.client.post("/proyecto/crear/", 
             {
                 'nombre': 'Proyecto Feriados', 'descripcion': 'Proyecto con feriados', 
