@@ -43,6 +43,8 @@ def proyectos(request):
 
     if not request.user.is_authenticated:
         return render(request, '401.html', status=401)
+    
+    request.session['cancelar_volver_a'] = request.path
 
     if tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
@@ -71,6 +73,7 @@ def proyecto_home(request, proyecto_id):
     if not request.user.equipo.filter(id=proyecto.id).exists():
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para ver este proyecto'}, status=403)
 
+    request.session['cancelar_volver_a'] = request.path
     return render(request, 'proyectos/home.html', {'proyecto': proyecto})
 
 
@@ -221,7 +224,7 @@ def editar_proyecto(request, proyecto_id):
         form = ProyectoConfigurarForm(request.POST, instance=proyecto)
         formset = formset_factory(request.POST, instance=form.instance)
         if form.is_valid() and formset.is_valid():
-            #try:
+            try:
                 # Editamos el proyecto
                 proyecto = Proyecto.objects.get(id=proyecto_id)
                 proyecto.descripcion = form.cleaned_data['descripcion']
@@ -237,8 +240,8 @@ def editar_proyecto(request, proyecto_id):
 
                 proyecto.save()
                 return redirect('proyectos')
-            #except Exception as e:
-            #    return HttpResponse('Error al editar el proyecto', status=500)
+            except Exception as e:
+                return HttpResponse('Error al editar el proyecto', status=500)
         else:
             return HttpResponse('Formulario invalido', status=422)
     else:
@@ -248,7 +251,8 @@ def editar_proyecto(request, proyecto_id):
 
         form_feriado = formset_factory(instance=proyecto)
 
-    return render(request, 'proyectos/editar_proyecto.html', {'form': form, 'form_feriado':form_feriado, 'proyecto': proyecto})
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'proyectos/editar_proyecto.html', {'form': form, 'form_feriado':form_feriado, 'proyecto': proyecto, 'volver_a': volver_a})
 
 
 # Recibimos una peticion POST para cancelar un proyecto
