@@ -803,13 +803,20 @@ def backlog_sprint(request, proyecto_id, sprint_id):
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
 
-    request.session['cancelar_volver_a'] = request.path
     if request.method == 'POST':
         historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
         historia.sprint = None
         historia.save()
+        
+    miembros = [miembro for miembro in proyecto.usuario.all() if UsuarioTiempoEnSprint.objects.filter(sprint=sprint, usuario=miembro).exists()]
+    for miembro in miembros:
+        miembro.historias_total = sum([historia.horasAsignadas for historia in sprint.historias.all() if historia.usuarioAsignado == miembro])
+        miembro.capacidad = UsuarioTiempoEnSprint.objects.get(sprint=sprint, usuario=miembro).horas
+        miembro.capacidad_total = miembro.capacidad * sprint.duracion
+        miembro.historias_count = len([historia for historia in sprint.historias.all() if historia.usuarioAsignado == miembro])
+    request.session['cancelar_volver_a'] = request.path
 
-    return render(request, 'sprints/base.html', {'proyecto': proyecto, 'historias': sprint.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO), 'titulo': "Sprint Backlog "+sprint.nombre}, status=200)
+    return render(request, 'sprints/base.html', {'proyecto': proyecto, 'miembros': miembros, 'sprint': sprint, 'historias': sprint.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO), 'titulo': "Sprint Backlog "+sprint.nombre}, status=200)
 
 @never_cache
 def agregar_historias(request, proyecto_id, sprint_id):
@@ -910,3 +917,50 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
                 d.horas = 0
 
     return render(request, 'sprints/editar_miembros.html', {'proyecto': proyecto, 'desarrolladores': desarrolladores, 'error': error, 'sprint': sprint}, status=status)
+
+@never_cache
+def agregar_historias_sprint(request, proyecto_id, sprint_id):
+    """
+    Permite agregar US a un Sprint
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que pertenece el sprint
+    :type proyecto_id: int
+
+    :param sprint_id: ID del sprint del cuál se quiere modificar el equipo
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para editar los miembros del sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        sprint = Sprint.objects.get(id=sprint_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0]
+    desarrolladores = proyecto.usuario.all()
+    status = 200
+    error = None
+    if request.method == 'POST':
+        for historia in historias:
+            if request.POST.get('historia_seleccionado_'+str(historia.id)):
+                historia.sprint = sprint
+                historia.horasAsignadas = request.POST.get('historia_horas_'+str(historia.id))
+                historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
+                historia.save()
+        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+
+    return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)

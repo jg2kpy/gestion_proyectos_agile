@@ -21,4 +21,5 @@ urlpatterns = [
     path('<int:proyecto_id>/sprints/crear/', crear_sprint, name='crear_sprint'),
     path('<int:proyecto_id>/sprints/<int:sprint_id>/backlog/', backlog_sprint, name='backlog_sprint'),
     path('<int:proyecto_id>/sprints/<int:sprint_id>/editar_miembros/', editar_miembros_sprint, name='editar_miembros_sprint'),
+    path('<int:proyecto_id>/sprints/<int:sprint_id>/agregar_historias/', agregar_historias_sprint, name='agregar_historias_sprint'),
 ]

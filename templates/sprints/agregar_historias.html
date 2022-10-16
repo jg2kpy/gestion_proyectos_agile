@@ -1,30 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Crear Sprint{% endblock %}
+{% block title %}Agregar Historias de Usuario al Sprint{% endblock %}
 {% block contenido %}
 <div class="row">
     <div class="col-md-12">
         <div class="container">
             <h1>
-                Creación de Sprint
+                Agregar Historias de Usuario al Sprint
             </h1>
         </div>
         <form id="sprintForm" action="." method="POST">
             {% csrf_token %}
-            <div class="tab container">
-                <h4>Información general del Sprint</h4>
-                <div style="display: none;" class="alert alert-secondary" role="alert" id="aviso_dias_planeados_max">
-                    Se recomienda que los días planeados no superen los {{proyecto.maximo_dias_sprint}} días.
-                </div>
-                <div style="display: none;" class="alert alert-secondary" role="alert" id="aviso_dias_planeados_min">
-                    Se recomienda que los días planeados sean al menos {{proyecto.minimo_dias_sprint}} días.
-                </div>
-                <p><input type="text" name="nombre" placeholder="Nombre Sprint" required></p>
-                <p><input type="textarea" name="descripcion" placeholder="Descripción" required></p>
-                <p>
-                    <input type="number" name="duracion" id="input_dias_planeados" placeholder="Días planeados" required>
-                </p>
-            </div>
-            
             <div class="tab container d-none">
                 <h4>Historias de Usuario</h4>
                 <div role="alert" class="alert alert-dark" id="aviso_horas_planeadas">
@@ -74,31 +59,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            
-            <div class="tab container d-none">
-                <h4>Horas desarolladores:</h4>
-                {% for desarrollador in proyecto.usuario.all %}
-                <div class="row desarrollador_horas_dia_list" id="campo_desarrollador_{{desarrollador.id}}">
-                    <span id="aviso_horas_desarrollador_{{desarrollador.id}}">
-                        Horas ingresadas difieren significativamente con horas calculadas de las historias de usuario!
-                    </span>
-                    <div class="col-md-4">
-                        <img src="{{ desarrollador.avatar_url }}" alt="{{ desarrollador.get_full_name }} foto perfil" width="30" height="30"
-                            class="rounded-circle" style="margin-right: 10px;" />
-                        {{ desarrollador.get_full_name }}
-                    </div>
-                    <div class="col-md-4">
-                        Horas según historias de usuario: <span class="horas_calculadas_desarrollador_list" id="horas_calculadas_{{desarrollador.id}}">0</span>
-                        <br>
-                        Horas según cantidad de días: <span id="horas_dias_{{desarrollador.id}}">0</span>
-                    </div>
-                    <div class="col-md-4">
-                        Horas que trabaja por día:
-                        <input type="number" min="0" max="24" value='0' class="horas_trabajadas_input" name="horas_trabajadas_{{desarrollador.id}}" id="horas_trabajadas_{{desarrollador.id}}">
                     </div>
                 </div>
                 {% endfor %}
@@ -208,17 +168,13 @@ function showTab(n) {
     x[tabActual].classList.remove("d-none");
     x[tabActual].classList.add("d-block");
 
-    // if (tabActual == 1) {
-    //     $("#horas_total_asignadas").text($('#input_dias_planeados').val() * 8);
-    // }
-
     if (n == 0) {
         document.getElementById("prevBtn").style.display = "none";
     } else {
         document.getElementById("prevBtn").style.display = "inline";
     }
     if (n == (x.length - 1)) {
-        document.getElementById("nextBtn").innerHTML = "Crear";
+        document.getElementById("nextBtn").innerHTML = "Agregar";
     } else {
         document.getElementById("nextBtn").innerHTML = "Siguiente";
     }
@@ -236,28 +192,7 @@ function nextPrev(n) {
         document.getElementById("sprintForm").submit();
         return false;
     }
-
-    if (tabActual == 2) {
-        calcularHoras();
-    }
     showTab(tabActual);
-}
-
-function calcularHoras() {
-    var horas = $('.historia_horas_list')
-
-    for (var i = 0; i < horas.length; i++) {
-        var horas_calculadas = $('#horas_calculadas_' + horas[i].name.replace('historia_horas_', ''));
-        horas_calculadas.text('0');
-    }
-    
-    for(var i = 0; i < horas.length; i++) {
-        if ($(horas[i]).is(":hidden")) {
-            continue;
-        }
-        var horas_calculadas = $('#horas_calculadas_' + $('#desarrollador_asignado_' + horas[i].name.replace('historia_horas_', '')).find(":selected").val());
-        horas_calculadas.text(parseInt(horas_calculadas.text()) + parseInt($(horas[i]).val()));
-    }
 }
 
 function validateForm() {
@@ -265,18 +200,6 @@ function validateForm() {
     var input = $('.tab:first :input');
     
     if(tabActual == 0) {
-        if(!input[0].checkValidity()) {
-            valid = false;
-        }
-        if(!input[1].checkValidity()) {
-            valid = false;
-        }
-        if(!input[2].checkValidity()) {
-            valid = false;
-        }
-        $('#sprintForm')[0].reportValidity();
-    }
-    else if(tabActual == 1) {
         var horas = $('.historia_horas_list')
         for (var i = 0; i < horas.length; i++) {
             if ($(horas[i]).is(":hidden")) {
@@ -301,8 +224,6 @@ function validateForm() {
             }
         }
         $('#sprintForm')[0].reportValidity();
-    } else {
-        return $('#sprintForm')[0].reportValidity();
     }
 
     return valid;
