@@ -1,10 +1,11 @@
+import datetime
 from django.shortcuts import render, redirect
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
 from django.http import HttpResponse, HttpResponseRedirect
 
 
-from proyectos.models import Proyecto
+from proyectos.models import Feriado, Proyecto
 from .models import *
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
 from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, HistoriaUsuarioProductOwnerForm, SubirArchivoForm, TipoHistoriaUsuarioForm
@@ -687,6 +688,26 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
     return render(request, 'historias/historial.html', {"volver_a": volver_a, 'proyecto': proyecto, 'version_ori': historia, 'versiones': historia.obtenerVersiones()}, status=200)
 
 
+def calcularFechaSprint(fechaInicio, dias, proyecto):
+    diasParaAgregar = dias
+    fechaActual = fechaInicio
+    feriadosFecha = []
+    feriados = Feriado.objects.filter(proyecto=proyecto)
+
+    if feriados:
+        for feriado in feriados:
+            feriadosFecha.append(feriado.fecha.date())
+    
+    while diasParaAgregar > 0:
+        fechaActual += datetime.timedelta(days=1)
+
+        if fechaActual.weekday() >= 5 or fechaActual.date() in feriadosFecha:
+            continue
+
+        diasParaAgregar -= 1
+
+    return fechaActual
+
 @ never_cache
 def verTablero(request, proyecto_id, tipo_id):
     """
@@ -731,22 +752,58 @@ def verTablero(request, proyecto_id, tipo_id):
     etapas = []
 
     if request.method == 'POST':
-        sprintId = request.POST.get('sprintId')
+        if request.POST.get('sprintId'):
+            sprintId = request.POST.get('sprintId')
 
-        for etapa in tipo.etapas.all().order_by('orden'):
-            aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
-            aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintId)
-            etapas.append(aux_etapa)
+            for etapa in tipo.etapas.all().order_by('orden'):
+                aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
+                
+                if Sprint.objects.get(id=sprintId).estado == 'A':
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintId, estado='A')
+                else:
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintId, estado='S')
+                
+                etapas.append(aux_etapa)
 
+        # Función para comenzar un sprint
+        # ! Verificar restricción en modelo en el caso que no tenga definido dias_totales
+        if request.POST.get('comenzar'):
+            sprintInciar = Sprint.objects.get(proyecto=proyecto, fecha_inicio__isnull=True)
+            sprintInciar.fecha_inicio = datetime.datetime.now()
+            sprintInciar.fecha_fin = calcularFechaSprint(sprintInciar.fecha_inicio, sprintInciar.total_dias, proyecto)
+            sprintInciar.estado = "Desarrollo"
+            sprintInciar.save()
+
+        # Función para terminar un sprint
+        if request.POST.get('terminar'):
+            sprintTerminar = sprintDesc[0]
+            sprintTerminar.estado = "Terminado"
+            sprintTerminar.save()
+
+            usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintDesc[0]).exclude(estado='H')
+            
+            for usFinalizar in usListFinalizar:
+                copiaUs = usFinalizar
+                copiaUs.pk = None
+                copiaUs.sprint = sprintTerminar
+                copiaUs.estado = 'S'
+                copiaUs.save()
+            
     else:
         for etapa in tipo.etapas.all().order_by('orden'):
             aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
             
             if sprintCookie:
-                aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id)
+                if Sprint.objects.get(id=sprintDesc[int(sprintCookie)].id).estado == 'A':
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado='A')
+                else:
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado='S')
 
             else:    
-                aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id)
+                if Sprint.objects.get(id=sprintDesc[0].id).estado == 'A':
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado='A')
+                else:
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado='S')
 
             etapas.append(aux_etapa)
     
