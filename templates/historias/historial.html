@@ -6,22 +6,16 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>{{ titulo }}</h1>
-        </div>
-        <div>
-            {% tiene_permiso_en_proyecto user 'pro_cargarUSalBacklog' proyecto as pro_cargarUSalBacklog %}
-            {% if pro_cargarUSalBacklog and esBacklog %}
-                <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Cargar US al product backlog</a>
-            {% endif %}
+            <h3>Historial de '{{ version_ori.nombre }}'</h3>
         </div>
     </div>
     <div class="row">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Fecha creación</th>
+                    <th>Fecha modificación</th>
                     <th>Nombre</th>
-                    <th>Tipo</th>
+                    <th>Etapa</th>
                     <th>User Points</th>
                     <th>Business Value</th>
                     <th>Usuario</th>
@@ -33,14 +27,18 @@
                 <tr>
                     <th>{{ historia.fecha_creacion|date:'Y-m-d H:i:s' }}</th>
                     <td>{{ historia.nombre }}</td>
-                    <td>{{ historia.tipo }}</td>
+                    {% if historia.etapa %}
+                        <td>{{ historia.etapa }}</td>
+                    {% else %}
+                        <td>Planificado</td>
+                    {% endif %}
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
                     <td>{{ historia.usuarioAsignado.get_full_name }}</td>
                     <td>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal"
                             data-bs-target="#modalVer{{ historia.id }}"><span 
-                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver descripción de historia">visibility</span>
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span>
                         </button>
 
                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
@@ -67,11 +65,11 @@
             <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Estas seguro que desea cancelar?</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Restaurar versión</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Seguro que quiere restaurar version del {{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}?</p>
+                    <p>¿Seguro que desea restaurar la historia '{{ historia.nombre }}' a la versión del {{ historia.fecha_creacion|date:'Y-m-d H:i:s' }}?</p>
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -87,45 +85,43 @@
         </div>
         
         <!-- Modal -->
-        <div class="modal fade" id="modalVer{{ historia.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+        <div class="modal fade" id="modalVer{{ historia.id }}" tabindex="-1" aria-labelledby="verModal"
         aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">{{ historia.nombre }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>{{ historia.descripcion }}</p>
-                        <p>Creado: {{ historia.fecha_creacion|date:'Y-m-d H:i:s'  }}</p>
-                        {% if historia.fechar_modificacion %}
-                        <p>Modificado: {{ historia.fechar_modificacion|date:'Y-m-d H:i:s'  }}</p>
-                        {% endif %}
-                        <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
-                        {% if historia.etapa %}
-                            <p>Etapa: {{ historia.etapa }}</p>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="verModal">{{ historia.nombre }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ historia.descripcion }}</p>
+                    {% if historia.fecha_modificacion %}
+                    <p>Modificado: {{ historia.fecha_modificacion|date:'Y-m-d H:i:s'}}</p>
+                    {% endif %}
+                    {% if historia.etapa %}
+                        <p>Etapa: {{ historia.etapa }}</p>
+                    {% else %}
+                        <p>Planificado</p>
+                    {% endif %}
+                    <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
+                    <p>
+                        {% if historia.comentarios.count > 0 %}
+                            {{ historia.comentarios.count}} comentarios
                         {% else %}
-                            <p>Planificado</p>
+                            No hay comentarios
                         {% endif %}
-                        <p>
-                            {% if historia.comentarios.count > 0 %}
-                                {{ historia.comentarios.count}} comentarios
-                            {% else %}
-                                No hay comentarios
-                            {% endif %}
-                        </p>
-                        <p>
-                            {% if historia.archivos.count > 0 %}
-                                {{ historia.archivos.count}} archivos
-                            {% else %}
-                                No hay archivos
-                            {% endif %}
-                        </p>
-                    </div>
+                    <p>
+                        {% if historia.archivos.count > 0 %}
+                            {{ historia.archivos.count}} archivos
+                        {% else %}
+                            No hay archivos
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>
+    </div>
     <!-- End Modal -->
     {% endfor %}
 </div>

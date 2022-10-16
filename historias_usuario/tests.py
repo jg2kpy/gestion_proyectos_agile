@@ -33,7 +33,7 @@ class TiposHistoriasUsuarioTest(TestCase):
                                                          avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
                                                          
         self.client.login(email='testemail@example.com', password='A123B456c.')
-        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id}, follow=True)
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
         self.assertEqual(res.status_code, 200)
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
         self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists())
@@ -126,7 +126,7 @@ class HistoriasUsuarioTest(TestCase):
 
 
         self.client.login(email='testemail@example.com', password='A123B456c.')
-        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id}, follow=True)
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
         self.assertEqual(res.status_code, 200)
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
         self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists())
@@ -148,8 +148,7 @@ class HistoriasUsuarioTest(TestCase):
         res = self.client.post(f"/proyecto/{self.proyecto.id}/historia-usuario/crear/", 
             {
                 'nombre': 'Test US 1', 'descripcion': 'Des de Test US 1', 'bv': '10', 'up': '10',
-                'tipo': TipoHistoriaUsusario.objects.get(nombre='Test tipo 1').id,
-                'usuarioAsignado': Usuario.objects.get(email='testemail@example.com').id
+                'tipo': TipoHistoriaUsusario.objects.get(nombre='Test tipo 1').id
             }, follow=True)
         self.assertEqual(res.status_code, 200)
 
@@ -160,7 +159,6 @@ class HistoriasUsuarioTest(TestCase):
         self.assertEqual(creado.bv, 10, 'La historia de usuario recien creada no tiene el BV correspondiente')
         self.assertEqual(creado.up, 10, 'La historia de usuario recien creada no tiene el UP correspondiente')
         self.assertEqual(creado.tipo, TipoHistoriaUsusario.objects.get(nombre='Test tipo 1'), 'La historia de usuario recien creada no tiene el tipo de US correspodiente')
-        self.assertEqual(creado.usuarioAsignado, Usuario.objects.get(email='testemail@example.com'), 'La historia de usuario recien creada no el usuario asignado correspondiente')
     
 
     def test_editarHistoriaUsuario(self):
@@ -177,8 +175,7 @@ class HistoriasUsuarioTest(TestCase):
         creado = HistoriaUsuario.objects.get(nombre='Test US 1')
         res = self.client.post(f"/proyecto/{self.proyecto.id}/historia-usuario/{creado.id}/editar/", 
             {
-                'descripcion': 'Des de Test US 1 actualizado', 'bv': '5', 'up': '15',
-                'usuarioAsignado': Usuario.objects.get(email='testemail2@example.com').id
+                'descripcion': 'Des de Test US 1 actualizado', 'bv': '5', 'up': '15'
             }, follow=True)
         self.assertEqual(res.status_code, 200)
 
@@ -187,7 +184,6 @@ class HistoriasUsuarioTest(TestCase):
         self.assertEqual(actualizado.descripcion, 'Des de Test US 1 actualizado', 'La descripcion de la historia de usuario no fue actualizada')
         self.assertEqual(actualizado.bv, 5, 'Los BV de la historia de usuario no fue actualizada')
         self.assertEqual(actualizado.up, 15, 'Los UP de la historia de usuario no fue actualizada')
-        self.assertEqual(actualizado.usuarioAsignado, Usuario.objects.get(email='testemail2@example.com'), 'El usuario asignado de la historia de usuario no fue actualizada')
 
     def test_cancelarHistoriaUsuario(self):
         """
@@ -270,6 +266,7 @@ class HistoriasUsuarioTest(TestCase):
         movidoAnt = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
         self.assertEqual(movidoAnt.etapa.nombre, 'Etapa 1', f'La historia de usuario no se movió. Está en etapa: {movidoAnt.etapa.nombre}')
 
+    # TODO: Reeimplementar con la asignacion realizada en la creacion de sprint
     def test_visualizarHistoriaUsuarioAsignada(self):
         """
         Prueba de visualizar una historia de usuario asignada a dicho usuario.
@@ -277,17 +274,16 @@ class HistoriasUsuarioTest(TestCase):
         res = self.client.post(f"/proyecto/{self.proyecto.id}/historia-usuario/crear/", 
             {
                 'nombre': 'Test US 1', 'descripcion': 'Des de Test US 1', 'bv': '10', 'up': '10',
-                'tipo': TipoHistoriaUsusario.objects.get(nombre='Test tipo 1').id,
-                'usuarioAsignado': Usuario.objects.get(email='testemail@example.com').id
+                'tipo': TipoHistoriaUsusario.objects.get(nombre='Test tipo 1').id
             }, follow=True)
         self.assertEqual(res.status_code, 200)
 
-        creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
-        self.assertEqual(self.user, creado.usuarioAsignado)
+        # creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        # self.assertEqual(self.user, creado.usuarioAsignado)
 
-        res = self.client.get(f"/proyecto/{self.proyecto.id}/mis-historias/", follow=True)
-        self.assertEqual(res.status_code, 200)
-        self.assertContains(res, '<td>Test US 1</td>', 1, 200, "No se puede visualizar la historia asignada")
+        # res = self.client.get(f"/proyecto/{self.proyecto.id}/mis-historias/", follow=True)
+        # self.assertEqual(res.status_code, 200)
+        # self.assertContains(res, '<td>Test US 1</td>', 1, 200, "No se puede visualizar la historia asignada")
 
 class TableroTest(TestCase):
     """
@@ -306,7 +302,7 @@ class TableroTest(TestCase):
                                                          avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
 
         self.client.login(email='testemail@example.com', password='A123B456c.')
-        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id}, follow=True)
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
         self.assertEqual(res.status_code, 200)
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
         self.assertIsNotNone(self.proyecto)
@@ -411,7 +407,7 @@ class HistorialTest(TestCase):
 
 
         self.client.login(email='testemail@example.com', password='A123B456c.')
-        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id}, follow=True)
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
         self.assertEqual(res.status_code, 200)
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
         self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists())

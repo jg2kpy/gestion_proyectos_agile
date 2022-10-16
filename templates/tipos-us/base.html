@@ -36,6 +36,8 @@
                     <td>{{ tipo.nombre }}</td>
                     <td>{{ tipo.descripcion }}</td>
                     <td>
+                        <a class="btn btn-link" href="#modalDetalles{{ tipo.id }}" data-bs-toggle="modal" data-bs-target="#modalDetalles{{ tipo.id }}"><span
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span></a>
                         {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
                         {% if pro_crearTipoUS and tipo.historias.count == 0 %}
                         <a href="{% url 'editarTipoHistoriaUsuario' proyecto.id tipo.id %}" class="btn btn-link"><span
@@ -60,11 +62,11 @@
     <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title" id="cancelarModal">Eliminar tipo de historia de usuario</h5>
+        <h5 class="modal-title" id="cancelarModal">Eliminar tipo de historia de usuario '{{ tipo.nombre }}'</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <p>Esta a punto de eliminar el tipo de historia de usuario {{ tipo.nombre }}, ¿quiere continuar?</p>
+            <p>Esta a punto de eliminar el tipo de historia de usuario '{{ tipo.nombre }}', ¿quiere continuar?</p>
         </div>
         <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -73,6 +75,28 @@
             <input type="submit" class="btn btn-danger" value="Eliminar tipo de Historia">
             <input type="hidden" name="url" value="{{ request.path }}">
         </form>
+        </div>
+    </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalDetalles{{tipo.id}}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="cancelarModal">Detalles de '{{tipo.nombre}}'</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <h6>{{tipo.descripcion}}</h6>
+            <div class="row">
+                <div class="col-md-12 mx-4">
+                    {% for etapa in tipo.etapas.all %}
+                        <li>{{ etapa.nombre }}</li>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
     </div>
