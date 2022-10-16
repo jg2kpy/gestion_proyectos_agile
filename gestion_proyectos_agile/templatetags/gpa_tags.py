@@ -204,3 +204,19 @@ def check_sprint_no_planificacion(tablero):
         return True
     else:
         return False
+
+@register.simple_tag
+def check_sprint_activo(proyecto):
+    """Funcion para verificar si existe un sprint en desarrollo
+    :param proyecto: Objeto del proyecto
+    :type proyecto: Proyecto
+
+    :return: Se retorna True si existe un sprint en desarrollo
+    :rtype: bool
+    """
+    sprints = Sprint.objects.filter(proyecto=proyecto, estado="Desarrollo").exclude(fecha_inicio__isnull=True)
+    
+    if sprints:
+        return True
+    else:
+        return False
