@@ -550,3 +550,67 @@ class ProyectoTests(TestCase):
         response = importar_rol(request, proyecto.id)
         self.assertEqual(response.status_code, 200,
                          'La respuesta no fue un estado HTTP 200 a un usuario Scrum Master')
+
+
+    def test_crear_proyecto_con_feriados(self):
+        """
+            Prueba de crear un proyecto con feriados
+        """
+        res = self.client.post("/proyecto/crear/", 
+            {
+                'nombre': 'Proyecto Feriados', 'descripcion': 'Proyecto con feriados', 
+                'minimo_dias_sprint': '15', 'maximo_dias_sprint': '30',
+                'scrumMaster': self.user.id,
+
+                'feriados-TOTAL_FORMS': '2', 
+                'feriados-INITIAL_FORMS': '0',
+                'feriados-MIN_NUM_FORMS': '0', 
+                'feriados-MAX_NUM_FORMS': '1000', 
+
+                'feriados-0-descripcion': "Navidad", 
+                'feriados-0-fecha': '2022-12-25', 
+
+                'feriados-1-descripcion': "Ano nuevo", 
+                'feriados-1-fecha': '2022-12-30', 
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de proyecto con feriados')
+            
+    def test_editar_feriados_proyecto(self):
+        res = self.client.post("/proyecto/crear/", 
+            {
+                'nombre': 'Proyecto Feriados', 'descripcion': 'Proyecto con feriados', 
+                'minimo_dias_sprint': '15', 'maximo_dias_sprint': '30',
+                'scrumMaster': self.user.id,
+
+                'feriados-TOTAL_FORMS': '2', 
+                'feriados-INITIAL_FORMS': '0',
+                'feriados-MIN_NUM_FORMS': '0', 
+                'feriados-MAX_NUM_FORMS': '1000', 
+
+                'feriados-0-descripcion': "Navidad", 
+                'feriados-0-fecha': '2022-12-25', 
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de proyecto con feriados')
+        
+        proyecto_con_feriado = Proyecto.objects.get(nombre='Proyecto Feriados')
+
+        res = self.client.post(f"/proyecto/{proyecto_con_feriado.id}/editar/",
+            {
+                'descripcion': 'Proyecto con feriados modificado', 
+                'minimo_dias_sprint': '10', 'maximo_dias_sprint': '35',
+
+                'feriados-TOTAL_FORMS': '2', 
+                'feriados-INITIAL_FORMS': '0',
+                'feriados-MIN_NUM_FORMS': '0', 
+                'feriados-MAX_NUM_FORMS': '1000', 
+
+                'feriados-0-descripcion': "Navidad", 
+                'feriados-0-fecha': '2022-12-26', 
+
+                'feriados-1-descripcion': "Ano nuevo", 
+                'feriados-1-fecha': '2022-12-30', 
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una edicion de proyecto con feriados')
