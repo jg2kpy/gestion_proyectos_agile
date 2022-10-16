@@ -8,7 +8,8 @@
                 Creación de Sprint
             </h1>
         </div>
-        <form id="sprintForm" action="">
+        <form id="sprintForm" action="." method="POST">
+            {% csrf_token %}
             <div class="tab container">
                 <h4>Información general del Sprint</h4>
                 <div style="display: none;" class="alert alert-secondary" role="alert" id="aviso_dias_planeados_max">
@@ -93,11 +94,11 @@
                     <div class="col-md-4">
                         Horas según historias de usuario: <span class="horas_calculadas_desarrollador_list" id="horas_calculadas_{{desarrollador.id}}">0</span>
                         <br>
-                        Horas según historias cantidad de días: <span id="horas_dias_{{desarrollador.id}}">0</span>
+                        Horas según cantidad de días: <span id="horas_dias_{{desarrollador.id}}">0</span>
                     </div>
                     <div class="col-md-4">
                         Horas que trabaja por día:
-                        <input type="number" min="0" max="24" value='0' class="horas_trabajadas_input" id="horas_trabajadas_{{desarrollador.id}}">
+                        <input type="number" min="0" max="24" value='0' class="horas_trabajadas_input" name="horas_trabajadas_{{desarrollador.id}}" id="horas_trabajadas_{{desarrollador.id}}">
                     </div>
                 </div>
                 {% endfor %}

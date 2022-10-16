@@ -69,7 +69,7 @@ class Sprint(models.Model):
     def __str__(self):
         return self.estado
 
-class UsuarioTiempoEnSprint:
+class UsuarioTiempoEnSprint(models.Model):
     sprint = models.ForeignKey(Sprint, related_name="participantes", on_delete=models.PROTECT)
     usuario = models.ForeignKey('usuarios.Usuario', related_name='sprints', on_delete=models.PROTECT)
     horas = models.IntegerField(blank=False, null=False, validators=[

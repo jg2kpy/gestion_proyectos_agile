@@ -355,7 +355,7 @@ def historiaUsuarioBacklog(request, proyecto_id):
         return render(request, '403.html', {'info_adicional': 'No pertenece a este proyecto, no tiene permisos para ver este backlog'}, status=403)
 
     request.session['cancelar_volver_a'] = request.path
-    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=None, estado=HistoriaUsuario.Estado.ACTIVO).order_by('nombre'), 'proyecto': proyecto, 'esBacklog': True, 'titulo': 'Backlog'})
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.ACTIVO).order_by('nombre'), 'proyecto': proyecto, 'esBacklog': True, 'titulo': 'Backlog'})
 
 
 @never_cache

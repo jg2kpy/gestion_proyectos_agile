@@ -14,6 +14,10 @@
             <h1>{{ titulo }}</h1>
         </div>
         <div>
+            {% tiene_permiso_en_proyecto user 'pro_cargarUSalBacklog' proyecto as pro_cargarUSalBacklog %}
+            {% if pro_cargarUSalBacklog and esBacklog %}
+                <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Agregar Historia al Sprint Backlog</a>
+            {% endif %}
             <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
         </div>
     </div>
