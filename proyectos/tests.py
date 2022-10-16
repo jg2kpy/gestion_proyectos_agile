@@ -44,7 +44,7 @@ class ProyectoTests(TestCase):
         Prueba que el usuario puede ver los proyectos
         """
         request_factory = RequestFactory()
-        request = request_factory.get('/proyectos/')
+        request = request_factory.get('/proyecto/')
         request.user = AnonymousUser()
         response = proyectos(request)
         self.assertEqual(response.status_code, 401,
@@ -63,15 +63,14 @@ class ProyectoTests(TestCase):
 
         # Verificamos que el usuario sin de admin puede ver los proyectos
         request.user = user
-        response = proyectos(request)
+        response = self.client.get('/proyecto/')
         self.assertContains(response, '<h1>Proyectos</h1>', None,
                             200,  "Usuario ve lista vacia si no es Scrum Master")
         self.assertContains(response, 'http://localhost/proyectos/crear/', 0,
                             200,  "Usuario no tiene opcion crear proyecto si no es Scrum Master")
 
         # Verificamos que el usuario puede ver los proyectos
-        request.user = master
-        response = proyectos(request)
+        response = self.client.get('/proyecto/')
         self.assertEqual(response.status_code, 200,
                          "Usuario no puede ver los proyectos")
 
