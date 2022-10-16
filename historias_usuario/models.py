@@ -128,10 +128,13 @@ class HistoriaUsuario(models.Model):
     :type bv: int
     :param usuarioAsignado: Usuario asignado a la historia de usuario.
     :type usuarioAsignado: Usuario
+    :param horasAsignadas: Horas asignadas a la historia de usuario.
+    :type horasAsignadas: int
     :param proyecto: Proyecto al que pertenece la historia de usuario.
     :type proyecto: Proyecto
     :param archivo: Archivos anexos a la historia de usuario.
     :type archivo: List[ArchivoAnexo]
+    :param sprintInfo: Información de la historia de usuario en un Sprint anterior.
     """
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
@@ -148,6 +151,8 @@ class HistoriaUsuario(models.Model):
                              MaxValueValidator(100), MinValueValidator(1)])
     usuarioAsignado = models.ForeignKey('usuarios.Usuario', related_name='usuarioAsignado',
                                         blank=True, null=True, on_delete=models.SET_NULL)
+    horasAsignadas = models.IntegerField(blank=False, default=0, validators=[MinValueValidator(0)])
+
     proyecto = models.ForeignKey(Proyecto, related_name='backlog', on_delete=models.PROTECT)
 
     class Estado(models.TextChoices):
@@ -162,6 +167,19 @@ class HistoriaUsuario(models.Model):
         default=Estado.ACTIVO,
     )
     archivos = models.ManyToManyField(ArchivoAnexo, related_name="historia_usuario", blank=True)
+
+    def getPrioridad(self):
+        """
+        Obtiene la prioridad de agregar la historia de usuario al sprint.
+
+        params
+        """
+        # No se puede agregar a nuevos Sprints si la historia esta todavía en un Sprint
+        if self.sprint is not None:
+            return -1
+        
+        return self.bv * 0.6 + self.up * 0.4 + (30 if self.sprintInfo is not None else 0)
+
     
     def guardarConHistorial(self):
         """
@@ -231,6 +249,23 @@ class HistoriaUsuario(models.Model):
         """
         return self.nombre
 
+
+class SprintInfo(models.Model):
+    """
+    Información de un Sprint anterior de una historia de usuario. Se usa solamente para guardar Info de Sprints anteriores para
+    mantener compatabilidad con código viejo.
+
+    :param versionEnHistorial: Historia de usuario en el historial con la cual se dejó de trabajar en el Sprint.
+    :type versionEnHistorial: HistoriaUsuario
+    :param sprint: Sprint al que pertenece esta informacion.
+    :type sprint: Sprint
+    :param historia: Historia de usuario a la que pertenece esta informacion.
+    :type historia: HistoriaUsuario
+    """
+
+    versionEnHistorial = models.ForeignKey(HistoriaUsuario, on_delete=models.PROTECT)
+    historia = models.ForeignKey(HistoriaUsuario, related_name='sprintInfo', on_delete=models.PROTECT)
+    sprint = models.ForeignKey(Sprint, related_name="historiasInfo", on_delete=models.PROTECT)
 
 class Comentario(models.Model):
     """

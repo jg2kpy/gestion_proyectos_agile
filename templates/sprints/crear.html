@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}Crear Sprint{% endblock %}
+{% block contenido %}
+<h1>
+    Creación de Sprint
+</h1>
+<div class="row">
+    <div class="col-lg-2 col-md-1">
+    </div>
+    <div class="col-lg-8 col-md-10">
+        <form id="regForm" action="">
+            <div class="tab">
+                <div class="alert d-none" role="alert" id="aviso_dias_planeados_max">
+                    Se recomienda que los días planeados no superen los {{proyecto.max_dias_recomendados}} días.
+                </div>
+                <div class="alert d-none" role="alert" id="aviso_dias_planeados_min">
+                    Se recomienda que los días planeados no superen los {{proyecto.min_dias_recomendados}} días.
+                </div>
+                <p><input type="text" placeholder="Nombre Sprint" required></p>
+                <p><input type="textarea" placeholder="Descripción" required></p>
+                <p>
+                    <input type="number" id="input_dias_planeados" placeholder="Días planeados" required>
+                </p>
+            </div>
+            
+            <div class="tab container d-none">Historias de Usuario
+                {% for historia in historias %}
+                <div class="row">
+                    <div class="col-md-1">
+                        <input type="checkbox" class="incluir_checkbox" name="historia_seleccionado_{{historia.id}}" value="{{historia.id}}">
+                    </div>
+                    <div class="col-md-11">
+                        <div class="card shadow-sm" id="cd1">
+                            <div class="card-body p-2">
+                                <div class="card-title">
+                                    <label style="display: none;" for="historia_{{historia.id}}_horas" id="label_historia_horas_{{historia.id}}">Horas</label>
+                                    <input style="display: none;" type="number" class="historia_horas_list" min="0" id="historia_horas_input_{{historia.id}}" name="historia_horas_{{historia.id}}" value="0">
+                                    <br>
+                                    <span class="lead font-weight-light fw-bold">{{ historia.id }}</span>
+                                    <span class="lead font-weight-light">{{ historia.nombre }}</span>
+                                    <br>
+                                    <span class="badge bg-secondary">UP {{ historia.up }}</span>
+                                    <span class="badge bg-secondary">BV {{ historia.bv }}</span>
+                                    <br>
+                                    <span>{{historia.fecha_modificacion|date:"Y/m/d"}}</span>
+                                </div>
+                                <div>
+                                    <p>
+                                        {{ historia.descripcion }}
+                                    </p>
+                                    <p>
+                                        <select style="display: none;" class="form-control" name="desarrollador_asignado" id="desarrollador_asignado_{{historia.id}}">
+                                            <option value="">Usuario asignado:</option>
+                                            {% for desarrollador in proyecto.usuario.all %}
+                                            <option value="{{ desarrollador.id }}">
+                                                <img src="{{ desarrollador.avatar_url }}" alt="{{ desarrollador.get_full_name }} foto perfil" width="30" height="30"
+                                                    class="rounded-circle" style="margin-right: 10px;" />
+                                                {{ desarrollador.get_full_name }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="tab container d-none">Horas desarolladores:
+                {% for desarrollador in proyecto.usuario.all %}
+                <div class="row" id="campo_desarrollador_{{desarrollador.id}}">
+                    <div class="col-md-4">
+                        <img src="{{ desarrollador.avatar_url }}" alt="{{ desarrollador.get_full_name }} foto perfil" width="30" height="30"
+                            class="rounded-circle" style="margin-right: 10px;" />
+                        {{ desarollador.get_full_name }}
+                    </div>
+                    <div class="col-md-4">
+                        Horas según historias de usuario: <span id="horas_calculadas_{{desarrollador.id}}">0</span>
+                    </div>
+                    <div class="col-md-4">
+                        Horas trabajadas por día:
+                        <input type="number" min="0" max="24" id="horas_trabajadas_{{desarrollador.id}}" oninput="">
+                    </div>
+                </div>
+                <div class="alert d-none" role="alert" id="aviso_horas_desarrollador_{{desarrollador.id}}">
+                    Horas ingresadas no coinciden con horas calculadas de las historias de usuario!
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div style="overflow:auto;">
+                <div style="float:left;">
+                    <button type="button" id="prevBtn" onclick="nextPrev(-1)">Volver</button>
+                    <button type="button" id="nextBtn" onclick="nextPrev(1)">Siguiente</button>
+                </div>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+<script>
+var tabActual = 0;
+showTab(tabActual);
+
+$('.incluir_checkbox').click( function() {
+    var id = $(this).attr('name').replace('historia_seleccionado_', '');
+
+    if($(this).is(':checked')) {
+        $('#historia_horas_input_'+id).toggle();
+        $('#label_historia_horas_'+id).toggle();
+        $('#desarrollador_asignado_'+id).toggle();
+    } else {
+        $('#historia_horas_input_'+id).toggle();
+        $('#label_historia_horas_'+id).toggle();
+        $('#desarrollador_asignado_'+id).toggle();
+    }
+    
+})
+
+$('#input_dias_planeados').change(function () {
+    var dias = $(this).val();
+    console.log(parseInt("{{proyecto.max_dias_recomendados}}"))
+    if (dias > parseInt("{{proyecto.max_dias_recomendados}}")) {
+        $('#aviso_dias_planeados_max').removeClass('d-none');
+        console.log("too much")
+    } else {
+        $('#aviso_dias_planeados_min').addClass('d-none');
+        console.log("good max")
+    }
+    if (dias < parseInt("{{proyecto.min_dias_recomendados}}")) {
+        $('#aviso_dias_planeados_min').removeClass('d-none');
+        console.log("too little")
+    } else {
+        $('#aviso_dias_planeados_min').addClass('d-none');
+        console.log("too")
+    }
+})
+
+function showTab(n) {
+    var x = $(".tab");
+
+    for (var i = 0; i < x.length; i++) {
+        x[i].classList.add("d-none");
+    }
+    x[tabActual].classList.remove("d-none");
+    x[tabActual].classList.add("d-block");
+
+    if (tabActual == 2) {
+        calcularHoras();
+    }
+
+    if (n == 0) {
+        document.getElementById("prevBtn").style.display = "none";
+    } else {
+        document.getElementById("prevBtn").style.display = "inline";
+    }
+    if (n == (x.length - 1)) {
+        document.getElementById("nextBtn").innerHTML = "Crear";
+    } else {
+        document.getElementById("nextBtn").innerHTML = "Sgiuiente";
+    }
+}
+
+function nextPrev(n) {
+    var x = document.getElementsByClassName("tab");
+    if (n == 1 && !validateForm()) return false;
+
+    x[tabActual].style.display = "none";
+
+    tabActual = tabActual + n;
+
+    if (tabActual >= x.length) {
+        document.getElementById("regForm").submit();
+        return false;
+    }
+    showTab(tabActual);
+}
+
+function calcularHoras() {
+    horas = $('.historia_horas_list')
+
+    for (var i = 0; i < horas.length; i++) {
+        var horas_calculadas = $('#horas_calculadas_' + horas[i].name.replace('historia_horas_', ''));
+        horas_calculadas.text('0');
+    }
+
+    for(var i = 0; i < horas.length; i++) {
+        var horas_calculadas = $('#horas_calculadas_' + $('#desarrollador_asignado_' + horas[i].name.replace('historia_horas_', '')).find(":selected").val());
+        console.log(horas_calculadas);
+        horas_calculadas.text(parseInt(horas_calculadas.text()) + parseInt($(horas[i]).val()));
+    }
+}
+
+function validateForm() {
+    var valid = true;
+    var inputs = $('.tab:first :input');
+    
+    console.log(inputs);
+    console.log(tabActual)
+    if(tabActual == 0) {
+        valid = false;
+    }
+
+    return valid;
+}
+</script>
+{% endblock %}

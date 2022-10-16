@@ -686,3 +686,41 @@ def importar_rol(request, proyecto_id):
 
 
     return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'roles': roles, 'proyecto': proyecto})
+
+@never_cache
+def crear_sprint(request, proyecto_id):
+    """Crear sprint
+    Renderiza la pagina para crear un sprint.
+    Recibe una llamada POST para crear el sprint.
+
+    :param request: Peticion HTTP donde se recibe la informacion del sprint a crear
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que se le creara el sprint
+    :type proyecto_id: int
+
+    :return: Renderiza la pagina para crear un sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0]
+    status = 200
+    if request.method == 'POST':
+        pass
+    else:
+        pass
+
+    return render(request, 'sprints/crear.html', {'proyecto': proyecto, 'historias': historias}, status=status)

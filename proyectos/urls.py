@@ -17,4 +17,6 @@ urlpatterns = [
     path('<int:proyecto_id>/roles/<int:id_rol_proyecto>/eliminar/', eliminar_rol_proyecto, name='eliminar_rol_proyecto'),
     
     path('<int:proyecto_id>/roles/import/', importar_rol, name='importar_rol'),
+
+    path('<int:proyecto_id>/sprints/crear/', crear_sprint, name='crear_sprint'),
 ]
