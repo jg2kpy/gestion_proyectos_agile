@@ -2,10 +2,26 @@
 {% block title %}Proyecto {{ proyecto.nombre }}{% endblock %}
 {% block contenido %}
 {% load gpa_tags %}
-<div class="d-flex align-items-center justify-content-center h-75 d-inline-block">
+<div class="d-flex mt-4 justify-content-center h-75 d-inline-block">
     <div class="box text-center">
-        <h1>{{ proyecto.nombre }}</h1>
+        <h2>{{ proyecto.nombre }}</h2>
+        <h3>{{ proyecto.descripcion }}</h3>
+        <p>El Scrum Master es: <br>{{ proyecto.scrumMaster.get_full_name }} ({{proyecto.scrumMaster.email}})</p>
+        <p>Usted posee los siguente roles en este proyecto: </p>
+        {% obtener_rol_en_proyecto user proyecto.id as rolesActual %}
+        {% for r in rolesActual %}
+            <p> - {{ r.nombre }}</p>
+        {% endfor %}
         <br>
+        {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
+        {% if pro_cambiarEstadoProyecto %}
+        <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
+            <span class="material-icons  align-text-bottom">
+                build
+            </span>
+            Configuración
+        </a>
+        {% endif %}
         <a href="{% url 'vista_equipo' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
             <span class="material-icons  align-text-bottom">
                 groups
