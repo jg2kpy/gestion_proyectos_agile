@@ -741,7 +741,7 @@ def crear_sprint(request, proyecto_id):
     sprint = Sprint()
     if request.method == 'POST':
         sprint.proyecto = proyecto
-        sprint.estado = "planificación"
+        sprint.estado = "Planificado"
         sprint.duracion = request.POST.get('duracion')
         sprint.nombre = request.POST.get('nombre')
         sprint.descripcion = request.POST.get('descripcion')
@@ -807,7 +807,7 @@ def backlog_sprint(request, proyecto_id, sprint_id):
         historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
         historia.sprint = None
         historia.save()
-        
+
     miembros = [miembro for miembro in proyecto.usuario.all() if UsuarioTiempoEnSprint.objects.filter(sprint=sprint, usuario=miembro).exists()]
     for miembro in miembros:
         miembro.historias_total = sum([historia.horasAsignadas for historia in sprint.historias.all() if historia.usuarioAsignado == miembro])
