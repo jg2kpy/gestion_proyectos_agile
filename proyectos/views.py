@@ -4,9 +4,9 @@ from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
 
-from historias_usuario.models import EtapaHistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
 
-from .models import Feriado, Proyecto
+from .models import Feriado, Proyecto, Sprint, UsuarioTiempoEnSprint
 from .forms import ProyectoConfigurarForm, ProyectoFeriadosForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
@@ -705,3 +705,262 @@ def importar_rol(request, proyecto_id):
 
 
     return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'roles': roles, 'proyecto': proyecto})
+
+@never_cache
+def crear_sprint(request, proyecto_id):
+    """Crear sprint
+    Renderiza la pagina para crear un sprint.
+    Recibe una llamada POST para crear el sprint.
+
+    :param request: Peticion HTTP donde se recibe la informacion del sprint a crear
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que se le creara el sprint
+    :type proyecto_id: int
+
+    :return: Renderiza la pagina para crear un sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0]
+    status = 200
+    error = None
+    sprint = Sprint()
+    if request.method == 'POST':
+        sprint.proyecto = proyecto
+        sprint.estado = "Planificado"
+        sprint.duracion = request.POST.get('duracion')
+        sprint.nombre = request.POST.get('nombre')
+        sprint.descripcion = request.POST.get('descripcion')
+
+        sprint.save()
+        for historia in historias:
+            if request.POST.get('historia_seleccionado_'+str(historia.id)):
+                historia.sprint = sprint
+                historia.horasAsignadas = request.POST.get('historia_horas_'+str(historia.id))
+                historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
+                historia.save()
+        
+        for usuario in proyecto.usuario.all():
+            print(usuario)
+            horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
+            print(horas)
+            if horas and int(horas) > 0:
+                tiempoSprint = UsuarioTiempoEnSprint()
+                tiempoSprint.sprint = sprint
+                tiempoSprint.usuario = usuario
+                tiempoSprint.horas = horas
+                tiempoSprint.save()
+
+        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+
+
+    else:
+        pass
+
+    return render(request, 'sprints/crear.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
+
+@never_cache
+def backlog_sprint(request, proyecto_id, sprint_id):
+    """Crear sprint
+    Renderiza la pagina para crear un sprint.
+    Recibe una llamada POST para crear el sprint.
+
+    :param request: Peticion HTTP donde se recibe la informacion del sprint a crear
+    :type request: HttpRequest
+
+    :param sprint_id: ID del sprint que se quiere visualizar
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para manejar el backlog de un sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        sprint = Sprint.objects.get(id=sprint_id)
+        proyecto = sprint.proyecto
+    except Sprint.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este sprint."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    if request.method == 'POST':
+        historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
+        historia.sprint = None
+        historia.save()
+
+    miembros = [miembro for miembro in proyecto.usuario.all() if UsuarioTiempoEnSprint.objects.filter(sprint=sprint, usuario=miembro).exists()]
+    for miembro in miembros:
+        miembro.historias_total = sum([historia.horasAsignadas for historia in sprint.historias.all() if historia.usuarioAsignado == miembro])
+        miembro.capacidad = UsuarioTiempoEnSprint.objects.get(sprint=sprint, usuario=miembro).horas
+        miembro.capacidad_total = miembro.capacidad * sprint.duracion
+        miembro.historias_count = len([historia for historia in sprint.historias.all() if historia.usuarioAsignado == miembro])
+    request.session['cancelar_volver_a'] = request.path
+
+    return render(request, 'sprints/base.html', {'proyecto': proyecto, 'miembros': miembros, 'sprint': sprint, 'historias': sprint.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO), 'titulo': "Sprint Backlog "+sprint.nombre}, status=200)
+
+@never_cache
+def agregar_historias(request, proyecto_id, sprint_id):
+    """
+    Agrega una historia al backlog del sprint
+
+    :param request: Peticion HTTP donde se recibe la informacion de la historia a agregar
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que se le agregara la historia
+    :type proyecto_id: int
+
+    :param sprint_id: ID del sprint al que se le agregara la historia
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para agregar una historia al backlog del sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        sprint = Sprint.objects.get(id=sprint_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0 and x.sprint == None]
+    status = 200
+    error = None
+    if request.method == 'POST':
+        historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
+        historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
+        historia.sprint = sprint
+        historia.save()
+        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+
+    return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
+
+@never_cache
+def editar_miembros_sprint(request, proyecto_id, sprint_id):
+    """
+    Permite editar la lista de miembros con las que trabajan de un Sprint
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que pertenece el sprint
+    :type proyecto_id: int
+
+    :param sprint_id: ID del sprint del cuál se quiere modificar el equipo
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para editar los miembros del sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        sprint = Sprint.objects.get(id=sprint_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    desarrolladores = proyecto.usuario.all()
+    status = 200
+    error = None
+    if request.method == 'POST':
+        for usuario in desarrolladores:
+            horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
+            if horas and int(horas) > 0:
+                tiempoSprint = UsuarioTiempoEnSprint.objects.get_or_create(usuario=usuario, sprint=sprint)[0]
+                tiempoSprint.horas = horas
+                tiempoSprint.save()
+        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+    else:
+        for d in desarrolladores:
+            try:
+                print(UsuarioTiempoEnSprint.objects.get(usuario=d, sprint=sprint).horas)
+                d.horas = UsuarioTiempoEnSprint.objects.get(usuario=d, sprint=sprint).horas
+                d.horas_total = 0
+                for historia in sprint.historias.filter(usuarioAsignado=d):
+                    d.horas_total += historia.horasAsignadas
+            except UsuarioTiempoEnSprint.DoesNotExist:
+                d.horas = 0
+
+    return render(request, 'sprints/editar_miembros.html', {'proyecto': proyecto, 'desarrolladores': desarrolladores, 'error': error, 'sprint': sprint}, status=status)
+
+@never_cache
+def agregar_historias_sprint(request, proyecto_id, sprint_id):
+    """
+    Permite agregar US a un Sprint
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que pertenece el sprint
+    :type proyecto_id: int
+
+    :param sprint_id: ID del sprint del cuál se quiere modificar el equipo
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para editar los miembros del sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        sprint = Sprint.objects.get(id=sprint_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0]
+    desarrolladores = proyecto.usuario.all()
+    status = 200
+    error = None
+    if request.method == 'POST':
+        for historia in historias:
+            if request.POST.get('historia_seleccionado_'+str(historia.id)):
+                historia.sprint = sprint
+                historia.horasAsignadas = request.POST.get('historia_horas_'+str(historia.id))
+                historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
+                historia.save()
+        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+
+    return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)

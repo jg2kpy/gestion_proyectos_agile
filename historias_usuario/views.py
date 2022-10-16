@@ -2,13 +2,12 @@ import datetime
 from django.shortcuts import render, redirect
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
-from django.http import HttpResponse, HttpResponseRedirect
 
 
 from proyectos.models import Feriado, Proyecto
 from .models import *
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
-from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, HistoriaUsuarioProductOwnerForm, SubirArchivoForm, TipoHistoriaUsuarioForm
+from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, SubirArchivoForm, TipoHistoriaUsuarioForm
 
 
 @never_cache
@@ -357,7 +356,7 @@ def historiaUsuarioBacklog(request, proyecto_id):
         return render(request, '403.html', {'info_adicional': 'No pertenece a este proyecto, no tiene permisos para ver este backlog'}, status=403)
 
     request.session['cancelar_volver_a'] = request.path
-    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=None, estado=HistoriaUsuario.Estado.ACTIVO).order_by('nombre'), 'proyecto': proyecto, 'esBacklog': True, 'titulo': 'Backlog'})
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.ACTIVO).order_by('nombre'), 'proyecto': proyecto, 'esBacklog': True, 'titulo': 'Backlog'})
 
 
 @never_cache
@@ -490,16 +489,12 @@ def crear_historiaUsuario(request, proyecto_id):
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
     else:
-        archivoForm = None
+        form = HistoriaUsuarioForm()
+        archivoForm = SubirArchivoForm()
         tipos = [(tipo.id, tipo.nombre) for tipo in proyecto.tiposHistoriaUsuario.all()]
+        form.set_tipos(tipos)
         if tiene_permiso_en_proyecto(request.user, "pro_verproyecto", proyecto):
-            form = HistoriaUsuarioProductOwnerForm()
-            form.set_tipos(tipos)
-        else:
-            usuarios = [(usuario.id, f"{usuario.get_full_name()} ({usuario.email})") for usuario in proyecto.usuario.all()]
-            form = HistoriaUsuarioForm()
-            form.set_tipos_usuarios(tipos, usuarios)
-            archivoForm = SubirArchivoForm()
+            form.fields['up'].widget.attrs['readonly'] = True
 
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'historias/crear_historia.html', {"volver_a": volver_a, 'form': form, 'archivo_form': archivoForm, 'proyecto': proyecto}, status=status)
@@ -584,8 +579,6 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             historia.bv = form.cleaned_data['bv']
             historia.up = form.cleaned_data['up']
 
-            historia.usuarioAsignado = form.cleaned_data['usuarioAsignado']
-
             historia.save()
 
             return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', proyecto_id=proyecto_id)
@@ -593,10 +586,8 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
     else:
-        usuarios = [(usuario.id, f"{usuario.get_full_name()} ({usuario.email})") for usuario in proyecto.usuario.all()]
         form = HistoriaUsuarioEditarForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion,
-                                                  'bv': historia.bv, 'up': historia.up, 'usuarioAsignado': historia.usuarioAsignado})
-        form.set_usuarios(usuarios)
+                                                  'bv': historia.bv, 'up': historia.up})
         
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'historias/editar_historia.html', {'form': form, 'proyecto': proyecto, 'historia': historia, "volver_a": volver_a}, status=status)
@@ -770,7 +761,7 @@ def verTablero(request, proyecto_id, tipo_id):
         if request.POST.get('comenzar'):
             sprintInciar = Sprint.objects.get(proyecto=proyecto, fecha_inicio__isnull=True)
             sprintInciar.fecha_inicio = datetime.datetime.now()
-            sprintInciar.fecha_fin = calcularFechaSprint(sprintInciar.fecha_inicio, sprintInciar.total_dias, proyecto)
+            sprintInciar.fecha_fin = calcularFechaSprint(sprintInciar.fecha_inicio, sprintInciar.duracion, proyecto)
             sprintInciar.estado = "Desarrollo"
             sprintInciar.save()
 

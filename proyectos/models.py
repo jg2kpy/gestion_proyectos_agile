@@ -1,5 +1,7 @@
 from email.policy import default
+from re import L
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Proyecto(models.Model):
@@ -49,14 +51,17 @@ class Sprint(models.Model):
     :type proyecto: Proyecto
     :param estado: Estado del sprint.
     :type estado: str
-    :param total_dias: Duración del sprint en días.
-    :type total_dias: int
+    :param duracion: Duración del sprint en días.
+    :type duracion: int
     """
     fecha_inicio = models.DateTimeField(blank=True, null=True)
     fecha_fin = models.DateTimeField(blank=True, null=True)
     proyecto = models.ForeignKey(Proyecto, related_name='sprints', on_delete=models.PROTECT)
     estado = models.CharField(max_length=255, blank=True, null=True)
-    total_dias = models.IntegerField(blank=True, null=True)
+    duracion = models.IntegerField(blank=False, null=False, validators=[
+                             MaxValueValidator(365), MinValueValidator(1)])
+    nombre = models.CharField(max_length=255, blank=False, null=False)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         constraints = [
@@ -66,8 +71,15 @@ class Sprint(models.Model):
     def __str__(self):
         return self.estado
 
+class UsuarioTiempoEnSprint(models.Model):
+    sprint = models.ForeignKey(Sprint, related_name="participantes", on_delete=models.PROTECT)
+    usuario = models.ForeignKey('usuarios.Usuario', related_name='sprints', on_delete=models.PROTECT)
+    horas = models.IntegerField(blank=False, null=False, validators=[
+                             MaxValueValidator(24), MinValueValidator(1)])
+    
+
 class Feriado(models.Model):
 
-    proyecto = models.ForeignKey('proyectos.Proyecto', related_name="feriados", on_delete=models.DO_NOTHING)
+    proyecto = models.ForeignKey('proyectos.Proyecto', related_name="feriados", on_delete=models.PROTECT)
     descripcion = models.TextField(blank=True, null=True)
     fecha = models.DateTimeField(blank=True, null=True)
