@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Crear Sprint{% endblock %}
 {% block contenido %}
-<h1>
-    Creación de Sprint
-</h1>
 <div class="row">
-    <div class="col-lg-2 col-md-1">
-    </div>
-    <div class="col-lg-8 col-md-10">
+    <div class="col-md-12">
+        <div class="container">
+            <h1>
+                Creación de Sprint
+            </h1>
+        </div>
         <form id="sprintForm" action="">
-            <div class="tab">
-                Información general del Sprint
+            <div class="tab container">
+                <h4>Información general del Sprint</h4>
                 <div style="display: none;" class="alert alert-secondary" role="alert" id="aviso_dias_planeados_max">
                     Se recomienda que los días planeados no superen los {{proyecto.maximo_dias_sprint}} días.
                 </div>
@@ -24,9 +24,10 @@
                 </p>
             </div>
             
-            <div class="tab container d-none">Historias de Usuario
+            <div class="tab container d-none">
+                <h4>Historias de Usuario</h4>
                 <div role="alert" class="alert alert-dark" id="aviso_horas_planeadas">
-                    <span id="horas_total_planeadas">0</span>/<span id="horas_total_asignadas">1</span> horas planeadas
+                    <span id="horas_total_planeadas">0</span> horas total
                 </div>
                 {% for historia in historias %}
                 <div class="row ">
@@ -77,29 +78,32 @@
                 {% endfor %}
             </div>
             
-            <div class="tab container d-none">Horas desarolladores:
+            <div class="tab container d-none">
+                <h4>Horas desarolladores:</h4>
                 {% for desarrollador in proyecto.usuario.all %}
-                <div class="row" id="campo_desarrollador_{{desarrollador.id}}">
+                <div class="row desarrollador_horas_dia_list" id="campo_desarrollador_{{desarrollador.id}}">
+                    <span id="aviso_horas_desarrollador_{{desarrollador.id}}">
+                        Horas ingresadas difieren significativamente con horas calculadas de las historias de usuario!
+                    </span>
                     <div class="col-md-4">
                         <img src="{{ desarrollador.avatar_url }}" alt="{{ desarrollador.get_full_name }} foto perfil" width="30" height="30"
                             class="rounded-circle" style="margin-right: 10px;" />
                         {{ desarrollador.get_full_name }}
                     </div>
                     <div class="col-md-4">
-                        Horas según historias de usuario: <span id="horas_calculadas_{{desarrollador.id}}">0</span>
+                        Horas según historias de usuario: <span class="horas_calculadas_desarrollador_list" id="horas_calculadas_{{desarrollador.id}}">0</span>
+                        <br>
+                        Horas según historias cantidad de días: <span id="horas_dias_{{desarrollador.id}}">0</span>
                     </div>
                     <div class="col-md-4">
-                        Horas trabajadas por día:
-                        <input type="number" min="0" max="24" id="horas_trabajadas_{{desarrollador.id}}" oninput="">
+                        Horas que trabaja por día:
+                        <input type="number" min="0" max="24" value='0' class="horas_trabajadas_input" id="horas_trabajadas_{{desarrollador.id}}">
                     </div>
-                </div>
-                <div class="alert d-none" role="alert" id="aviso_horas_desarrollador_{{desarrollador.id}}">
-                    Horas ingresadas no coinciden con horas calculadas de las historias de usuario!
                 </div>
                 {% endfor %}
             </div>
             <br>
-            <div style="overflow:auto;">
+            <div class="container" style="overflow:auto;">
                 <div style="float:left;">
                     <button type="button" id="prevBtn" onclick="nextPrev(-1)">Volver</button>
                     <button type="button" id="nextBtn" onclick="nextPrev(1)">Siguiente</button>
@@ -156,6 +160,25 @@ $('#input_dias_planeados').change(function () {
     }
 })
 
+$('.horas_trabajadas_input').mouseup(function(){
+      $(this).change();
+})
+$('.horas_trabajadas_input').keyup(function(){
+      $(this).change();
+})
+$('.horas_trabajadas_input').change(function () {
+    var horas = $(this).val() * $('#input_dias_planeados').val();
+    var id_dev = $(this).attr('id').replace('horas_trabajadas_', '');
+    var horas_calculadas = $('#horas_calculadas_'+id_dev).text();
+
+    $('#horas_dias_'+id_dev).text(horas);
+    if (Math.abs((horas - horas_calculadas)) > Math.min(parseInt($(this).val()), parseInt($('#input_dias_planeados').val()))) {
+        $('#aviso_horas_desarrollador_'+id_dev).show();
+    } else {
+        $('#aviso_horas_desarrollador_'+id_dev).hide();
+    }
+})
+
 $('.historia_horas_list').mouseup(function(){
       $(this).change();
 })
@@ -184,9 +207,9 @@ function showTab(n) {
     x[tabActual].classList.remove("d-none");
     x[tabActual].classList.add("d-block");
 
-    if (tabActual == 1) {
-        $("#horas_total_asignadas").text($('#input_dias_planeados').val() * 8);
-    }
+    // if (tabActual == 1) {
+    //     $("#horas_total_asignadas").text($('#input_dias_planeados').val() * 8);
+    // }
 
     if (n == 0) {
         document.getElementById("prevBtn").style.display = "none";
@@ -209,7 +232,7 @@ function nextPrev(n) {
     tabActual = tabActual + n;
 
     if (tabActual >= x.length) {
-        document.getElementById("regForm").submit();
+        document.getElementById("sprintForm").submit();
         return false;
     }
 
@@ -251,7 +274,8 @@ function validateForm() {
             valid = false;
         }
         $('#sprintForm')[0].reportValidity();
-    } else if(tabActual == 1) {
+    }
+    else if(tabActual == 1) {
         var horas = $('.historia_horas_list')
         for (var i = 0; i < horas.length; i++) {
             if ($(horas[i]).is(":hidden")) {
@@ -276,6 +300,8 @@ function validateForm() {
             }
         }
         $('#sprintForm')[0].reportValidity();
+    } else {
+        return $('#sprintForm')[0].reportValidity();
     }
 
     return valid;
