@@ -4,9 +4,9 @@ from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
 
-from historias_usuario.models import EtapaHistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
 
-from .models import Feriado, Proyecto
+from .models import Feriado, Proyecto, Sprint, UsuarioTiempoEnSprint
 from .forms import ProyectoConfigurarForm, ProyectoFeriadosForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
@@ -737,9 +737,76 @@ def crear_sprint(request, proyecto_id):
 
     historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0]
     status = 200
+    error = None
+    sprint = Sprint()
     if request.method == 'POST':
-        pass
+        sprint.proyecto = proyecto
+        sprint.estado = "planificación"
+        sprint.duracion = request.POST.get('duracion')
+        sprint.nombre = request.POST.get('nombre')
+        sprint.descripcion = request.POST.get('descripcion')
+
+        try:
+            sprint.save
+            for historia in historias:
+                if request.POST.get('historia_seleccionado_'+historia.id):
+                    historia.sprint = sprint
+                    historia.horasAsignadas = request.POST.get('historia_horas_'+historia.id)
+                    historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+historia.id))
+                    historia.save()
+            
+            for usuario in proyecto.usuario.all():
+                horas = request.POST.get('horas_trabajadas_'+usuario.id)
+                if horas and horas > 0:
+                    tiempoSprint = UsuarioTiempoEnSprint
+                    tiempoSprint.sprint = sprint
+                    tiempoSprint.usuario = usuario
+                    tiempoSprint.horas = horas
+                    tiempoSprint.save()
+
+            return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+        except:
+            error = "No se pudo crear el sprint, porfavor verificar datos y reintentar"
+
+
     else:
         pass
 
-    return render(request, 'sprints/crear.html', {'proyecto': proyecto, 'historias': historias}, status=status)
+    return render(request, 'sprints/crear.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
+
+@never_cache
+def backlog_sprint(request, proyecto_id, sprint_id):
+    """Crear sprint
+    Renderiza la pagina para crear un sprint.
+    Recibe una llamada POST para crear el sprint.
+
+    :param request: Peticion HTTP donde se recibe la informacion del sprint a crear
+    :type request: HttpRequest
+
+    :param sprint_id: ID del sprint que se quiere visualizar
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para manejar el backlog de un sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        sprint = Sprint.objects.get(id=sprint_id)
+        proyecto = sprint.proyecto
+    except Sprint.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este sprint."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    if request.method == 'POST':
+        historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
+        historia.sprint = None
+        historia.save()
+
+    return render(request, 'sprints/base.html', {'proyecto': proyecto, 'historias': sprint.historias}, status=200)

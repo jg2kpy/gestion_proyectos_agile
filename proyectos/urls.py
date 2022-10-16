@@ -19,4 +19,5 @@ urlpatterns = [
     path('<int:proyecto_id>/roles/import/', importar_rol, name='importar_rol'),
 
     path('<int:proyecto_id>/sprints/crear/', crear_sprint, name='crear_sprint'),
+    path('<int:proyecto_id>/sprints/backlog/', backlog_sprint, name='backlog_sprint'),
 ]
