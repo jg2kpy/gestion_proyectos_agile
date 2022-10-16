@@ -69,7 +69,7 @@ class Sprint(models.Model):
         ]
 
     def __str__(self):
-        return self.estado
+        return self.nombre
 
 class UsuarioTiempoEnSprint(models.Model):
     sprint = models.ForeignKey(Sprint, related_name="participantes", on_delete=models.PROTECT)

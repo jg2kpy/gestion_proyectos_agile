@@ -1,3 +1,4 @@
+import datetime
 from django.forms import inlineformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -5,6 +6,7 @@ from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
 
 from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.views import calcularFechaSprint
 
 from .models import Feriado, Proyecto, Sprint, UsuarioTiempoEnSprint
 from .forms import ProyectoConfigurarForm, ProyectoFeriadosForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
@@ -804,9 +806,16 @@ def backlog_sprint(request, proyecto_id, sprint_id):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
 
     if request.method == 'POST':
-        historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
-        historia.sprint = None
-        historia.save()
+        if request.POST.get('historia_id'):
+            historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
+            historia.sprint = None
+            historia.save()
+        else:
+            sprintInciar = Sprint.objects.get(proyecto=proyecto, fecha_inicio__isnull=True)
+            sprintInciar.fecha_inicio = datetime.datetime.now()
+            sprintInciar.fecha_fin = calcularFechaSprint(sprintInciar.fecha_inicio, sprintInciar.duracion, proyecto)
+            sprintInciar.estado = "Desarrollo"
+            sprintInciar.save()
 
     miembros = [miembro for miembro in proyecto.usuario.all() if UsuarioTiempoEnSprint.objects.filter(sprint=sprint, usuario=miembro).exists()]
     for miembro in miembros:
