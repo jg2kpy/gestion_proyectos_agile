@@ -1,4 +1,5 @@
 from django import template
+from historias_usuario.models import HistoriaUsuario
 from usuarios.models import RolSistema, RolProyecto, Usuario
 from proyectos.models import Proyecto, Sprint
 
@@ -217,6 +218,26 @@ def check_sprint_activo(proyecto):
     sprints = Sprint.objects.filter(proyecto=proyecto, estado="Desarrollo").exclude(fecha_inicio__isnull=True)
     
     if sprints:
+        return True
+    else:
+        return False
+
+@register.simple_tag
+def check_historia_activa(proyecto, sprints):
+    """Funcion para determinar si existe una historia de usuario activa en el sprint más reciente
+
+    :param proyecto: Objeto del proyecto
+    :type proyecto: Proyecto
+
+    :param sprints: Lista con los sprints disponibles
+    :type sprints: list
+
+    :return: Se retorna True si encuentra una historia de usuario no terminada
+    :rtype: bool
+    """
+    historiasActivas = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprints[0], estado='A')
+
+    if historiasActivas:
         return True
     else:
         return False
