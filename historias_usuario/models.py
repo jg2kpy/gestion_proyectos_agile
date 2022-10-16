@@ -152,6 +152,7 @@ class HistoriaUsuario(models.Model):
         TERMINADO = 'T', _('Terminado')
         CANCELADO = 'C', _('Cancelado')
         HISTORIAL = 'H', _('Historial')
+        SNAPSHOT = 'S', _('Snapshot')
 
     estado = models.CharField(
         max_length=1,
