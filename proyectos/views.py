@@ -763,9 +763,7 @@ def crear_sprint(request, proyecto_id):
                 historia.save()
         
         for usuario in proyecto.usuario.all():
-            print(usuario)
             horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
-            print(horas)
             if horas and int(horas) > 0:
                 tiempoSprint = UsuarioTiempoEnSprint()
                 tiempoSprint.sprint = sprint
@@ -919,9 +917,14 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
     error = None
     if request.method == 'POST':
         for usuario in desarrolladores:
+            print(usuario.id)
+            print(request.POST.keys())
             horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
             if horas and int(horas) > 0:
-                tiempoSprint = UsuarioTiempoEnSprint.objects.get_or_create(usuario=usuario, sprint=sprint)[0]
+                if UsuarioTiempoEnSprint.objects.filter(usuario=usuario, sprint=sprint).exists():
+                    tiempoSprint = UsuarioTiempoEnSprint.objects.get(usuario=usuario, sprint=sprint)
+                else:
+                    tiempoSprint = UsuarioTiempoEnSprint(usuario=usuario, sprint=sprint)
                 tiempoSprint.horas = horas
                 tiempoSprint.save()
         return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)

@@ -1,5 +1,8 @@
 import os
 from django import setup
+
+from historias_usuario.views import tiposHistoriaUsuario
+from django.utils.timezone import get_current_timezone
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_proyectos_agile.settings")
 setup()
 
@@ -634,3 +637,74 @@ class SprintTests(TestCase):
                                "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
         self.assertEqual(res.status_code, 200, 'La respuesta no fue un estado HTTP 200 al intentar crear un proyecto')
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
+        self.sprint = Sprint()
+        self.sprint.nombre = 'Sprint 1'
+        self.sprint.proyecto = self.proyecto
+        self.sprint.duracion = 3
+        self.sprint.fecha_inicio = datetime.datetime.now(tz=get_current_timezone())
+        self.sprint.fecha_fin = datetime.datetime.now(tz=get_current_timezone()) + datetime.timedelta(days=7)
+        self.sprint.estado = "Desarrollo"
+        self.sprint.save()
+        self.tipoTest = TipoHistoriaUsusario.objects.get(proyecto=self.proyecto, nombre="Default")
+        self.historiaTest = HistoriaUsuario.objects.create(tipo=self.tipoTest, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1)
+        self.historiaTest.estado = HistoriaUsuario.Estado.CANCELADO
+        self.historiaTest.tipo = self.tipoTest
+        self.historiaTest.save()
+    
+    def test_crear_sprint_vacio(self):
+        """
+        Prueba de crear un sprint
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+            {
+                'nombre': 'Sprint 1', 'descripcion': 'Sprint 1', 'duracion': '15', f'horas_trabajadas_{self.proyecto.id}': '6',
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+
+    def test_crear_sprint_con_us(self):
+        """
+        Prueba de crear un sprint con historias iniciales
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+            {
+                'nombre': 'Sprint 1', 'descripcion': 'Sprint 1', 'duracion': '15', f'horas_trabajadas_{self.proyecto.id}': '6',
+                f'historia_seleccionado_{self.historiaTest.id}': '1',
+                f'historia_horas_{self.historiaTest.id}': '5',
+                f'desarrollador_asignado_{self.historiaTest.id}': f'{self.user.id}',
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+    
+    def test_agregar_us_backlog_sprint(self):
+        """
+        Prueba de agregar un US al backlog del sprint
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/backlog/", 
+            {
+                'historia_id': self.historiaTest.id
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/agregar_historias/",
+            {
+                f'historia_seleccionado_{self.historiaTest.id}': '1',
+                f'historia_horas_{self.historiaTest.id}': '5',
+                f'desarrollador_asignado_{self.historiaTest.id}': f'{self.user.id}',
+
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+    
+    def test_cambiar_horas_desarrollador(self):
+        """
+        Prueba cambiar la capacidad de un desarrollador
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/editar_miembros/",
+            {
+                f'horas_trabajadas_{self.user.id}': '20'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
