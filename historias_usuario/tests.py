@@ -281,6 +281,7 @@ class HistoriasUsuarioTest(TestCase):
 
         creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
         creado.usuarioAsignado = self.user
+        creado.save()
         self.assertEqual(self.user, creado.usuarioAsignado)
 
         res = self.client.get(f"/proyecto/{self.proyecto.id}/mis-historias/", follow=True)

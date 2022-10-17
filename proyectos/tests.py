@@ -1,5 +1,6 @@
 import os
 from django import setup
+from historias_usuario.models import SprintInfo
 
 from historias_usuario.views import tiposHistoriaUsuario
 from django.utils.timezone import get_current_timezone
@@ -732,3 +733,97 @@ class SprintTests(TestCase):
             }, follow=True)
         self.assertEqual(res.status_code, 422,
                 'La respuesta no fue un estado HTTP 422 con horas negativas')
+    
+    def test_prioridad_sin_previo(self):
+        """
+        Prueba calcular prioridad sin previo sprint
+        """
+        self.historiaTest.sprint = None
+        self.historiaTest.estado = HistoriaUsuario.Estado.ACTIVO
+        self.assertEqual(self.historiaTest.getPrioridad(), 1,
+                'Con BV == UP prioridad debería ser == BV == UP')
+
+    def test_prioridad_sin_previo_porcentajes(self):
+        """
+        Prueba calcular prioridad sin previo sprint y porcentajes diferentes
+        """
+        self.historiaTest.bv = 20
+        self.historiaTest.up = 10
+        self.historiaTest.sprint = None
+        self.historiaTest.estado = HistoriaUsuario.Estado.ACTIVO
+        self.assertEqual(self.historiaTest.getPrioridad(), self.historiaTest.bv*0.6+self.historiaTest.up*0.4,
+                'BV debería ser 0.6 la prioriad')
+
+    def test_prioridad_sin_previo(self):
+        """
+        Prueba calcular prioridad con un sprint previo
+        """
+        info = SprintInfo()
+        info.versionEnHistorial = self.historiaTest
+        info.historia = self.historiaTest
+        info.sprint = self.sprint
+        info.save()
+        self.historiaTest.sprint = None
+        self.historiaTest.estado = HistoriaUsuario.Estado.ACTIVO
+        self.assertEqual(self.historiaTest.getPrioridad(), 31,
+                'Al haber estado en sprint anterior la prioridad recibe +30')
+
+    def test_prioridad_variuos_previo(self):
+        """
+        Prueba calcular prioridad con varios sprints previos
+        """
+        info = SprintInfo()
+        info.versionEnHistorial = self.historiaTest
+        info.historia = self.historiaTest
+        info.sprint = self.sprint
+        info.save()
+        info2 = SprintInfo()
+        info2.versionEnHistorial = self.historiaTest
+        info2.historia = self.historiaTest
+        info2.sprint = self.sprint
+        info2.save()
+        info3 = SprintInfo()
+        info3.versionEnHistorial = self.historiaTest
+        info3.historia = self.historiaTest
+        info3.sprint = self.sprint
+        info3.save()
+        self.historiaTest.sprint = None
+        self.historiaTest.estado = HistoriaUsuario.Estado.ACTIVO
+        self.assertEqual(self.historiaTest.getPrioridad(), 31,
+                'El +30 por haber estad en sprint se aplica solamente una vez')
+    
+    def test_prioridad_en_sprint(self):
+        """
+        Prueba que prioridad es -1 para historias en un Sprint
+        """
+        self.historiaTest.sprint = self.sprint
+        self.historiaTest.estado = HistoriaUsuario.Estado.ACTIVO
+        self.assertEqual(self.historiaTest.getPrioridad(), -1,
+                'La historia en un sprint tiene prioridad -1')
+    
+    def test_prioridad_cancelado(self):
+        """
+        Prueba que prioridad es -1 para historias canceladas
+        """
+        self.historiaTest.sprint = self.sprint
+        self.historiaTest.estado = HistoriaUsuario.Estado.CANCELADO
+        self.assertEqual(self.historiaTest.getPrioridad(), -1,
+                'La historia cancelada tiene prioridad -1')
+    
+    def test_prioridad_terminado(self):
+        """
+        Prueba que prioridad es -1 para historias terminadas
+        """
+        self.historiaTest.sprint = self.sprint
+        self.historiaTest.estado = HistoriaUsuario.Estado.TERMINADO
+        self.assertEqual(self.historiaTest.getPrioridad(), -1,
+                'La historia terminada tiene prioridad -1')
+    
+    def test_prioridad_terminado(self):
+        """
+        Prueba que prioridad es -1 para historias snapshot
+        """
+        self.historiaTest.sprint = self.sprint
+        self.historiaTest.estado = HistoriaUsuario.Estado.SNAPSHOT
+        self.assertEqual(self.historiaTest.getPrioridad(), -1,
+                'La historia snapshot tiene prioridad -1')
