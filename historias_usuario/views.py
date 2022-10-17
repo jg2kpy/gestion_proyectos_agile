@@ -765,6 +765,7 @@ def verTablero(request, proyecto_id, tipo_id):
             usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintDesc[0],estado=HistoriaUsuario.Estado.ACTIVO)
             
             for usFinalizar in usListFinalizar:
+                id_ori = usFinalizar.id
                 usFinalizar.sprint = None
                 usFinalizar.save()
                 copiaUs = usFinalizar
@@ -772,14 +773,16 @@ def verTablero(request, proyecto_id, tipo_id):
                 copiaUs.sprint = sprintTerminar
                 copiaUs.estado = 'S'
                 copiaUs.save()
+                # Volver a tener de base de dato para no apuntar a copia
+                usFinalizar = HistoriaUsuario.objects.get(id=id_ori)
+                usFinalizar.horasAsignadas = 0
+                usFinalizar.usuarioAsignado = None
+                usFinalizar.save()
                 sprintInfo = SprintInfo()
                 sprintInfo.sprint = sprintTerminar
                 sprintInfo.historia = usFinalizar
                 sprintInfo.versionEnHistorial = copiaUs
                 sprintInfo.save()
-                usFinalizar.horasAsignadas = 0
-                usFinalizar.usuarioAsignado = None
-                usFinalizar.save()
             
     else:
         for etapa in tipo.etapas.all().order_by('orden'):
