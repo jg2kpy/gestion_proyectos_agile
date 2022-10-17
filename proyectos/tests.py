@@ -768,7 +768,7 @@ class SprintTests(TestCase):
         self.assertEqual(self.historiaTest.getPrioridad(), 31,
                 'Al haber estado en sprint anterior la prioridad recibe +30')
 
-    def test_prioridad_variuos_previo(self):
+    def test_prioridad_varios_previo(self):
         """
         Prueba calcular prioridad con varios sprints previos
         """
@@ -819,7 +819,7 @@ class SprintTests(TestCase):
         self.assertEqual(self.historiaTest.getPrioridad(), -1,
                 'La historia terminada tiene prioridad -1')
     
-    def test_prioridad_terminado(self):
+    def test_prioridad_snapshot(self):
         """
         Prueba que prioridad es -1 para historias snapshot
         """
