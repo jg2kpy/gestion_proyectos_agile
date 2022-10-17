@@ -777,7 +777,7 @@ def verTablero(request, proyecto_id, tipo_id):
                 sprintInfo.historia = usFinalizar
                 sprintInfo.versionEnHistorial = copiaUs
                 sprintInfo.save()
-                usFinalizar.horasAsignadas = None
+                usFinalizar.horasAsignadas = 0
                 usFinalizar.usuarioAsignado = None
                 usFinalizar.save()
             
