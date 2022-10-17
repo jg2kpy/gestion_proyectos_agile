@@ -1,13 +1,13 @@
+import datetime
 from django.shortcuts import render, redirect
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
-from django.http import HttpResponse, HttpResponseRedirect
 
 
-from proyectos.models import Proyecto
+from proyectos.models import Feriado, Proyecto
 from .models import *
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
-from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, HistoriaUsuarioProductOwnerForm, SubirArchivoForm, TipoHistoriaUsuarioForm
+from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, SubirArchivoForm, TipoHistoriaUsuarioForm
 
 
 @never_cache
@@ -356,7 +356,7 @@ def historiaUsuarioBacklog(request, proyecto_id):
         return render(request, '403.html', {'info_adicional': 'No pertenece a este proyecto, no tiene permisos para ver este backlog'}, status=403)
 
     request.session['cancelar_volver_a'] = request.path
-    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=None, estado=HistoriaUsuario.Estado.ACTIVO).order_by('nombre'), 'proyecto': proyecto, 'esBacklog': True, 'titulo': 'Backlog'})
+    return render(request, 'historias/base.html', {'historias': HistoriaUsuario.objects.filter(proyecto=proyecto, estado=HistoriaUsuario.Estado.ACTIVO).order_by('nombre'), 'proyecto': proyecto, 'esBacklog': True, 'titulo': 'Backlog'})
 
 
 @never_cache
@@ -489,16 +489,12 @@ def crear_historiaUsuario(request, proyecto_id):
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
     else:
-        archivoForm = None
+        form = HistoriaUsuarioForm()
+        archivoForm = SubirArchivoForm()
         tipos = [(tipo.id, tipo.nombre) for tipo in proyecto.tiposHistoriaUsuario.all()]
+        form.set_tipos(tipos)
         if tiene_permiso_en_proyecto(request.user, "pro_verproyecto", proyecto):
-            form = HistoriaUsuarioProductOwnerForm()
-            form.set_tipos(tipos)
-        else:
-            usuarios = [(usuario.id, f"{usuario.get_full_name()} ({usuario.email})") for usuario in proyecto.usuario.all()]
-            form = HistoriaUsuarioForm()
-            form.set_tipos_usuarios(tipos, usuarios)
-            archivoForm = SubirArchivoForm()
+            form.fields['up'].widget.attrs['readonly'] = True
 
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'historias/crear_historia.html', {"volver_a": volver_a, 'form': form, 'archivo_form': archivoForm, 'proyecto': proyecto}, status=status)
@@ -583,8 +579,6 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             historia.bv = form.cleaned_data['bv']
             historia.up = form.cleaned_data['up']
 
-            historia.usuarioAsignado = form.cleaned_data['usuarioAsignado']
-
             historia.save()
 
             return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', proyecto_id=proyecto_id)
@@ -592,10 +586,8 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             form.add_error(None, "Hay errores en el formulario.")
             status = 422
     else:
-        usuarios = [(usuario.id, f"{usuario.get_full_name()} ({usuario.email})") for usuario in proyecto.usuario.all()]
         form = HistoriaUsuarioEditarForm(initial={'nombre': historia.nombre, 'descripcion': historia.descripcion,
-                                                  'bv': historia.bv, 'up': historia.up, 'usuarioAsignado': historia.usuarioAsignado})
-        form.set_usuarios(usuarios)
+                                                  'bv': historia.bv, 'up': historia.up})
         
     volver_a = request.session['cancelar_volver_a']
     return render(request, 'historias/editar_historia.html', {'form': form, 'proyecto': proyecto, 'historia': historia, "volver_a": volver_a}, status=status)
@@ -687,6 +679,26 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
     return render(request, 'historias/historial.html', {"volver_a": volver_a, 'proyecto': proyecto, 'version_ori': historia, 'versiones': historia.obtenerVersiones()}, status=200)
 
 
+def calcularFechaSprint(fechaInicio, dias, proyecto):
+    diasParaAgregar = dias
+    fechaActual = fechaInicio
+    feriadosFecha = []
+    feriados = Feriado.objects.filter(proyecto=proyecto)
+
+    if feriados:
+        for feriado in feriados:
+            feriadosFecha.append(feriado.fecha.date())
+    
+    while diasParaAgregar > 0:
+        fechaActual += datetime.timedelta(days=1)
+
+        if fechaActual.weekday() >= 5 or fechaActual.date() in feriadosFecha:
+            continue
+
+        diasParaAgregar -= 1
+
+    return fechaActual
+
 @ never_cache
 def verTablero(request, proyecto_id, tipo_id):
     """
@@ -724,14 +736,63 @@ def verTablero(request, proyecto_id, tipo_id):
     if tipo.proyecto != proyecto:
         return render(request, '404.html', {'info_adicional': "No se encontró este tipo de historia de usuario."}, status=404)
 
-    etapas = []
-    for etapa in tipo.etapas.all().order_by('orden'):
-        aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
-        aux_etapa["historias"] = etapa.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO)
-        etapas.append(aux_etapa)
+    sprints = Sprint.objects.filter(proyecto=proyecto).exclude(fecha_inicio__isnull=True)
+    sprintDesc = sprints.order_by("-fecha_inicio")
+    sprintCookie = request.COOKIES.get(f'indiceActual_{proyecto.id}')
 
+    etapas = []
+
+    if request.method == 'POST':
+        if request.POST.get('sprintId'):
+            sprintId = request.POST.get('sprintId')
+
+            for etapa in tipo.etapas.all().order_by('orden'):
+                aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
+                
+                if Sprint.objects.get(id=sprintId).estado == 'Desarrollo':
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintId, estado='A')
+                else:
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintId, estado='S')
+                
+                etapas.append(aux_etapa)
+
+        # Función para terminar un sprint
+        if request.POST.get('terminar'):
+            sprintTerminar = sprintDesc[0]
+            sprintTerminar.estado = "Terminado"
+            sprintTerminar.save()
+
+            usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintDesc[0]).exclude(estado='H')
+            
+            for usFinalizar in usListFinalizar:
+                usFinalizar.sprint = None
+                usFinalizar.save()
+                copiaUs = usFinalizar
+                copiaUs.pk = None
+                copiaUs.sprint = sprintTerminar
+                copiaUs.estado = 'S'
+                copiaUs.save()
+            
+    else:
+        for etapa in tipo.etapas.all().order_by('orden'):
+            aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
+            
+            if sprintCookie:
+                if Sprint.objects.get(id=sprintDesc[int(sprintCookie)].id).estado == 'Desarrollo':
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado=HistoriaUsuario.Estado.ACTIVO)
+                else:
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado=HistoriaUsuario.Estado.SNAPSHOT)
+
+            else:    
+                if Sprint.objects.get(id=sprintDesc[0].id).estado == 'Desarrollo':
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado=HistoriaUsuario.Estado.ACTIVO)
+                else:
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado=HistoriaUsuario.Estado.SNAPSHOT)
+
+            etapas.append(aux_etapa)
+    
     request.session['cancelar_volver_a'] = request.path
-    return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo, 'proyecto': proyecto})
+    return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo, 'proyecto': proyecto, "sprints": sprintDesc})
 
 @never_cache
 def ver_archivos(request, proyecto_id, historia_id):

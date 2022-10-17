@@ -16,7 +16,7 @@
         <div>
             {% tiene_permiso_en_proyecto user 'pro_cargarUSalBacklog' proyecto as pro_cargarUSalBacklog %}
             {% if pro_cargarUSalBacklog and esBacklog %}
-                <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Agregar US al Product Backlog</a>
+                <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Agregar Historia al Sprint Backlog</a>
             {% endif %}
             <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
         </div>
@@ -26,13 +26,7 @@
             <thead>
                 <tr>
                     <th>Nombre</th>
-                    {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
-                        <th>Etapa</th>
-                    {% elif titulo == 'Historias Terminadas' %}
-                        <th>Fecha y hora de terminación</th>
-                    {% elif titulo == 'Historias Canceladas'%}
-                        <th>Fecha y hora de cancelación</th>
-                    {% endif %}
+                    <th>Etapa</th>
                     <th>User Points</th>
                     <th>Business Value</th>
                     <th>Encargado</th>
@@ -43,16 +37,10 @@
                 {% for historia in historias %}
                 <tr>
                     <td>{{ historia.nombre }}</td>
-                    {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
-                        {% if historia.etapa %}
-                            <td>{{ historia.etapa }}</td>
-                        {% else %}
-                            <td>Planificado</td>
-                        {% endif %}
-                    {% elif titulo == 'Historias Terminadas' %}
-                        <td>{{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}</td>
-                    {% elif titulo == 'Historias Canceladas'%}
-                        <td>{{ historia.fecha_modificacion|date:'Y-m-d H:i:s' }}</td>
+                    {% if historia.etapa %}
+                        <td>{{ historia.etapa }}</td>
+                    {% else %}
+                        <td>Planificado</td>
                     {% endif %}
                     <td>{{ historia.up }}</td>
                     <td>{{ historia.bv }}</td>
@@ -106,14 +94,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Esta a punto de cancelar la historia de usuario '{{ historia.nombre }}', ¿quiere continuar?</p>
+                    <p>Esta a punto de sacar la historia de usuario '{{ historia.nombre }}' del Sprint, ¿quiere continuar?</p>
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
-                <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
+                <form method="post">
                     {% csrf_token %}
                     <input type="submit" class="btn btn-danger" value="Cancelar Historia">
-                    <input type="hidden" name="url" value="{{ request.path }}">
+                    <input type="hidden" name="historia_id" value="{{historia.id}}">
                 </form>
                 
                 </div>
@@ -143,11 +131,7 @@
                     {% else %}
                         <p>Planificado</p>
                     {% endif %}
-                    {% if historia.usuarioAsignado %}
-                        <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
-                    {% else %}
-                        <p>AUN NO TIENE ENCARGADO</p>
-                    {% endif %}
+                    <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
                     <p>
                         {% if historia.comentarios.count > 0 %}
                             {{ historia.comentarios.count}} comentarios

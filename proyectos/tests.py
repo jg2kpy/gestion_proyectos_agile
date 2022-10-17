@@ -35,8 +35,8 @@ class ProyectoTests(TestCase):
 
         self.client.login(email='testemail@example.com', password='A123B456c.')
         res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD",
-                               "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id}, follow=True)
-        self.assertEqual(res.status_code, 200)
+                               "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'La respuesta no fue un estado HTTP 200 al intentar crear un proyecto')
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
 
     def test_ver_proyectos(self):
@@ -44,7 +44,7 @@ class ProyectoTests(TestCase):
         Prueba que el usuario puede ver los proyectos
         """
         request_factory = RequestFactory()
-        request = request_factory.get('/proyectos/')
+        request = request_factory.get('/proyecto/')
         request.user = AnonymousUser()
         response = proyectos(request)
         self.assertEqual(response.status_code, 401,
@@ -63,15 +63,14 @@ class ProyectoTests(TestCase):
 
         # Verificamos que el usuario sin de admin puede ver los proyectos
         request.user = user
-        response = proyectos(request)
+        response = self.client.get('/proyecto/')
         self.assertContains(response, '<h1>Proyectos</h1>', None,
                             200,  "Usuario ve lista vacia si no es Scrum Master")
         self.assertContains(response, 'http://localhost/proyectos/crear/', 0,
                             200,  "Usuario no tiene opcion crear proyecto si no es Scrum Master")
 
         # Verificamos que el usuario puede ver los proyectos
-        request.user = master
-        response = proyectos(request)
+        response = self.client.get('/proyecto/')
         self.assertEqual(response.status_code, 200,
                          "Usuario no puede ver los proyectos")
 
@@ -103,7 +102,7 @@ class ProyectoTests(TestCase):
 
         # Verfificamos la creacion de un proyecto
         request = request_factory.post(
-            '/proyectos/crear/', {'nombre': 'Proyecto de prueba', 'descripcion': 'Descripcion de prueba', 'scrum_master': master.id})
+            '/proyectos/crear/', {'nombre': 'Proyecto de prueba', 'descripcion': 'Descripcion de prueba', 'scrumMaster': master.id})
         request.user = master
         response = crear_proyecto(request)
         self.assertEqual(response.status_code, 302,
@@ -161,7 +160,7 @@ class ProyectoTests(TestCase):
 
         # Verficicamos la edicion correcta de un proyecto
         request = request_factory.post(f'/proyectos/{proyecto.id}/editar', {'nombre': 'Proyecto de prueba 22',
-                                       'descripcion': 'Descripcion de prueba 2', 'estado': 'Planificacion', 'scrumMaster': master.id})
+                                       'descripcion': 'Descripcion de prueba 2'})
         request.user = master
         response = editar_proyecto(request, proyecto.id)
         self.assertEqual(response.status_code, 422,
@@ -550,3 +549,88 @@ class ProyectoTests(TestCase):
         response = importar_rol(request, proyecto.id)
         self.assertEqual(response.status_code, 200,
                          'La respuesta no fue un estado HTTP 200 a un usuario Scrum Master')
+
+
+    def test_crear_proyecto_con_feriados(self):
+        """
+            Prueba de crear un proyecto con feriados
+        """
+        res = self.client.post("/proyecto/crear/", 
+            {
+                'nombre': 'Proyecto Feriados', 'descripcion': 'Proyecto con feriados', 
+                'minimo_dias_sprint': '15', 'maximo_dias_sprint': '30',
+                'scrumMaster': self.user.id,
+
+                'feriados-TOTAL_FORMS': '2', 
+                'feriados-INITIAL_FORMS': '0',
+                'feriados-MIN_NUM_FORMS': '0', 
+                'feriados-MAX_NUM_FORMS': '1000', 
+
+                'feriados-0-descripcion': "Navidad", 
+                'feriados-0-fecha': '2022-12-25', 
+
+                'feriados-1-descripcion': "Ano nuevo", 
+                'feriados-1-fecha': '2022-12-30', 
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de proyecto con feriados')
+            
+    def test_editar_feriados_proyecto(self):
+        """
+            Prueba de editar un proyecto y sus feriados
+        """
+        res = self.client.post("/proyecto/crear/", 
+            {
+                'nombre': 'Proyecto Feriados', 'descripcion': 'Proyecto con feriados', 
+                'minimo_dias_sprint': '15', 'maximo_dias_sprint': '30',
+                'scrumMaster': self.user.id,
+
+                'feriados-TOTAL_FORMS': '2', 
+                'feriados-INITIAL_FORMS': '0',
+                'feriados-MIN_NUM_FORMS': '0', 
+                'feriados-MAX_NUM_FORMS': '1000', 
+
+                'feriados-0-descripcion': "Navidad", 
+                'feriados-0-fecha': '2022-12-25', 
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de proyecto con feriados')
+        
+        proyecto_con_feriado = Proyecto.objects.get(nombre='Proyecto Feriados')
+
+        res = self.client.post(f"/proyecto/{proyecto_con_feriado.id}/editar/",
+            {
+                'descripcion': 'Proyecto con feriados modificado', 
+                'minimo_dias_sprint': '10', 'maximo_dias_sprint': '35',
+
+                'feriados-TOTAL_FORMS': '2', 
+                'feriados-INITIAL_FORMS': '0',
+                'feriados-MIN_NUM_FORMS': '0', 
+                'feriados-MAX_NUM_FORMS': '1000', 
+
+                'feriados-0-descripcion': "Navidad", 
+                'feriados-0-fecha': '2022-12-26', 
+
+                'feriados-1-descripcion': "Ano nuevo", 
+                'feriados-1-fecha': '2022-12-30', 
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una edicion de proyecto con feriados')
+
+class SprintTests(TestCase):
+    fixtures = [
+        "databasedump.json",
+    ]
+
+    def setUp(self):
+        """
+        Crea un usuario y un proyecto para realizar las pruebas y un proyecto.
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD",
+                               "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'La respuesta no fue un estado HTTP 200 al intentar crear un proyecto')
+        self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")

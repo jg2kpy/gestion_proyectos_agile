@@ -36,15 +36,18 @@
                     <td>{{ proyecto.estado }}</td>
                     <td>{{ proyecto.scrumMaster.get_full_name }} ({{ proyecto.scrumMaster.email }})</td>
                     <td>
+                        {% es_miembro user proyecto as es_miembro %}
+                        {% if es_miembro %}
+                        <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-link"><span
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver proyecto">visibility</span></a>
+                        {% endif %}
                         {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
                         {% if proyecto.estado != 'Cancelado' %}
                             {% if pro_cambiarEstadoProyecto %}
-                            <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-link"><span
-                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver proyecto">visibility</span></a>
                                 {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
                                 {% if pro_cambiarEstadoProyecto %}
                                 <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn btn-link"><span
-                                        class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar proyecto">create</span></a>
+                                        class="material-icons" data-toggle="tooltip" data-placement="top" title="Configuración de proyecto">build</span></a>
                                 <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span
                                         class="material-icons" data-toggle="tooltip" data-placement="top" title="Cancelar proyecto">cancel</span></a>
                                 {% endif %}

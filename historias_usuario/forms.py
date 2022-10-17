@@ -82,23 +82,21 @@ class HistoriaUsuarioForm(forms.ModelForm):
         """ Meta
         :param model: HistoriaUsusario
         :type model: HistoriaUsusario
-        :param fields: [nombre', 'descripcion', 'bv', 'up', 'tipo', 'usuarioAsignado']
+        :param fields: [nombre', 'descripcion', 'bv', 'up', 'tipo']
         :type fields: list
         :param widgets: TextInput, Textarea, NumberInput, forms.Select con clase form-control
         :type widgets: dict
-        :param labels: nombre, descripcion, bv, up, tipo, usuarioAsignado
-        :type widgets: dict
+        :param labels: nombre, descripcion, bv, up, tipo
+        :type labels: dict
         """
         model = HistoriaUsuario
-        fields = ('nombre', 'descripcion', 'bv',
-                  'up', 'tipo', 'usuarioAsignado')
+        fields = ('nombre', 'descripcion', 'bv', 'up', 'tipo')
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
-            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-            'up': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 100}),
+            'up': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 100}),
             'tipo': forms.Select(attrs={'class': 'form-control'}),
-            'usuarioAsignado': forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
             "nombre": "Nombre",
@@ -106,51 +104,15 @@ class HistoriaUsuarioForm(forms.ModelForm):
             "bv": "Business Value (Prioridad de negocio)",
             "up": "User Point (Prioridad técnica)",
             "tipo": "Tipo de Historia de Usuario",
-            "usuarioAsignado": "Usuario asignado"
         }
     
     def __init__(self, *args, **kwargs):
         super(HistoriaUsuarioForm, self).__init__(*args, **kwargs)
-        self.fields['usuarioAsignado'].required = False
         self.fields['up'].required = False
-    
-    def set_tipos_usuarios(self, tipos, usuarios):
-        self.fields['tipo'].choices = tipos
-        self.fields['usuarioAsignado'].choices = usuarios
-        
-
-class HistoriaUsuarioProductOwnerForm(forms.ModelForm):
-    """ Formulario para crear una de historia de usuario siendo un product owner
-    """
-    class Meta:
-        """ Meta
-        :param model: HistoriaUsusario
-        :type model: HistoriaUsusario
-        :param fields: [nombre', 'descripcion', 'bv', 'tipo']
-        :type fields: list
-        :param widgets: TextInput, Textarea, NumberInput, forms.Select con clase form-control
-        :type widgets: dict
-        :param labels: nombre, descripcion, up, tipo
-        :type widgets: dict
-        """
-        model = HistoriaUsuario
-        fields = ('nombre', 'descripcion', 'bv', 'tipo')
-        widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
-            'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-            'tipo': forms.Select(attrs={'class': 'form-control'}),
-        }
-        labels = {
-            "nombre": "Nombre",
-            "descripcion": "Descripción",
-            "bv": "Business Value (Prioridad de negocio)",
-            "tipo": "Tipo de Historia de Usuario"
-        }
     
     def set_tipos(self, tipos):
         self.fields['tipo'].choices = tipos
-
+        
 
 class HistoriaUsuarioEditarForm(forms.ModelForm):
     """ Formulario para editar una de historia de usuario
@@ -160,7 +122,7 @@ class HistoriaUsuarioEditarForm(forms.ModelForm):
 
         :param model: HistoriaUsusario
         :type model: HistoriaUsusario
-        :param fields: [nombre', 'descripcion', 'bv', 'up', 'usuarioAsignado']
+        :param fields: [nombre', 'descripcion', 'bv', 'up']
         :type fields: list
         :param widgets: TextInput, Textarea, NumberInput, forms.Select con clase form-control
         :type widgets: dict
@@ -168,22 +130,17 @@ class HistoriaUsuarioEditarForm(forms.ModelForm):
         :type widgets: dict
         """
         model = HistoriaUsuario
-        fields = ('descripcion', 'bv', 'up', 'usuarioAsignado')
+        fields = ('descripcion', 'bv', 'up')
         widgets = {
             'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
             'bv': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
             'up': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-            'usuarioAsignado': forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
             "descripcion": "Descripción",
             "bv": "Business Value (Prioridad de negocio)",
             "up": "User Point (Prioridad técnica)",
-            "usuarioAsignado": "Usuario asignado"
         }
-    
-    def set_usuarios(self, usuarios):
-        self.fields['usuarioAsignado'].choices = usuarios
 
 
 class ComentarioForm(forms.ModelForm):

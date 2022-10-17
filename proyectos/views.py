@@ -1,12 +1,15 @@
+import datetime
+from django.forms import inlineformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
 
-from historias_usuario.models import EtapaHistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.views import calcularFechaSprint
 
-from .models import Proyecto
-from .forms import ProyectoForm, ProyectoCancelForm, RolProyectoForm
+from .models import Feriado, Proyecto, Sprint, UsuarioTiempoEnSprint
+from .forms import ProyectoConfigurarForm, ProyectoFeriadosForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
 
@@ -42,6 +45,8 @@ def proyectos(request):
 
     if not request.user.is_authenticated:
         return render(request, '401.html', status=401)
+    
+    request.session['cancelar_volver_a'] = request.path
 
     if tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
@@ -70,6 +75,7 @@ def proyecto_home(request, proyecto_id):
     if not request.user.equipo.filter(id=proyecto.id).exists():
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para ver este proyecto'}, status=403)
 
+    request.session['cancelar_volver_a'] = request.path
     return render(request, 'proyectos/home.html', {'proyecto': proyecto})
 
 
@@ -92,77 +98,93 @@ def crear_proyecto(request):
     if not tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear proyectos'}, status=403)
 
+    formset_factory = inlineformset_factory(
+        Proyecto, Feriado, form=ProyectoFeriadosForm, extra=0, can_delete=False)
+
     if request.method == 'POST':
         form = ProyectoForm(request.POST)
+        formset = formset_factory(request.POST, instance=form.instance)
+
         if form.is_valid():
+            # Creamos el proyecto
+            proyecto = Proyecto()
+            proyecto.nombre = form.cleaned_data['nombre']
+            proyecto.descripcion = form.cleaned_data['descripcion']
+            # Automaticamente el estado se queda en planificado
+            proyecto.estado = ESTADOS_PROYECTO.__getitem__(0)[0]
+            scrum_master = form.cleaned_data['scrumMaster']
+            proyecto.scrumMaster = scrum_master
+            if form.cleaned_data['minimo_dias_sprint']:
+                proyecto.minimo_dias_sprint = form.cleaned_data['minimo_dias_sprint']
+            if form.cleaned_data['maximo_dias_sprint']:
+                proyecto.maximo_dias_sprint = form.cleaned_data['maximo_dias_sprint']
+            
             try:
-                # Creamos el proyecto
-                proyecto = Proyecto()
-                proyecto.nombre = form.cleaned_data['nombre']
-                proyecto.descripcion = form.cleaned_data['descripcion']
-                # Automaticamente el estado se queda en planificado
-                proyecto.estado = ESTADOS_PROYECTO.__getitem__(0)[0]
-                id_scrum_master = form.cleaned_data['scrum_master']
-                scrum_master = Usuario.objects.get(id=id_scrum_master)
-                proyecto.scrumMaster = scrum_master
                 proyecto.save()
 
                 scrum_master.equipo.add(proyecto)
 
-                # Traemos el ID del proyecto recien creado
-                # Traemos todos los roles que tenga null como proyecto_id
-                roles = RolProyecto.objects.filter(proyecto__isnull=True)
-                # Generamos una copia de este rol y el asignamos el id del proyecto
-                for rol in roles:
-                    # Creamos el rol
-                    rol_nuevo = RolProyecto()
-                    rol_nuevo.nombre = rol.nombre
-                    rol_nuevo.descripcion = rol.descripcion
-                    rol_nuevo.proyecto = Proyecto.objects.get(id=proyecto.id)
-                    rol_nuevo.save()
-
-                    # Traemos los permisos del rol
-                    permisos = PermisoProyecto.objects.filter(rol=rol)
-
-                    # Recorremos los permisos y los asignamos al rol
-                    for permiso in permisos:
-                        # Agregamos el rol al permiso
-                        permiso.rol.add(rol_nuevo)
-                        permiso.save()
-
-                scrum_master.roles_proyecto.add(RolProyecto.objects.get(
-                    nombre="Scrum Master", proyecto=proyecto))
-                scrum_master.save()
-
-                tipos = TipoHistoriaUsusario.objects.filter(proyecto__isnull=True)
-
-                for tipo in tipos:
-                    tipo_nuevo = TipoHistoriaUsusario()
-                    tipo_nuevo.nombre = tipo.nombre
-                    tipo_nuevo.descripcion = tipo.descripcion
-                    tipo_nuevo.proyecto = proyecto
-                    tipo_nuevo.save()
-
-                    etapas = EtapaHistoriaUsuario.objects.filter(TipoHistoriaUsusario=tipo)
-                    for etapa in etapas:
-                        etapa_nuevo = EtapaHistoriaUsuario()
-                        etapa_nuevo.nombre = etapa.nombre
-                        etapa_nuevo.descripcion = etapa.descripcion
-                        etapa_nuevo.orden = etapa.orden
-                        etapa_nuevo.TipoHistoriaUsusario_id = tipo_nuevo.id
-                        etapa_nuevo.save()
-                    
-                    tipo_nuevo.save()
+                for f in formset:
+                    feriado = f.save(commit=False)
+                    feriado.proyecto = proyecto
+                    feriado.save()
 
             except Exception as e:
                 return HttpResponse('Error al crear el proyecto', status=500)
+
+            # Traemos el ID del proyecto recien creado
+            # Traemos todos los roles que tenga null como proyecto_id
+            roles = RolProyecto.objects.filter(proyecto__isnull=True)
+            # Generamos una copia de este rol y el asignamos el id del proyecto
+            for rol in roles:
+                # Creamos el rol
+                rol_nuevo = RolProyecto()
+                rol_nuevo.nombre = rol.nombre
+                rol_nuevo.descripcion = rol.descripcion
+                rol_nuevo.proyecto = Proyecto.objects.get(id=proyecto.id)
+                rol_nuevo.save()
+
+                # Traemos los permisos del rol
+                permisos = PermisoProyecto.objects.filter(rol=rol)
+
+                # Recorremos los permisos y los asignamos al rol
+                for permiso in permisos:
+                    # Agregamos el rol al permiso
+                    permiso.rol.add(rol_nuevo)
+                    permiso.save()
+
+            scrum_master.roles_proyecto.add(RolProyecto.objects.get(
+                nombre="Scrum Master", proyecto=proyecto))
+            scrum_master.save()
+
+            tipos = TipoHistoriaUsusario.objects.filter(proyecto__isnull=True)
+
+            for tipo in tipos:
+                tipo_nuevo = TipoHistoriaUsusario()
+                tipo_nuevo.nombre = tipo.nombre
+                tipo_nuevo.descripcion = tipo.descripcion
+                tipo_nuevo.proyecto = proyecto
+                tipo_nuevo.save()
+
+                etapas = EtapaHistoriaUsuario.objects.filter(TipoHistoriaUsusario=tipo)
+                for etapa in etapas:
+                    etapa_nuevo = EtapaHistoriaUsuario()
+                    etapa_nuevo.nombre = etapa.nombre
+                    etapa_nuevo.descripcion = etapa.descripcion
+                    etapa_nuevo.orden = etapa.orden
+                    etapa_nuevo.TipoHistoriaUsusario_id = tipo_nuevo.id
+                    etapa_nuevo.save()
+                
+                tipo_nuevo.save()
+
 
             return redirect('proyectos')
         else:
             return HttpResponse('Formulario invalido', status=422)
     else:
         form = ProyectoForm()
-    return render(request, 'proyectos/crear_proyecto.html', {'form': form})
+        form_feriado = formset_factory()
+    return render(request, 'proyectos/crear_proyecto.html', {'form': form, 'form_feriado': form_feriado})
 
 
 # Editar un proyecto
@@ -196,40 +218,45 @@ def editar_proyecto(request, proyecto_id):
     if not tiene_permiso_en_proyecto(request_user, 'pro_cambiarEstadoProyecto', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para editar proyectos'}, status=403)
 
+    formset_factory = inlineformset_factory(
+        Proyecto, Feriado, form=ProyectoFeriadosForm, extra=0, can_delete=False)
+
     # Verificamos que el usuario tenga permisos rol de moderador o es el scrum master del proyecto
     if request.method == 'POST':
-        form = ProyectoForm(request.POST)
-        if form.is_valid():
+        form = ProyectoConfigurarForm(request.POST, instance=proyecto)
+        formset = formset_factory(request.POST, instance=form.instance)
+        if form.is_valid() and formset.is_valid():
             try:
                 # Editamos el proyecto
                 proyecto = Proyecto.objects.get(id=proyecto_id)
-                proyecto.nombre = form.cleaned_data['nombre']
                 proyecto.descripcion = form.cleaned_data['descripcion']
+                proyecto.minimo_dias_sprint = form.cleaned_data['minimo_dias_sprint']
+                proyecto.maximo_dias_sprint = form.cleaned_data['maximo_dias_sprint']
 
-                proyecto.scrumMaster.roles_proyecto.remove(RolProyecto.objects.get(
-                    nombre="Scrum Master", proyecto=proyecto))
-
-                id_scrum_master = form.cleaned_data['scrum_master']
-                scrum_master = Usuario.objects.get(id=id_scrum_master)
-
-                scrum_master.roles_proyecto.add(RolProyecto.objects.get(
-                    nombre="Scrum Master", proyecto=proyecto))
-
-                proyecto.scrumMaster = scrum_master
+                proyecto.feriados.all().delete()
+                
                 proyecto.save()
-                return redirect('proyectos')
+
+                for f in formset:
+                    feriado = f.save(commit=False)
+                    feriado.proyecto = proyecto
+                    feriado.save()
+
+                proyecto.save()
+                return redirect('proyecto_home', proyecto_id=proyecto.id)
             except Exception as e:
                 return HttpResponse('Error al editar el proyecto', status=500)
         else:
             return HttpResponse('Formulario invalido', status=422)
     else:
-        form = ProyectoForm()
-        # cargamos los datos del proyecto
         proyecto = Proyecto.objects.get(id=proyecto_id)
-        form.fields['nombre'].initial = proyecto.nombre
-        form.fields['descripcion'].initial = proyecto.descripcion
+        form = ProyectoConfigurarForm(instance=proyecto)
+        # cargamos los datos del proyecto
 
-    return render(request, 'proyectos/editar_proyecto.html', {'form': form})
+        form_feriado = formset_factory(instance=proyecto)
+
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'proyectos/editar_proyecto.html', {'form': form, 'form_feriado':form_feriado, 'proyecto': proyecto, 'volver_a': volver_a})
 
 
 # Recibimos una peticion POST para cancelar un proyecto
@@ -447,7 +474,7 @@ def modificar_rol_proyecto(request, proyecto_id, id_rol_proyecto):
             return redirect('roles_de_proyecto', proyecto_id=proyecto.id)
     else:
         form = RolProyectoForm(
-            initial={'nombre': rol.nombre, 'descripcion': rol.descripcion})
+            initial={'nombre': rol.nombre, 'descripcion': rol.descripcion, 'permisos': rol.permisos.all() })
     return render(request, 'proyectos/roles_proyecto/modificar_rol_proyecto.html', {'form': form, 'rol': rol, 'permisos': permisos, 'proyecto': proyecto})
 
 
@@ -669,9 +696,9 @@ def importar_rol(request, proyecto_id):
         # proyecto_objetivo = Proyecto.objects.get(nombre = request.GET.get('proyectos'))
         # Este es el GET cuando solicita ver los roles de proyectos de un proyecto en especifico
         if request.GET.get('proyectos'):
-            proyecto = Proyecto.objects.get(
+            proyecto_seleccionado = Proyecto.objects.get(
                 nombre=request.GET.get('proyectos'))
-            roles = RolProyecto.objects.filter(proyecto=proyecto)
+            roles = RolProyecto.objects.filter(proyecto=proyecto_seleccionado)
         else:  # Este es el GET cuando se llama desde otra pagina
             roles = None
             if proyectos.count() == 0:
@@ -686,3 +713,304 @@ def importar_rol(request, proyecto_id):
 
 
     return render(request, 'proyectos/roles_proyecto/importar_rol.html', {'proyectos': proyectos, 'proyecto_seleccionado': proyecto_seleccionado, 'roles': roles, 'proyecto': proyecto})
+
+@never_cache
+def crear_sprint(request, proyecto_id):
+    """Crear sprint
+    Renderiza la pagina para crear un sprint.
+    Recibe una llamada POST para crear el sprint.
+
+    :param request: Peticion HTTP donde se recibe la informacion del sprint a crear
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que se le creara el sprint
+    :type proyecto_id: int
+
+    :return: Renderiza la pagina para crear un sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0]
+    status = 200
+    error = None
+    sprint = Sprint()
+    if request.method == 'POST':
+        sprint.proyecto = proyecto
+        sprint.estado = "Planificado"
+        sprint.duracion = request.POST.get('duracion')
+        sprint.nombre = request.POST.get('nombre')
+        sprint.descripcion = request.POST.get('descripcion')
+
+        sprint.save()
+        for historia in historias:
+            if request.POST.get('historia_seleccionado_'+str(historia.id)):
+                historia.sprint = sprint
+                historia.horasAsignadas = request.POST.get('historia_horas_'+str(historia.id))
+                historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
+                historia.save()
+        
+        for usuario in proyecto.usuario.all():
+            print(usuario)
+            horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
+            print(horas)
+            if horas and int(horas) > 0:
+                tiempoSprint = UsuarioTiempoEnSprint()
+                tiempoSprint.sprint = sprint
+                tiempoSprint.usuario = usuario
+                tiempoSprint.horas = horas
+                tiempoSprint.save()
+
+        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+
+
+    else:
+        pass
+
+    return render(request, 'sprints/crear.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
+
+@never_cache
+def backlog_sprint(request, proyecto_id, sprint_id):
+    """Crear sprint
+    Renderiza la pagina para crear un sprint.
+    Recibe una llamada POST para crear el sprint.
+
+    :param request: Peticion HTTP donde se recibe la informacion del sprint a crear
+    :type request: HttpRequest
+
+    :param sprint_id: ID del sprint que se quiere visualizar
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para manejar el backlog de un sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        sprint = Sprint.objects.get(id=sprint_id)
+        proyecto = sprint.proyecto
+    except Sprint.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este sprint."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+    if sprint.estado == "Terminado":
+        return render(request, '403.html', {'info_adicional': 'No puede ver backlogs de Sprint terminado'}, status=403)
+
+    if request.method == 'POST':
+        if request.POST.get('historia_id'):
+            historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
+            historia.sprint = None
+            historia.save()
+        else:
+            if sprint.fecha_inicio != None:
+                return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
+            if Sprint.objects.filter(estado="Desarrollo",proyecto=proyecto).count() > 0:
+                return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
+            sprint.fecha_inicio = datetime.datetime.now()
+            sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto)
+            sprint.estado = "Desarrollo"
+            sprint.save()
+
+    miembros = [miembro for miembro in proyecto.usuario.all() if UsuarioTiempoEnSprint.objects.filter(sprint=sprint, usuario=miembro).exists()]
+    for miembro in miembros:
+        miembro.historias_total = sum([historia.horasAsignadas for historia in sprint.historias.filter(estado='A') if historia.usuarioAsignado == miembro])
+        miembro.capacidad = UsuarioTiempoEnSprint.objects.get(sprint=sprint, usuario=miembro).horas
+        miembro.capacidad_total = miembro.capacidad * sprint.duracion
+        miembro.historias_count = len([historia for historia in sprint.historias.filter(estado='A') if historia.usuarioAsignado == miembro])
+    request.session['cancelar_volver_a'] = request.path
+
+    return render(request, 'sprints/base.html', {'proyecto': proyecto, 'miembros': miembros, 'sprint': sprint, 'historias': sprint.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO), 'titulo': "Sprint Backlog "+sprint.nombre}, status=200)
+
+@never_cache
+def agregar_historias(request, proyecto_id, sprint_id):
+    """
+    Agrega una historia al backlog del sprint
+
+    :param request: Peticion HTTP donde se recibe la informacion de la historia a agregar
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que se le agregara la historia
+    :type proyecto_id: int
+
+    :param sprint_id: ID del sprint al que se le agregara la historia
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para agregar una historia al backlog del sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        sprint = Sprint.objects.get(id=sprint_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0 and x.sprint == None]
+    status = 200
+    error = None
+    if request.method == 'POST':
+        historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
+        historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
+        historia.sprint = sprint
+        historia.save()
+        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+
+    return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
+
+@never_cache
+def editar_miembros_sprint(request, proyecto_id, sprint_id):
+    """
+    Permite editar la lista de miembros con las que trabajan de un Sprint
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que pertenece el sprint
+    :type proyecto_id: int
+
+    :param sprint_id: ID del sprint del cuál se quiere modificar el equipo
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para editar los miembros del sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        sprint = Sprint.objects.get(id=sprint_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    desarrolladores = proyecto.usuario.all()
+    status = 200
+    error = None
+    if request.method == 'POST':
+        for usuario in desarrolladores:
+            horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
+            if horas and int(horas) > 0:
+                tiempoSprint = UsuarioTiempoEnSprint.objects.get_or_create(usuario=usuario, sprint=sprint)[0]
+                tiempoSprint.horas = horas
+                tiempoSprint.save()
+        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+    else:
+        for d in desarrolladores:
+            try:
+                print(UsuarioTiempoEnSprint.objects.get(usuario=d, sprint=sprint).horas)
+                d.horas = UsuarioTiempoEnSprint.objects.get(usuario=d, sprint=sprint).horas
+                d.horas_total = 0
+                for historia in sprint.historias.filter(usuarioAsignado=d):
+                    d.horas_total += historia.horasAsignadas
+            except UsuarioTiempoEnSprint.DoesNotExist:
+                d.horas = 0
+
+    return render(request, 'sprints/editar_miembros.html', {'proyecto': proyecto, 'desarrolladores': desarrolladores, 'error': error, 'sprint': sprint}, status=status)
+
+@never_cache
+def agregar_historias_sprint(request, proyecto_id, sprint_id):
+    """
+    Permite agregar US a un Sprint
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que pertenece el sprint
+    :type proyecto_id: int
+
+    :param sprint_id: ID del sprint del cuál se quiere modificar el equipo
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para editar los miembros del sprint
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        sprint = Sprint.objects.get(id=sprint_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0]
+    desarrolladores = proyecto.usuario.all()
+    status = 200
+    error = None
+    if request.method == 'POST':
+        for historia in historias:
+            if request.POST.get('historia_seleccionado_'+str(historia.id)):
+                historia.sprint = sprint
+                historia.horasAsignadas = request.POST.get('historia_horas_'+str(historia.id))
+                historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
+                historia.save()
+        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+
+    return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
+
+@never_cache
+def sprint_list(request, proyecto_id):
+    """
+    Permite ver una lista de Sprints
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que pertenecen los sprint
+    :type proyecto_id: int
+
+    :return: Renderiza la pagina para ver los sprints
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    return render(request, 'sprints/sprintList.html', {'proyecto': proyecto}, status=200)

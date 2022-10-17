@@ -1,6 +1,7 @@
 from django import forms
+from pkg_resources import require
 from usuarios.models import Usuario
-from .models import Proyecto
+from .models import Feriado, Proyecto
 # Traemos los roles y los permisos de los proyectos
 from usuarios.models import RolProyecto, PermisoProyecto
 
@@ -19,7 +20,7 @@ ESTADOS_PROYECTO = (
 )
 
 
-class ProyectoForm(forms.Form):
+class ProyectoForm(forms.ModelForm):
     """
         Formulario para crear un proyecto
         Se introduce el nombre del proyecto, la descripcion, las fechas de inicio y de fin
@@ -29,25 +30,100 @@ class ProyectoForm(forms.Form):
         :type nombre: Texto
         :param descripcion: Descripcion del proyecto
         :type descripcion: Texto
-        :param fecha_inicio: Fecha de inicio del proyecto
-        :type fecha_inicio: Fecha
-        :param fecha_fin: Fecha de fin del proyecto
-        :type fecha_fin: Fecha
         :param scrum_master: Usuario que sera el Scrum Master del proyecto
         :type scrum_master: Usuario
+        :param minimo_dias_sprint: Minimo de dias para un sprint de este proyecto
+        :type minimo_dias_sprint: int
+        :param maximo_dias_sprint: Maximo de dias para un sprint de este proyecto
+        :type maximo_dias_sprint: int
 
         :return: Formulario para crear un proyecto
-        :rtype: Proyecto
+        :rtype: Form
     """
-    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
-    scrum_master = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
+    class Meta:
+
+        model = Proyecto
+        fields = ('nombre', 'descripcion','scrumMaster','minimo_dias_sprint','maximo_dias_sprint')
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
+            'scrumMaster': forms.Select(attrs={'class': 'form-control'}),
+            'minimo_dias_sprint': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'maximo_dias_sprint': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'})
+        }
+        initial={
+            'minimo_dias_sprint': 15,
+            'maximo_dias_sprint': 30,
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['scrum_master'].choices = [
+        self.fields['scrumMaster'].choices = [
             (usuario.id, f'{usuario.get_full_name()} ({usuario.email})') for usuario in Usuario.objects.all()]
+        self.fields['minimo_dias_sprint'].required = False
+        self.fields['maximo_dias_sprint'].required = False
 
+
+class ProyectoConfigurarForm(forms.ModelForm):
+    """
+        Formulario para configurar un proyecto
+        Se introduce el nombre del proyecto, la descripcion, las fechas de inicio y de fin
+        y se asigna un usuario como Scrum Master del proyecto
+
+        :param descripcion: Descripcion del proyecto
+        :type descripcion: Texto
+        :param scrum_master: Usuario que sera el Scrum Master del proyecto
+        :type scrum_master: Usuario
+        :param minimo_dias_sprint: Minimo de dias para un sprint de este proyecto
+        :type minimo_dias_sprint: int
+        :param maximo_dias_sprint: Maximo de dias para un sprint de este proyecto
+        :type maximo_dias_sprint: int
+
+        :return: Formulario para crear un proyecto
+        :rtype: Form
+    """
+
+    class Meta:
+        model = Proyecto
+        fields = ('descripcion', 'minimo_dias_sprint', 'maximo_dias_sprint')
+        widgets = {
+            # 'nombre': forms.TextInput(attrs={'class': 'form-control', 'disabled': 'disabled'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
+            'minimo_dias_sprint': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'maximo_dias_sprint': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['minimo_dias_sprint'].required = False
+        self.fields['maximo_dias_sprint'].required = False
+
+
+class ProyectoFeriadosForm(forms.ModelForm):
+    """
+        Formulario para agregar feriados a un proyecto
+        Se introduce los feriados que se desean agregar al proyecto
+
+        :param descripcion: Descripcion del feriado
+        :type descripcion: str
+        :param fecha: FEcha del feriado
+        :type fecha: Date
+
+        :return: Formulario para agregar feriados
+        :rtype: Form
+    """
+
+    class Meta:
+        model = Feriado
+        fields = ('descripcion', 'fecha')
+        widgets = {
+            'descripcion': forms.TextInput(attrs={'class': 'form-control', 'required': 'requiered'}),
+            'fecha': forms.DateInput(format='%Y-%m-%d', attrs={'type':'date', 'class': 'form-control', 'required': 'requiered'})
+        }
+        required={
+            'descripcion': False,
+            'fecha': False,
+        }
 
 class ProyectoCancelForm(forms.Form):
     """

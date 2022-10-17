@@ -1,6 +1,7 @@
 from django import template
+from historias_usuario.models import HistoriaUsuario
 from usuarios.models import RolSistema, RolProyecto, Usuario
-from proyectos.models import Proyecto
+from proyectos.models import Proyecto, Sprint
 
 """
 Los templares tags son funciones en python que podemos ejecutar en los templates HTML
@@ -170,3 +171,88 @@ def lista_adm():
     """
     adminRol = RolSistema.objects.get(nombre="gpa_admin")
     return adminRol.usuario.all()
+
+@register.simple_tag
+
+def check_sprint_desarrollo(cookies, proyecto, sprints):
+    """Funcion para determinar si un sprint se encuentra en desarrollo
+    :param cookies: Cookies del navegador
+    :type cookies: str
+
+    :param proyecto: Proyecto en el cual se encuentra
+    :type proyecto: Proyecto
+
+    :param sprints: Lista con los sprints disponibles
+    :type sprints: list
+
+    :return: Se retorna True si está en desarrollo caso contrario False
+    :rtype: bool
+    """
+
+    cookieIndice = cookies.get(f'indiceActual_{proyecto.id}')
+    
+    if cookieIndice:
+        return sprints[int(cookieIndice)].estado == "Desarrollo"
+    else:
+        return sprints[0].estado == "Desarrollo"
+
+@register.simple_tag
+def check_sprint_no_planificacion(tablero):
+    """Funcion para verificar si existe un sprint en desarrollo o ya terminado para el tablero
+    :param tablero: Objeto del tipo de historia
+    :type tablero: TipoHistoriaUsusario
+
+    :return: Se retorna True si existe un sprint en desarrollo o ya terminado
+    :rtype: bool
+    """
+    sprints = Sprint.objects.filter(proyecto=tablero.proyecto, historias__tipo=tablero).exclude(fecha_inicio__isnull=True)
+    
+    if sprints:
+        return True
+    else:
+        return False
+
+@register.simple_tag
+def check_sprint_activo(proyecto):
+    """Funcion para verificar si existe un sprint en desarrollo
+    :param proyecto: Objeto del proyecto
+    :type proyecto: Proyecto
+
+    :return: Se retorna True si existe un sprint en desarrollo
+    :rtype: bool
+    """
+    sprints = Sprint.objects.filter(proyecto=proyecto, estado="Desarrollo").exclude(fecha_inicio__isnull=True)
+    
+    if sprints:
+        return True
+    else:
+        return False
+
+@register.simple_tag
+def check_historia_activa(proyecto, sprints):
+    """Funcion para determinar si existe una historia de usuario activa en el sprint más reciente
+
+    :param proyecto: Objeto del proyecto
+    :type proyecto: Proyecto
+
+    :param sprints: Lista con los sprints disponibles
+    :type sprints: list
+
+    :return: Se retorna True si encuentra una historia de usuario no terminada
+    :rtype: bool
+    """
+    historiasActivas = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprints[0], estado='A')
+
+    if historiasActivas:
+        return True
+    else:
+        return False
+
+@register.simple_tag
+def es_miembro(usuario, proyecto):
+    """Funcion para verificar que un miembro pertenece a un proyecto
+
+    :return: True si el usuario es miembro del proyecto
+    :rtype: bool
+    """
+    return usuario.equipo.filter(id=proyecto.id).exists()
