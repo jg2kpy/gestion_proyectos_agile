@@ -1,4 +1,5 @@
 import datetime
+import django
 from django.forms import inlineformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -821,7 +822,7 @@ def backlog_sprint(request, proyecto_id, sprint_id):
                 return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
             if Sprint.objects.filter(estado="Desarrollo",proyecto=proyecto).count() > 0:
                 return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
-            sprint.fecha_inicio = datetime.datetime.now()
+            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone())
             sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto)
             sprint.estado = "Desarrollo"
             sprint.save()

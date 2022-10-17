@@ -758,11 +758,11 @@ def verTablero(request, proyecto_id, tipo_id):
 
         # Función para terminar un sprint
         if request.POST.get('terminar'):
-            sprintTerminar = sprintDesc[0]
+            sprintTerminar = proyecto.sprints.get(estado="Desarrollo")
             sprintTerminar.estado = "Terminado"
             sprintTerminar.save()
 
-            usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintDesc[0],estado=HistoriaUsuario.Estado.ACTIVO)
+            usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintTerminar,estado=HistoriaUsuario.Estado.ACTIVO)
             
             for usFinalizar in usListFinalizar:
                 id_ori = usFinalizar.id
