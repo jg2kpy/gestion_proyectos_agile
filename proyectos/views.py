@@ -239,7 +239,7 @@ def editar_proyecto(request, proyecto_id):
                     feriado.save()
 
                 proyecto.save()
-                return redirect('proyectos')
+                return redirect('proyecto_home', proyecto_id=proyecto.id)
             except Exception as e:
                 return HttpResponse('Error al editar el proyecto', status=500)
         else:
