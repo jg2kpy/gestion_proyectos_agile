@@ -64,6 +64,27 @@
                     </div>
                 </li>
                 <li class="mb-1">
+                <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                        data-bs-target="#sprints-collapse" aria-expanded="true">
+                        <i class="material-icons align-text-bottom">directions_run</i>
+                        Sprints
+                    </button>
+                    <div class="collapse show" id="sprints-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            {% for sprint in proyecto.sprints.all %}
+                                {% if sprint.estado == 'Desarrollo' or sprint.estado == 'Planificado' %}
+                                    <li>
+                                        <a href="{% url 'backlog_sprint' proyecto.id sprint.id %}" class="link-dark rounded">
+                                            <i class="material-icons  align-text-bottom">list</i>
+                                            {{ sprint.nombre }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+                <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                         data-bs-target="#us-collapse" aria-expanded="true">
                         <i class="material-icons  align-text-bottom">checklist</i>
