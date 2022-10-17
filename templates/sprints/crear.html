@@ -30,12 +30,26 @@
                 <div role="alert" class="alert alert-dark" id="aviso_horas_planeadas">
                     <span id="horas_total_planeadas">0</span> horas total
                 </div>
+                <div class="row ">
+                    <div class="col-md-1 align-self-center d-flex justify-content-center">
+                        <h4>Incluir</h4>
+                    </div>
+                    <div class="col-md-1 align-self-center d-flex justify-content-center">
+                        <h4>Prioridad</h4>
+                    </div>
+                    <div class="col-md-10">
+                        <h4>Historia</h4>
+                    </div>
+                </div>
                 {% for historia in historias %}
                 <div class="row ">
                     <div class="col-md-1 align-self-center d-flex justify-content-center">
                         <input type="checkbox" class="incluir_checkbox" name="historia_seleccionado_{{historia.id}}" value="{{historia.id}}">
                     </div>
-                    <div class="col-md-11">
+                    <div class="col-md-1 align-self-center d-flex justify-content-center">
+                        <span>{{historia.getPrioridad}}</span>
+                    </div>
+                    <div class="col-md-10">
                         <div class="card bg-light">
                             <div class="card-body">
                                 <div class="card shadow-sm" id="cd1">

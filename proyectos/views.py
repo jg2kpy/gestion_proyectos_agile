@@ -743,7 +743,7 @@ def crear_sprint(request, proyecto_id):
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
 
-    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0]
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad(), reverse=True) if x.getPrioridad() >= 0]
     status = 200
     error = None
     sprint = Sprint()

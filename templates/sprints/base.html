@@ -248,13 +248,12 @@
                     No hay archivos
                     {% endif %}
                 </p>
-                <br>
                 {% for info in historia.sprintInfo.all %}
+                <hr>
                 <p>Sprint: {{info.sprint.nombre}}</p>
                 <p>Horas: {{info.versionEnHistorial.horasAsignadas}}</p>
                 <p>Asignado: {{info.versionEnHistorial.usuarioAsignado.get_full_name}}</p>
                 <p>Etapa: {{info.versionEnHistorial.etapa}}</p>
-                <br>
                 {% endfor %}
             </div>
         </div>
