@@ -909,5 +909,5 @@ class SprintTests(TestCase):
         res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest2.tipo.id}/",
                                data={'sprintId': self.sprint2.id}, follow=True)
         
-        self.assertContains(res, '<span class="lead font-weight-light">Test US 2</span>', 2,
+        self.assertContains(res, '<span class="lead font-weight-light">Test US 2</span>', 1,
                             200, "No visualiza correctamente el sprint")

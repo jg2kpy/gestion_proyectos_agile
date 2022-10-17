@@ -87,25 +87,27 @@
             </thead>
             <tbody>
                 {% for miembro in miembros %}
-                <tr>
-                    <td>
-                        <img src="{{ miembro.avatar_url }}" alt="{{ miembro.get_full_name }}" width="30" height="30"
-                            class="rounded-circle" style="margin-right: 10px;" />
-                        {{ miembro.get_full_name }}
-                    </td>
-                    <td>
-                        {{ miembro.capacidad }}
-                    </td>
-                    <td>
-                        {{ miembro.capacidad_total }}
-                    </td>
-                    <td>
-                        {{ miembro.historias_count }}
-                    </td>
-                    <td>
-                        {{ miembro.historias_total }}
-                    </td>
-                </tr>
+                {% if miembro.capacidad > 0 or miembro.historias_count > 0 %}
+                    <tr>
+                        <td>
+                            <img src="{{ miembro.avatar_url }}" alt="{{ miembro.get_full_name }}" width="30" height="30"
+                                class="rounded-circle" style="margin-right: 10px;" />
+                            {{ miembro.get_full_name }}
+                        </td>
+                        <td>
+                            {{ miembro.capacidad }}
+                        </td>
+                        <td>
+                            {{ miembro.capacidad_total }}
+                        </td>
+                        <td>
+                            {{ miembro.historias_count }}
+                        </td>
+                        <td>
+                            {{ miembro.historias_total }}
+                        </td>
+                    </tr>
+                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>

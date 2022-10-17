@@ -801,22 +801,23 @@ def verTablero(request, proyecto_id, tipo_id):
                 sprintInfo.versionEnHistorial = copiaUs
                 sprintInfo.save()
             
-    for etapa in tipo.etapas.all().order_by('orden'):
-        aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
-        
-        if sprintCookie:
-            if Sprint.objects.get(id=sprintDesc[int(sprintCookie)].id).estado == 'Desarrollo':
-                aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado=HistoriaUsuario.Estado.ACTIVO)
-            else:
-                aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado=HistoriaUsuario.Estado.SNAPSHOT)
+    else:
+        for etapa in tipo.etapas.all().order_by('orden'):
+            aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
+            
+            if sprintCookie:
+                if Sprint.objects.get(id=sprintDesc[int(sprintCookie)].id).estado == 'Desarrollo':
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado=HistoriaUsuario.Estado.ACTIVO)
+                else:
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado=HistoriaUsuario.Estado.SNAPSHOT)
 
-        else:    
-            if Sprint.objects.get(id=sprintDesc[0].id).estado == 'Desarrollo':
-                aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado=HistoriaUsuario.Estado.ACTIVO)
-            else:
-                aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado=HistoriaUsuario.Estado.SNAPSHOT)
+            else:    
+                if Sprint.objects.get(id=sprintDesc[0].id).estado == 'Desarrollo':
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado=HistoriaUsuario.Estado.ACTIVO)
+                else:
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado=HistoriaUsuario.Estado.SNAPSHOT)
 
-        etapas.append(aux_etapa)
+            etapas.append(aux_etapa)
     
     request.session['cancelar_volver_a'] = request.path
     return render(request, 'tablero/tablero.html', {'etapas': etapas, "tipo": tipo, 'proyecto': proyecto, "sprints": sprintDesc})
