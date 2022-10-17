@@ -772,6 +772,14 @@ def verTablero(request, proyecto_id, tipo_id):
                 copiaUs.sprint = sprintTerminar
                 copiaUs.estado = 'S'
                 copiaUs.save()
+                sprintInfo = SprintInfo()
+                sprintInfo.sprint = sprintTerminar
+                sprintInfo.historia = usFinalizar
+                sprintInfo.versionEnHistorial = copiaUs
+                sprintInfo.save()
+                usFinalizar.horasAsignadas = None
+                usFinalizar.usuarioAsignado = None
+                usFinalizar.save()
             
     else:
         for etapa in tipo.etapas.all().order_by('orden'):
