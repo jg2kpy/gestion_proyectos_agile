@@ -28,7 +28,7 @@
                 {% if master and not sprint.fecha_inicio %}
                 <a href="#modalSprintIni" class="btn btn-primary" data-bs-toggle="modal"
                     data-bs-target="#modalSprintIni" data-toggle="tooltip" data-placement="top"
-                    title="Empezar sprint">Empezar Sprint</a>
+                    title="Empezar sprint">Empezar Sprint</a>&nbsp;&nbsp;
                 {% endif %}
                 <!-- Modal -->
                 <div class="modal fade" id="modalSprintIni" tabindex="-1" aria-labelledby="sprintModal"
@@ -89,7 +89,7 @@
                 {% for miembro in miembros %}
                 <tr>
                     <td>
-                        <img src="{{ user.avatar_url }}" alt="{{ user.get_full_name }}" width="30" height="30"
+                        <img src="{{ miembro.avatar_url }}" alt="{{ miembro.get_full_name }}" width="30" height="30"
                             class="rounded-circle" style="margin-right: 10px;" />
                         {{ miembro.get_full_name }}
                     </td>

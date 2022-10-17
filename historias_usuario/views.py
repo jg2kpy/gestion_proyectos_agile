@@ -762,7 +762,7 @@ def verTablero(request, proyecto_id, tipo_id):
             sprintTerminar.estado = "Terminado"
             sprintTerminar.save()
 
-            usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintDesc[0]).exclude(estado='H')
+            usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintDesc[0],estado=HistoriaUsuario.Estado.ACTIVO)
             
             for usFinalizar in usListFinalizar:
                 usFinalizar.sprint = None
