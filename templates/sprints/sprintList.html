@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}Sprints {{sprint.nombre}}{% endblock %}
+{% block contenido %}
+{% load gpa_tags %}
+
+<div>
+    <style>
+        thead input {
+            width: 100%;
+        }
+    </style>
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{{ Sprints }}</h1>
+        </div>
+        <div class="d-flex justify-content-between">
+            <div>
+                <a href="{% url 'crear_sprint' proyecto.id %}" class="btn btn-primary">Agregar
+                    miembros</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-striped" id="tablaSprints" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Duración</th>
+                    <th>Fecha inicio</th>
+                    <th>Fecha fin</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sprint in proyecto.sprints %}
+                <tr>
+                    <td>{{sprint.nombre}}</td>
+                    <td>{{sprint.descripcion}}</td>
+                    <td>{{sprint.duracion}}</td>
+                    <td>{{sprint.fecha_inicio}}</td>
+                    <td>{{sprint.fecha_fin}}</td>
+                    <td>{{sprint.Estado}}</td>
+                    <td>
+                        {% if sprint.estado == 'Activo' or sprint.estado == 'Planificado' %}
+                        <a href="{% url 'backlog_sprint' proyecto.id sprint.id %}"><i class="material-icons  align-text-bottom">list</i></a>
+                        {% if sprint.estado == 'Planificado' %}
+                        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+                        {% if master and not sprint.fecha_inicio %}
+                        <a href="#modalSprintIni" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#modalSprintIni" data-toggle="tooltip" data-placement="top"
+                            title="Empezar sprint">Empezar Sprint</a>
+                        {% endif %}
+                        <!-- Modal -->
+                        <div class="modal fade" id="modalSprintIni" tabindex="-1" aria-labelledby="sprintModal"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+
+                                    {% check_sprint_activo proyecto as existe_sprint_activo %}
+                                    {% if existe_sprint_activo %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="sprintModal">ERROR</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>¡No se puede empezar nuevo sprint porque ya existe un sprint en desarrollo!</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                                    </div>
+                                    {% else %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="sprintModal">¿Está seguro que desea comenzar el sprint?</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>No se detectaron conflictos</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                                        <form method="post" action=".">
+                                            {% csrf_token %}
+                                            <input type="submit" class="btn btn-primary" name="comenzar" value="comenzar">
+                                        </form>
+                                    </div>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Modal -->
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% for historia in historias %}
+{% endfor %}
+
+<script>
+    $(document).ready(function () {
+        $('#tablaSprints thead tr')
+            .clone(true)
+            .addClass('filters1')
+            .appendTo('#tablaSprints thead');
+        $('#tablaSprints').DataTable({
+            "binfo": true,
+            "sDom": '<"header"i>t<"Footer">',
+            "oLanguage": {
+                "sInfo": "<h4>Miembros</h4>"
+            },
+            paging: false,
+            orderCellsTop: true,
+            fixedHeader: true,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.12.1/i18n/es-ES.json'
+            },
+            initComplete: function () {
+                var api = this.api();
+                api
+                    .columns()
+                    .eq(0)
+                    .each(function (colIdx) {
+                        var cell = $('.filters1 th').eq(
+                            $(api.column(colIdx).header()).index()
+                        );
+                        var title = $(cell).text();
+                        $(cell).html('<input type="text" placeholder="' + title + '" />');
+
+                        $(
+                            'input',
+                            $('.filters1 th').eq($(api.column(colIdx).header()).index())
+                        )
+                            .off('keyup change')
+                            .on('change', function (e) {
+                                $(this).attr('title', $(this).val());
+                                var regexr = '({search})';
+
+                                var cursorPosition = this.selectionStart;
+                                api
+                                    .column(colIdx)
+                                    .search(
+                                        this.value != ''
+                                            ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                            : '',
+                                        this.value != '',
+                                        this.value == ''
+                                    )
+                                    .draw();
+                            })
+                            .on('keyup', function (e) {
+                                e.stopPropagation();
+
+                                $(this).trigger('change');
+                                $(this)
+                                    .focus()[0]
+                                    .setSelectionRange(cursorPosition, cursorPosition);
+                            });
+                    });
+            },
+            "drawCallback": function (settings) {
+                $('body').tooltip({ selector: '[data-toggle="tooltip"]' });
+            }
+        });
+    });
+</script>
+{% endblock %}

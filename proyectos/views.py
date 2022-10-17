@@ -804,6 +804,8 @@ def backlog_sprint(request, proyecto_id, sprint_id):
 
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+    if sprint.estado == "Terminado":
+        return render(request, '403.html', {'info_adicional': 'No puede ver backlogs de Sprint terminado'}, status=403)
 
     if request.method == 'POST':
         if request.POST.get('historia_id'):
@@ -811,18 +813,21 @@ def backlog_sprint(request, proyecto_id, sprint_id):
             historia.sprint = None
             historia.save()
         else:
-            sprintInciar = Sprint.objects.get(proyecto=proyecto, fecha_inicio__isnull=True)
-            sprintInciar.fecha_inicio = datetime.datetime.now()
-            sprintInciar.fecha_fin = calcularFechaSprint(sprintInciar.fecha_inicio, sprintInciar.duracion, proyecto)
-            sprintInciar.estado = "Desarrollo"
-            sprintInciar.save()
+            if sprint.fecha_inicio != None:
+                return render(request, '422.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
+            if Sprint.objects.get(estado="Desarrollo").count() > 0:
+                return render(request, '422.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
+            sprint.fecha_inicio = datetime.datetime.now()
+            sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto)
+            sprint.estado = "Desarrollo"
+            sprint.save()
 
     miembros = [miembro for miembro in proyecto.usuario.all() if UsuarioTiempoEnSprint.objects.filter(sprint=sprint, usuario=miembro).exists()]
     for miembro in miembros:
-        miembro.historias_total = sum([historia.horasAsignadas for historia in sprint.historias.all() if historia.usuarioAsignado == miembro])
+        miembro.historias_total = sum([historia.horasAsignadas for historia in sprint.historias.filter(estado='A') if historia.usuarioAsignado == miembro])
         miembro.capacidad = UsuarioTiempoEnSprint.objects.get(sprint=sprint, usuario=miembro).horas
         miembro.capacidad_total = miembro.capacidad * sprint.duracion
-        miembro.historias_count = len([historia for historia in sprint.historias.all() if historia.usuarioAsignado == miembro])
+        miembro.historias_count = len([historia for historia in sprint.historias.filter(estado='A') if historia.usuarioAsignado == miembro])
     request.session['cancelar_volver_a'] = request.path
 
     return render(request, 'sprints/base.html', {'proyecto': proyecto, 'miembros': miembros, 'sprint': sprint, 'historias': sprint.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO), 'titulo': "Sprint Backlog "+sprint.nombre}, status=200)
@@ -973,3 +978,33 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
         return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
 
     return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
+
+@never_cache
+def sprint_list(request, proyecto_id):
+    """
+    Permite ver una lista de Sprints
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que pertenecen los sprint
+    :type proyecto_id: int
+
+    :return: Renderiza la pagina para ver los sprints
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    return render(request, 'sprints/sprintList.html', {'proyecto': proyecto, 'sprint': sprint}, status=200)

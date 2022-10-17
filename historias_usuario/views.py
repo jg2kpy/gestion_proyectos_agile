@@ -749,21 +749,12 @@ def verTablero(request, proyecto_id, tipo_id):
             for etapa in tipo.etapas.all().order_by('orden'):
                 aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
                 
-                if Sprint.objects.get(id=sprintId).estado == 'A':
+                if Sprint.objects.get(id=sprintId).estado == 'Desarrollo':
                     aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintId, estado='A')
                 else:
                     aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintId, estado='S')
                 
                 etapas.append(aux_etapa)
-
-        # Función para comenzar un sprint
-        # ! Verificar restricción en modelo en el caso que no tenga definido dias_totales
-        if request.POST.get('comenzar'):
-            sprintInciar = Sprint.objects.get(proyecto=proyecto, fecha_inicio__isnull=True)
-            sprintInciar.fecha_inicio = datetime.datetime.now()
-            sprintInciar.fecha_fin = calcularFechaSprint(sprintInciar.fecha_inicio, sprintInciar.duracion, proyecto)
-            sprintInciar.estado = "Desarrollo"
-            sprintInciar.save()
 
         # Función para terminar un sprint
         if request.POST.get('terminar'):
@@ -774,6 +765,8 @@ def verTablero(request, proyecto_id, tipo_id):
             usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintDesc[0]).exclude(estado='H')
             
             for usFinalizar in usListFinalizar:
+                usFinalizar.sprint = None
+                usFinalizar.save()
                 copiaUs = usFinalizar
                 copiaUs.pk = None
                 copiaUs.sprint = sprintTerminar
@@ -785,16 +778,16 @@ def verTablero(request, proyecto_id, tipo_id):
             aux_etapa = {"nombre": etapa.nombre, "historias": [], "proyecto": proyecto_id}
             
             if sprintCookie:
-                if Sprint.objects.get(id=sprintDesc[int(sprintCookie)].id).estado == 'A':
-                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado='A')
+                if Sprint.objects.get(id=sprintDesc[int(sprintCookie)].id).estado == 'Desarrollo':
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado=HistoriaUsuario.Estado.ACTIVO)
                 else:
-                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado='S')
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[int(sprintCookie)].id, estado=HistoriaUsuario.Estado.SNAPSHOT)
 
             else:    
-                if Sprint.objects.get(id=sprintDesc[0].id).estado == 'A':
-                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado='A')
+                if Sprint.objects.get(id=sprintDesc[0].id).estado == 'Desarrollo':
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado=HistoriaUsuario.Estado.ACTIVO)
                 else:
-                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado='S')
+                    aux_etapa["historias"] = etapa.historias.filter(sprint__id=sprintDesc[0].id, estado=HistoriaUsuario.Estado.SNAPSHOT)
 
             etapas.append(aux_etapa)
     
