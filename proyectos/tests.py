@@ -676,6 +676,18 @@ class SprintTests(TestCase):
         self.assertEqual(res.status_code, 200,
                 'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
     
+    def test_crear_sprint_con_dev(self):
+        """
+        Prueba de crear un sprint con historias iniciales
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+            {
+                'nombre': 'Sprint 1', 'descripcion': 'Sprint 1', 'duracion': '15', f'horas_trabajadas_{self.proyecto.id}': '6',
+                f'desarrollador_asignado_{self.historiaTest.id}': f'{self.user.id}',
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+    
     def test_agregar_us_backlog_sprint(self):
         """
         Prueba de agregar un US al backlog del sprint
@@ -708,3 +720,15 @@ class SprintTests(TestCase):
             }, follow=True)
         self.assertEqual(res.status_code, 200,
                 'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+
+    def test_cambiar_horas_desarrollador_negativo(self):
+        """
+        Prueba cambiar la capacidad de un desarrollador
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/editar_miembros/",
+            {
+                f'horas_trabajadas_{self.user.id}': '-20'
+            }, follow=True)
+        self.assertEqual(res.status_code, 422,
+                'La respuesta no fue un estado HTTP 422 con horas negativas')

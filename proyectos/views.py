@@ -917,8 +917,6 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
     error = None
     if request.method == 'POST':
         for usuario in desarrolladores:
-            print(usuario.id)
-            print(request.POST.keys())
             horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
             if horas and int(horas) > 0:
                 if UsuarioTiempoEnSprint.objects.filter(usuario=usuario, sprint=sprint).exists():
@@ -927,7 +925,9 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
                     tiempoSprint = UsuarioTiempoEnSprint(usuario=usuario, sprint=sprint)
                 tiempoSprint.horas = horas
                 tiempoSprint.save()
-        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+                return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+            else:
+                status = 422
     else:
         for d in desarrolladores:
             try:
