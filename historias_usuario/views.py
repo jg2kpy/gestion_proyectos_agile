@@ -738,7 +738,7 @@ def verTablero(request, proyecto_id, tipo_id):
 
     sprints = Sprint.objects.filter(proyecto=proyecto).exclude(fecha_inicio__isnull=True)
     sprintDesc = sprints.order_by("-fecha_inicio")
-    sprintCookie = request.COOKIES.get('indiceActual')
+    sprintCookie = request.COOKIES.get(f'indiceActual_{proyecto.id}')
 
     etapas = []
 

@@ -15,8 +15,7 @@
         </div>
         <div class="d-flex justify-content-between">
             <div>
-                <a href="{% url 'crear_sprint' proyecto.id %}" class="btn btn-primary">Agregar
-                    miembros</a>
+                <a href="{% url 'crear_sprint' proyecto.id %}" class="btn btn-primary">Agregar</a>
             </div>
         </div>
     </div>
@@ -34,23 +33,24 @@
                 </tr>
             </thead>
             <tbody>
-                {% for sprint in proyecto.sprints %}
+                {% for sprint in proyecto.sprints.all %}
                 <tr>
                     <td>{{sprint.nombre}}</td>
                     <td>{{sprint.descripcion}}</td>
                     <td>{{sprint.duracion}}</td>
                     <td>{{sprint.fecha_inicio}}</td>
                     <td>{{sprint.fecha_fin}}</td>
-                    <td>{{sprint.Estado}}</td>
+                    <td>{{sprint.estado}}</td>
                     <td>
-                        {% if sprint.estado == 'Activo' or sprint.estado == 'Planificado' %}
-                        <a href="{% url 'backlog_sprint' proyecto.id sprint.id %}"><i class="material-icons  align-text-bottom">list</i></a>
+                        {% if sprint.estado == 'Desarrollo' or sprint.estado == 'Planificado' %}
+                        <a href="{% url 'backlog_sprint' proyecto.id sprint.id %}" data-toggle="tooltip" data-placement="top"
+                        title="Backlog del Sprint"><i class="material-icons  align-text-bottom">visibility</i></a>
                         {% if sprint.estado == 'Planificado' %}
                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                         {% if master and not sprint.fecha_inicio %}
-                        <a href="#modalSprintIni" class="btn btn-primary" data-bs-toggle="modal"
+                        <a href="#modalSprintIni" data-bs-toggle="modal"
                             data-bs-target="#modalSprintIni" data-toggle="tooltip" data-placement="top"
-                            title="Empezar sprint">Empezar Sprint</a>
+                            title="Empezar sprint"><i class="material-icons  align-text-bottom">play_arrow</i></a>
                         {% endif %}
                         <!-- Modal -->
                         <div class="modal fade" id="modalSprintIni" tabindex="-1" aria-labelledby="sprintModal"
@@ -82,7 +82,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
-                                        <form method="post" action=".">
+                                        <form method="post" action="{% url 'backlog_sprint' proyecto.id sprint.id %}">
                                             {% csrf_token %}
                                             <input type="submit" class="btn btn-primary" name="comenzar" value="comenzar">
                                         </form>

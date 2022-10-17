@@ -11,7 +11,7 @@
             <form method="post" id="formId">
                 {% csrf_token %}
                 <select id="selId" name="sprintId" class="form-select form-select-sm" aria-label=".form-select-sm example"
-                        onchange="document.cookie= 'indiceActual = ' + this.selectedIndex + '; path=/;';formId.submit()"
+                        onchange="document.cookie= 'indiceActual_{{proyecto.id}} = ' + this.selectedIndex + '; path=/;';formId.submit()"
                         data-toggle="tooltip" data-placement="bottom" title="Seleccionar un Sprint">
                     {% if sprints %}
                         {% for sprint in sprints %}
@@ -31,14 +31,14 @@
                         return null;
                     }
 
-                    window.onload = function () { document.getElementById("selId").selectedIndex = readCookie("indiceActual"); }
+                    window.onload = function () { document.getElementById("selId").selectedIndex = readCookie("indiceActual_{{proyecto.id}}"); }
                 </script>
             </form>
         </div>
 
         {% comment %} Inicio terminar Sprint {% endcomment %}
         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
-        {% check_sprint_desarrollo request.COOKIES.indiceActual sprints as esta_en_desarrollo %}
+        {% check_sprint_desarrollo request.COOKIES proyecto sprints as esta_en_desarrollo %}
         {% if master and esta_en_desarrollo %}
             <button href="#modalSprintFin" class="btn btn-link" data-bs-toggle="modal" 
             data-bs-target="#modalSprintFin" data-toggle="tooltip" data-placement="top" 
@@ -105,7 +105,7 @@
                                         {{us.usuarioAsignado.get_full_name}}
                                     </p>
                                     <br>
-                                    {%check_sprint_desarrollo request.COOKIES.indiceActual sprints as esta_en_desarrollo %}
+                                    {%check_sprint_desarrollo request.COOKIES proyecto sprints as esta_en_desarrollo %}
                                     {% if esta_en_desarrollo %}
                                         <div class="d-flex justify-content-evenly">
                                             {% tiene_permiso_en_proyecto user 'pro_modificarUS' us.proyecto as pro_modificarUS %}

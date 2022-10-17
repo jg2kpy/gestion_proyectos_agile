@@ -59,10 +59,11 @@
             </span>
             Product Backlog
         </a>
-        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
-        <a href="{% url 'historiaUsuarioBacklog' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
+        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as main %}
+        {% if main %}
+        <a href="{% url 'sprint_list' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
             <span class="material-icons  align-text-bottom">
-                production_quantity_limits
+                list
             </span>
             Sprints
         </a>

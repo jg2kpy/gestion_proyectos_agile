@@ -230,9 +230,11 @@ def editar_proyecto(request, proyecto_id):
                 # Editamos el proyecto
                 proyecto = Proyecto.objects.get(id=proyecto_id)
                 proyecto.descripcion = form.cleaned_data['descripcion']
+                proyecto.minimo_dias_sprint = form.cleaned_data['minimo_dias_sprint']
+                proyecto.maximo_dias_sprint = form.cleaned_data['maximo_dias_sprint']
 
                 proyecto.feriados.all().delete()
-
+                
                 proyecto.save()
 
                 for f in formset:
@@ -818,9 +820,9 @@ def backlog_sprint(request, proyecto_id, sprint_id):
             historia.save()
         else:
             if sprint.fecha_inicio != None:
-                return render(request, '422.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
-            if Sprint.objects.get(estado="Desarrollo").count() > 0:
-                return render(request, '422.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
+                return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
+            if Sprint.objects.filter(estado="Desarrollo",proyecto=proyecto).count() > 0:
+                return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
             sprint.fecha_inicio = datetime.datetime.now()
             sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto)
             sprint.estado = "Desarrollo"
@@ -1011,4 +1013,4 @@ def sprint_list(request, proyecto_id):
     if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
 
-    return render(request, 'sprints/sprintList.html', {'proyecto': proyecto, 'sprint': sprint}, status=200)
+    return render(request, 'sprints/sprintList.html', {'proyecto': proyecto}, status=200)

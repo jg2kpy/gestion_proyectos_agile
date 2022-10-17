@@ -173,7 +173,7 @@ $('.horas_trabajadas_input').change(function () {
     var horas_calculadas = $('#horas_calculadas_'+id_dev).text();
 
     $('#horas_dias_'+id_dev).text(horas);
-    if (Math.abs((horas - horas_calculadas)) > Math.min(parseInt($(this).val()), parseInt($('#input_dias_planeados').val()))) {
+    if (Math.abs((horas - horas_calculadas)) > Math.max(parseInt($(this).val()), parseInt($('#input_dias_planeados').val()))) {
         $('#aviso_horas_desarrollador_'+id_dev).show();
     } else {
         $('#aviso_horas_desarrollador_'+id_dev).hide();

@@ -174,10 +174,13 @@ def lista_adm():
 
 @register.simple_tag
 
-def check_sprint_desarrollo(cookieIndice, sprints):
+def check_sprint_desarrollo(cookies, proyecto, sprints):
     """Funcion para determinar si un sprint se encuentra en desarrollo
-    :param cookieIndice: Indice guardado en cookie
-    :type cookieIndice: str
+    :param cookies: Cookies del navegador
+    :type cookies: str
+
+    :param proyecto: Proyecto en el cual se encuentra
+    :type proyecto: Proyecto
 
     :param sprints: Lista con los sprints disponibles
     :type sprints: list
@@ -185,6 +188,8 @@ def check_sprint_desarrollo(cookieIndice, sprints):
     :return: Se retorna True si está en desarrollo caso contrario False
     :rtype: bool
     """
+
+    cookieIndice = cookies.get(f'indiceActual_{proyecto.id}')
     
     if cookieIndice:
         return sprints[int(cookieIndice)].estado == "Desarrollo"

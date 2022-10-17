@@ -616,3 +616,21 @@ class ProyectoTests(TestCase):
             }, follow=True)
         self.assertEqual(res.status_code, 200,
                 'La respuesta no fue un estado HTTP 200 a una edicion de proyecto con feriados')
+
+class SprintTests(TestCase):
+    fixtures = [
+        "databasedump.json",
+    ]
+
+    def setUp(self):
+        """
+        Crea un usuario y un proyecto para realizar las pruebas y un proyecto.
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD",
+                               "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'La respuesta no fue un estado HTTP 200 al intentar crear un proyecto')
+        self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
