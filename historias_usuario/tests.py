@@ -1,5 +1,7 @@
+import datetime
 import email
 import os
+from django.utils.timezone import get_current_timezone
 from django import setup
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_proyectos_agile.settings")
 setup()
@@ -8,7 +10,7 @@ setup()
 from phonenumber_field.modelfields import PhoneNumber
 from historias_usuario.views import tiposHistoriaUsuario
 from usuarios.models import RolProyecto, Usuario
-from proyectos.models import Proyecto
+from proyectos.models import Proyecto, Sprint
 from usuarios.models import RolSistema
 from .models import HistoriaUsuario, TipoHistoriaUsusario
 from django.contrib.auth.models import AnonymousUser, User
@@ -266,7 +268,6 @@ class HistoriasUsuarioTest(TestCase):
         movidoAnt = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
         self.assertEqual(movidoAnt.etapa.nombre, 'Etapa 1', f'La historia de usuario no se movió. Está en etapa: {movidoAnt.etapa.nombre}')
 
-    # TODO: Reeimplementar con la asignacion realizada en la creacion de sprint
     def test_visualizarHistoriaUsuarioAsignada(self):
         """
         Prueba de visualizar una historia de usuario asignada a dicho usuario.
@@ -278,12 +279,14 @@ class HistoriasUsuarioTest(TestCase):
             }, follow=True)
         self.assertEqual(res.status_code, 200)
 
-        # creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
-        # self.assertEqual(self.user, creado.usuarioAsignado)
+        creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        creado.usuarioAsignado = self.user
+        creado.save()
+        self.assertEqual(self.user, creado.usuarioAsignado)
 
-        # res = self.client.get(f"/proyecto/{self.proyecto.id}/mis-historias/", follow=True)
-        # self.assertEqual(res.status_code, 200)
-        # self.assertContains(res, '<td>Test US 1</td>', 1, 200, "No se puede visualizar la historia asignada")
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/mis-historias/", follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, '<td>Test US 1</td>', 1, 200, "No se puede visualizar la historia asignada")
 
 class TableroTest(TestCase):
     """
@@ -316,6 +319,14 @@ class TableroTest(TestCase):
         self.assertIsNotNone(self.creado, 'El tipo de historia de usuario no existe')
         self.assertEqual(self.creado.nombre, 'Test tipo 1', 'El tipo de historia de usuario no tiene el nombre correspondiente')
         self.assertEqual(self.creado.descripcion, 'Des de Test tipo 1', 'El tipo de historia de usuario no tiene la descripcion correspondiente')
+        self.sprint = Sprint()
+        self.sprint.nombre = 'Sprint 1'
+        self.sprint.proyecto = self.proyecto
+        self.sprint.duracion = 3
+        self.sprint.fecha_inicio = datetime.datetime.now(tz=get_current_timezone())
+        self.sprint.fecha_fin = datetime.datetime.now(tz=get_current_timezone()) + datetime.timedelta(days=7)
+        self.sprint.estado = "Desarrollo"
+        self.sprint.save()
     
     def test_visualizarTablero(self):
         """
@@ -357,6 +368,7 @@ class TableroTest(TestCase):
         historia = HistoriaUsuario.objects.create(tipo=self.creado, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1, usuarioAsignado=self.user)
         historia.etapa = self.creado.etapas.all()[0]
         historia.estado = HistoriaUsuario.Estado.ACTIVO
+        historia.sprint = self.sprint
         historia.save()
         res = self.client.get(f"/proyecto/{self.proyecto.id}/tablero/{self.creado.id}", follow=True)
         self.assertEqual(res.status_code, 200)
@@ -371,6 +383,7 @@ class TableroTest(TestCase):
         historia = HistoriaUsuario.objects.create(tipo=self.creado, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1, usuarioAsignado=self.user)
         historia.etapa = self.creado.etapas.all()[0]
         historia.estado = HistoriaUsuario.Estado.CANCELADO
+        historia.sprint = self.sprint
         historia.save()
         self.assertContains(res, 'class="card shadow-sm"', 0, 200, "Se puede visualizar el tablero vacío")
 

@@ -176,10 +176,10 @@ class HistoriaUsuario(models.Model):
         params
         """
         # No se puede agregar a nuevos Sprints si la historia esta todavía en un Sprint
-        if self.sprint is not None:
+        if self.sprint is not None or self.estado != HistoriaUsuario.Estado.ACTIVO:
             return -1
         
-        return self.bv * 0.6 + self.up * 0.4 + (30 if self.sprintInfo is not None else 0)
+        return self.bv * 0.6 + self.up * 0.4 + (30 if len(self.sprintInfo.all()) != 0 else 0)
 
     
     def guardarConHistorial(self):

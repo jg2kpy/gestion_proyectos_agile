@@ -1,4 +1,5 @@
 import datetime
+import django
 from django.forms import inlineformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -743,7 +744,7 @@ def crear_sprint(request, proyecto_id):
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
 
-    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0]
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad(), reverse=True) if x.getPrioridad() >= 0]
     status = 200
     error = None
     sprint = Sprint()
@@ -763,9 +764,7 @@ def crear_sprint(request, proyecto_id):
                 historia.save()
         
         for usuario in proyecto.usuario.all():
-            print(usuario)
             horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
-            print(horas)
             if horas and int(horas) > 0:
                 tiempoSprint = UsuarioTiempoEnSprint()
                 tiempoSprint.sprint = sprint
@@ -823,7 +822,7 @@ def backlog_sprint(request, proyecto_id, sprint_id):
                 return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
             if Sprint.objects.filter(estado="Desarrollo",proyecto=proyecto).count() > 0:
                 return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
-            sprint.fecha_inicio = datetime.datetime.now()
+            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone())
             sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto)
             sprint.estado = "Desarrollo"
             sprint.save()
@@ -921,10 +920,15 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
         for usuario in desarrolladores:
             horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
             if horas and int(horas) > 0:
-                tiempoSprint = UsuarioTiempoEnSprint.objects.get_or_create(usuario=usuario, sprint=sprint)[0]
+                if UsuarioTiempoEnSprint.objects.filter(usuario=usuario, sprint=sprint).exists():
+                    tiempoSprint = UsuarioTiempoEnSprint.objects.get(usuario=usuario, sprint=sprint)
+                else:
+                    tiempoSprint = UsuarioTiempoEnSprint(usuario=usuario, sprint=sprint)
                 tiempoSprint.horas = horas
                 tiempoSprint.save()
-        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+                return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
+            else:
+                status = 422
     else:
         for d in desarrolladores:
             try:

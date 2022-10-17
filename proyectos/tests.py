@@ -1,5 +1,9 @@
 import os
 from django import setup
+from historias_usuario.models import SprintInfo
+
+from historias_usuario.views import tiposHistoriaUsuario
+from django.utils.timezone import get_current_timezone
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_proyectos_agile.settings")
 setup()
 
@@ -634,3 +638,276 @@ class SprintTests(TestCase):
                                "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
         self.assertEqual(res.status_code, 200, 'La respuesta no fue un estado HTTP 200 al intentar crear un proyecto')
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
+        self.sprint = Sprint()
+        self.sprint.nombre = 'Sprint 1'
+        self.sprint.proyecto = self.proyecto
+        self.sprint.duracion = 3
+        self.sprint.fecha_inicio = datetime.datetime.now(tz=get_current_timezone())
+        self.sprint.fecha_fin = datetime.datetime.now(tz=get_current_timezone()) + datetime.timedelta(days=7)
+        self.sprint.estado = "Desarrollo"
+        self.sprint.save()
+        self.tipoTest = TipoHistoriaUsusario.objects.get(proyecto=self.proyecto, nombre="Default")
+        self.historiaTest = HistoriaUsuario.objects.create(tipo=self.tipoTest, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1)
+        self.historiaTest.estado = HistoriaUsuario.Estado.CANCELADO
+        self.historiaTest.tipo = self.tipoTest
+        self.historiaTest.save()
+    
+    def test_crear_sprint_vacio(self):
+        """
+        Prueba de crear un sprint
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+            {
+                'nombre': 'Sprint 1', 'descripcion': 'Sprint 1', 'duracion': '15', f'horas_trabajadas_{self.proyecto.id}': '6',
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+
+    def test_crear_sprint_con_us(self):
+        """
+        Prueba de crear un sprint con historias iniciales
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+            {
+                'nombre': 'Sprint 1', 'descripcion': 'Sprint 1', 'duracion': '15', f'horas_trabajadas_{self.proyecto.id}': '6',
+                f'historia_seleccionado_{self.historiaTest.id}': '1',
+                f'historia_horas_{self.historiaTest.id}': '5',
+                f'desarrollador_asignado_{self.historiaTest.id}': f'{self.user.id}',
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+    
+    def test_crear_sprint_con_dev(self):
+        """
+        Prueba de crear un sprint con historias iniciales
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+            {
+                'nombre': 'Sprint 1', 'descripcion': 'Sprint 1', 'duracion': '15', f'horas_trabajadas_{self.proyecto.id}': '6',
+                f'desarrollador_asignado_{self.historiaTest.id}': f'{self.user.id}',
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+    
+    def test_agregar_us_backlog_sprint(self):
+        """
+        Prueba de agregar un US al backlog del sprint
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/backlog/", 
+            {
+                'historia_id': self.historiaTest.id
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/agregar_historias/",
+            {
+                f'historia_seleccionado_{self.historiaTest.id}': '1',
+                f'historia_horas_{self.historiaTest.id}': '5',
+                f'desarrollador_asignado_{self.historiaTest.id}': f'{self.user.id}',
+
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+    
+    def test_cambiar_horas_desarrollador(self):
+        """
+        Prueba cambiar la capacidad de un desarrollador
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/editar_miembros/",
+            {
+                f'horas_trabajadas_{self.user.id}': '20'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+
+    def test_cambiar_horas_desarrollador_negativo(self):
+        """
+        Prueba cambiar la capacidad de un desarrollador
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/editar_miembros/",
+            {
+                f'horas_trabajadas_{self.user.id}': '-20'
+            }, follow=True)
+        self.assertEqual(res.status_code, 422,
+                'La respuesta no fue un estado HTTP 422 con horas negativas')
+    
+    def test_prioridad_sin_previo(self):
+        """
+        Prueba calcular prioridad sin previo sprint
+        """
+        self.historiaTest.sprint = None
+        self.historiaTest.estado = HistoriaUsuario.Estado.ACTIVO
+        self.assertEqual(self.historiaTest.getPrioridad(), 1,
+                'Con BV == UP prioridad debería ser == BV == UP')
+
+    def test_prioridad_sin_previo_porcentajes(self):
+        """
+        Prueba calcular prioridad sin previo sprint y porcentajes diferentes
+        """
+        self.historiaTest.bv = 20
+        self.historiaTest.up = 10
+        self.historiaTest.sprint = None
+        self.historiaTest.estado = HistoriaUsuario.Estado.ACTIVO
+        self.assertEqual(self.historiaTest.getPrioridad(), self.historiaTest.bv*0.6+self.historiaTest.up*0.4,
+                'BV debería ser 0.6 la prioriad')
+
+    def test_prioridad_sin_previo(self):
+        """
+        Prueba calcular prioridad con un sprint previo
+        """
+        info = SprintInfo()
+        info.versionEnHistorial = self.historiaTest
+        info.historia = self.historiaTest
+        info.sprint = self.sprint
+        info.save()
+        self.historiaTest.sprint = None
+        self.historiaTest.estado = HistoriaUsuario.Estado.ACTIVO
+        self.assertEqual(self.historiaTest.getPrioridad(), 31,
+                'Al haber estado en sprint anterior la prioridad recibe +30')
+
+    def test_prioridad_variuos_previo(self):
+        """
+        Prueba calcular prioridad con varios sprints previos
+        """
+        info = SprintInfo()
+        info.versionEnHistorial = self.historiaTest
+        info.historia = self.historiaTest
+        info.sprint = self.sprint
+        info.save()
+        info2 = SprintInfo()
+        info2.versionEnHistorial = self.historiaTest
+        info2.historia = self.historiaTest
+        info2.sprint = self.sprint
+        info2.save()
+        info3 = SprintInfo()
+        info3.versionEnHistorial = self.historiaTest
+        info3.historia = self.historiaTest
+        info3.sprint = self.sprint
+        info3.save()
+        self.historiaTest.sprint = None
+        self.historiaTest.estado = HistoriaUsuario.Estado.ACTIVO
+        self.assertEqual(self.historiaTest.getPrioridad(), 31,
+                'El +30 por haber estad en sprint se aplica solamente una vez')
+    
+    def test_prioridad_en_sprint(self):
+        """
+        Prueba que prioridad es -1 para historias en un Sprint
+        """
+        self.historiaTest.sprint = self.sprint
+        self.historiaTest.estado = HistoriaUsuario.Estado.ACTIVO
+        self.assertEqual(self.historiaTest.getPrioridad(), -1,
+                'La historia en un sprint tiene prioridad -1')
+    
+    def test_prioridad_cancelado(self):
+        """
+        Prueba que prioridad es -1 para historias canceladas
+        """
+        self.historiaTest.sprint = self.sprint
+        self.historiaTest.estado = HistoriaUsuario.Estado.CANCELADO
+        self.assertEqual(self.historiaTest.getPrioridad(), -1,
+                'La historia cancelada tiene prioridad -1')
+    
+    def test_prioridad_terminado(self):
+        """
+        Prueba que prioridad es -1 para historias terminadas
+        """
+        self.historiaTest.sprint = self.sprint
+        self.historiaTest.estado = HistoriaUsuario.Estado.TERMINADO
+        self.assertEqual(self.historiaTest.getPrioridad(), -1,
+                'La historia terminada tiene prioridad -1')
+    
+    def test_prioridad_terminado(self):
+        """
+        Prueba que prioridad es -1 para historias snapshot
+        """
+        self.historiaTest.sprint = self.sprint
+        self.historiaTest.estado = HistoriaUsuario.Estado.SNAPSHOT
+        self.assertEqual(self.historiaTest.getPrioridad(), -1,
+                'La historia snapshot tiene prioridad -1')
+    
+    def test_terminar_sprint(self):
+        """
+        Prueba para terminar un sprint
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+        
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/")
+        self.assertContains(res, 'Terminado', 1,
+                            200, "No se cambió a estado terminado")
+
+    def test_comenzar_sprint(self):
+        """
+        Prueba para comenzar un sprint
+        """
+        
+        self.sprint2 = Sprint()
+        self.sprint2.nombre = 'Sprint 1'
+        self.sprint2.proyecto = self.proyecto
+        self.sprint2.duracion = 3
+        self.sprint2.estado = "Planificado"
+        self.sprint2.save()
+        self.historiaTest2 = HistoriaUsuario.objects.create(tipo=self.tipoTest, nombre="Test US 2", descripcion="Test US 2", proyecto=self.proyecto, up=1, bv=1)
+        self.historiaTest2.tipo = self.tipoTest
+        self.historiaTest2.save()
+
+        self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint2.id}/backlog/",
+            {
+                'comenzar' : 'comenzar'
+            }, follow=True)
+
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al inciar un sprint')
+        
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/")
+        self.assertContains(res, 'Desarrollo', 1,
+                            200, "No inicia el sprint correctamente")
+
+    def test_ver_tablero_otros_sprints(self):
+        """
+        Prueba visualizar sprint terminado en tablero teniendo ya un sprint empezado
+        """
+
+        self.sprint2 = Sprint()
+        self.sprint2.nombre = 'Sprint 1'
+        self.sprint2.proyecto = self.proyecto
+        self.sprint2.duracion = 3
+        self.sprint2.estado = "Planificado"
+        self.sprint2.save()
+        self.historiaTest2 = HistoriaUsuario.objects.create(tipo=self.tipoTest, nombre="Test US 2", descripcion="Test US 2", proyecto=self.proyecto, up=1, bv=1)
+        self.historiaTest2.tipo = self.tipoTest
+        self.historiaTest2.save()
+        self.historiaTest2.sprint = self.sprint2
+        self.historiaTest2.etapa = self.tipoTest.etapas.all()[0]
+        self.historiaTest2.save()
+
+        self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint2.id}/backlog/",
+            {
+                'comenzar' : 'comenzar'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al inciar un sprint')
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest2.tipo.id}/",
+                               data={'sprintId': self.sprint2.id}, follow=True)
+        
+        self.assertContains(res, '<span class="lead font-weight-light">Test US 2</span>', 1,
+                            200, "No visualiza correctamente el sprint")
