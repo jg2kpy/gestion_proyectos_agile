@@ -190,8 +190,7 @@ def check_sprint_desarrollo(cookies, proyecto, sprints):
     """
 
     cookieIndice = cookies.get(f'indiceActual_{proyecto.id}')
-    
-    if cookieIndice:
+    if cookieIndice and int(cookieIndice) < len(sprints):
         return sprints[int(cookieIndice)].estado == "Desarrollo"
     else:
         return sprints[0].estado == "Desarrollo"

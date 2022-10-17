@@ -79,7 +79,7 @@ class UsuarioTiempoEnSprint(models.Model):
     sprint = models.ForeignKey(Sprint, related_name="participantes", on_delete=models.PROTECT)
     usuario = models.ForeignKey('usuarios.Usuario', related_name='sprints', on_delete=models.PROTECT)
     horas = models.IntegerField(blank=False, null=False, validators=[
-                             MaxValueValidator(24), MinValueValidator(1)])
+                             MaxValueValidator(24), MinValueValidator(0)])
     
 
 class Feriado(models.Model):

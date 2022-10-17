@@ -765,7 +765,7 @@ def crear_sprint(request, proyecto_id):
         
         for usuario in proyecto.usuario.all():
             horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
-            if horas and int(horas) > 0:
+            if horas and int(horas) >= 0:
                 tiempoSprint = UsuarioTiempoEnSprint()
                 tiempoSprint.sprint = sprint
                 tiempoSprint.usuario = usuario
