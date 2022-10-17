@@ -35,7 +35,9 @@
             <form method="POST">
                 {% csrf_token %}
                 {% for rol in roles %}
-                <input type="checkbox" name="{{rol.id}}" value="{{rol.id}}"><label for="{{rol.id}}">{{ rol.nombre }}</label>
+                    <input type="checkbox" name="{{rol.id}}" value="{{rol.id}}" style="margin-right: 4px"><label for="{{rol.id}}">{{ rol.nombre }}</label>
+                    <a class="btn btn-link" href="#modalDetalles{{ rol.id }}" data-bs-toggle="modal" data-bs-target="#modalDetalles{{ rol.id }}"><span
+                    class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span></a>
                 <br>
                 {% endfor %}
                 <input hidden name="proyecto_seleccionado" value="{{proyecto_seleccionado.id}}">
@@ -52,4 +54,29 @@
         </div>
         <a href="{% url 'roles_de_proyecto' proyecto.id %}" class="btn btn-secondary">Volver</a>
     {% endif %}
+
+    {% for rol in roles %}
+        <!-- Modal -->
+        <div class="modal fade" id="modalDetalles{{rol.id}}" tabindex="-1" aria-labelledby="modalDetalles" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title">Detalles de '{{rol}}'</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>{{rol.descripcion}}</h6>
+                        <div class="row">
+                            <div class="col-md-12 mx-4">
+                                {% for permiso in rol.permisos.all %}
+                                    <li>{{ permiso.descripcion }}</li>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
     {% endblock %}

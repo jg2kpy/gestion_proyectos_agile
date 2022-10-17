@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Editar miembros{% endblock %}
+{% block contenido %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="container">
+            <h1>
+                Editar miembros de Sprint
+            </h1>
+        </div>
+        <form id="sprintForm" action="." method="POST">
+            {% csrf_token %}
+            <div class="tab container d-none">
+                <h4>Horas desarolladores:</h4>
+                {% for desarrollador in desarrolladores %}
+                <div class="row desarrollador_horas_dia_list" id="campo_desarrollador_{{desarrollador.id}}">
+                    <span id="aviso_horas_desarrollador_{{desarrollador.id}}">
+                        Horas ingresadas difieren significativamente con horas calculadas de las historias de usuario!
+                    </span>
+                    <div class="col-md-4">
+                        <img src="{{ desarrollador.avatar_url }}" alt="{{ desarrollador.get_full_name }} foto perfil" width="30" height="30"
+                            class="rounded-circle" style="margin-right: 10px;" />
+                        {{ desarrollador.get_full_name }}
+                    </div>
+                    <div class="col-md-4">
+                        Horas según historias de usuario: <span class="horas_calculadas_desarrollador_list" id="horas_calculadas_{{desarrollador.id}}">{{desarrollador.horas_total}}</span>
+                        <br>
+                        Horas según cantidad de días: <span id="horas_dias_{{desarrollador.id}}">0</span>
+                    </div>
+                    <div class="col-md-4">
+                        Horas que trabaja por día:
+                        <input type="number" min="0" max="24" value='{{desarrollador.horas}}' class="horas_trabajadas_input" name="horas_trabajadas_{{desarrollador.id}}" id="horas_trabajadas_{{desarrollador.id}}">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <br>
+            <div class="container" style="overflow:auto;">
+                <div style="float:left;">
+                    <button type="button" id="prevBtn" onclick="nextPrev(-1)">Volver</button>
+                    <button type="button" id="nextBtn" onclick="nextPrev(1)">Siguiente</button>
+                </div>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+<script>
+var tabActual = 0;
+showTab(tabActual);
+
+$('.horas_trabajadas_input').mouseup(function(){
+      $(this).change();
+})
+$('.horas_trabajadas_input').keyup(function(){
+      $(this).change();
+})
+$('.horas_trabajadas_input').change(function () {
+    var horas = $(this).val() * parseInt('{{sprint.duracion}}');
+    var id_dev = $(this).attr('id').replace('horas_trabajadas_', '');
+    var horas_calculadas = $('#horas_calculadas_'+id_dev).text();
+
+    $('#horas_dias_'+id_dev).text(horas);
+    console.log(parseInt(horas_calculadas))
+    console.log(horas)
+    if (Math.abs((horas - horas_calculadas)) > Math.min(parseInt($(this).val()), parseInt('{{sprint.duracion}}'))) {
+        $('#aviso_horas_desarrollador_'+id_dev).show();
+    } else {
+        $('#aviso_horas_desarrollador_'+id_dev).hide();
+    }
+})
+
+$('.horas_trabajadas_input').change()
+
+function showTab(n) {
+    var x = $(".tab");
+
+    for (var i = 0; i < x.length; i++) {
+        x[i].classList.add("d-none");
+    }
+    x[tabActual].classList.remove("d-none");
+    x[tabActual].classList.add("d-block");
+
+    if (n == 0) {
+        document.getElementById("prevBtn").style.display = "none";
+    } else {
+        document.getElementById("prevBtn").style.display = "inline";
+    }
+    if (n == (x.length - 1)) {
+        document.getElementById("nextBtn").innerHTML = "Guardar";
+    } else {
+        document.getElementById("nextBtn").innerHTML = "Siguiente";
+    }
+}
+
+function nextPrev(n) {
+    var x = document.getElementsByClassName("tab");
+    if (n == 1 && !validateForm()) return false;
+
+    x[tabActual].style.display = "none";
+
+    tabActual = tabActual + n;
+
+    if (tabActual >= x.length) {
+        document.getElementById("sprintForm").submit();
+        return false;
+    }
+    showTab(tabActual);
+}
+
+function validateForm() {
+    var valid = true;
+    var input = $('.tab:first :input');
+
+    return valid;
+}
+</script>
+{% endblock %}

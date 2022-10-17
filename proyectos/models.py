@@ -1,4 +1,7 @@
+from email.policy import default
+from re import L
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Proyecto(models.Model):
@@ -20,6 +23,10 @@ class Proyecto(models.Model):
     :type estado: str
     :param scrum_master: Scrum Master del proyecto.
     :type scrum_master: Usuario
+    :param minimo_dias_sprint: Minimo de dias para un sprint de este proyecto
+    :type minimo_dias_sprint: int
+    :param maximo_dias_sprint: Maximo de dias para un sprint de este proyecto
+    :type maximo_dias_sprint: int
     """
     nombre = models.CharField(max_length=255, unique=True)
     descripcion = models.TextField(blank=True, null=True)
@@ -28,6 +35,8 @@ class Proyecto(models.Model):
     usuario = models.ManyToManyField('usuarios.Usuario', related_name="equipo", blank=True)
     scrumMaster = models.ForeignKey('usuarios.Usuario', related_name='scrumMaster', on_delete=models.PROTECT)
     estado = models.CharField(max_length=255, blank=True, null=True)
+    minimo_dias_sprint = models.IntegerField(default=15)
+    maximo_dias_sprint = models.IntegerField(default=30)
 
     def __str__(self):
         return self.nombre
@@ -46,11 +55,17 @@ class Sprint(models.Model):
     :type proyecto: Proyecto
     :param estado: Estado del sprint.
     :type estado: str
+    :param duracion: Duración del sprint en días.
+    :type duracion: int
     """
     fecha_inicio = models.DateTimeField(blank=True, null=True)
     fecha_fin = models.DateTimeField(blank=True, null=True)
     proyecto = models.ForeignKey(Proyecto, related_name='sprints', on_delete=models.PROTECT)
     estado = models.CharField(max_length=255, blank=True, null=True)
+    duracion = models.IntegerField(blank=False, null=False, validators=[
+                             MaxValueValidator(365), MinValueValidator(1)])
+    nombre = models.CharField(max_length=255, blank=False, null=False)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         constraints = [
@@ -58,4 +73,26 @@ class Sprint(models.Model):
         ]
 
     def __str__(self):
-        return self.estado
+        return self.nombre
+
+class UsuarioTiempoEnSprint(models.Model):
+    sprint = models.ForeignKey(Sprint, related_name="participantes", on_delete=models.PROTECT)
+    usuario = models.ForeignKey('usuarios.Usuario', related_name='sprints', on_delete=models.PROTECT)
+    horas = models.IntegerField(blank=False, null=False, validators=[
+                             MaxValueValidator(24), MinValueValidator(1)])
+    
+
+class Feriado(models.Model):
+    """
+    Es aquel que no es día laborable (en el ámbito laboral) o que no es día hábil (en el ámbito procesal)
+
+    :param proyecto: Proyecto del cual pertenece este feriado.
+    :type proyecto: Proyecto
+    :param descripcion: Descripcion de este feriado.
+    :type descripcion: datetime
+    :param fecha: Fecha del feriado.
+    :type fecha: Fecha
+    """
+    proyecto = models.ForeignKey(Proyecto, related_name="feriados", on_delete=models.DO_NOTHING)
+    descripcion = models.TextField(blank=True, null=True)
+    fecha = models.DateTimeField(blank=True, null=True)

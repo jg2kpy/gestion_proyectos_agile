@@ -29,9 +29,9 @@
                     {% if titulo == 'Backlog' or titulo == 'Mis Historias' %}
                         <th>Etapa</th>
                     {% elif titulo == 'Historias Terminadas' %}
-                        <th>Fecha de terminación</th>
+                        <th>Fecha y hora de terminación</th>
                     {% elif titulo == 'Historias Canceladas'%}
-                        <th>Fecha de cancelación</th>
+                        <th>Fecha y hora de cancelación</th>
                     {% endif %}
                     <th>User Points</th>
                     <th>Business Value</th>
@@ -64,7 +64,7 @@
                     <td>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal"
                                 data-bs-target="#modalVer{{ historia.id }}"><span 
-                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver historia">visibility</span>
+                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span>
                             </button>
                         {% if historia.estado == historia.Estado.ACTIVO %}
 
@@ -102,11 +102,11 @@
             <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="cancelarModal">Cancelar Historia</h5>
+                <h5 class="modal-title" id="cancelarModal">Cancelar Historia '{{ historia.nombre }}'</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Esta a punto de cancelar la historia de usuario {{ historia.nombre }}, ¿quiere continuar?</p>
+                    <p>Esta a punto de cancelar la historia de usuario '{{ historia.nombre }}', ¿quiere continuar?</p>
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -134,7 +134,6 @@
                 </div>
                 <div class="modal-body">
                     <p>{{ historia.descripcion }}</p>
-                    <p>Creado: {{ historia.fecha_creacion|date:'Y-m-d H:i:s'}}</p>
                     {% if historia.fecha_modificacion %}
                     <p>Modificado: {{ historia.fecha_modificacion|date:'Y-m-d H:i:s'}}</p>
                     {% endif %}
@@ -144,7 +143,14 @@
                     {% else %}
                         <p>Planificado</p>
                     {% endif %}
-                    <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
+                    {% if historia.sprint %}
+                    <p>Horas: {{historia.horasAsignadas}}</p>
+                    {% endif %}
+                    {% if historia.usuarioAsignado %}
+                        <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
+                    {% else %}
+                        <p>AUN NO TIENE ENCARGADO</p>
+                    {% endif %}
                     <p>
                         {% if historia.comentarios.count > 0 %}
                             {{ historia.comentarios.count}} comentarios
@@ -158,6 +164,13 @@
                             No hay archivos
                         {% endif %}
                     </p>
+                    {% for info in historia.sprintInfo.all %}
+                    <hr>
+                    <p>Sprint: {{info.sprint.nombre}}</p>
+                    <p>Horas: {{info.versionEnHistorial.horasAsignadas}}</p>
+                    <p>Asignado: {{info.versionEnHistorial.usuarioAsignado.get_full_name}}</p>
+                    <p>Etapa: {{info.versionEnHistorial.etapa}}</p>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -173,7 +186,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Esta seguro que desea mover {{ historia.nombre }} a la etapa {% siguente_etapa historia %}?</p>
+                <p>Esta seguro que desea mover '{{ historia.nombre }}' a la etapa {% siguente_etapa historia %}?</p>
             </div>
             <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -200,6 +213,9 @@
             paging: false,
             orderCellsTop: true,
             fixedHeader: true,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.12.1/i18n/es-ES.json'
+            },
             initComplete: function () {
                 var api = this.api();
                 api

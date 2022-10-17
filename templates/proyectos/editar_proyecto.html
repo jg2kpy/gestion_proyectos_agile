@@ -1,23 +1,81 @@
 {% extends "base.html" %}
-{% block title %}Editar proyecto {{ proyecto.nombre }}{% endblock %}
+{% block title %}Configuración de proyecto {{ proyecto.nombre }}{% endblock %}
 {% block contenido %}
 
 <!-- Formulario para crear proyectos Django forms -->
 <div class="container">
     <div class="row">
-        <div class="col-md-12">
-            <h1>Modificar proyecto</h1>
+        <div class="col-lg-2 col-md-1">
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
+        <div class="col-lg-8 col-md-10 mt-3 mb-3">
+            <h2>Configuración del proyecto '{{ proyecto.nombre }}'</h2>
             <form action="." method="POST">
                 {% csrf_token %}
                 {{ form.as_div }}
+                {{ form_feriado.management_form }}
                 <br>
-                <button type="submit" class="btn btn-primary">Editar proyecto</button>
-                <a href="{% url 'proyectos' %}" class="btn btn-secondary">Volver</a>
+                <h6>Feriados:</h6>
+                <div id="feriados" class="mx-auto" align="center">
+                    <div id="form_set">
+                        {% for form in form_feriado.forms %}
+                            <table class='no_error'>
+                                {{ form.as_table }}
+                            </table>
+                            <button class="btn-dark mt-3 mb-3" id="delete-{{ form.prefix }}" type="button">
+                                <span class="material-icons">
+                                    delete
+                                </span>
+                                <script>
+                                    $('#delete-{{ form.prefix }}').click(function () {
+                                        var form_idx = $('#id_feriados-TOTAL_FORMS').val();
+                                        $('#id_{{ form.prefix }}-descripcion').val($('#id_feriados-'+ (form_idx - 1) +'-descripcion').val())
+                                        $('#id_{{ form.prefix }}-fecha').val($('#id_feriados-'+ (form_idx - 1) +'-fecha').val())
+                                        $('#id_feriados-'+ (form_idx - 1) +'-descripcion').parent().parent().parent().parent().remove();
+                                        $('#id_feriados-TOTAL_FORMS').val(parseInt(form_idx) - 1);
+                                        $('#delete-{{ form.prefix }}').remove();
+                                    });
+                                </script>
+                            </button>
+                        {% endfor %}
+                    </div>
+                    <button class="btn-dark mt-3" id="add_more" type="button">
+                        <span class="material-icons" data-toggle="tooltip" data-placement="top" title="Agregar feriado">
+                            add
+                        </span>
+                    </button>
+                    <br>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary">Aplicar Cambios</button>
+                <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
             </form>
+            <div id="empty_form" style="display:none">
+                <table class='no_error'>
+                    {{ form_feriado.empty_form.as_table }}
+                </table>
+                <button class="btn-dark mt-3 mb-3" id="delete-__prefix__" type="button">
+                    <span class="material-icons">
+                        delete
+                    </span>
+                    <script>
+                        $('#delete-__prefix__').click(function () {
+                            var form_idx = $('#id_feriados-TOTAL_FORMS').val();
+                            $('#id-___prefix__-descripcion').val($('#id_feriados-'+ (form_idx - 1) +'-descripcion').val())
+                            $('#id-___prefix__-fecha').val($('#id_feriados-'+ (form_idx - 1) +'-fecha').val())
+                            $('#id_feriados-'+ (form_idx - 1) +'-descripcion').parent().parent().parent().parent().remove();
+                            $('#id_feriados-TOTAL_FORMS').val(parseInt(form_idx) - 1);
+                            $('#delete-__prefix__').remove();
+                        });
+                    </script>
+                </button>
+            </div>
+            <script>
+                $('#add_more').click(function () {
+                    var form_idx = $('#id_feriados-TOTAL_FORMS').val();
+                    $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+                    $('#id_feriados-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+                });
+            </script>
         </div>
     </div>
 </div>

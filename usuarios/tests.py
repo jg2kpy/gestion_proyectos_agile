@@ -177,10 +177,10 @@ class MiembrosRolesTest(TestCase):
                                                          avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
                                                          
         self.client.login(email='testemail@example.com', password='A123B456c.')
-        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrum_master": self.user.id}, follow=True)
-        self.assertEqual(res.status_code, 200)
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'La respuesta no fue un estado HTTP 200 al intentar crear un proyecto')
         self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
-        self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists())
+        self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists(),'No se creo el rol Scrum Master en un proyecto nuevo')
     
     def test_get_visualizar_proyecto(self):
         """

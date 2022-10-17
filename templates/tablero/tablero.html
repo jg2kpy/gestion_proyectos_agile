@@ -4,7 +4,75 @@
 {% block contenido %}
 {% load gpa_tags %}
 <div class="container-fluid pt-3 overflow-auto">
-    <h3>{{ tipo.nombre }}</h3>
+    <div class="d-flex bd-highlight">
+        <div class="p-2 flex-grow-1 bd-highlight"><h3>{{ tipo.nombre }}</h3></div>
+        <div class="p-2 bd-highlight">Sprint:</div>
+        <div class="p-2 bd-highlight">
+            <form method="post" id="formId">
+                {% csrf_token %}
+                <select id="selId" name="sprintId" class="form-select form-select-sm" aria-label=".form-select-sm example"
+                        onchange="document.cookie= 'indiceActual_{{proyecto.id}} = ' + this.selectedIndex + '; path=/;';formId.submit()"
+                        data-toggle="tooltip" data-placement="bottom" title="Seleccionar un Sprint">
+                    {% if sprints %}
+                        {% for sprint in sprints %}
+                            <option value={{ sprint.id }}>{{ sprint.fecha_inicio }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+                <script type="text/javascript">
+                    function readCookie(name) {
+                        var nameEQ = name + "=";
+                        var ca = document.cookie.split(';');
+                        for(var i=0;i < ca.length;i++) {
+                            var c = ca[i];
+                            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+                        }
+                        return null;
+                    }
+
+                    window.onload = function () { document.getElementById("selId").selectedIndex = readCookie("indiceActual_{{proyecto.id}}"); }
+                </script>
+            </form>
+        </div>
+
+        {% comment %} Inicio terminar Sprint {% endcomment %}
+        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+        {% check_sprint_desarrollo request.COOKIES proyecto sprints as esta_en_desarrollo %}
+        {% if master and esta_en_desarrollo %}
+            <button href="#modalSprintFin" class="btn btn-link" data-bs-toggle="modal" 
+            data-bs-target="#modalSprintFin" data-toggle="tooltip" data-placement="top" 
+            title="Terminar sprint"><span class="material-icons">arrow_forward</span></button>
+        {% endif %}
+        <!-- Modal -->
+        <div class="modal fade" id="modalSprintFin" tabindex="-1" aria-labelledby="sprintModal" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="sprintModal">¿Está seguro que desea terminar el sprint?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% check_historia_activa proyecto sprints as posee_historia_activa %}
+                    {% if posee_historia_activa %}
+                        <p>Se detectaron historias de usuario sin terminar en el sprint actual ¿Desea continuar con la operación?</p>
+                    {% else %}
+                        <p>No se detectaron conflictos</p>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-primary" name="terminar" value="terminar">
+                </form>
+                </div>
+            </div>
+            </div>
+        </div>
+        <!-- End Modal -->
+
+    </div>
     <div class="small">{{ tipo.descripcion }}</div>
     <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
     <div class="row flex-row flex-sm-nowrap py-3">
@@ -23,6 +91,7 @@
                                     <br>
                                     <span class="badge bg-secondary">UP {{ us.up }}</span>
                                     <span class="badge bg-secondary">BV {{ us.bv }}</span>
+                                    <span class="badge bg-secondary"> {{ us.horasAsignadas }} HORAS</span>
                                     <br>
                                     <span>{{us.fecha_modificacion|date:"Y/m/d"}}</span>
                                 </div>
@@ -37,42 +106,45 @@
                                         {{us.usuarioAsignado.get_full_name}}
                                     </p>
                                     <br>
-                                    <div class="d-flex justify-content-evenly">
-                                        {% tiene_permiso_en_proyecto user 'pro_modificarUS' us.proyecto as pro_modificarUS %}
-                                        {% if pro_modificarUS %}
-                                            <a href="{% url 'editar_historiaUsuario' us.proyecto.id us.id %}"><span 
-                                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar historia">create</span></a>
-                                        {% endif %}
-            
-                                        {% tiene_permiso_en_proyecto user 'pro_cancelarUS' us.proyecto as pro_cancelarUS %}
-                                        {% if pro_cancelarUS %}
-                                            <a href="#modal{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ us.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Cancelar historia">cancel</span></a>
-                                        {% endif %}
-                                        <span>
-                                            <a href="{% url 'comentarios_historiaUsuario' etapa.proyecto us.id %}"><span 
-                                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Agregar un comentario">comment</span></a>
-                                            {{ us.comentarios.count }}
-                                        </span>
-                                        <a href="{% url 'ver_archivos' proyecto.id us.id %}"><span 
-                                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver archivos">description</span></a>
-                                        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
-                                        {% if master or us.usuarioAsignado == user %}
-                                            {% if us.etapa.orden != 0 %}
-                                                <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_anterior{{us.id}}">
+                                    {%check_sprint_desarrollo request.COOKIES proyecto sprints as esta_en_desarrollo %}
+                                    {% if esta_en_desarrollo %}
+                                        <div class="d-flex justify-content-evenly">
+                                            {% tiene_permiso_en_proyecto user 'pro_modificarUS' us.proyecto as pro_modificarUS %}
+                                            {% if pro_modificarUS %}
+                                                <a href="{% url 'editar_historiaUsuario' us.proyecto.id us.id %}"><span 
+                                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar historia">create</span></a>
+                                            {% endif %}
+                
+                                            {% tiene_permiso_en_proyecto user 'pro_cancelarUS' us.proyecto as pro_cancelarUS %}
+                                            {% if pro_cancelarUS %}
+                                                <a href="#modal{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ us.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Cancelar historia">cancel</span></a>
+                                            {% endif %}
+                                            <span>
+                                                <a href="{% url 'comentarios_historiaUsuario' etapa.proyecto us.id %}"><span 
+                                                    class="material-icons" data-toggle="tooltip" data-placement="top" title="Agregar un comentario">comment</span></a>
+                                                {{ us.comentarios.count }}
+                                            </span>
+                                            <a href="{% url 'ver_archivos' proyecto.id us.id %}"><span 
+                                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver archivos">description</span></a>
+                                            {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+                                            {% if master or us.usuarioAsignado == user %}
+                                                {% if us.etapa.orden != 0 %}
+                                                    <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_anterior{{us.id}}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="url" value="{{ request.path }}">
+                                                        <input type="hidden" name="anterior" value="anterior">
+                                                        <a href="javascript:{}" onclick="document.getElementById('form_anterior{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa anterior">arrow_back</span></a>
+                                                    </form>
+                                                {% endif %}
+                                                <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_siguiente{{us.id}}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="url" value="{{ request.path }}">
-                                                    <input type="hidden" name="anterior" value="anterior">
-                                                    <a href="javascript:{}" onclick="document.getElementById('form_anterior{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa anterior">arrow_back</span></a>
+                                                    <input type="hidden" name="siguiente" value="siguiente">
+                                                    <a href="javascript:{}" onclick="document.getElementById('form_siguiente{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa siguiente">arrow_forward</span></a>
                                                 </form>
                                             {% endif %}
-                                            <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_siguiente{{us.id}}">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="url" value="{{ request.path }}">
-                                                <input type="hidden" name="siguiente" value="siguiente">
-                                                <a href="javascript:{}" onclick="document.getElementById('form_siguiente{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa siguiente">arrow_forward</span></a>
-                                            </form>
-                                        {% endif %}
-                                    </div>
+                                        </div>
+                                    {% endif %}
                                     {% else %}
                                     <p>
                                         <span class="fw-bold">Sin asignar</span>
@@ -86,11 +158,11 @@
                             <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 class="modal-title" id="cancelarModal">Cancelar Historia</h5>
+                                <h5 class="modal-title" id="cancelarModal">Cancelar Historia '{{ us.nombre }}'</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Esta a punto de cancelar la historia de usuario {{ us.nombre }}, ¿quiere continuar?</p>
+                                    <p>Esta a punto de cancelar la historia de usuario '{{ us.nombre }}', ¿quiere continuar?</p>
                                 </div>
                                 <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -112,7 +184,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Esta seguro que desea mover {{ us.nombre }} a la etapa {% anterior_etapa us %}?</p>
+                                    <p>Esta seguro que desea mover '{{ us.nombre }}' a la etapa {% anterior_etapa us %}?</p>
                                 </div>
                                 <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
@@ -134,7 +206,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Esta seguro que desea mover {{ us.nombre }} a la etapa {% siguente_etapa us %}?</p>
+                                    <p>Esta seguro que desea mover '{{ us.nombre }}' a la etapa {% siguente_etapa us %}?</p>
                                 </div>
                                 <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
