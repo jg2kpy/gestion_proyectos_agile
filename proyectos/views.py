@@ -45,6 +45,8 @@ def proyectos(request):
 
     if not request.user.is_authenticated:
         return render(request, '401.html', status=401)
+    
+    request.session['cancelar_volver_a'] = request.path
 
     if tiene_permiso_en_sistema(request_user, 'sys_crearproyectos'):
         return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()})
@@ -73,6 +75,7 @@ def proyecto_home(request, proyecto_id):
     if not request.user.equipo.filter(id=proyecto.id).exists():
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para ver este proyecto'}, status=403)
 
+    request.session['cancelar_volver_a'] = request.path
     return render(request, 'proyectos/home.html', {'proyecto': proyecto})
 
 
@@ -114,7 +117,7 @@ def crear_proyecto(request):
             if form.cleaned_data['minimo_dias_sprint']:
                 proyecto.minimo_dias_sprint = form.cleaned_data['minimo_dias_sprint']
             if form.cleaned_data['maximo_dias_sprint']:
-                proyecto.minimo_dias_sprint = form.cleaned_data['maximo_dias_sprint']
+                proyecto.maximo_dias_sprint = form.cleaned_data['maximo_dias_sprint']
             
             try:
                 proyecto.save()
@@ -215,42 +218,43 @@ def editar_proyecto(request, proyecto_id):
     if not tiene_permiso_en_proyecto(request_user, 'pro_cambiarEstadoProyecto', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para editar proyectos'}, status=403)
 
+    formset_factory = inlineformset_factory(
+        Proyecto, Feriado, form=ProyectoFeriadosForm, extra=0, can_delete=False)
+
     # Verificamos que el usuario tenga permisos rol de moderador o es el scrum master del proyecto
     if request.method == 'POST':
-        form = ProyectoForm(request.POST)
-        if form.is_valid():
+        form = ProyectoConfigurarForm(request.POST, instance=proyecto)
+        formset = formset_factory(request.POST, instance=form.instance)
+        if form.is_valid() and formset.is_valid():
             try:
                 # Editamos el proyecto
                 proyecto = Proyecto.objects.get(id=proyecto_id)
-                proyecto.nombre = form.cleaned_data['nombre']
                 proyecto.descripcion = form.cleaned_data['descripcion']
 
-                proyecto.scrumMaster.roles_proyecto.remove(RolProyecto.objects.get(
-                    nombre="Scrum Master", proyecto=proyecto))
+                proyecto.feriados.all().delete()
 
-                id_scrum_master = form.cleaned_data['scrum_master']
-                scrum_master = Usuario.objects.get(id=id_scrum_master)
-
-                scrum_master.roles_proyecto.add(RolProyecto.objects.get(
-                    nombre="Scrum Master", proyecto=proyecto))
-
-                proyecto.scrumMaster = scrum_master
                 proyecto.save()
-                return redirect('proyectos')
+
+                for f in formset:
+                    feriado = f.save(commit=False)
+                    feriado.proyecto = proyecto
+                    feriado.save()
+
+                proyecto.save()
+                return redirect('proyecto_home', proyecto_id=proyecto.id)
             except Exception as e:
                 return HttpResponse('Error al editar el proyecto', status=500)
         else:
             return HttpResponse('Formulario invalido', status=422)
     else:
-        form = ProyectoConfigurarForm()
-        # cargamos los datos del proyecto
         proyecto = Proyecto.objects.get(id=proyecto_id)
-        form.fields['nombre'].initial = proyecto.nombre
-        form.fields['descripcion'].initial = proyecto.descripcion
-        form.fields['minimo_dias_sprint'].initial = proyecto.minimo_dias_sprint
-        form.fields['maximo_dias_sprint'].initial = proyecto.maximo_dias_sprint
+        form = ProyectoConfigurarForm(instance=proyecto)
+        # cargamos los datos del proyecto
 
-    return render(request, 'proyectos/editar_proyecto.html', {'form': form})
+        form_feriado = formset_factory(instance=proyecto)
+
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'proyectos/editar_proyecto.html', {'form': form, 'form_feriado':form_feriado, 'proyecto': proyecto, 'volver_a': volver_a})
 
 
 # Recibimos una peticion POST para cancelar un proyecto

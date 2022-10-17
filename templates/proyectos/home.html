@@ -2,10 +2,30 @@
 {% block title %}Proyecto {{ proyecto.nombre }}{% endblock %}
 {% block contenido %}
 {% load gpa_tags %}
-<div class="d-flex align-items-center justify-content-center h-75 d-inline-block">
-    <div class="box text-center">
-        <h1>{{ proyecto.nombre }}</h1>
+<div class="d-flex mt-4 justify-content-center d-inline-block">
+    <div class="box">
         <br>
+        <h2 class="text-center">{{ proyecto.nombre }}</h2>
+        <h3 class="text-center">{{ proyecto.descripcion }}</h3>
+        <hr>
+        <p>El Scrum Master es: <b>{{ proyecto.scrumMaster.get_full_name }}</b> (<a href="mailto:{{proyecto.scrumMaster.email}}">{{proyecto.scrumMaster.email}}</a>)</p>
+        <p>Usted posee los siguente roles en este proyecto: </p>
+        {% obtener_rol_en_proyecto user proyecto.id as rolesActual %}
+        {% for r in rolesActual %}
+            <p>&nbsp;&nbsp; - {{ r.nombre }}</p>
+        {% endfor %}
+        <hr>
+        <h5 class="text-center">Menu</h5>
+        <br>
+        {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
+        {% if pro_cambiarEstadoProyecto %}
+        <a href="{% url 'editar_proyecto' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
+            <span class="material-icons  align-text-bottom">
+                build
+            </span>
+            Configuración
+        </a>
+        {% endif %}
         <a href="{% url 'vista_equipo' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
             <span class="material-icons  align-text-bottom">
                 groups
@@ -39,6 +59,14 @@
             </span>
             Product Backlog
         </a>
+        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+        <a href="{% url 'historiaUsuarioBacklog' proyecto.id %}" class="btn-primary btn-lg ms-3 text-decoration-none">
+            <span class="material-icons  align-text-bottom">
+                production_quantity_limits
+            </span>
+            Sprints
+        </a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

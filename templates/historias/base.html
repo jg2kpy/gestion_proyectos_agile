@@ -143,7 +143,11 @@
                     {% else %}
                         <p>Planificado</p>
                     {% endif %}
-                    <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
+                    {% if historia.usuarioAsignado %}
+                        <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
+                    {% else %}
+                        <p>AUN NO TIENE ENCARGADO</p>
+                    {% endif %}
                     <p>
                         {% if historia.comentarios.count > 0 %}
                             {{ historia.comentarios.count}} comentarios

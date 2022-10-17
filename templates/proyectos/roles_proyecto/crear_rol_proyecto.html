@@ -4,12 +4,10 @@
 <!-- Formulario para crear rol de proyectos Django forms -->
 <div class="container">
     <div class="row">
-        <div class="col-md-12">
-            <h1>Crear rol de proyecto</h1>
+        <div class="col-lg-2 col-md-1">
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
+        <div class="col-lg-8 col-md-10 mt-3 mb-3">
+            <h1>Crear rol de proyecto</h1>
             <form action="." method="POST">
                 {% csrf_token %}
                 {{ form.as_div }}
@@ -19,4 +17,5 @@
             </form>
         </div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}

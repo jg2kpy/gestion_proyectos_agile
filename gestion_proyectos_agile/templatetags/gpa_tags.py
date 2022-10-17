@@ -173,6 +173,7 @@ def lista_adm():
     return adminRol.usuario.all()
 
 @register.simple_tag
+
 def check_sprint_desarrollo(cookieIndice, sprints):
     """Funcion para determinar si un sprint se encuentra en desarrollo
     :param cookieIndice: Indice guardado en cookie
@@ -241,3 +242,12 @@ def check_historia_activa(proyecto, sprints):
         return True
     else:
         return False
+
+@register.simple_tag
+def es_miembro(usuario, proyecto):
+    """Funcion para verificar que un miembro pertenece a un proyecto
+
+    :return: True si el usuario es miembro del proyecto
+    :rtype: bool
+    """
+    return usuario.equipo.filter(id=proyecto.id).exists()

@@ -30,18 +30,16 @@ class ProyectoForm(forms.ModelForm):
         :type nombre: Texto
         :param descripcion: Descripcion del proyecto
         :type descripcion: Texto
-        :param fecha_inicio: Fecha de inicio del proyecto
-        :type fecha_inicio: Fecha
-        :param fecha_fin: Fecha de fin del proyecto
-        :type fecha_fin: Fecha
         :param scrum_master: Usuario que sera el Scrum Master del proyecto
         :type scrum_master: Usuario
+        :param minimo_dias_sprint: Minimo de dias para un sprint de este proyecto
+        :type minimo_dias_sprint: int
+        :param maximo_dias_sprint: Maximo de dias para un sprint de este proyecto
+        :type maximo_dias_sprint: int
 
         :return: Formulario para crear un proyecto
-        :rtype: Proyecto
+        :rtype: Form
     """
-
-
     class Meta:
 
         model = Proyecto
@@ -66,40 +64,61 @@ class ProyectoForm(forms.ModelForm):
         self.fields['maximo_dias_sprint'].required = False
 
 
-class ProyectoConfigurarForm(forms.Form):
+class ProyectoConfigurarForm(forms.ModelForm):
     """
         Formulario para configurar un proyecto
         Se introduce el nombre del proyecto, la descripcion, las fechas de inicio y de fin
         y se asigna un usuario como Scrum Master del proyecto
 
-        :param nombre: Nombre del proyecto
-        :type nombre: Texto
         :param descripcion: Descripcion del proyecto
         :type descripcion: Texto
-        :param fecha_inicio: Fecha de inicio del proyecto
-        :type fecha_inicio: Fecha
-        :param fecha_fin: Fecha de fin del proyecto
-        :type fecha_fin: Fecha
         :param scrum_master: Usuario que sera el Scrum Master del proyecto
         :type scrum_master: Usuario
+        :param minimo_dias_sprint: Minimo de dias para un sprint de este proyecto
+        :type minimo_dias_sprint: int
+        :param maximo_dias_sprint: Maximo de dias para un sprint de este proyecto
+        :type maximo_dias_sprint: int
 
         :return: Formulario para crear un proyecto
-        :rtype: Proyecto
+        :rtype: Form
     """
-    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
-    minimo_dias_sprint = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}), initial=15)
-    maximo_dias_sprint = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}), initial=30)
+
+    class Meta:
+        model = Proyecto
+        fields = ('descripcion', 'minimo_dias_sprint', 'maximo_dias_sprint')
+        widgets = {
+            # 'nombre': forms.TextInput(attrs={'class': 'form-control', 'disabled': 'disabled'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
+            'minimo_dias_sprint': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'maximo_dias_sprint': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['minimo_dias_sprint'].required = False
+        self.fields['maximo_dias_sprint'].required = False
 
 
 class ProyectoFeriadosForm(forms.ModelForm):
+    """
+        Formulario para agregar feriados a un proyecto
+        Se introduce los feriados que se desean agregar al proyecto
+
+        :param descripcion: Descripcion del feriado
+        :type descripcion: str
+        :param fecha: FEcha del feriado
+        :type fecha: Date
+
+        :return: Formulario para agregar feriados
+        :rtype: Form
+    """
 
     class Meta:
         model = Feriado
         fields = ('descripcion', 'fecha')
         widgets = {
-            'descripcion': forms.TextInput(),
-            'fecha': forms.DateInput(format='%d/%m/%Y', attrs={'type':'date'})
+            'descripcion': forms.TextInput(attrs={'class': 'form-control', 'required': 'requiered'}),
+            'fecha': forms.DateInput(format='%Y-%m-%d', attrs={'type':'date', 'class': 'form-control', 'required': 'requiered'})
         }
         required={
             'descripcion': False,

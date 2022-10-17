@@ -23,6 +23,10 @@ class Proyecto(models.Model):
     :type estado: str
     :param scrum_master: Scrum Master del proyecto.
     :type scrum_master: Usuario
+    :param minimo_dias_sprint: Minimo de dias para un sprint de este proyecto
+    :type minimo_dias_sprint: int
+    :param maximo_dias_sprint: Maximo de dias para un sprint de este proyecto
+    :type maximo_dias_sprint: int
     """
     nombre = models.CharField(max_length=255, unique=True)
     descripcion = models.TextField(blank=True, null=True)
@@ -79,7 +83,16 @@ class UsuarioTiempoEnSprint(models.Model):
     
 
 class Feriado(models.Model):
+    """
+    Es aquel que no es día laborable (en el ámbito laboral) o que no es día hábil (en el ámbito procesal)
 
-    proyecto = models.ForeignKey('proyectos.Proyecto', related_name="feriados", on_delete=models.PROTECT)
+    :param proyecto: Proyecto del cual pertenece este feriado.
+    :type proyecto: Proyecto
+    :param descripcion: Descripcion de este feriado.
+    :type descripcion: datetime
+    :param fecha: Fecha del feriado.
+    :type fecha: Fecha
+    """
+    proyecto = models.ForeignKey(Proyecto, related_name="feriados", on_delete=models.DO_NOTHING)
     descripcion = models.TextField(blank=True, null=True)
     fecha = models.DateTimeField(blank=True, null=True)
