@@ -40,8 +40,13 @@
                     <td>{{sprint.nombre}}</td>
                     <td>{{sprint.descripcion}}</td>
                     <td>{{sprint.duracion}}</td>
-                    <td>{{sprint.fecha_inicio}}</td>
-                    <td>{{sprint.fecha_fin}}</td>
+                    {% if sprint.fecha_inicio and sprint.fecha_fin %}
+                        <td>{{sprint.fecha_inicio}}</td>
+                        <td>{{sprint.fecha_fin}}</td>
+                    {% else %}
+                        <td>Sin fecha</td>
+                        <td>Sin fecha</td>
+                    {% endif %}
                     <td>{{sprint.estado}}</td>
                     <td>
                         {% if sprint.estado == 'Desarrollo' or sprint.estado == 'Planificado' %}
@@ -86,7 +91,7 @@
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                                         <form method="post" action="{% url 'backlog_sprint' proyecto.id sprint.id %}">
                                             {% csrf_token %}
-                                            <input type="submit" class="btn btn-primary" name="comenzar" value="comenzar">
+                                            <input type="submit" class="btn btn-primary" name="comenzar" value="Comenzar">
                                         </form>
                                     </div>
                                     {% endif %}

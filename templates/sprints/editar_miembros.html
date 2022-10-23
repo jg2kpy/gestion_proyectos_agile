@@ -64,7 +64,7 @@ $('.horas_trabajadas_input').change(function () {
     $('#horas_dias_'+id_dev).text(horas);
     console.log(parseInt(horas_calculadas))
     console.log(horas)
-    if (Math.abs((horas - horas_calculadas)) > Math.min(parseInt($(this).val()), parseInt('{{sprint.duracion}}'))) {
+    if (Math.abs((horas - horas_calculadas)) >= Math.max(parseInt($(this).val()), parseInt('{{sprint.duracion}}'))) {
         $('#aviso_horas_desarrollador_'+id_dev).show();
     } else {
         $('#aviso_horas_desarrollador_'+id_dev).hide();

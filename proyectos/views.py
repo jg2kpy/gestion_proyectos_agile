@@ -765,7 +765,7 @@ def crear_sprint(request, proyecto_id):
         
         for usuario in proyecto.usuario.all():
             horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
-            if horas and int(horas) > 0:
+            if horas and int(horas) >= 0:
                 tiempoSprint = UsuarioTiempoEnSprint()
                 tiempoSprint.sprint = sprint
                 tiempoSprint.usuario = usuario
@@ -778,7 +778,7 @@ def crear_sprint(request, proyecto_id):
     else:
         pass
 
-    return render(request, 'sprints/crear.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
+    return render(request, 'sprints/crear.html', {'proyecto': proyecto, 'desarrolladores': list(proyecto.usuario.all().values_list('id', flat=True)), 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
 
 @never_cache
 def backlog_sprint(request, proyecto_id, sprint_id):
@@ -828,14 +828,18 @@ def backlog_sprint(request, proyecto_id, sprint_id):
             sprint.save()
 
     miembros = [miembro for miembro in proyecto.usuario.all() if UsuarioTiempoEnSprint.objects.filter(sprint=sprint, usuario=miembro).exists()]
+    capacidad_total = 0
+    capacidad_asignada = 0
     for miembro in miembros:
         miembro.historias_total = sum([historia.horasAsignadas for historia in sprint.historias.filter(estado='A') if historia.usuarioAsignado == miembro])
+        capacidad_asignada += miembro.historias_total
         miembro.capacidad = UsuarioTiempoEnSprint.objects.get(sprint=sprint, usuario=miembro).horas
         miembro.capacidad_total = miembro.capacidad * sprint.duracion
+        capacidad_total += miembro.capacidad_total
         miembro.historias_count = len([historia for historia in sprint.historias.filter(estado='A') if historia.usuarioAsignado == miembro])
     request.session['cancelar_volver_a'] = request.path
 
-    return render(request, 'sprints/base.html', {'proyecto': proyecto, 'miembros': miembros, 'sprint': sprint, 'historias': sprint.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO), 'titulo': "Sprint Backlog "+sprint.nombre}, status=200)
+    return render(request, 'sprints/base.html', {'proyecto': proyecto, 'capacidad_asignada': capacidad_asignada, 'capacidad_total':capacidad_total, 'miembros': miembros, 'sprint': sprint, 'historias': sprint.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO), 'titulo': "Sprint Backlog "+sprint.nombre}, status=200)
 
 @never_cache
 def agregar_historias(request, proyecto_id, sprint_id):

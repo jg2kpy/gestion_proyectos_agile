@@ -680,6 +680,21 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
 
 
 def calcularFechaSprint(fechaInicio, dias, proyecto):
+    """
+        Realiza el cálculo de la fecha final del sprint.
+
+        :param fechaInicio: Fecha inicial del sprint
+        :type fechaInicio: datetime
+
+        :param dias: Total de duración del sprint en días
+        :type dias: int
+
+        :param proyecto: Proyecto en el que se encuentra el sprint
+        :type proyecto: int
+
+        :return: Retorna la fecha de final del sprint
+        :rtype: datetime
+    """
     diasParaAgregar = dias
     fechaActual = fechaInicio
     feriadosFecha = []
@@ -690,13 +705,14 @@ def calcularFechaSprint(fechaInicio, dias, proyecto):
             feriadosFecha.append(feriado.fecha.date())
     
     while diasParaAgregar > 0:
-        fechaActual += datetime.timedelta(days=1)
+        
+        if not (fechaActual.weekday() >= 5 or fechaActual.date() in feriadosFecha):
+            diasParaAgregar -= 1
 
-        if fechaActual.weekday() >= 5 or fechaActual.date() in feriadosFecha:
-            continue
+        if diasParaAgregar > 0:
+            fechaActual += datetime.timedelta(days=1)
 
-        diasParaAgregar -= 1
-
+    
     return fechaActual
 
 @ never_cache
@@ -739,6 +755,7 @@ def verTablero(request, proyecto_id, tipo_id):
     sprints = Sprint.objects.filter(proyecto=proyecto).exclude(fecha_inicio__isnull=True)
     sprintDesc = sprints.order_by("-fecha_inicio")
     sprintCookie = request.COOKIES.get(f'indiceActual_{proyecto.id}')
+    sprintCookie = sprintCookie if sprintCookie and int(sprintCookie) < len(sprintDesc) else 0
 
     etapas = []
 
