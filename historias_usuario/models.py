@@ -300,3 +300,14 @@ class SubirArchivo(models.Model):
     :type archivo: file
     """
     archivo = models.FileField(blank=True, null=True)
+
+class Tarea(models.Model):
+    """
+    """
+
+    fecha = models.DateField(auto_now_add=True)
+    historia = models.ForeignKey(HistoriaUsuario, related_name='tareas', on_delete=models.PROTECT)
+    sprint = models.ForeignKey(Sprint, related_name='tareas', on_delete=models.PROTECT)
+    usuario = models.ForeignKey('usuarios.Usuario', related_name='tareas', on_delete=models.PROTECT)
+    descripcion = models.TextField(blank=True, null=True)
+    horas = models.IntegerField(default=0)
