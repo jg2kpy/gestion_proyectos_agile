@@ -322,12 +322,14 @@ function calcularHoras() {
         horas_calculadas.text('0');
     }
     
+    var aux = 0;
     for(var i = 0; i < horas.length; i++) {
         if ($(horas[i]).is(":hidden")) {
             continue;
         }
         var horas_calculadas = $('.horas_calculadas_' + $('#desarrollador_asignado_' + horas[i].name.replace('historia_horas_', '')).find(":selected").val());
-        horas_calculadas.text(parseInt(horas_calculadas.first().text()) + parseInt($(horas[i]).val()));
+        aux += parseInt($(horas[i]).val());
+        horas_calculadas.text(parseInt(aux));
     }
 }
 
