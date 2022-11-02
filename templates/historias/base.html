@@ -164,6 +164,18 @@
                             No hay archivos
                         {% endif %}
                     </p>
+                    <p>
+                    {% if historia.estado == historia.Estado.ACTIVO %}
+                        Sprint actual: 
+                    {% else %}
+                        Último sprint:
+                    {%endif%}
+                    {% if historia.sprint%}
+                        {{historia.sprint}}
+                    {% else %}
+                        Ninguno
+                    {%endif%}
+                    </p>
                     {% for info in historia.sprintInfo.all %}
                     <hr>
                     <p>Sprint: {{info.sprint.nombre}}</p>
