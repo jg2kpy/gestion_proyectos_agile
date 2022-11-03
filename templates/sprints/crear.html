@@ -111,6 +111,10 @@
                                         <div>
                                             <p>
                                                 {{ historia.descripcion }}
+                                                <a class="btn btn-link" data-bs-toggle="modal"
+                                                    data-bs-target="#modalVer{{ historia.id }}"><span class="material-icons"
+                                                    data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span>
+                                                </a>
                                             </p>
                                             <p>
                                                 <select style="display: none;" class="form-control desarrollador_asignado_list" name="desarrollador_asignado_{{historia.id}}" id="desarrollador_asignado_{{historia.id}}">
@@ -129,6 +133,7 @@
                         </div>
                     </div>
                 </div>
+                {% include "modals/modalUSInfo.html" with historia=historia %}
                 {% endfor %}
             </div>
             

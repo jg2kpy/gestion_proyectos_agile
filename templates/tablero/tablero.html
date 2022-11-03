@@ -109,11 +109,9 @@
                                     {%check_sprint_desarrollo request.COOKIES proyecto sprints as esta_en_desarrollo %}
                                     {% if esta_en_desarrollo %}
                                         <div class="d-flex justify-content-evenly">
-                                            {% tiene_permiso_en_proyecto user 'pro_modificarUS' us.proyecto as pro_modificarUS %}
-                                            {% if pro_modificarUS %}
-                                                <a href="{% url 'editar_historiaUsuario' us.proyecto.id us.id %}"><span 
-                                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar historia">create</span></a>
-                                            {% endif %}
+                                            <a href="#modalVer{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalVer{{ us.id }}"><span class="material-icons"
+                                                data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span>
+                                            </a>
                 
                                             {% tiene_permiso_en_proyecto user 'pro_cancelarUS' us.proyecto as pro_cancelarUS %}
                                             {% if pro_cancelarUS %}
@@ -154,27 +152,8 @@
                         </div>
                         <div class="dropzone rounded"> &nbsp; </div>
 
-                        <div class="modal fade" id="modal{{ us.id }}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
-                            <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 class="modal-title" id="cancelarModal">Cancelar Historia '{{ us.nombre }}'</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Esta a punto de cancelar la historia de usuario '{{ us.nombre }}', ¿quiere continuar?</p>
-                                </div>
-                                <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
-                                <form method="post" action="{% url 'borrar_historiaUsuario' us.proyecto.id us.id %}">
-                                    {% csrf_token %}
-                                    <input type="submit" class="btn btn-danger" value="Cancelar Historia">
-                                    <input type="hidden" name="url" value="{{ request.path }}">
-                                </form>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
+                        {% include "modals/modalUSCancelar.html" with historia=us %}
+                        {% include "modals/modalUSInfo.html" with historia=us %}
 
                         <div class="modal fade" id="modalEtapaAnterior{{ us.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
                             <div class="modal-dialog">
