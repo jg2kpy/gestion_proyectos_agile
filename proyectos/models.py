@@ -3,7 +3,6 @@ from re import L
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-
 class Proyecto(models.Model):
     """
     Un proyecto consiste de un conjunto de sprints, un equipo de trabajo y un backlog de historias de usuario.
@@ -42,6 +41,24 @@ class Proyecto(models.Model):
         return self.nombre
 
 
+class ArchivoBurndown(models.Model):
+    """
+    Archivos pertenecientes al Burndown Chart de cada Sprint terminado.
+    El nombre del archivo en el servidor es la concatenación del nombre de Proyecto y nombre de Sprint
+    con su respectivo id.
+
+    :param nombre: Nombre del archivo.
+    :type nombre: str
+    :param fecha_subida: Fecha de subida del archivo.
+    :type fecha_subida: datetime
+    :param archivo: Archivo perteneciente al Burndown Chart.
+    :type archivo: ImageField
+    """
+    nombre = models.CharField(max_length=255)
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+    archivo = models.FileField(upload_to=f"app/staticfiles/", null=True)
+    
+
 class Sprint(models.Model):
     """
     Un Sprint es un periodo de tiempo en el que se puede trabajar en un proyecto sobre un conjunto de historias de usuario.
@@ -66,6 +83,7 @@ class Sprint(models.Model):
                              MaxValueValidator(365), MinValueValidator(1)])
     nombre = models.CharField(max_length=255, blank=False, null=False)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
+    burndownChart = models.ForeignKey(ArchivoBurndown, related_name='sprint', on_delete=models.DO_NOTHING, null=True)
 
     class Meta:
         constraints = [
