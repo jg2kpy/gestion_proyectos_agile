@@ -20,7 +20,7 @@ from django.urls import path
 from django.contrib import admin
 from django.conf.urls import include
 
-from .views import Home, descargar
+from .views import Home, descargar, notificaciones
 from usuarios import views as usuarios_views
 
 urlpatterns = [
@@ -39,6 +39,8 @@ urlpatterns = [
     path('rolesglobales/<int:id>/editar/', usuarios_views.rol_global_editar, name='rol_global_editar'),
     path('rolesglobales/<int:id>/usuarios/', usuarios_views.rol_global_usuarios, name='rol_global_usuarios'),
     path('archivos/<int:archivo_id>/', descargar, name='descargar'),
+
+    path('notificaciones/', notificaciones, name='notificaciones'),
 
 ]
 handler404 = 'gestion_proyectos_agile.views.error_404_view'
