@@ -2,6 +2,8 @@ import datetime
 from django.shortcuts import render, redirect
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
+from django.db import models
+import pytz
 
 
 from proyectos.models import Feriado, Proyecto
@@ -777,6 +779,7 @@ def verTablero(request, proyecto_id, tipo_id):
         if request.POST.get('terminar'):
             sprintTerminar = proyecto.sprints.get(estado="Desarrollo")
             sprintTerminar.estado = "Terminado"
+            sprintTerminar.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
             sprintTerminar.save()
 
             usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintTerminar,estado=HistoriaUsuario.Estado.ACTIVO)
@@ -800,6 +803,9 @@ def verTablero(request, proyecto_id, tipo_id):
                 sprintInfo.historia = usFinalizar
                 sprintInfo.versionEnHistorial = copiaUs
                 sprintInfo.save()
+            
+            proyecto.estado = "Planificación"
+            proyecto.save()
             
     else:
         for etapa in tipo.etapas.all().order_by('orden'):

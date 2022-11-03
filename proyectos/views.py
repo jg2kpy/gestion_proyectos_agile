@@ -827,6 +827,17 @@ def backlog_sprint(request, proyecto_id, sprint_id):
             sprint.estado = "Desarrollo"
             sprint.save()
 
+            #Mover a la primera etapa en caso de que el US esta en planificacion
+            historias_en_planificacion = sprint.historias.filter(etapa=None)
+            for historia in historias_en_planificacion:
+                sigEtapa = EtapaHistoriaUsuario.objects.get(
+                            orden=0, TipoHistoriaUsusario=historia.tipo)
+                historia.etapa = sigEtapa
+                historia.save()
+
+            proyecto.estado = "Ejecución"
+            proyecto.save()
+        
     miembros = [miembro for miembro in proyecto.usuario.all() if UsuarioTiempoEnSprint.objects.filter(sprint=sprint, usuario=miembro).exists()]
     capacidad_total = 0
     capacidad_asignada = 0
@@ -838,13 +849,6 @@ def backlog_sprint(request, proyecto_id, sprint_id):
         capacidad_total += miembro.capacidad_total
         miembro.historias_count = len([historia for historia in sprint.historias.filter(estado='A') if historia.usuarioAsignado == miembro])
     
-    #Mover a la primera etapa en caso de que el US esta en planificacion
-    historias_en_planificacion = sprint.historias.filter(etapa=None)
-    for historia in historias_en_planificacion:
-        sigEtapa = EtapaHistoriaUsuario.objects.get(
-                    orden=0, TipoHistoriaUsusario=historia.tipo)
-        historia.etapa = sigEtapa
-        historia.save()
 
     request.session['cancelar_volver_a'] = request.path
 
