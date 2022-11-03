@@ -27,8 +27,9 @@
                 {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                 {% if master and not sprint.fecha_inicio %}
                 <a href="#modalSprintIni" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#modalSprintIni" data-toggle="tooltip" data-placement="top"
-                    title="Empezar sprint">Empezar Sprint</a>&nbsp;&nbsp;
+                    data-bs-target="#modalSprintIni">Empezar Sprint</a>&nbsp;&nbsp;
+                    <a href="#modalSprintCan" class="btn btn-secondary" data-bs-toggle="modal"
+                    data-bs-target="#modalSprintCan">Cancelar Sprint</a>&nbsp;&nbsp;
                 {% endif %}
                 <!-- Modal -->
                 <div class="modal fade" id="modalSprintIni" tabindex="-1" aria-labelledby="sprintModal"
@@ -62,7 +63,48 @@
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                                 <form method="post" action=".">
                                     {% csrf_token %}
-                                    <input type="submit" class="btn btn-primary" name="comenzar" value="comenzar">
+                                    <input type="submit" class="btn btn-primary" name="comenzar" value="Comenzar">
+                                </form>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End Modal -->
+                <!-- Modal -->
+                <div class="modal fade" id="modalSprintCan" tabindex="-1" aria-labelledby="sprintModal"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            {% check_sprint_activo proyecto as existe_sprint_activo %}
+                            {% if existe_sprint_activo %}
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="sprintModal">ERROR</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>¡No se puede empezar nuevo sprint porque ya existe un sprint en desarrollo!</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                            </div>
+                            {% else %}
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="sprintModal">¿Está seguro que desea cancelar el sprint?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>¿Está seguro que desea cancelar '{{sprint.nombre}}'?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                                <form method="post" action=".">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-danger" name="cancelar" value="Cancelar">
                                 </form>
                             </div>
                             {% endif %}

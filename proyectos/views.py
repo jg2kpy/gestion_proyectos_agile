@@ -5,8 +5,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
+import pytz
 
-from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, SprintInfo, TipoHistoriaUsusario
 from historias_usuario.views import calcularFechaSprint
 
 from .models import Feriado, Proyecto, Sprint, UsuarioTiempoEnSprint
@@ -784,7 +785,7 @@ def crear_sprint(request, proyecto_id):
 def backlog_sprint(request, proyecto_id, sprint_id):
     """Crear sprint
     Renderiza la pagina para crear un sprint.
-    Recibe una llamada POST para crear el sprint.
+    Recibe una llamada POST para iniciar o cancelar el sprint.
 
     :param request: Peticion HTTP donde se recibe la informacion del sprint a crear
     :type request: HttpRequest
@@ -817,6 +818,27 @@ def backlog_sprint(request, proyecto_id, sprint_id):
             historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
             historia.sprint = None
             historia.save()
+        elif request.POST.get('cancelar'):
+            if sprint.fecha_inicio != None:
+                return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
+            if Sprint.objects.filter(estado="Desarrollo",proyecto=proyecto).count() > 0:
+                return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
+
+            sprint.estado = "Cancelado"
+            sprint.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
+            sprint.save()
+
+            usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprint,estado=HistoriaUsuario.Estado.ACTIVO)
+            for usFinalizar in usListFinalizar:
+                usFinalizar.sprint = None
+                usFinalizar.horasAsignadas = 0
+                usFinalizar.usuarioAsignado = None
+                usFinalizar.save()
+            
+            proyecto.estado = "Planificación"
+            proyecto.save()
+
+            return redirect('sprint_list', proyecto_id=proyecto.id)
         else:
             if sprint.fecha_inicio != None:
                 return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
