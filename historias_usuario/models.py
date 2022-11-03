@@ -260,6 +260,12 @@ class SprintInfo(models.Model):
     :type versionEnHistorial: HistoriaUsuario
     :param sprint: Sprint al que pertenece esta informacion.
     :type sprint: Sprint
+    :param horasAsignadas: Horas asignadas a la historia de usuario en el Sprint.
+    :type horasAsignadas: int
+    :param horasUsadas: Horas usadas en el Sprint.
+    :type horasUsadas: int
+    :param fechaCreacion: Fecha de creación de la información.
+    :type fechaCreacion: datetime
     :param historia: Historia de usuario a la que pertenece esta informacion.
     :type historia: HistoriaUsuario
     """
@@ -267,6 +273,9 @@ class SprintInfo(models.Model):
     versionEnHistorial = models.ForeignKey(HistoriaUsuario, on_delete=models.PROTECT)
     historia = models.ForeignKey(HistoriaUsuario, related_name='sprintInfo', on_delete=models.PROTECT)
     sprint = models.ForeignKey(Sprint, related_name="historiasInfo", on_delete=models.PROTECT)
+    fechaCreacion = models.DateTimeField(default=timezone.now)
+    horasAsignadas = models.IntegerField(blank=False, default=0, validators=[MinValueValidator(0)])
+    horasUsadas = models.IntegerField(blank=False, default=0, validators=[MinValueValidator(0)])
 
 class Comentario(models.Model):
     """

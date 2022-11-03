@@ -695,7 +695,7 @@ def tareas(request, proyecto_id, historia_id):
     else:
         form = TareaForm()
 
-    all_tareas = Tarea.objects.filter(historia=historia).order_by('etapa__orden', 'sprint__fecha_inicio', 'fecha')
+    all_tareas = Tarea.objects.filter(historia=historia).order_by('etapa__orden', '-sprint__fecha_inicio', 'fecha')
     sprints_tareas = {}
     for tarea in all_tareas:
         if tarea.sprint not in sprints_tareas:
@@ -867,7 +867,10 @@ def verTablero(request, proyecto_id, tipo_id):
                 sprintInfo.sprint = sprintTerminar
                 sprintInfo.historia = usFinalizar
                 sprintInfo.versionEnHistorial = copiaUs
+                sprintInfo.horasAsignadas = copiaUs.horasAsignadas
+                sprintInfo.horasUsadas = sum([tarea.horas for tarea in Tarea.objects.filter(historia=id_ori, sprint=sprintTerminar)])
                 sprintInfo.save()
+
             
     else:
         for etapa in tipo.etapas.all().order_by('orden'):

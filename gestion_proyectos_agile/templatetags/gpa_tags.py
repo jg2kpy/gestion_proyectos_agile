@@ -1,5 +1,5 @@
 from django import template
-from historias_usuario.models import HistoriaUsuario
+from historias_usuario.models import HistoriaUsuario, Tarea
 from usuarios.models import RolSistema, RolProyecto, Usuario
 from proyectos.models import Proyecto, Sprint
 
@@ -297,3 +297,36 @@ def es_scrum_master(usuario, proyecto):
     :rtype: bool
     """
     return proyecto.scrumMaster == usuario
+
+@register.simple_tag
+def horas_trabajadas_en_sprint(usuario, sprint):
+    """Funcion para determinar las horas trabajadas en un sprint por un usuario
+
+    :param usuario: Usuario para el cual se desea determinar las horas trabajadas
+    :type usuario: Usuario
+    :param sprint: Sprint en el cual se desea determinar las horas trabajadas
+    :type sprint: Sprint
+
+    :return: Se retorna las horas trabajadas en el sprint
+    :rtype: int
+    """
+    horas = 0
+    for tarea in Tarea.objects.filter(sprint=sprint, usuario=usuario):
+        horas += tarea.horas
+    return horas
+
+@register.simple_tag
+def horas_restantes_de_ultimo_sprint(historia):
+    """Funcion para determinar las horas restantes de la ultima tarea de la historia de usuario
+
+    :param historia: Historia de usuario para la cual se desea determinar las horas restantes
+    :type historia: HistoriaUsuario
+
+    :return: Se retorna las horas restantes de la ultima tarea de la historia de usuario
+    :rtype: int
+    """
+    print(historia.sprintInfo.all())
+    if historia.sprintInfo.count() > 0:
+        ultimoSprint = historia.sprintInfo.all().order_by('-fechaCreacion').first()
+        return ultimoSprint.horasAsignadas - ultimoSprint.horasUsadas
+    return 0
