@@ -7,6 +7,8 @@ from historias_usuario.models import ArchivoAnexo, HistoriaUsuario
 from django.shortcuts import render, redirect
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 
+from usuarios.models import Notificacion
+
 
 class NeverCacheMixin(object):
     @method_decorator(never_cache)
@@ -47,3 +49,34 @@ def descargar(request, archivo_id):
         return render(request, '403.html', {'info_adicional': "No tiene permisos para descargar este archivo."}, status=403)
     
     return FileResponse(open(archivo.archivo.path, 'rb'), content_type='application/force-download')
+
+
+@never_cache
+def notificaciones(request):
+    """
+    Despliega las notificaciones que posee el usuario.
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :rtype: HttpResponse
+    """
+    if not request.user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    if request.method == 'POST':
+        if 'leidoId' in request.POST:
+            leidoId = request.POST['leidoId']
+            notifLeida = Notificacion.objects.get(id=leidoId)
+            notifLeida.leido = True
+            notifLeida.save()
+
+        if 'noLeidoId' in request.POST:
+            leidoId = request.POST['noLeidoId']
+            notifNoLeida = Notificacion.objects.get(id=leidoId)
+            notifNoLeida.leido = False
+            notifNoLeida.save()
+
+    notifLeido = Notificacion.objects.filter(usuario=request.user, leido=True)
+    notifNoLeido = Notificacion.objects.filter(usuario=request.user, leido=False)
+    
+    return render(request, 'notificaciones/notificaciones.html', {'notifLeido' : notifLeido, 'notifNoLeido': notifNoLeido}, status=200)
