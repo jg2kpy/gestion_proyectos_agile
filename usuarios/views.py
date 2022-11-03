@@ -374,6 +374,12 @@ def asignar_rol_proyecto(form, request_user, proyecto):
         rol_id = form.get(f'roles{usuario_email}')
         usuario_a_agregar_rol = Usuario.objects.get(email=usuario_email)
         rol = RolProyecto.objects.get(id=rol_id)
+        if rol.nombre == "Scrum Master":
+            anteriorMaster = proyecto.scrumMaster
+            anteriorMaster.roles_proyecto.remove(rol)
+            proyecto.scrumMaster = usuario_a_agregar_rol
+            proyecto.save()
+
         usuario_a_agregar_rol.roles_proyecto.add(rol)
 
     except Usuario.DoesNotExist:
