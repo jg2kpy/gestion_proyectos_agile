@@ -61,7 +61,7 @@
                     <div class="col-md-8">
                         {% for desarrollador in proyecto.usuario.all %}
                         <p class=" depende_miembro_equipo_{{desarrollador.id}}">
-                            <span class="horas_calculadas_{{desarrollador.id}}">0</span> de <span class="horas_dias_{{desarrollador.id}}">0</span> horas asignadas
+                            <span class="horas_calculadas_list horas_calculadas_{{desarrollador.id}}">0</span> de <span class="horas_dias_{{desarrollador.id}}">0</span> horas asignadas
                             <br>
                             <span style="color:red;" id="aviso_horas_desarrollador_{{desarrollador.id}}">
                                 Horas ingresadas difieren significativamente con horas calculadas de las historias de usuario!
@@ -316,6 +316,7 @@ function ocultarOpciones() {
 
 function calcularHoras() {
     var horas = $('.historia_horas_list')
+    $('.horas_calculadas_list').text(0)
 
     for (var i = 0; i < horas.length; i++) {
         var horas_calculadas = $('.horas_calculadas_' + horas[i].name.replace('historia_horas_', ''));
