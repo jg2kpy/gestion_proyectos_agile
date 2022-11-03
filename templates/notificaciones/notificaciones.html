@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Notifiaciones{% endblock %}
+{% block contenido %}
+{% load gpa_tags %}
+
+<!-- Redirigir a home si no tiene los permisos para ver esta pantalla -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Notificaciones</h1>
+        </div>
+    </div>
+    {% if notifNoLeido %}
+        <br>
+        <h3>No Leídos</h3>
+        <div class="row">
+            <!-- Traemos en una tabla los proyectos -->
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Fecha de Envío</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notif in notifNoLeido %}
+                    <tr>
+                        <td>{{ notif.descripcion }}</td>
+                        <td>{{ notif.fecha }}</td>
+                        <td>
+                            <form method="post" action=".">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link" name="leidoId" value={{ notif.id }}><span
+                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Marcar como leído">mark_email_read</span></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+    {% if notifLeido %}
+        <br>
+        <h3>Leídos</h3>
+        <div class="row">
+            <!-- Traemos en una tabla los proyectos -->
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Fecha de Envío</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notif in notifLeido %}
+                    <tr>
+                        <td>{{ notif.descripcion }}</td>
+                        <td>{{ notif.fecha }}</td>
+                        <td>
+                            <form method="post" action=".">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link" name="noLeidoId" value={{ notif.id }}><span
+                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Marcar como no leído">mark_email_unread</span></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+    {% if not notifLeido and not notifNoLeido%}
+        <div class="d-inline-flex p-2 bd-highlight">
+            <div class="alert alert-primary d-flex align-items-center" role="alert">
+                <div>
+                    <i class="material-icons  align-text-bottom">info_outline</i> No posee ninguna notificación
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
