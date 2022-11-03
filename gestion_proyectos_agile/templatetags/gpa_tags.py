@@ -255,3 +255,45 @@ def es_miembro(usuario, proyecto):
     :rtype: bool
     """
     return usuario.equipo.filter(id=proyecto.id).exists()
+
+@register.simple_tag
+def cantidad_tareas_en_etapa(historia, contar_ya_consideradas=False):
+    """Funcion para determinar la cantidad de tareas en una etapa
+
+    :param historia: Historia de usuario para la cual determinar la cantidad de tareas
+    :type usuario: historia
+    :param contar_ya_consideradas: Indica si se deben contar las tareas ya consideradas en la etapa
+    :type contar_ya_consideradas: bool
+
+    :return: Se retorna la cantidad de tareas en la etapa
+    :rtype: int
+    """
+
+    if contar_ya_consideradas:
+        return historia.tareas.filter(etapa=historia.etapa).count()
+    return historia.tareas.filter(etapa=historia.etapa, considerado=False).count()
+
+
+@register.simple_tag
+def trabajo_realizado_en_sprint(historia):
+    """Funcion para determinar el trabajo realizado en un sprint
+
+    :param historia: Historia de usuario para la cual determinar el trabajo realizado
+    :type usuario: historia
+
+    :return: Se retorna el trabajo realizado en el sprint
+    :rtype: int
+    """
+    horas = 0
+    for tarea in historia.tareas.filter(sprint=historia.sprint):
+        horas += tarea.horas
+    return horas
+
+@register.simple_tag
+def es_scrum_master(usuario, proyecto):
+    """Funcion para verificar que un usuario es scrum master de un proyecto
+
+    :return: True si el usuario es scrum master del proyecto
+    :rtype: bool
+    """
+    return proyecto.scrumMaster == usuario

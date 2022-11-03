@@ -303,6 +303,22 @@ class SubirArchivo(models.Model):
 
 class Tarea(models.Model):
     """
+    Registra el trabajo realizado por un usuario en una historia de usuario.
+
+    :param historia: Historia de usuario a la que pertenece la tarea.
+    :type historia: HistoriaUsuario
+    :param usuario: Usuario que realizó la tarea.
+    :type usuario: Usuario
+    :param fecha: Fecha en la que se realizó la tarea.
+    :type fecha: datetime
+    :param descripcion: Descripción de la tarea realizada.
+    :type descripcion: str
+    :param horas: Horas que se trabajaron en la tarea.
+    :type horas: int
+    :param etapa: Etapa en la que se realizó la tarea.
+    :type etapa: Etapa
+    :param sprint: Sprint en el que se realizó la tarea.
+    :type sprint: Sprint
     """
 
     fecha = models.DateField(auto_now_add=True)
@@ -310,5 +326,6 @@ class Tarea(models.Model):
     sprint = models.ForeignKey(Sprint, related_name='tareas', on_delete=models.PROTECT)
     usuario = models.ForeignKey('usuarios.Usuario', related_name='tareas', on_delete=models.PROTECT)
     descripcion = models.TextField(blank=True, null=True)
+    etapa = models.ForeignKey(EtapaHistoriaUsuario, related_name='tareas', on_delete=models.PROTECT)
     horas = models.IntegerField(default=0)
     considerado = models.BooleanField(default=False)

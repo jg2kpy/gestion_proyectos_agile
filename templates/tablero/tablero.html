@@ -97,6 +97,10 @@
                                 </div>
                                 <div>
                                     <p>
+                                        {% trabajo_realizado_en_sprint us as horas_usadas %}
+                                        {{ horas_usadas }} de {{ us.horasAsignadas }} horas usadas
+                                    </p>
+                                    <p>
                                         {{ us.descripcion }}
                                     </p>
                                     {% if us.usuarioAsignado %}
@@ -114,7 +118,12 @@
                                                 <a href="{% url 'editar_historiaUsuario' us.proyecto.id us.id %}"><span 
                                                 class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar historia">create</span></a>
                                             {% endif %}
-                
+                                            {% es_scrum_master user proyecto as es_scrum %}
+                                            {% if us.usuarioAsignado == user or es_scrum %}
+                                                <a href="{% url 'tareas' proyecto.id us.id %}"><span 
+                                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Agregar trabajo">engineering</span></a>
+                                            {% endif %}
+                                            
                                             {% tiene_permiso_en_proyecto user 'pro_cancelarUS' us.proyecto as pro_cancelarUS %}
                                             {% if pro_cancelarUS %}
                                                 <a href="#modal{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ us.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Cancelar historia">cancel</span></a>
@@ -136,12 +145,15 @@
                                                         <a href="javascript:{}" onclick="document.getElementById('form_anterior{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa anterior">arrow_back</span></a>
                                                     </form>
                                                 {% endif %}
+                                                {% cantidad_tareas_en_etapa us as tareas_en_etapa %}
+                                                {% if tareas_en_etapa > 0 %}
                                                 <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_siguiente{{us.id}}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="url" value="{{ request.path }}">
                                                     <input type="hidden" name="siguiente" value="siguiente">
                                                     <a href="javascript:{}" onclick="document.getElementById('form_siguiente{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa siguiente">arrow_forward</span></a>
                                                 </form>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     {% endif %}
