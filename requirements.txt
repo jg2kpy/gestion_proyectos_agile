@@ -5,3 +5,4 @@ gunicorn==20.1
 django-phonenumber-field==6.4.0
 phonenumbers==8.12.54
 tzdata
+matplotlib
