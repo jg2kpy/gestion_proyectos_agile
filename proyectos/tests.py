@@ -940,3 +940,35 @@ class SprintTests(TestCase):
         res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/")
         self.assertContains(res, 'Cancelado', 1,
                             200, "No se cancelo el sprint correctamente")
+
+
+    def test_comenzar_sprint_mover_a_primera_etapa(self):
+        """
+        Prueba para comenzar un sprint
+        """
+        self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+        
+        historiaTest3 = HistoriaUsuario(tipo=self.tipoTest, nombre="Test US 3", descripcion="Test US 3", proyecto=self.proyecto, up=50, bv=50)
+        historiaTest3.save()
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+            {
+                'nombre': 'Sprint 4', 'descripcion': 'Sprint 4', 'duracion': '15', 
+                f'horas_trabajadas_{self.proyecto.id}': '6',
+                f'historia_seleccionado_{historiaTest3.id}': '1',
+                f'historia_horas_{historiaTest3.id}': '5',
+                f'desarrollador_asignado_{historiaTest3.id}': f'{self.user.id}',
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+        self.sprint4 = Sprint.objects.get(nombre="Sprint 4")
+        self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint4.id}/backlog/",
+        {
+            'comenzar' : 'Comenzar'
+        }, follow=True)
+
+        self.assertEqual(HistoriaUsuario.objects.get(id=historiaTest3.id).etapa, self.tipoTest.etapas.get(orden=0),
+                'La historia no se fue a la primera etapa al momento de inicar el sprint')
