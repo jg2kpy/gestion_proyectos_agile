@@ -322,12 +322,16 @@ function calcularHoras() {
         horas_calculadas.text('0');
     }
     
+    var total = {};
     for(var i = 0; i < horas.length; i++) {
         if ($(horas[i]).is(":hidden")) {
             continue;
         }
-        var horas_calculadas = $('.horas_calculadas_' + $('#desarrollador_asignado_' + horas[i].name.replace('historia_horas_', '')).find(":selected").val());
-        horas_calculadas.text(parseInt(horas_calculadas.first().text()) + parseInt($(horas[i]).val()));
+        var dev = $('#desarrollador_asignado_' + horas[i].name.replace('historia_horas_', '')).find(":selected").val();
+        var horas_calculadas = $('.horas_calculadas_' + dev);
+        console.log(horas_calculadas)
+        total[dev] = (total[dev] || 0) + parseInt($(horas[i]).val());
+        horas_calculadas.text(parseInt(total[dev]));
     }
 }
 
