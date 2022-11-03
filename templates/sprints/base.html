@@ -182,15 +182,6 @@
                                 class="material-icons">cancel</span></button>
                         {% endif %}
 
-                        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
-                        {% if master or historia.usuarioAsignado == user %}
-                        {% if not historia.etapa and historia.usuarioAsignado %}
-                        <button href="#modalEtapa{{ historia.id }}" class="btn btn-link" data-bs-toggle="modal"
-                            data-bs-target="#modalEtapa{{ historia.id }}" data-toggle="tooltip" data-placement="top"
-                            title="Mover a la siguiente etapa"><span
-                                class="material-icons">arrow_forward</span></button>
-                        {% endif %}
-                        {% endif %}
                         {% endif %}
                         <a class="btn btn-link" data-toggle="tooltip" data-placement="top" title="Ver historial"
                             href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span
@@ -203,32 +194,8 @@
     </div>
 </div>
 {% for historia in historias %}
-{% include "modals/modalUSCancelar.html" with historia=historia %}
-{% include "modals/modalUSInfo.html" with historia=historia %}
-
-<!-- Modal -->
-<div class="modal fade" id="modalEtapa{{ historia.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="etapaModal">Estas seguro que desea mover a la siguente etapa?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Esta seguro que desea mover '{{ historia.nombre }}' a la etapa {% siguente_etapa historia %}?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
-                <form method="post" action="{% url 'mover_historias_usuario' proyecto.id historia.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="url" value="{{ request.path }}">
-                    <input type="submit" class="btn btn-primary" value="Mover">
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div>
+    {% include "modals/modalUSCancelar.html" with historia=historia %}
+    {% include "modals/modalUSInfo.html" with historia=historia %}
 {% endfor %}
 
 <script>

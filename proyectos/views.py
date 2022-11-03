@@ -837,6 +837,15 @@ def backlog_sprint(request, proyecto_id, sprint_id):
         miembro.capacidad_total = miembro.capacidad * sprint.duracion
         capacidad_total += miembro.capacidad_total
         miembro.historias_count = len([historia for historia in sprint.historias.filter(estado='A') if historia.usuarioAsignado == miembro])
+    
+    #Mover a la primera etapa en caso de que el US esta en planificacion
+    historias_en_planificacion = sprint.historias.filter(etapa=None)
+    for historia in historias_en_planificacion:
+        sigEtapa = EtapaHistoriaUsuario.objects.get(
+                    orden=0, TipoHistoriaUsusario=historia.tipo)
+        historia.etapa = sigEtapa
+        historia.save()
+
     request.session['cancelar_volver_a'] = request.path
 
     return render(request, 'sprints/base.html', {'proyecto': proyecto, 'capacidad_asignada': capacidad_asignada, 'capacidad_total':capacidad_total, 'miembros': miembros, 'sprint': sprint, 'historias': sprint.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO), 'titulo': "Sprint Backlog "+sprint.nombre}, status=200)
