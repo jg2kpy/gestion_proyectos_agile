@@ -325,7 +325,6 @@ def horas_restantes_de_ultimo_sprint(historia):
     :return: Se retorna las horas restantes de la ultima tarea de la historia de usuario
     :rtype: int
     """
-    print(historia.sprintInfo.all())
     if historia.sprintInfo.count() > 0:
         ultimoSprint = historia.sprintInfo.all().order_by('-fechaCreacion').first()
         return ultimoSprint.horasAsignadas - ultimoSprint.horasUsadas

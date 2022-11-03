@@ -695,7 +695,7 @@ def tareas(request, proyecto_id, historia_id):
     else:
         form = TareaForm()
 
-    all_tareas = Tarea.objects.filter(historia=historia).order_by('etapa__orden', '-sprint__fecha_inicio', 'fecha')
+    all_tareas = Tarea.objects.filter(historia=historia).order_by('-sprint__fecha_inicio', 'etapa__orden', '-fecha')
     sprints_tareas = {}
     for tarea in all_tareas:
         if tarea.sprint not in sprints_tareas:

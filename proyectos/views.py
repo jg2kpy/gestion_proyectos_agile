@@ -892,7 +892,6 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
     else:
         for d in desarrolladores:
             try:
-                print(UsuarioTiempoEnSprint.objects.get(usuario=d, sprint=sprint).horas)
                 d.horas = UsuarioTiempoEnSprint.objects.get(usuario=d, sprint=sprint).horas
                 d.horas_total = 0
                 for historia in sprint.historias.filter(usuarioAsignado=d):

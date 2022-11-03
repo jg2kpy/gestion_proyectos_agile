@@ -330,7 +330,7 @@ class Tarea(models.Model):
     :type sprint: Sprint
     """
 
-    fecha = models.DateField(auto_now_add=True)
+    fecha = models.DateField(default=timezone.now)
     historia = models.ForeignKey(HistoriaUsuario, related_name='tareas', on_delete=models.PROTECT)
     sprint = models.ForeignKey(Sprint, related_name='tareas', on_delete=models.PROTECT)
     usuario = models.ForeignKey('usuarios.Usuario', related_name='tareas', on_delete=models.PROTECT)
