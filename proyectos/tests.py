@@ -911,3 +911,32 @@ class SprintTests(TestCase):
         
         self.assertContains(res, '<span class="lead font-weight-light">Test US 2</span>', 1,
                             200, "No visualiza correctamente el sprint")
+                        
+    def test_cancelar_sprint(self):
+        """
+        Prueba para comenzar un sprint
+        """
+        
+        self.sprint3 = Sprint()
+        self.sprint3.nombre = 'Sprint 1'
+        self.sprint3.proyecto = self.proyecto
+        self.sprint3.duracion = 3
+        self.sprint3.estado = "Planificado"
+        self.sprint3.save()
+
+        self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint3.id}/backlog/",
+            {
+                'cancelar' : 'Cancelar'
+            }, follow=True)
+
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al inciar un sprint')
+        
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/")
+        self.assertContains(res, 'Cancelado', 1,
+                            200, "No se cancelo el sprint correctamente")
