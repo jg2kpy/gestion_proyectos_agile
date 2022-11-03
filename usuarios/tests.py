@@ -367,6 +367,32 @@ class MiembrosRolesTest(TestCase):
         self.assertEqual(response.status_code, 302,
                          'La respuesta no fue un estado HTTP 302 ante una presunta operacion exitosa')
         
+        request = request_factory.post(f'/proyecto/{proyectoTest.id}/usuarios/', data={
+            'usuario_a_cambiar_rol': usuarioTest.email,
+            f'roles{usuarioTest.email}': rolTest.id,
+            'hidden_action': 'asignar_rol_proyecto'
+        })
+        request.user = master
+        response = vista_equipo(request, proyectoTest.id)
+        self.assertEqual(response.status_code, 302,
+                         'La respuesta no fue un estado HTTP 302 ante una presunta operacion exitosa')
+        
+        self.assertTrue(rolTest in usuarioTest.roles_proyecto.all(),
+                        'El usuario tiene el rol asignado en el proyecto')
+
+    def test_reasignar_scrum_master(self):
+        request_factory = RequestFactory()
+
+        usuarioTest = Usuario(username="test", email='normal@user.com', password='foo')
+        master = self.user
+        usuarioTest.save()
+
+        proyectoTest = self.proyecto
+        proyectoTest.scrumMaster = master
+        proyectoTest.save()
+
+        rolTest = RolProyecto.objects.get(nombre="Scrum Master", proyecto=proyectoTest)
+
         self.assertTrue(rolTest in usuarioTest.roles_proyecto.all(),
                         'El usuario tiene el rol asignado en el proyecto')
 
