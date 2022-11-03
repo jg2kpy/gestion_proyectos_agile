@@ -311,3 +311,4 @@ class Tarea(models.Model):
     usuario = models.ForeignKey('usuarios.Usuario', related_name='tareas', on_delete=models.PROTECT)
     descripcion = models.TextField(blank=True, null=True)
     horas = models.IntegerField(default=0)
+    considerado = models.BooleanField(default=False)

@@ -323,7 +323,10 @@ def moverEtapa(request, proyecto_id, historia_id):
 
             antEtapa = EtapaHistoriaUsuario.objects.get(
                 orden=antOrden, TipoHistoriaUsusario=historia.tipo)
-            historia.etapa = antEtapa
+            if historia.etapa != antEtapa:
+                for trabajo in historia.trabajos.all():
+                    trabajo.considerado = True
+                historia.etapa = antEtapa
     
         historia.save()
 
