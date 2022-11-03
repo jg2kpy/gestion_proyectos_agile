@@ -83,7 +83,7 @@ class Sprint(models.Model):
                              MaxValueValidator(365), MinValueValidator(1)])
     nombre = models.CharField(max_length=255, blank=False, null=False)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
-    burndownChart = models.ForeignKey(ArchivoBurndown, related_name='sprint', on_delete=models.DO_NOTHING, null=True)
+    burndownChart = models.OneToOneField(ArchivoBurndown, related_name='sprint', on_delete=models.DO_NOTHING, null=True)
 
     class Meta:
         constraints = [

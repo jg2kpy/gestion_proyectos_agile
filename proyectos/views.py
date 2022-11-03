@@ -1,4 +1,6 @@
 import datetime
+from genericpath import isdir
+from os import makedirs
 import django
 from django.forms import inlineformset_factory
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
@@ -944,7 +946,6 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
     else:
         for d in desarrolladores:
             try:
-                print(UsuarioTiempoEnSprint.objects.get(usuario=d, sprint=sprint).horas)
                 d.horas = UsuarioTiempoEnSprint.objects.get(usuario=d, sprint=sprint).horas
                 d.horas_total = 0
                 for historia in sprint.historias.filter(usuarioAsignado=d):
@@ -1049,6 +1050,9 @@ def generarGraficoBurndown(x, yTeorico, yReal):
     
 
 def generarBurndownChart(sprintId):
+    if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
+        return
+
     # Datos para realizar los cálculos
     sprint = Sprint.objects.get(id=sprintId)
     cantDiasSprint = sprint.duracion
@@ -1078,14 +1082,18 @@ def generarBurndownChart(sprintId):
         yReal.append(horasRestanteSprint)
 
     generarGraficoBurndown(x, yTeorico, yReal)
-    plt.savefig(f"app/staticfiles/bdChart_{sprint.proyecto.nombre}{sprint.proyecto.id}_{sprint.nombre}{sprint.id}.png")
-    rutaImg = Path(f"app/staticfiles/bdChart_{sprint.proyecto.nombre}{sprint.proyecto.id}_{sprint.nombre}{sprint.id}.png")
+    if not isdir('app/staticfiles'):
+        makedirs("app/staticfiles")
+    plt.savefig(f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+    rutaImg = Path(f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
     
     archivoBurndown = ArchivoBurndown()
-    archivoBurndown.nombre = f"bdChart_{sprint.proyecto.nombre}{sprint.proyecto.id}_{sprint.nombre}{sprint.id}"
+    archivoBurndown.nombre = f"bdChart_{sprint.proyecto.id}_{sprint.id}"
     with rutaImg.open(mode='rb') as archivo:
         archivoBurndown.archivo = File(archivo, name=rutaImg.name)
         archivoBurndown.save()
+        sprint.burndownChart = archivoBurndown
+        sprint.save()
 
 
 def generarVelocityChart(proyectoId):
@@ -1150,7 +1158,6 @@ def descargarReporte(request, id):
     if 'descargarBurndown' in request.POST:
         # sprint = Sprint.objects.get(id=id)
         # archivo = ArchivoBurndown.objects.get(sprint=sprint)
-        archivo = ArchivoBurndown.objects.get(sprint__id=id)
 
         try:
             archivo = ArchivoBurndown.objects.get(sprint__id=id)
@@ -1198,7 +1205,7 @@ def sprint_list(request, proyecto_id):
         if 'descargarBurndown' in request.POST:
             sprintId = request.POST['descargarBurndown']
             generarBurndownChart(sprintId)
-            descargarReporte(request, sprintId)
+            return descargarReporte(request, sprintId)
         else:
             proyectoId = request.POST['descargarVelocity']
             generarVelocityChart(proyectoId)
