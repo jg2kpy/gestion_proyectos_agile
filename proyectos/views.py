@@ -1,18 +1,26 @@
 import datetime
 import django
 from django.forms import inlineformset_factory
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
+import numpy as np
 
-from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, Tarea, TipoHistoriaUsusario
 from historias_usuario.views import calcularFechaSprint
 
-from .models import Feriado, Proyecto, Sprint, UsuarioTiempoEnSprint
+from .models import ArchivoBurndown, Feriado, Proyecto, Sprint, UsuarioTiempoEnSprint
 from .forms import ProyectoConfigurarForm, ProyectoFeriadosForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
+
+import matplotlib.pyplot as plt
+from matplotlib.legend_handler import HandlerLine2D
+
+from pathlib import Path
+from django.core.files import File
+from PIL import Image
 
 """
     Enumerador de estados de Proyecto
@@ -993,6 +1001,171 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
 
     return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
 
+
+def calcularHorasDiarias(sprint, cantDiasSprint, fechaInicial, feriados):
+    fechaActual = fechaInicial
+    totalHorasDiario = []
+    feriadosFecha = []
+
+    if feriados:
+        for feriado in feriados:
+            feriadosFecha.append(feriado.fecha.date())
+
+    while cantDiasSprint:
+        if not (fechaActual.weekday() >= 5 or feriados and fechaActual.date() in feriadosFecha):
+            cantDiasSprint -= 1
+            tareasDiarias = Tarea.objects.filter(sprint=sprint, fecha=fechaActual)
+            sumaHoras = 0
+            
+            for tarea in tareasDiarias:
+                sumaHoras += tarea.horas
+
+            totalHorasDiario.append(sumaHoras)
+
+        if cantDiasSprint > 0:
+            fechaActual += datetime.timedelta(days=1)
+
+    return totalHorasDiario
+
+
+def calcularHorasSprint(sprint):
+    usList = HistoriaUsuario.objects.filter(sprint=sprint, estado__in=["S","T"])
+    totalHoras = 0
+
+    for us in usList:
+        totalHoras += us.horasAsignadas
+    
+    return totalHoras
+
+
+def generarGraficoBurndown(x, yTeorico, yReal):
+    fig, ax = plt.subplots()
+    ax.set_xlabel("Días")
+    ax.set_ylabel("Horas")
+    line1, = ax.plot(x, yTeorico, label="Tareas Ideales", linestyle='-', marker='o', color='b')
+    line2, = ax.plot(x, yReal, label="Tareas Reales", linestyle='-', marker='o', color='r')
+    ax.legend(handler_map={line1: HandlerLine2D()})
+    plt.title("Burndown Chart")
+    
+
+def generarBurndownChart(sprintId):
+    # Datos para realizar los cálculos
+    sprint = Sprint.objects.get(id=sprintId)
+    cantDiasSprint = sprint.duracion
+    inicioSprint = sprint.fecha_inicio
+    feriados = Feriado.objects.filter(proyecto=sprint.proyecto)
+    horasUsDiario = calcularHorasDiarias(sprint, cantDiasSprint, inicioSprint, feriados)
+    horasTotalSprint = calcularHorasSprint(sprint)
+
+    # Inicio de los cálculos
+    x = [dias for dias in range(cantDiasSprint + 1)]
+    yTeorico = [horasTotalSprint]
+    yReal = [horasTotalSprint]
+
+    # Para el horario ideal
+    horasRestanteSprint = horasTotalSprint
+    horasIdealDiario = int(horasTotalSprint / cantDiasSprint)
+
+    for _ in range(cantDiasSprint):
+        horasRestanteSprint -= horasIdealDiario
+        yTeorico.append(horasRestanteSprint)
+
+    # Para el horario real
+    horasRestanteSprint = horasTotalSprint
+
+    for horasUs in horasUsDiario:
+        horasRestanteSprint = horasRestanteSprint - horasUs
+        yReal.append(horasRestanteSprint)
+
+    generarGraficoBurndown(x, yTeorico, yReal)
+    plt.savefig(f"app/staticfiles/bdChart_{sprint.proyecto.nombre}{sprint.proyecto.id}_{sprint.nombre}{sprint.id}.png")
+    rutaImg = Path(f"app/staticfiles/bdChart_{sprint.proyecto.nombre}{sprint.proyecto.id}_{sprint.nombre}{sprint.id}.png")
+    
+    archivoBurndown = ArchivoBurndown()
+    archivoBurndown.nombre = f"bdChart_{sprint.proyecto.nombre}{sprint.proyecto.id}_{sprint.nombre}{sprint.id}"
+    with rutaImg.open(mode='rb') as archivo:
+        archivoBurndown.archivo = File(archivo, name=rutaImg.name)
+        archivoBurndown.save()
+
+
+def generarVelocityChart(proyectoId):
+    # Datos para realizar los cálculos
+    proyecto = Proyecto.objects.get(id=proyectoId)
+    sprints = Sprint.objects.filter(proyecto__id=proyectoId, estado="Terminado")
+    horasTotalSprintList = []
+    horasUsSprintList = []
+    sprintNombreList = []
+
+    for sprint in sprints:
+        cantDiasSprint = sprint.duracion
+        inicioSprint = sprint.fecha_inicio
+        feriados = Feriado.objects.filter(proyecto=sprint.proyecto)
+        sprintNombreList.append(sprint.nombre)
+        horasUsDiario = calcularHorasDiarias(sprint, cantDiasSprint, inicioSprint, feriados)
+        horasTotalSprintList.append(calcularHorasSprint(sprint))
+        
+        tempUsTotal = 0
+
+        for horaUs in horasUsDiario:
+            tempUsTotal += horaUs
+        
+        horasUsSprintList.append(tempUsTotal)
+    
+    generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList)
+    # plt.savefig(f"app/staticfiles/velChart_{proyecto.nombre}{proyecto.id}.png")
+    plt.savefig(f"velChart_{proyecto.nombre}{proyecto.id}.png")
+
+
+def generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList):
+    cantBarras = len(horasTotalSprintList)
+    barraIzq = horasTotalSprintList
+    barrDer = horasUsSprintList
+    ind = np.arange(cantBarras)
+    ancho = 0.3
+
+    plt.figure(figsize=(10,5))
+
+    plt.bar(ind, barraIzq , ancho, label='Trabajo propuesto')
+    plt.bar(ind + ancho, barrDer, ancho, label='Trabajo realizado')
+
+    plt.ylabel('Horas')
+    plt.title('Velocity Chart')
+    plt.xticks(ind + ancho / 2, sprintNombreList)
+
+    plt.legend(loc='best')
+    plt.show()
+
+
+@never_cache
+def descargarReporte(request, id):
+    """
+    Permite descargar un archivo.
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param id: Id del sprint o del proyecto al que pertenece el reporte
+    :type id: int
+    :rtype: HttpResponse
+    """
+    if 'descargarBurndown' in request.POST:
+        # sprint = Sprint.objects.get(id=id)
+        # archivo = ArchivoBurndown.objects.get(sprint=sprint)
+        archivo = ArchivoBurndown.objects.get(sprint__id=id)
+
+        try:
+            archivo = ArchivoBurndown.objects.get(sprint__id=id)
+        except ArchivoBurndown.DoesNotExist:
+            return render(request, '404.html', {'info_adicional': "No se encontró este archivo."}, status=404)
+    else:
+        try:
+            # TODO Cambiar a modelo para velocity
+            archivo = ArchivoBurndown.objects.get(sprint__id=id)
+        except ArchivoBurndown.DoesNotExist:
+            return render(request, '404.html', {'info_adicional': "No se encontró este archivo."}, status=404)
+
+    return FileResponse(open(archivo.archivo.path, 'rb'), content_type='application/force-download')
+
+
 @never_cache
 def sprint_list(request, proyecto_id):
     """
@@ -1021,4 +1194,14 @@ def sprint_list(request, proyecto_id):
     if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
 
+    if request.method == 'POST':
+        if 'descargarBurndown' in request.POST:
+            sprintId = request.POST['descargarBurndown']
+            generarBurndownChart(sprintId)
+            descargarReporte(request, sprintId)
+        else:
+            proyectoId = request.POST['descargarVelocity']
+            generarVelocityChart(proyectoId)
+
+            
     return render(request, 'sprints/sprintList.html', {'proyecto': proyecto}, status=200)
