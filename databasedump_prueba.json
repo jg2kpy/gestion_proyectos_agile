@@ -1,0 +1,1700 @@
+[
+  {
+    "model": "usuarios.usuario",
+    "pk": 1,
+    "fields": {
+      "password": "!h0yMjeNFx45mi6OKrBRZzY3zHsK33D9CW9BjQyw2",
+      "last_login": "2022-11-04T03:24:41.982Z",
+      "is_superuser": false,
+      "email": "jlgutierrez2000@hotmail.com",
+      "username": "",
+      "direccion": "Asunción, Paraguay",
+      "telefono": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-11-04T03:24:41.935Z",
+      "avatar_url": "https://avatars.githubusercontent.com/u/46907456?v=4",
+      "first_name": "José",
+      "last_name": "Luis Junior Gutiérrez Agüero",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 2,
+    "fields": {
+      "password": "!6HcocBJ2O5WL79D4BOsKYrUdKTfRMTzduNLsvSov",
+      "last_login": "2022-11-04T03:25:25.212Z",
+      "is_superuser": false,
+      "email": "dummygpais2test@gmail.com",
+      "username": "",
+      "direccion": null,
+      "telefono": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-11-04T03:25:25.133Z",
+      "avatar_url": "https://avatars.githubusercontent.com/u/113201839?v=4",
+      "first_name": "Cuenta",
+      "last_name": "Secundaria",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 1,
+    "fields": {
+      "nombre": "Scrum Master",
+      "descripcion": "Un Scrum Master es un facilitador para un equipo de desarrollo Agile.",
+      "proyecto": null,
+      "usuario": []
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 2,
+    "fields": {
+      "nombre": "Product Owner",
+      "descripcion": "Propietario del proyecto",
+      "proyecto": null,
+      "usuario": []
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 3,
+    "fields": {
+      "nombre": "Member",
+      "descripcion": "Miembro del proyecto",
+      "proyecto": null,
+      "usuario": []
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 4,
+    "fields": {
+      "nombre": "Scrum Master",
+      "descripcion": "Un Scrum Master es un facilitador para un equipo de desarrollo Agile.",
+      "proyecto": 1,
+      "usuario": [1]
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 5,
+    "fields": {
+      "nombre": "Product Owner",
+      "descripcion": "Propietario del proyecto",
+      "proyecto": 1,
+      "usuario": []
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 6,
+    "fields": {
+      "nombre": "Member",
+      "descripcion": "Miembro del proyecto",
+      "proyecto": 1,
+      "usuario": [2]
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 7,
+    "fields": {
+      "nombre": "Scrum Master",
+      "descripcion": "Un Scrum Master es un facilitador para un equipo de desarrollo Agile.",
+      "proyecto": 2,
+      "usuario": [2]
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 8,
+    "fields": {
+      "nombre": "Product Owner",
+      "descripcion": "Propietario del proyecto",
+      "proyecto": 2,
+      "usuario": []
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 9,
+    "fields": {
+      "nombre": "Member",
+      "descripcion": "Miembro del proyecto",
+      "proyecto": 2,
+      "usuario": [1]
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 10,
+    "fields": {
+      "nombre": "Scrum Master",
+      "descripcion": "Un Scrum Master es un facilitador para un equipo de desarrollo Agile.",
+      "proyecto": 3,
+      "usuario": [1]
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 11,
+    "fields": {
+      "nombre": "Product Owner",
+      "descripcion": "Propietario del proyecto",
+      "proyecto": 3,
+      "usuario": []
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 12,
+    "fields": {
+      "nombre": "Member",
+      "descripcion": "Miembro del proyecto",
+      "proyecto": 3,
+      "usuario": []
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 13,
+    "fields": {
+      "nombre": "Rol para cancelar US",
+      "descripcion": "Rol para cancelar US",
+      "proyecto": 1,
+      "usuario": []
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 14,
+    "fields": {
+      "nombre": "Rol para cancelar US",
+      "descripcion": "Rol para cancelar US",
+      "proyecto": 2,
+      "usuario": []
+    }
+  },
+  {
+    "model": "usuarios.rolsistema",
+    "pk": 1,
+    "fields": { "nombre": "gpa_admin", "descripcion": null, "usuario": [1] }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 1,
+    "fields": {
+      "nombre": "pro_cambiarEstadoProyecto",
+      "descripcion": "Cambiar de estado al proyecto",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 2,
+    "fields": {
+      "nombre": "pro_especificarFechaFinProyecto",
+      "descripcion": "Especificar la fecha de fin de proyecto",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 3,
+    "fields": {
+      "nombre": "pro_crearRolProyecto",
+      "descripcion": "Crear rol de proyecto",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 4,
+    "fields": {
+      "nombre": "pro_asignarRolProyecto",
+      "descripcion": "Asignar rol de proyecto",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 5,
+    "fields": {
+      "nombre": "pro_editarRolProyecto",
+      "descripcion": "Editar rol de proyecto",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 6,
+    "fields": {
+      "nombre": "pro_importarRol",
+      "descripcion": "Importar rol de proyecto custom entre proyectos",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 7,
+    "fields": {
+      "nombre": "pro_asignarMiembros",
+      "descripcion": "Agregar miembros al equipo durante la planificacion/ejecucion del Proyecto",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 8,
+    "fields": {
+      "nombre": "pro_iniciarSprint",
+      "descripcion": "Iniciar sprint",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 9,
+    "fields": {
+      "nombre": "pro_especificarTiempoDeSprint",
+      "descripcion": "Especificar el tiempo del Sprint",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 10,
+    "fields": {
+      "nombre": "pro_crearTipoUS",
+      "descripcion": "Crear un tipo de US",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 11,
+    "fields": {
+      "nombre": "pro_eliminarTipoUS",
+      "descripcion": "Eliminar un tipo de US",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 12,
+    "fields": {
+      "nombre": "pro_importarTipoUS",
+      "descripcion": "Importar tipos de US entre proyectos",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 13,
+    "fields": {
+      "nombre": "pro_cambiarEstadoSprint",
+      "descripcion": "Cambiar de estado al Sprint",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 14,
+    "fields": {
+      "nombre": "pro_asignarUS",
+      "descripcion": "Asignar US a un miembro",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 15,
+    "fields": {
+      "nombre": "pro_cambiarUsuarioAsignadoUS",
+      "descripcion": "Cambiar a quien esta asignado un US",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 16,
+    "fields": {
+      "nombre": "pro_modificarUS",
+      "descripcion": "Modificar una historia de Usuario",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 17,
+    "fields": {
+      "nombre": "pro_cargarUSalBacklog",
+      "descripcion": "Cargar US al product backlog",
+      "rol": [1, 2, 4, 5, 7, 8, 10, 11]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 18,
+    "fields": {
+      "nombre": "pro_asignarBVaUS",
+      "descripcion": "Asignar BV a un US que esta en product backlog",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 19,
+    "fields": {
+      "nombre": "pro_cancelarUS",
+      "descripcion": "Cancelar una historia de Usuario",
+      "rol": [1, 4, 7, 10, 13, 14]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 20,
+    "fields": {
+      "nombre": "pro_cancelarSprint",
+      "descripcion": "Cancelar Sprint",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 21,
+    "fields": {
+      "nombre": "pro_eliminarMiembros",
+      "descripcion": "Eliminar miembros",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 22,
+    "fields": {
+      "nombre": "pro_generarReportes",
+      "descripcion": "Generar los reportes",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 23,
+    "fields": {
+      "nombre": "pro_verproyecto",
+      "descripcion": "Ver el proyecto, pero no modificar nada",
+      "rol": [2, 5, 8, 11]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 24,
+    "fields": {
+      "nombre": "pro_cambiarEstadoUS",
+      "descripcion": "Cambiar estado del US que tiene asignado",
+      "rol": [3, 6, 9, 12]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 25,
+    "fields": {
+      "nombre": "pro_asignarUPaUS",
+      "descripcion": "Asignar UP a un US que esta en product backlog",
+      "rol": [3, 6, 9, 12]
+    }
+  },
+  {
+    "model": "usuarios.permisoproyecto",
+    "pk": 26,
+    "fields": {
+      "nombre": "pro_agregarRetroespectiva",
+      "descripcion": "Agregar retroespectiva",
+      "rol": [1, 4, 7, 10]
+    }
+  },
+  {
+    "model": "usuarios.permisosistema",
+    "pk": 1,
+    "fields": {
+      "nombre": "sys_crearproyectos",
+      "descripcion": "Crear proyectos",
+      "rol": [1]
+    }
+  },
+  {
+    "model": "usuarios.permisosistema",
+    "pk": 2,
+    "fields": {
+      "nombre": "sys_asignarmaster",
+      "descripcion": "Asignar Scrum Master",
+      "rol": [1]
+    }
+  },
+  {
+    "model": "usuarios.permisosistema",
+    "pk": 3,
+    "fields": {
+      "nombre": "sys_crearrolsistema",
+      "descripcion": "Crear Rol del sistema",
+      "rol": [1]
+    }
+  },
+  {
+    "model": "usuarios.permisosistema",
+    "pk": 4,
+    "fields": {
+      "nombre": "sys_importarusuarios",
+      "descripcion": "Importar usuarios atravez de SSO y elegir su rol o permisos",
+      "rol": [1]
+    }
+  },
+  {
+    "model": "usuarios.permisosistema",
+    "pk": 5,
+    "fields": {
+      "nombre": "sys_eliminarUsuarios",
+      "descripcion": "Eliminar usuario",
+      "rol": [1]
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 1,
+    "fields": {
+      "fecha": "2022-11-04T03:25:52.454Z",
+      "usuario": 2,
+      "descripcion": "",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 2,
+    "fields": {
+      "fecha": "2022-11-04T03:26:06.526Z",
+      "usuario": 1,
+      "descripcion": "",
+      "leido": false
+    }
+  },
+  {
+    "model": "proyectos.proyecto",
+    "pk": 1,
+    "fields": {
+      "nombre": "Proyecto 1",
+      "descripcion": "Proyecto 1",
+      "fecha_creacion": "2022-11-04T03:25:16.115Z",
+      "fecha_modificacion": "2022-11-04T03:31:44.644Z",
+      "scrumMaster": 1,
+      "estado": "Planificación",
+      "minimo_dias_sprint": 15,
+      "maximo_dias_sprint": 30,
+      "usuario": [1, 2]
+    }
+  },
+  {
+    "model": "proyectos.proyecto",
+    "pk": 2,
+    "fields": {
+      "nombre": "Proyecto 2",
+      "descripcion": "Proyecto 2",
+      "fecha_creacion": "2022-11-04T03:25:37.575Z",
+      "fecha_modificacion": "2022-11-04T03:37:36.767Z",
+      "scrumMaster": 2,
+      "estado": "Planificación",
+      "minimo_dias_sprint": 15,
+      "maximo_dias_sprint": 30,
+      "usuario": [2, 1]
+    }
+  },
+  {
+    "model": "proyectos.proyecto",
+    "pk": 3,
+    "fields": {
+      "nombre": "Proyecto 3",
+      "descripcion": "Proyecto 3",
+      "fecha_creacion": "2022-11-04T03:25:44.090Z",
+      "fecha_modificacion": "2022-11-04T03:25:44.090Z",
+      "scrumMaster": 1,
+      "estado": "Planificacion",
+      "minimo_dias_sprint": 15,
+      "maximo_dias_sprint": 30,
+      "usuario": [1]
+    }
+  },
+  {
+    "model": "proyectos.archivoburndown",
+    "pk": 1,
+    "fields": {
+      "nombre": "bdChart_2_2",
+      "fecha_subida": "2022-11-04T03:37:44.510Z",
+      "archivo": "app/staticfiles/bdChart_2_2_LnkHbYf.png"
+    }
+  },
+  {
+    "model": "proyectos.archivovelocity",
+    "pk": 1,
+    "fields": {
+      "nombre": "velocityChart_2",
+      "fecha_subida": "2022-11-04T03:37:53.888Z",
+      "proyecto": 2,
+      "archivo": "app/staticfiles/velocityChart_Proyecto_22.png"
+    }
+  },
+  {
+    "model": "proyectos.sprint",
+    "pk": 1,
+    "fields": {
+      "fecha_inicio": "2022-11-04T03:29:02.292Z",
+      "fecha_fin": "2022-11-04T03:31:44.639Z",
+      "proyecto": 1,
+      "estado": "Terminado",
+      "duracion": 15,
+      "nombre": "Sprint 1",
+      "descripcion": "Sprint 1",
+      "burndownChart": null
+    }
+  },
+  {
+    "model": "proyectos.sprint",
+    "pk": 2,
+    "fields": {
+      "fecha_inicio": "2022-11-04T03:36:09.831Z",
+      "fecha_fin": "2022-11-04T03:37:36.728Z",
+      "proyecto": 2,
+      "estado": "Terminado",
+      "duracion": 15,
+      "nombre": "Sprint proyecto 2",
+      "descripcion": "Sprint proyecto 2",
+      "burndownChart": 1
+    }
+  },
+  {
+    "model": "proyectos.sprint",
+    "pk": 3,
+    "fields": {
+      "fecha_inicio": null,
+      "fecha_fin": null,
+      "proyecto": 2,
+      "estado": "Planificado",
+      "duracion": 15,
+      "nombre": "Sprint 2 en proyecto 2",
+      "descripcion": "Sprint 2 en proyecto 2",
+      "burndownChart": null
+    }
+  },
+  {
+    "model": "proyectos.sprint",
+    "pk": 4,
+    "fields": {
+      "fecha_inicio": null,
+      "fecha_fin": null,
+      "proyecto": 1,
+      "estado": "Planificado",
+      "duracion": 15,
+      "nombre": "Sprint 2",
+      "descripcion": "Sprint 2",
+      "burndownChart": null
+    }
+  },
+  {
+    "model": "proyectos.usuariotiempoensprint",
+    "pk": 1,
+    "fields": { "sprint": 1, "usuario": 2, "horas": 6 }
+  },
+  {
+    "model": "proyectos.usuariotiempoensprint",
+    "pk": 2,
+    "fields": { "sprint": 1, "usuario": 1, "horas": 6 }
+  },
+  {
+    "model": "proyectos.usuariotiempoensprint",
+    "pk": 3,
+    "fields": { "sprint": 2, "usuario": 2, "horas": 6 }
+  },
+  {
+    "model": "proyectos.usuariotiempoensprint",
+    "pk": 4,
+    "fields": { "sprint": 2, "usuario": 1, "horas": 6 }
+  },
+  {
+    "model": "proyectos.usuariotiempoensprint",
+    "pk": 5,
+    "fields": { "sprint": 3, "usuario": 2, "horas": 6 }
+  },
+  {
+    "model": "proyectos.usuariotiempoensprint",
+    "pk": 6,
+    "fields": { "sprint": 3, "usuario": 1, "horas": 6 }
+  },
+  {
+    "model": "proyectos.usuariotiempoensprint",
+    "pk": 7,
+    "fields": { "sprint": 4, "usuario": 2, "horas": 6 }
+  },
+  {
+    "model": "proyectos.usuariotiempoensprint",
+    "pk": 8,
+    "fields": { "sprint": 4, "usuario": 1, "horas": 6 }
+  },
+  {
+    "model": "proyectos.feriado",
+    "pk": 1,
+    "fields": {
+      "proyecto": 1,
+      "descripcion": "Feriado 1",
+      "fecha": "2022-11-09T03:00:00Z"
+    }
+  },
+  {
+    "model": "proyectos.feriado",
+    "pk": 2,
+    "fields": {
+      "proyecto": 1,
+      "descripcion": "Feriado 2",
+      "fecha": "2022-11-11T03:00:00Z"
+    }
+  },
+  {
+    "model": "historias_usuario.tipohistoriaususario",
+    "pk": 1,
+    "fields": {
+      "nombre": "Default",
+      "descripcion": "Tipo de historia de usuario por defecto en el sistema",
+      "proyecto": null
+    }
+  },
+  {
+    "model": "historias_usuario.tipohistoriaususario",
+    "pk": 2,
+    "fields": {
+      "nombre": "Default",
+      "descripcion": "Tipo de historia de usuario por defecto en el sistema",
+      "proyecto": 1
+    }
+  },
+  {
+    "model": "historias_usuario.tipohistoriaususario",
+    "pk": 3,
+    "fields": {
+      "nombre": "Default",
+      "descripcion": "Tipo de historia de usuario por defecto en el sistema",
+      "proyecto": 2
+    }
+  },
+  {
+    "model": "historias_usuario.tipohistoriaususario",
+    "pk": 4,
+    "fields": {
+      "nombre": "Default",
+      "descripcion": "Tipo de historia de usuario por defecto en el sistema",
+      "proyecto": 3
+    }
+  },
+  {
+    "model": "historias_usuario.tipohistoriaususario",
+    "pk": 5,
+    "fields": { "nombre": "Tipo ABC", "descripcion": "Tipo ABC", "proyecto": 1 }
+  },
+  {
+    "model": "historias_usuario.tipohistoriaususario",
+    "pk": 6,
+    "fields": { "nombre": "Tipo ABC", "descripcion": "Tipo ABC", "proyecto": 2 }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 1,
+    "fields": {
+      "nombre": "TO DO",
+      "descripcion": "TO DO",
+      "orden": 0,
+      "TipoHistoriaUsusario": 1
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 4,
+    "fields": {
+      "nombre": "DOING",
+      "descripcion": "DOING",
+      "orden": 1,
+      "TipoHistoriaUsusario": 1
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 5,
+    "fields": {
+      "nombre": "DONE",
+      "descripcion": "DONE",
+      "orden": 2,
+      "TipoHistoriaUsusario": 1
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 6,
+    "fields": {
+      "nombre": "TO DO",
+      "descripcion": "TO DO",
+      "orden": 0,
+      "TipoHistoriaUsusario": 2
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 7,
+    "fields": {
+      "nombre": "DOING",
+      "descripcion": "DOING",
+      "orden": 1,
+      "TipoHistoriaUsusario": 2
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 8,
+    "fields": {
+      "nombre": "DONE",
+      "descripcion": "DONE",
+      "orden": 2,
+      "TipoHistoriaUsusario": 2
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 9,
+    "fields": {
+      "nombre": "TO DO",
+      "descripcion": "TO DO",
+      "orden": 0,
+      "TipoHistoriaUsusario": 3
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 10,
+    "fields": {
+      "nombre": "DOING",
+      "descripcion": "DOING",
+      "orden": 1,
+      "TipoHistoriaUsusario": 3
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 11,
+    "fields": {
+      "nombre": "DONE",
+      "descripcion": "DONE",
+      "orden": 2,
+      "TipoHistoriaUsusario": 3
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 12,
+    "fields": {
+      "nombre": "TO DO",
+      "descripcion": "TO DO",
+      "orden": 0,
+      "TipoHistoriaUsusario": 4
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 13,
+    "fields": {
+      "nombre": "DOING",
+      "descripcion": "DOING",
+      "orden": 1,
+      "TipoHistoriaUsusario": 4
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 14,
+    "fields": {
+      "nombre": "DONE",
+      "descripcion": "DONE",
+      "orden": 2,
+      "TipoHistoriaUsusario": 4
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 15,
+    "fields": {
+      "nombre": "Etapa A",
+      "descripcion": "",
+      "orden": 0,
+      "TipoHistoriaUsusario": 5
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 16,
+    "fields": {
+      "nombre": "Etapa B",
+      "descripcion": "",
+      "orden": 1,
+      "TipoHistoriaUsusario": 5
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 17,
+    "fields": {
+      "nombre": "Etapa C",
+      "descripcion": "",
+      "orden": 2,
+      "TipoHistoriaUsusario": 5
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 18,
+    "fields": {
+      "nombre": "Etapa A",
+      "descripcion": "",
+      "orden": 0,
+      "TipoHistoriaUsusario": 6
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 19,
+    "fields": {
+      "nombre": "Etapa B",
+      "descripcion": "",
+      "orden": 1,
+      "TipoHistoriaUsusario": 6
+    }
+  },
+  {
+    "model": "historias_usuario.etapahistoriausuario",
+    "pk": 20,
+    "fields": {
+      "nombre": "Etapa C",
+      "descripcion": "",
+      "orden": 2,
+      "TipoHistoriaUsusario": 6
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 1,
+    "fields": {
+      "nombre": "US para cancelar",
+      "descripcion": "US para cancelar",
+      "fecha_creacion": "2022-11-04T03:27:26.010Z",
+      "fecha_modificacion": "2022-11-04T03:27:28.610Z",
+      "sprint": null,
+      "etapa": null,
+      "tipo": 2,
+      "versionPrevia": null,
+      "up": 1,
+      "bv": 1,
+      "usuarioAsignado": null,
+      "horasAsignadas": 0,
+      "proyecto": 1,
+      "estado": "C",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 2,
+    "fields": {
+      "nombre": "US 1",
+      "descripcion": "US 1",
+      "fecha_creacion": "2022-11-04T03:31:26.848Z",
+      "fecha_modificacion": "2022-11-04T03:31:26.854Z",
+      "sprint": 1,
+      "etapa": 8,
+      "tipo": 2,
+      "versionPrevia": 12,
+      "up": 50,
+      "bv": 50,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
+      "proyecto": 1,
+      "estado": "T",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 3,
+    "fields": {
+      "nombre": "US 2",
+      "descripcion": "US 2",
+      "fecha_creacion": "2022-11-04T03:31:08.624Z",
+      "fecha_modificacion": "2022-11-04T03:31:08.629Z",
+      "sprint": 1,
+      "etapa": 8,
+      "tipo": 2,
+      "versionPrevia": 11,
+      "up": 25,
+      "bv": 75,
+      "usuarioAsignado": 1,
+      "horasAsignadas": 90,
+      "proyecto": 1,
+      "estado": "T",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 4,
+    "fields": {
+      "nombre": "US 3",
+      "descripcion": "US 3",
+      "fecha_creacion": "2022-11-04T03:31:41.362Z",
+      "fecha_modificacion": "2022-11-04T03:31:41.368Z",
+      "sprint": 1,
+      "etapa": 8,
+      "tipo": 2,
+      "versionPrevia": 13,
+      "up": 75,
+      "bv": 25,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
+      "proyecto": 1,
+      "estado": "T",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 5,
+    "fields": {
+      "nombre": "US 2",
+      "descripcion": "US 2",
+      "fecha_creacion": "2022-11-04T03:27:44.912Z",
+      "fecha_modificacion": "2022-11-04T03:29:21.166Z",
+      "sprint": 1,
+      "etapa": 6,
+      "tipo": 2,
+      "versionPrevia": null,
+      "up": 25,
+      "bv": 75,
+      "usuarioAsignado": 1,
+      "horasAsignadas": 90,
+      "proyecto": 1,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 6,
+    "fields": {
+      "nombre": "US 1",
+      "descripcion": "US 1",
+      "fecha_creacion": "2022-11-04T03:27:37.654Z",
+      "fecha_modificacion": "2022-11-04T03:29:30.466Z",
+      "sprint": 1,
+      "etapa": 6,
+      "tipo": 2,
+      "versionPrevia": null,
+      "up": 50,
+      "bv": 50,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
+      "proyecto": 1,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 7,
+    "fields": {
+      "nombre": "US 3",
+      "descripcion": "US 3",
+      "fecha_creacion": "2022-11-04T03:27:54.033Z",
+      "fecha_modificacion": "2022-11-04T03:29:39.343Z",
+      "sprint": 1,
+      "etapa": 6,
+      "tipo": 2,
+      "versionPrevia": null,
+      "up": 75,
+      "bv": 25,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
+      "proyecto": 1,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 8,
+    "fields": {
+      "nombre": "US 2",
+      "descripcion": "US 2",
+      "fecha_creacion": "2022-11-04T03:29:21.174Z",
+      "fecha_modificacion": "2022-11-04T03:29:56.994Z",
+      "sprint": 1,
+      "etapa": 7,
+      "tipo": 2,
+      "versionPrevia": 5,
+      "up": 25,
+      "bv": 75,
+      "usuarioAsignado": 1,
+      "horasAsignadas": 90,
+      "proyecto": 1,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 9,
+    "fields": {
+      "nombre": "US 1",
+      "descripcion": "US 1",
+      "fecha_creacion": "2022-11-04T03:29:30.474Z",
+      "fecha_modificacion": "2022-11-04T03:30:31.309Z",
+      "sprint": 1,
+      "etapa": 7,
+      "tipo": 2,
+      "versionPrevia": 6,
+      "up": 50,
+      "bv": 50,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
+      "proyecto": 1,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 10,
+    "fields": {
+      "nombre": "US 3",
+      "descripcion": "US 3",
+      "fecha_creacion": "2022-11-04T03:29:39.351Z",
+      "fecha_modificacion": "2022-11-04T03:30:44.234Z",
+      "sprint": 1,
+      "etapa": 7,
+      "tipo": 2,
+      "versionPrevia": 7,
+      "up": 75,
+      "bv": 25,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
+      "proyecto": 1,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 11,
+    "fields": {
+      "nombre": "US 2",
+      "descripcion": "US 2",
+      "fecha_creacion": "2022-11-04T03:29:57.002Z",
+      "fecha_modificacion": "2022-11-04T03:31:08.615Z",
+      "sprint": 1,
+      "etapa": 8,
+      "tipo": 2,
+      "versionPrevia": 8,
+      "up": 25,
+      "bv": 75,
+      "usuarioAsignado": 1,
+      "horasAsignadas": 90,
+      "proyecto": 1,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 12,
+    "fields": {
+      "nombre": "US 1",
+      "descripcion": "US 1",
+      "fecha_creacion": "2022-11-04T03:30:31.316Z",
+      "fecha_modificacion": "2022-11-04T03:31:26.841Z",
+      "sprint": 1,
+      "etapa": 8,
+      "tipo": 2,
+      "versionPrevia": 9,
+      "up": 50,
+      "bv": 50,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
+      "proyecto": 1,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 13,
+    "fields": {
+      "nombre": "US 3",
+      "descripcion": "US 3",
+      "fecha_creacion": "2022-11-04T03:30:44.242Z",
+      "fecha_modificacion": "2022-11-04T03:31:41.355Z",
+      "sprint": 1,
+      "etapa": 8,
+      "tipo": 2,
+      "versionPrevia": 10,
+      "up": 75,
+      "bv": 25,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
+      "proyecto": 1,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 14,
+    "fields": {
+      "nombre": "US 4",
+      "descripcion": "US 4",
+      "fecha_creacion": "2022-11-04T03:36:39.581Z",
+      "fecha_modificacion": "2022-11-04T03:38:50.654Z",
+      "sprint": 3,
+      "etapa": 10,
+      "tipo": 3,
+      "versionPrevia": 18,
+      "up": 50,
+      "bv": 50,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 30,
+      "proyecto": 2,
+      "estado": "A",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 15,
+    "fields": {
+      "nombre": "US 5",
+      "descripcion": "US 5",
+      "fecha_creacion": "2022-11-04T03:37:32.398Z",
+      "fecha_modificacion": "2022-11-04T03:38:50.651Z",
+      "sprint": 3,
+      "etapa": 11,
+      "tipo": 3,
+      "versionPrevia": 20,
+      "up": 25,
+      "bv": 75,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 20,
+      "proyecto": 2,
+      "estado": "A",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 16,
+    "fields": {
+      "nombre": "US 6",
+      "descripcion": "US 6",
+      "fecha_creacion": "2022-11-04T03:36:51.980Z",
+      "fecha_modificacion": "2022-11-04T03:38:50.657Z",
+      "sprint": 3,
+      "etapa": 10,
+      "tipo": 3,
+      "versionPrevia": 19,
+      "up": 75,
+      "bv": 25,
+      "usuarioAsignado": 1,
+      "horasAsignadas": 20,
+      "proyecto": 2,
+      "estado": "A",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 17,
+    "fields": {
+      "nombre": "US 5",
+      "descripcion": "US 5",
+      "fecha_creacion": "2022-11-04T03:34:58.875Z",
+      "fecha_modificacion": "2022-11-04T03:36:25.800Z",
+      "sprint": 2,
+      "etapa": 9,
+      "tipo": 3,
+      "versionPrevia": null,
+      "up": 25,
+      "bv": 75,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 90,
+      "proyecto": 2,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 18,
+    "fields": {
+      "nombre": "US 4",
+      "descripcion": "US 4",
+      "fecha_creacion": "2022-11-04T03:33:13.508Z",
+      "fecha_modificacion": "2022-11-04T03:36:39.567Z",
+      "sprint": 2,
+      "etapa": 9,
+      "tipo": 3,
+      "versionPrevia": null,
+      "up": 50,
+      "bv": 50,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 60,
+      "proyecto": 2,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 19,
+    "fields": {
+      "nombre": "US 6",
+      "descripcion": "US 6",
+      "fecha_creacion": "2022-11-04T03:35:12.308Z",
+      "fecha_modificacion": "2022-11-04T03:36:51.968Z",
+      "sprint": 2,
+      "etapa": 9,
+      "tipo": 3,
+      "versionPrevia": null,
+      "up": 75,
+      "bv": 25,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 30,
+      "proyecto": 2,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 20,
+    "fields": {
+      "nombre": "US 5",
+      "descripcion": "US 5",
+      "fecha_creacion": "2022-11-04T03:36:25.812Z",
+      "fecha_modificacion": "2022-11-04T03:37:32.386Z",
+      "sprint": 2,
+      "etapa": 10,
+      "tipo": 3,
+      "versionPrevia": 17,
+      "up": 25,
+      "bv": 75,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 90,
+      "proyecto": 2,
+      "estado": "H",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 21,
+    "fields": {
+      "nombre": "US 4",
+      "descripcion": "US 4",
+      "fecha_creacion": "2022-11-04T03:36:39.581Z",
+      "fecha_modificacion": "2022-11-04T03:37:36.740Z",
+      "sprint": 2,
+      "etapa": 10,
+      "tipo": 3,
+      "versionPrevia": 18,
+      "up": 50,
+      "bv": 50,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 60,
+      "proyecto": 2,
+      "estado": "S",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 22,
+    "fields": {
+      "nombre": "US 6",
+      "descripcion": "US 6",
+      "fecha_creacion": "2022-11-04T03:36:51.980Z",
+      "fecha_modificacion": "2022-11-04T03:37:36.752Z",
+      "sprint": 2,
+      "etapa": 10,
+      "tipo": 3,
+      "versionPrevia": 19,
+      "up": 75,
+      "bv": 25,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 30,
+      "proyecto": 2,
+      "estado": "S",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 23,
+    "fields": {
+      "nombre": "US 5",
+      "descripcion": "US 5",
+      "fecha_creacion": "2022-11-04T03:37:32.398Z",
+      "fecha_modificacion": "2022-11-04T03:37:36.761Z",
+      "sprint": 2,
+      "etapa": 11,
+      "tipo": 3,
+      "versionPrevia": 20,
+      "up": 25,
+      "bv": 75,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 90,
+      "proyecto": 2,
+      "estado": "S",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 24,
+    "fields": {
+      "nombre": "US 100",
+      "descripcion": "US 100",
+      "fecha_creacion": "2022-11-04T03:39:44.839Z",
+      "fecha_modificacion": "2022-11-04T03:39:44.873Z",
+      "sprint": null,
+      "etapa": null,
+      "tipo": 4,
+      "versionPrevia": null,
+      "up": 50,
+      "bv": 50,
+      "usuarioAsignado": null,
+      "horasAsignadas": 0,
+      "proyecto": 3,
+      "estado": "A",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 25,
+    "fields": {
+      "nombre": "US 101",
+      "descripcion": "US 101",
+      "fecha_creacion": "2022-11-04T03:39:54.542Z",
+      "fecha_modificacion": "2022-11-04T03:39:54.548Z",
+      "sprint": null,
+      "etapa": null,
+      "tipo": 4,
+      "versionPrevia": null,
+      "up": 25,
+      "bv": 75,
+      "usuarioAsignado": null,
+      "horasAsignadas": 0,
+      "proyecto": 3,
+      "estado": "A",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.historiausuario",
+    "pk": 26,
+    "fields": {
+      "nombre": "US 102",
+      "descripcion": "US 102",
+      "fecha_creacion": "2022-11-04T03:40:13.959Z",
+      "fecha_modificacion": "2022-11-04T03:40:13.990Z",
+      "sprint": null,
+      "etapa": null,
+      "tipo": 4,
+      "versionPrevia": null,
+      "up": 75,
+      "bv": 25,
+      "usuarioAsignado": null,
+      "horasAsignadas": 0,
+      "proyecto": 3,
+      "estado": "A",
+      "archivos": []
+    }
+  },
+  {
+    "model": "historias_usuario.sprintinfo",
+    "pk": 1,
+    "fields": {
+      "versionEnHistorial": 21,
+      "historia": 14,
+      "sprint": 2,
+      "fechaCreacion": "2022-11-04T03:37:36.745Z",
+      "horasAsignadas": 60,
+      "horasUsadas": 30
+    }
+  },
+  {
+    "model": "historias_usuario.sprintinfo",
+    "pk": 2,
+    "fields": {
+      "versionEnHistorial": 22,
+      "historia": 16,
+      "sprint": 2,
+      "fechaCreacion": "2022-11-04T03:37:36.757Z",
+      "horasAsignadas": 30,
+      "horasUsadas": 10
+    }
+  },
+  {
+    "model": "historias_usuario.sprintinfo",
+    "pk": 3,
+    "fields": {
+      "versionEnHistorial": 23,
+      "historia": 15,
+      "sprint": 2,
+      "fechaCreacion": "2022-11-04T03:37:36.764Z",
+      "horasAsignadas": 90,
+      "horasUsadas": 70
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 1,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 3,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "Trabajo 1",
+      "etapa": 6,
+      "horas": 30,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 2,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 2,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "Trabajo 2",
+      "etapa": 6,
+      "horas": 30,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 3,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 4,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "Trabajo 3",
+      "etapa": 6,
+      "horas": 30,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 4,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 3,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "Trabajo 4",
+      "etapa": 7,
+      "horas": 30,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 5,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 2,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "Trabajo 5",
+      "etapa": 7,
+      "horas": 30,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 6,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 4,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "Trabajo 6",
+      "etapa": 7,
+      "horas": 30,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 7,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 3,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "Finalización del US 2",
+      "etapa": 8,
+      "horas": 30,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 8,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 2,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "Finalizacion de US 1",
+      "etapa": 8,
+      "horas": 1,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 9,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 4,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "Finalizacion de US 3",
+      "etapa": 8,
+      "horas": 1,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 10,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 15,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "Trabajo 1 en US 5",
+      "etapa": 9,
+      "horas": 30,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 11,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 14,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "Trabajo 2 en US 4",
+      "etapa": 9,
+      "horas": 30,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 12,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 16,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "Trabajo 3 en US 6",
+      "etapa": 9,
+      "horas": 10,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 13,
+    "fields": {
+      "fecha": "2022-11-04",
+      "historia": 15,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "Trabajo 3 en US 5",
+      "etapa": 10,
+      "horas": 40,
+      "considerado": false
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "email": "jlgutierrez2000@hotmail.com",
+      "verified": false,
+      "primary": true
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "email": "dummygpais2test@gmail.com",
+      "verified": false,
+      "primary": true
+    }
+  },
+  {
+    "model": "socialaccount.socialaccount",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "provider": "github",
+      "uid": "46907456",
+      "last_login": "2022-11-04T03:24:41.967Z",
+      "date_joined": "2022-11-04T03:24:41.967Z",
+      "extra_data": "{\"login\": \"jg2kpy\", \"id\": 46907456, \"node_id\": \"MDQ6VXNlcjQ2OTA3NDU2\", \"avatar_url\": \"https://avatars.githubusercontent.com/u/46907456?v=4\", \"gravatar_id\": \"\", \"url\": \"https://api.github.com/users/jg2kpy\", \"html_url\": \"https://github.com/jg2kpy\", \"followers_url\": \"https://api.github.com/users/jg2kpy/followers\", \"following_url\": \"https://api.github.com/users/jg2kpy/following{/other_user}\", \"gists_url\": \"https://api.github.com/users/jg2kpy/gists{/gist_id}\", \"starred_url\": \"https://api.github.com/users/jg2kpy/starred{/owner}{/repo}\", \"subscriptions_url\": \"https://api.github.com/users/jg2kpy/subscriptions\", \"organizations_url\": \"https://api.github.com/users/jg2kpy/orgs\", \"repos_url\": \"https://api.github.com/users/jg2kpy/repos\", \"events_url\": \"https://api.github.com/users/jg2kpy/events{/privacy}\", \"received_events_url\": \"https://api.github.com/users/jg2kpy/received_events\", \"type\": \"User\", \"site_admin\": false, \"name\": \"Jos\\u00e9 Luis Junior Guti\\u00e9rrez Ag\\u00fcero\", \"company\": \"Facultad Polit\\u00e9cnica - Universidad Nacional de Asunci\\u00f3n\", \"blog\": \"https://juniorgutierrez.com/\", \"location\": \"Asunci\\u00f3n, Paraguay\", \"email\": \"jlgutierrez2000@hotmail.com\", \"hireable\": null, \"bio\": \"Computer Science & Engineering student\", \"twitter_username\": \"jg2kpy\", \"public_repos\": 16, \"public_gists\": 0, \"followers\": 22, \"following\": 45, \"created_at\": \"2019-01-21T21:56:19Z\", \"updated_at\": \"2022-11-01T12:32:31Z\"}"
+    }
+  },
+  {
+    "model": "socialaccount.socialaccount",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "provider": "github",
+      "uid": "113201839",
+      "last_login": "2022-11-04T03:25:25.190Z",
+      "date_joined": "2022-11-04T03:25:25.190Z",
+      "extra_data": "{\"login\": \"17gpais2test\", \"id\": 113201839, \"node_id\": \"U_kgDOBr9Srw\", \"avatar_url\": \"https://avatars.githubusercontent.com/u/113201839?v=4\", \"gravatar_id\": \"\", \"url\": \"https://api.github.com/users/17gpais2test\", \"html_url\": \"https://github.com/17gpais2test\", \"followers_url\": \"https://api.github.com/users/17gpais2test/followers\", \"following_url\": \"https://api.github.com/users/17gpais2test/following{/other_user}\", \"gists_url\": \"https://api.github.com/users/17gpais2test/gists{/gist_id}\", \"starred_url\": \"https://api.github.com/users/17gpais2test/starred{/owner}{/repo}\", \"subscriptions_url\": \"https://api.github.com/users/17gpais2test/subscriptions\", \"organizations_url\": \"https://api.github.com/users/17gpais2test/orgs\", \"repos_url\": \"https://api.github.com/users/17gpais2test/repos\", \"events_url\": \"https://api.github.com/users/17gpais2test/events{/privacy}\", \"received_events_url\": \"https://api.github.com/users/17gpais2test/received_events\", \"type\": \"User\", \"site_admin\": false, \"name\": \"Cuenta Secundaria\", \"company\": null, \"blog\": \"\", \"location\": null, \"email\": \"dummygpais2test@gmail.com\", \"hireable\": null, \"bio\": null, \"twitter_username\": null, \"public_repos\": 0, \"public_gists\": 0, \"followers\": 0, \"following\": 0, \"created_at\": \"2022-09-09T17:01:19Z\", \"updated_at\": \"2022-11-03T01:18:42Z\"}"
+    }
+  }
+]
