@@ -76,7 +76,24 @@ def notificaciones(request):
             notifNoLeida.leido = False
             notifNoLeida.save()
 
-    notifLeido = Notificacion.objects.filter(usuario=request.user, leido=True)
-    notifNoLeido = Notificacion.objects.filter(usuario=request.user, leido=False)
+    notifLeido = Notificacion.objects.filter(usuario=request.user, leido=True).order_by('-fecha')
+    notifNoLeido = Notificacion.objects.filter(usuario=request.user, leido=False).order_by('-fecha')
     
     return render(request, 'notificaciones/notificaciones.html', {'notifLeido' : notifLeido, 'notifNoLeido': notifNoLeido}, status=200)
+
+
+def crearNotificacion(usuario, descripcion):
+    """
+    Crea una notificación con el usuario y la descripción
+
+    :param usuario: Usuario a recibir la notificación
+    :type usuario: Usuario
+    
+    :param descripcion: Descripción de la notificación
+    :type descripcion: str
+    """
+
+    nuevaNotif = Notificacion()
+    nuevaNotif.usuario = usuario
+    nuevaNotif.descripcion = descripcion
+    nuevaNotif.save()

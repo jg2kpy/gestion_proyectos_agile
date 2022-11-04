@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
 import pytz
+from gestion_proyectos_agile.views import crearNotificacion
 
 from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, SprintInfo, TipoHistoriaUsusario
 import numpy as np
@@ -311,6 +312,15 @@ def cancelar_proyecto(request, proyecto_id):
             if form.cleaned_data['nombre'] == proyecto.nombre:
                 proyecto.estado = 'Cancelado'
                 proyecto.save()
+
+                usuariosProyecto = Usuario.objects.filter(equipo__id=proyecto.id)
+            
+                for usuario in usuariosProyecto:
+                    crearNotificacion(
+                        usuario,
+                        f"El proyecto {proyecto.nombre} pasa a estado Cancelado"
+                    )
+
                 return redirect('proyectos')
             else:
                 return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()}, status=422)
@@ -772,8 +782,14 @@ def crear_sprint(request, proyecto_id):
             if request.POST.get('historia_seleccionado_'+str(historia.id)):
                 historia.sprint = sprint
                 historia.horasAsignadas = request.POST.get('historia_horas_'+str(historia.id))
-                historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
+                historia.usuarioAsignado = Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
                 historia.save()
+            
+            if historia.usuarioAsignado:
+                crearNotificacion(
+                    historia.usuarioAsignado,
+                    f"Se le ha asignado la historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre}"
+                )
         
         for usuario in proyecto.usuario.all():
             horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
@@ -783,6 +799,7 @@ def crear_sprint(request, proyecto_id):
                 tiempoSprint.usuario = usuario
                 tiempoSprint.horas = horas
                 tiempoSprint.save()
+                
 
         return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
 
@@ -989,6 +1006,13 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
                 historia.horasAsignadas = request.POST.get('historia_horas_'+str(historia.id))
                 historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
                 historia.save()
+
+                if historia.usuarioAsignado:
+                    crearNotificacion(
+                        historia.usuarioAsignado,
+                        f"Se le ha asignado la historia {historia.nombre} perteneciente al sprint {historia.sprint} dentro del proyecto {proyecto.nombre} dentro del proyecto {historia.proyecto.nombre}"
+                    )
+
         return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
 
     return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
@@ -1028,18 +1052,46 @@ def reasignar_us(request, proyecto_id, historia_id):
     status = 200
     error = None
     if request.method == 'POST':
+
+        if historia.usuarioAsignado:
+            crearNotificacion(
+                historia.usuarioAsignado,
+                f"Usted ha sido desasignado de la historia de usuario {historia.nombre} perteneciente al proyecto {historia.proyecto.nombre}"
+            )
+
         historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
         historia.save()
+
+        crearNotificacion(
+            historia.usuarioAsignado,
+            f"Usted ha sido asignado a la historia de usuario {historia.nombre} perteneciente al proyecto {historia.proyecto.nombre}"
+        )
+
         return redirect('backlog_sprint', proyecto.id, historia.sprint.id)
 
     return render(request, 'sprints/reasignar_historia.html', {'proyecto': proyecto, 'historia': historia, 'error': error}, status=status)
 
 
 def calcularHorasDiarias(sprint, cantDiasSprint, fechaInicial, feriados):
+    """
+    Permite calcular las horas diarias que tiene realizado un sprint
+
+    :param sprint: Sprint a querer analizar
+    :type sprint: Sprint
+
+    :param cantDiasSprint: Cantidad de días que posee el sprint
+    :type cantDiasSprint: int
+
+    :param fechaInicial: Fecha inicial del sprint
+    :type fechaInicial: datetime
+
+    :return: Retorna un array con las horas realizadas por día
+    :rtype: list[int]
+    """
     fechaActual = fechaInicial
     totalHorasDiario = []
     feriadosFecha = []
-
+    
     if feriados:
         for feriado in feriados:
             feriadosFecha.append(feriado.fecha.date())
@@ -1062,6 +1114,15 @@ def calcularHorasDiarias(sprint, cantDiasSprint, fechaInicial, feriados):
 
 
 def calcularHorasSprint(sprint):
+    """
+    Permite calcular las horas totales que posee el sprint
+
+    :param sprint: Sprint a querer analizar
+    :type sprint: Sprint
+
+    :return: Retorna el total que horas que posee un sprint
+    :rtype: int
+    """
     usList = HistoriaUsuario.objects.filter(sprint=sprint, estado__in=["S","T"])
     totalHoras = 0
 
@@ -1072,6 +1133,19 @@ def calcularHorasSprint(sprint):
 
 
 def generarGraficoBurndown(x, yTeorico, yReal):
+    """
+    Genera el gráfico Burndown
+
+    :param x: Lista de valores enteros para el eje x
+    :type x: list[int]
+
+    :param yTeorico: Lista de valores enteros para el eje y del valor teórico
+    :type yTeorico: list[int]
+
+    :param yReal: Lista de valores enteros para el eje y del valor real
+    :type yReal: list[int]
+    """
+
     fig, ax = plt.subplots()
     ax.set_xlabel("Días")
     ax.set_ylabel("Horas")
@@ -1082,6 +1156,13 @@ def generarGraficoBurndown(x, yTeorico, yReal):
     
 
 def generarBurndownChart(sprintId):
+    """
+    Calcula los datos necesarios para el gráfico Burndown y genera el gráfico
+
+    :param sprintId: Id del sprint a querer crear el gráfico
+    :type sprintId: int
+    """
+
     if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
         return
 
@@ -1129,6 +1210,13 @@ def generarBurndownChart(sprintId):
 
 
 def generarVelocityChart(proyectoId):
+    """
+    Calcula los datos necesarios para el gráfico Velocity y genera el gráfico
+
+    :param proyectoId: Id del proyecto a querer crear el gráfico
+    :type proyectoId: int
+    """
+
     velChart = None
     if ArchivoVelocity.objects.filter(proyecto__id=proyectoId).exists():
         velChart = ArchivoVelocity.objects.get(proyecto__id=proyectoId)
@@ -1170,6 +1258,19 @@ def generarVelocityChart(proyectoId):
 
 
 def generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList):
+    """
+    Genera el gráfico Velocity
+
+    :param horasTotalSprintList: Lista de valores enteros con el total de horas a completar por sprint
+    :type horasTotalSprintList: list[int]
+
+    :param horasUsSprintList: Lista de valores enteros con el total de horas completados por sprint
+    :type horasUsSprintList: list[int]
+
+    :param sprintNombreList: Lista de valores con los nombres de los sprints
+    :type sprintNombreList: list[int]
+    """
+
     cantBarras = len(horasTotalSprintList)
     barraIzq = horasTotalSprintList
     barrDer = horasUsSprintList
@@ -1200,6 +1301,7 @@ def descargarReporte(request, id):
     :type id: int
     :rtype: HttpResponse
     """
+    
     if 'descargarBurndown' in request.POST:
         try:
             archivo = ArchivoBurndown.objects.get(sprint__id=id)
