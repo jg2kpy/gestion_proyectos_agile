@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
 import pytz
+from gestion_proyectos_agile.views import crearNotificacion
 
 from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, SprintInfo, TipoHistoriaUsusario
 import numpy as np
@@ -311,6 +312,15 @@ def cancelar_proyecto(request, proyecto_id):
             if form.cleaned_data['nombre'] == proyecto.nombre:
                 proyecto.estado = 'Cancelado'
                 proyecto.save()
+
+                usuariosProyecto = Usuario.objects.filter(equipo__id=proyecto.id)
+            
+                for usuario in usuariosProyecto:
+                    crearNotificacion(
+                        usuario,
+                        f"El proyecto {proyecto.nombre} pasa a estado Cancelado"
+                    )
+
                 return redirect('proyectos')
             else:
                 return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()}, status=422)
@@ -774,6 +784,11 @@ def crear_sprint(request, proyecto_id):
                 historia.horasAsignadas = request.POST.get('historia_horas_'+str(historia.id))
                 historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
                 historia.save()
+            
+            crearNotificacion(
+                historia.usuarioAsignado,
+                f"Se le ha asignado la historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre}"
+            )
         
         for usuario in proyecto.usuario.all():
             horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
@@ -783,6 +798,7 @@ def crear_sprint(request, proyecto_id):
                 tiempoSprint.usuario = usuario
                 tiempoSprint.horas = horas
                 tiempoSprint.save()
+                
 
         return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
 
@@ -989,6 +1005,12 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
                 historia.horasAsignadas = request.POST.get('historia_horas_'+str(historia.id))
                 historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
                 historia.save()
+
+                crearNotificacion(
+                    historia.usuarioAsignado,
+                    f"Se le ha asignado la historia {historia.nombre} perteneciente al sprint {historia.sprint} dentro del proyecto {proyecto.nombre} dentro del proyecto {historia.proyecto.nombre}"
+                )
+
         return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
 
     return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
@@ -1028,8 +1050,19 @@ def reasignar_us(request, proyecto_id, historia_id):
     status = 200
     error = None
     if request.method == 'POST':
+        crearNotificacion(
+            historia.usuarioAsignado,
+            f"Usted ha sido desasignado de la historia de usuario {historia.nombre} dentro del sprint {historia.sprint.nombre} perteneciente al proyecto {historia.proyecto.nombre}"
+        )
+
         historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
         historia.save()
+
+        crearNotificacion(
+            historia.usuarioAsignado,
+            f"Usted ha sido asignado a la historia de usuario {historia.nombre} dentro del sprint {historia.sprint.nombre} perteneciente al proyecto {historia.proyecto.nombre}"
+        )
+
         return redirect('backlog_sprint', proyecto.id, historia.sprint.id)
 
     return render(request, 'sprints/reasignar_historia.html', {'proyecto': proyecto, 'historia': historia, 'error': error}, status=status)
