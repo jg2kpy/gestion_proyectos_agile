@@ -228,6 +228,13 @@
                                 title="Editar historia">create</span></a>
                         {% endif %}
 
+                        {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
+                        {% if pro_crearTipoUS %}
+                        <a href="{% url 'reasignar_us' proyecto.id historia.id %}" class="btn btn-link"><span
+                                class="material-icons" data-toggle="tooltip" data-placement="top"
+                                title="Reasignar historia">people</span></a>
+                        {% endif %}
+
                         {% tiene_permiso_en_proyecto user 'pro_cancelarUS' proyecto as pro_cancelarUS %}
                         {% if pro_cancelarUS %}
                         <button type="button" data-toggle="tooltip" data-placement="top" title="Cancelar historia"

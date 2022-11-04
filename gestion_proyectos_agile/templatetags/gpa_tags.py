@@ -1,11 +1,8 @@
 from django import template
-<<<<<<< HEAD
 from historias_usuario.models import HistoriaUsuario, Tarea
 from usuarios.models import RolSistema, RolProyecto, Usuario
-=======
 from historias_usuario.models import HistoriaUsuario
 from usuarios.models import Notificacion, RolSistema, RolProyecto, Usuario
->>>>>>> feature/notificaciones-&-informe
 from proyectos.models import Proyecto, Sprint
 
 """
@@ -364,6 +361,7 @@ def restar(value, arg):
     """
     return value - arg
 
+@register.simple_tag
 def cantidad_notif_no_leido(usuario):
     """Funcion ver la cantidad de notificaciones no leídas
 
