@@ -23,4 +23,5 @@ urlpatterns = [
     path('<int:proyecto_id>/historial/<int:historia_id>/', restaurar_historia_historial, name='restaurar_historia_historial'),
     path('<int:proyecto_id>/tablero/<int:tipo_id>/', verTablero, name='verTablero'),
     path('<int:proyecto_id>/archivos/<int:historia_id>/', ver_archivos, name='ver_archivos'),
+    path('<int:proyecto_id>/tareas/<int:historia_id>/', tareas, name='tareas'),
 ]

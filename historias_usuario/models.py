@@ -260,6 +260,12 @@ class SprintInfo(models.Model):
     :type versionEnHistorial: HistoriaUsuario
     :param sprint: Sprint al que pertenece esta informacion.
     :type sprint: Sprint
+    :param horasAsignadas: Horas asignadas a la historia de usuario en el Sprint.
+    :type horasAsignadas: int
+    :param horasUsadas: Horas usadas en el Sprint.
+    :type horasUsadas: int
+    :param fechaCreacion: Fecha de creación de la información.
+    :type fechaCreacion: datetime
     :param historia: Historia de usuario a la que pertenece esta informacion.
     :type historia: HistoriaUsuario
     """
@@ -267,6 +273,9 @@ class SprintInfo(models.Model):
     versionEnHistorial = models.ForeignKey(HistoriaUsuario, on_delete=models.PROTECT)
     historia = models.ForeignKey(HistoriaUsuario, related_name='sprintInfo', on_delete=models.PROTECT)
     sprint = models.ForeignKey(Sprint, related_name="historiasInfo", on_delete=models.PROTECT)
+    fechaCreacion = models.DateTimeField(default=timezone.now)
+    horasAsignadas = models.IntegerField(blank=False, default=0, validators=[MinValueValidator(0)])
+    horasUsadas = models.IntegerField(blank=False, default=0, validators=[MinValueValidator(0)])
 
 class Comentario(models.Model):
     """
@@ -300,3 +309,32 @@ class SubirArchivo(models.Model):
     :type archivo: file
     """
     archivo = models.FileField(blank=True, null=True)
+
+class Tarea(models.Model):
+    """
+    Registra el trabajo realizado por un usuario en una historia de usuario.
+
+    :param historia: Historia de usuario a la que pertenece la tarea.
+    :type historia: HistoriaUsuario
+    :param usuario: Usuario que realizó la tarea.
+    :type usuario: Usuario
+    :param fecha: Fecha en la que se realizó la tarea.
+    :type fecha: datetime
+    :param descripcion: Descripción de la tarea realizada.
+    :type descripcion: str
+    :param horas: Horas que se trabajaron en la tarea.
+    :type horas: int
+    :param etapa: Etapa en la que se realizó la tarea.
+    :type etapa: Etapa
+    :param sprint: Sprint en el que se realizó la tarea.
+    :type sprint: Sprint
+    """
+
+    fecha = models.DateField(default=timezone.now)
+    historia = models.ForeignKey(HistoriaUsuario, related_name='tareas', on_delete=models.PROTECT)
+    sprint = models.ForeignKey(Sprint, related_name='tareas', on_delete=models.PROTECT)
+    usuario = models.ForeignKey('usuarios.Usuario', related_name='tareas', on_delete=models.PROTECT)
+    descripcion = models.TextField(blank=True, null=True)
+    etapa = models.ForeignKey(EtapaHistoriaUsuario, related_name='tareas', on_delete=models.PROTECT)
+    horas = models.IntegerField(default=0)
+    considerado = models.BooleanField(default=False)

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Editar historia de usuario{% endblock %}
+{% block contenido %}
+<div class="row">
+    <div class="col-lg-2 col-md-1">
+    </div>
+    <div class="col-lg-8 col-md-10 mt-3 mb-3">
+        <h3>Editar historia de usuario '{{ historia }}'</h3>
+        <form method="post">
+            {% csrf_token %}
+            <p>
+                <span id="horas_usadas"></span>
+                horas de la capacidad de
+                <span id="capacidad"></span>
+                horas asignadas.
+            </p>
+            {{ form.non_form_errors }}
+            {{ form.as_p }}
+            <br>
+            <input type="submit" class="btn btn-primary" value="Guardar">
+            <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
+        </form>
+    </div>
+</div>
+<script>
+$('.form-control').mouseup(function(){
+      $(this).change();
+})
+$('.form-control').keyup(function(){
+      $(this).change();
+})
+$('.form-control').change(function () {
+    var desarolladores = {{ desarrolladores|safe }};
+    
+    var dev = $('#desarrollador_asignado').find(":selected").val();
+    $('#horas_usadas').text(desarolladores[dev].horas_usadas + parseInt($('#horas').val()));
+    $('#capacidad').text(desarolladores[dev].capacidad);
+})
+</script>
+{% endblock %}

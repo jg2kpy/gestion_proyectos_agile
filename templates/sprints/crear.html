@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Crear Sprint{% endblock %}
+{% load gpa_tags %}
 {% block contenido %}
 <div class="row">
     <div class="col-md-12">
@@ -98,7 +99,10 @@
                                         <div class="card-title">
                                             <div>
                                                 <label style="display: none;" for="historia_{{historia.id}}_horas" id="label_historia_horas_{{historia.id}}">Horas</label>
-                                                <input style="display: none;" type="number" class="historia_horas_list" min="1" id="historia_horas_input_{{historia.id}}" name="historia_horas_{{historia.id}}" value="1">
+                                                {% horas_restantes_de_ultimo_sprint historia as horas_restantes %}
+                                                <input style="display: none;" type="number" class="historia_horas_list" min="1"
+                                                    id="historia_horas_input_{{historia.id}}" name="historia_horas_{{historia.id}}"
+                                                    value="{% if horas_restantes > 0 %}{{horas_restantes}}{% else %}1{% endif %}">
                                             </div>
                                             <span class="lead font-weight-light fw-bold">{{ historia.id }}</span>
                                             <span class="lead font-weight-light">{{ historia.nombre }}</span>

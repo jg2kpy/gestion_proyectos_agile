@@ -125,10 +125,11 @@
             &nbsp;&nbsp;Horas necesarias de trabajo: {{capacidad_asignada}} hs
         </h5>
         <h5>
-            &nbsp;&nbsp;Horas trabajadas: --TO DO-- hs
+            {% horas_trabajadas_en_sprint_total sprint as horas_t %}
+            &nbsp;&nbsp;Horas trabajadas: {{horas_t}} hs
         </h5>
         <h5>
-            &nbsp;&nbsp;Horas faltantes: --TO DO-- hs
+            &nbsp;&nbsp;Horas faltantes: {{ capacidad_asignada|restar:horas_t }} hs
         </h5>
     </div>
     <div class="row">
@@ -139,7 +140,8 @@
                     <th>Capacidad por día</th>
                     <th>Capacidad total</th>
                     <th>Historias asignadas</th>
-                    <th>Horas total de historias</th>
+                    <th>Horas asignadas</th>
+                    <th>Horas trabajadas</th>
                 </tr>
             </thead>
             <tbody>
@@ -163,6 +165,10 @@
                         <td>
                             {{ miembro.historias_total }}
                         </td>
+                        <td>
+                            {% horas_trabajadas_en_sprint miembro sprint as horas_trabajadas %}
+                            {{ horas_trabajadas }}
+                        </td>
                     </tr>
                     {% endif %}
                 {% endfor %}
@@ -180,7 +186,8 @@
                     <th>User Points</th>
                     <th>Business Value</th>
                     <th>Encargado</th>
-                    <th>Horas</th>
+                    <th>Horas Asignadas</th>
+                    <th>Horas Usadas</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -202,6 +209,10 @@
                     {% endif %}
                     <td>
                         {{historia.horasAsignadas}}
+                    </td>
+                    <td>
+                        {% trabajo_realizado_en_sprint historia as horas_usadas %}
+                        {{horas_usadas}}
                     </td>
                     <td>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal"
