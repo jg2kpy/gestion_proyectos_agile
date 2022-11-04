@@ -4,7 +4,8 @@ if [ $(which docker-compose) ] ; then
 else
     docker="docker compose"
 fi
-
+printf "\nScript de ejecución automatica\n\n"
+echo "El script necesita de permisos de super usuario para poder realizar limpiza de BD y migraciones"
 sudo rm -rf ./postgre-data
 sudo rm -rf ./*/migrations
 
@@ -17,8 +18,6 @@ iteraciones["Iteracion-3"]="Iteracion-3"
 iteraciones["Iteracion-4"]="Iteracion-4"
 iteraciones["Iteracion-5"]="Iteracion-5"
 
-echo "Script de ejecución automatica"
-
 tag=""
 
 if [ $# -eq 1 ];then
@@ -29,7 +28,7 @@ if [ $# -eq 1 ];then
     fi
 elif [ $# -gt 1 ];then
     echo "USO:"
-    echo "  run.sh [arguments]"
+    echo "  ./run.sh [arguments]"
     echo "Comandos habilitados:"
     echo "  help"
     echo "  Iteracion-1"
@@ -41,7 +40,7 @@ elif [ $# -gt 1 ];then
 fi
 
 if [ -z "$tag" ];then
-    echo "Seleccione un tag"
+    printf "\nSeleccione un tag\n"
     echo "1) Iteracion-1"
     echo "2) Iteracion-2"
     echo "3) Iteracion-3"
@@ -67,17 +66,18 @@ fi
 echo "El tag seleccionado es ${tag}"
 git checkout $tag
 
-echo "En que entorno le gustaria ejecutar?"
+printf "\nEn que entorno le gustaria ejecutar?\n"
 echo "1) Producción"
 echo "2) Desarrollo"
 
 read entorno
 
 if [ $entorno -eq 1 ];then
-    echo "Ejecutando en entorno de producción..."
+    printf "\nEjecutando en entorno de producción...\n"
     $docker -f "docker-compose.produccion.yaml" up --build -d
+    sleep 4
     if [ $tag = "Iteracion-5" ];then
-        echo "Le gustaria cargar los datos de prueba?[s/n]"
+        printf "\nLe gustaria cargar los datos de prueba?[s/n]\n"
         read opcion
         if [ $opcion = "s" ];then
             echo "Cargando datos de prueba..."
@@ -86,40 +86,41 @@ if [ $entorno -eq 1 ];then
     fi
     while [ true ]
     do
-    echo "Le gustaria terminar con la ejecución en el entorno de producción?[s/n]"
+    printf "\nLe gustaria terminar con la ejecución en el entorno de producción?[s/n]\n"
     read opcion
     if [ $opcion = "s" ];then
-        echo "Terminando la ejecución en entorno de producción..."
+        printf "\nTerminando la ejecución en entorno de producción...\n\n"
         $docker -f "docker-compose.produccion.yaml" stop
         exit
     fi
     done
 else
-    echo "Ejecutando en entorno de desarrollo..."
+    printf "\nEjecutando en entorno de desarrollo...\n"
     $docker -f "docker-compose.desarrollo.yaml" up --build -d
+    sleep 4
     if [ $tag = "Iteracion-5" ];then
-        echo "Le gustaria cargar los datos de prueba?[s/n]"
+        printf "\nLe gustaria cargar los datos de prueba?[s/n]\n"
         read opcion
         if [ $opcion = "s" ];then
             echo "Cargando datos de prueba..."
-            docker exec gpa-dev python3 manage.py loaddata databasedump_junior.json
+            docker exec gpa-dev python3 manage.py loaddata databasedump_prueba.json
         fi
     fi
     while [ true ]
     do
-        echo "Menu de desarrollo"
+        printf "\n\nMenu de desarrollo\n"
         echo "1) Ejecutar las pruebas unitarias"
         echo "2) Generar la documentación automatica"
         echo "3) Terminar la ejecución"
         read opcion
         if [ $opcion -eq 1 ];then
-            echo "Ejecutando las pruebas unitarias..."
+            printf "\nEjecutando las pruebas unitarias...\n"
             docker exec gpa-dev python3 manage.py test
         elif [ $opcion -eq 2 ];then
-            echo "Ejecutando las documentación autogenerada... (accesible desde http://localhost:8081/)"
+            printf "\nEjecutando las documentación autogenerada... (accesible desde http://localhost:8081/, Ctrl+C para terminar)\n\n"
             docker exec gpa-dev ./docs/generar_doc_html.sh
         else
-            echo "Terminando la ejecución en entorno de desarrollo..."
+            printf "\nTerminando la ejecución en entorno de desarrollo...\n\n"
             $docker -f "docker-compose.desarrollo.yaml" stop
             exit
         fi
