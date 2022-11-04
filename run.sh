@@ -74,6 +74,7 @@ echo "2) Desarrollo"
 read entorno
 
 if [ $entorno -eq 1 ];then
+    echo "Ejecutando en entorno de producción..."
     $docker -f "docker-compose.produccion.yaml" up --build -d
     echo "Le gustaria cargar los datos de prueba?[s/n]"
     read opcion
@@ -90,6 +91,7 @@ if [ $entorno -eq 1 ];then
     fi
     done
 else
+    echo "Ejecutando en entorno de desarrollo..."
     $docker -f "docker-compose.desarrollo.yaml" up --build -d
     echo "Le gustaria cargar los datos de prueba?[s/n]"
     read opcion
@@ -104,10 +106,13 @@ else
         echo "3) Terminar la ejecución"
         read opcion
         if [ $opcion -eq 1 ];then
+            echo "Ejecutando las pruebas unitarias..."
             docker exec gpa-dev python3 manage.py test
         elif [ $opcion -eq 2 ];then
+            echo "Ejecutando las documentación autogenerada... (accesible desde http://localhost:8081)"
             docker exec gpa-dev ./docs/generar_doc_html.sh
         else
+            echo "Terminando la ejecución..."
             $docker -f "docker-compose.desarrollo.yaml" stop
             exit
         fi
