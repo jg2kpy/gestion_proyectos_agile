@@ -972,3 +972,43 @@ class SprintTests(TestCase):
 
         self.assertEqual(HistoriaUsuario.objects.get(id=historiaTest3.id).etapa, self.tipoTest.etapas.get(orden=0),
                 'La historia no se fue a la primera etapa al momento de inicar el sprint')
+
+
+    def test_descargar_burndown_chart(self):
+        """
+        Prueba para ver si descarga el burndown chart
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/list/",
+            {
+                'descargarBurndown' : self.sprint.id
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+    
+    def test_descargar_velocity_chart(self):
+        """
+        Prueba para ver si descarga el velocity chart
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/list/",
+            {
+                'descargarVelocity' : self.proyecto.id
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+    
