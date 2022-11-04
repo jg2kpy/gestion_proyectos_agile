@@ -1,6 +1,11 @@
 from django import template
-from historias_usuario.models import HistoriaUsuario
+<<<<<<< HEAD
+from historias_usuario.models import HistoriaUsuario, Tarea
 from usuarios.models import RolSistema, RolProyecto, Usuario
+=======
+from historias_usuario.models import HistoriaUsuario
+from usuarios.models import Notificacion, RolSistema, RolProyecto, Usuario
+>>>>>>> feature/notificaciones-&-informe
 from proyectos.models import Proyecto, Sprint
 
 """
@@ -255,3 +260,125 @@ def es_miembro(usuario, proyecto):
     :rtype: bool
     """
     return usuario.equipo.filter(id=proyecto.id).exists()
+
+@register.simple_tag
+def cantidad_tareas_en_etapa(historia, contar_ya_consideradas=False):
+    """Funcion para determinar la cantidad de tareas en una etapa
+
+    :param historia: Historia de usuario para la cual determinar la cantidad de tareas
+    :type usuario: historia
+    :param contar_ya_consideradas: Indica si se deben contar las tareas ya consideradas en la etapa
+    :type contar_ya_consideradas: bool
+
+    :return: Se retorna la cantidad de tareas en la etapa
+    :rtype: int
+    """
+
+    if contar_ya_consideradas:
+        return historia.tareas.filter(etapa=historia.etapa).count()
+    return historia.tareas.filter(etapa=historia.etapa, considerado=False).count()
+
+
+@register.simple_tag
+def trabajo_realizado_en_sprint(historia):
+    """Funcion para determinar el trabajo realizado en un sprint
+
+    :param historia: Historia de usuario para la cual determinar el trabajo realizado
+    :type usuario: historia
+
+    :return: Se retorna el trabajo realizado en el sprint
+    :rtype: int
+    """
+    horas = 0
+    for tarea in historia.tareas.filter(sprint=historia.sprint):
+        horas += tarea.horas
+    return horas
+
+@register.simple_tag
+def es_scrum_master(usuario, proyecto):
+    """Funcion para verificar que un usuario es scrum master de un proyecto
+
+    :return: True si el usuario es scrum master del proyecto
+    :rtype: bool
+    """
+    return proyecto.scrumMaster == usuario
+
+@register.simple_tag
+def horas_trabajadas_en_sprint(usuario, sprint):
+    """Funcion para determinar las horas trabajadas en un sprint por un usuario
+
+    :param usuario: Usuario para el cual se desea determinar las horas trabajadas
+    :type usuario: Usuario
+    :param sprint: Sprint en el cual se desea determinar las horas trabajadas
+    :type sprint: Sprint
+
+    :return: Se retorna las horas trabajadas en el sprint
+    :rtype: int
+    """
+    horas = 0
+    for tarea in Tarea.objects.filter(sprint=sprint, usuario=usuario):
+        horas += tarea.horas
+    return horas
+
+@register.simple_tag
+def horas_trabajadas_en_sprint_total(sprint):
+    """Funcion para determinar las horas trabajadas en un sprint por todos los usuarios
+
+    :param sprint: Sprint en el cual se desea determinar las horas trabajadas
+    :type sprint: Sprint
+
+    :return: Se retorna las horas trabajadas en el sprint
+    :rtype: int
+    """
+    horas = 0
+    for tarea in Tarea.objects.filter(sprint=sprint):
+        horas += tarea.horas
+    return horas
+
+@register.simple_tag
+def horas_restantes_de_ultimo_sprint(historia):
+    """Funcion para determinar las horas restantes de la ultima tarea de la historia de usuario
+
+    :param historia: Historia de usuario para la cual se desea determinar las horas restantes
+    :type historia: HistoriaUsuario
+
+    :return: Se retorna las horas restantes de la ultima tarea de la historia de usuario
+    :rtype: int
+    """
+    if historia.sprintInfo.count() > 0:
+        ultimoSprint = historia.sprintInfo.all().order_by('-fechaCreacion').first()
+        return ultimoSprint.horasAsignadas - ultimoSprint.horasUsadas
+    return 0
+
+@register.filter
+def restar(value, arg):
+    """Funcion para restar dos valores
+
+    :param value: Valor a restar
+    :type value: int
+    :param arg: Valor a restar
+    :type arg: int
+
+    :return: Se retorna el resultado de la resta
+    :rtype: int
+    """
+    return value - arg
+
+def cantidad_notif_no_leido(usuario):
+    """Funcion ver la cantidad de notificaciones no leídas
+
+    :return: Retorna 0 si no hay notificaciones sin leer o la cantidad de notificaciones correspondiente
+    :rtype: int
+    """
+    return len(Notificacion.objects.filter(usuario=usuario, leido=False))
+
+@register.simple_tag
+def existe_sprint_terminado(proyecto):
+    """Verifica si existe un sprint terminado
+
+    :return: Retorna True si hay por lo menos un sprint terminado, caso contrario False
+    :rtype: bool
+    """
+    sprintTerminado = Sprint.objects.filter(proyecto=proyecto, estado="Terminado")
+
+    return True if sprintTerminado else False

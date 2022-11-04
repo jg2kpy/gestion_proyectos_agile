@@ -1,0 +1,23 @@
+<!-- Modal -->
+<div class="modal fade" id="modal{{ historia.id }}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="cancelarModal">Cancelar Historia '{{ historia.nombre }}'</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p>Esta a punto de cancelar la historia de usuario '{{ historia.nombre }}', ¿quiere continuar?</p>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+        <form method="post" action="{% url 'borrar_historiaUsuario' proyecto.id historia.id %}">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-danger" value="Cancelar Historia">
+            <input type="hidden" name="url" value="{{ request.path }}">
+        </form>
+        
+        </div>
+    </div>
+    </div>
+</div>

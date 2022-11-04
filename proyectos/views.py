@@ -1,18 +1,30 @@
 import datetime
+from genericpath import isdir
+from os import makedirs
 import django
 from django.forms import inlineformset_factory
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.views.decorators.cache import never_cache
+import pytz
 
-from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, TipoHistoriaUsusario
+from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, SprintInfo, TipoHistoriaUsusario
+import numpy as np
+
+from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, Tarea, TipoHistoriaUsusario
 from historias_usuario.views import calcularFechaSprint
 
-from .models import Feriado, Proyecto, Sprint, UsuarioTiempoEnSprint
+from .models import *
 from .forms import ProyectoConfigurarForm, ProyectoFeriadosForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
+
+import matplotlib.pyplot as plt
+from matplotlib.legend_handler import HandlerLine2D
+
+from pathlib import Path
+from django.core.files import File
 
 """
     Enumerador de estados de Proyecto
@@ -784,7 +796,7 @@ def crear_sprint(request, proyecto_id):
 def backlog_sprint(request, proyecto_id, sprint_id):
     """Crear sprint
     Renderiza la pagina para crear un sprint.
-    Recibe una llamada POST para crear el sprint.
+    Recibe una llamada POST para iniciar o cancelar el sprint.
 
     :param request: Peticion HTTP donde se recibe la informacion del sprint a crear
     :type request: HttpRequest
@@ -817,6 +829,27 @@ def backlog_sprint(request, proyecto_id, sprint_id):
             historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
             historia.sprint = None
             historia.save()
+        elif request.POST.get('cancelar'):
+            if sprint.fecha_inicio != None:
+                return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
+            if Sprint.objects.filter(estado="Desarrollo",proyecto=proyecto).count() > 0:
+                return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
+
+            sprint.estado = "Cancelado"
+            sprint.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
+            sprint.save()
+
+            usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprint,estado=HistoriaUsuario.Estado.ACTIVO)
+            for usFinalizar in usListFinalizar:
+                usFinalizar.sprint = None
+                usFinalizar.horasAsignadas = 0
+                usFinalizar.usuarioAsignado = None
+                usFinalizar.save()
+            
+            proyecto.estado = "Planificación"
+            proyecto.save()
+
+            return redirect('sprint_list', proyecto_id=proyecto.id)
         else:
             if sprint.fecha_inicio != None:
                 return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
@@ -827,6 +860,17 @@ def backlog_sprint(request, proyecto_id, sprint_id):
             sprint.estado = "Desarrollo"
             sprint.save()
 
+            #Mover a la primera etapa en caso de que el US esta en planificacion
+            historias_en_planificacion = sprint.historias.filter(etapa=None)
+            for historia in historias_en_planificacion:
+                sigEtapa = EtapaHistoriaUsuario.objects.get(
+                            orden=0, TipoHistoriaUsusario=historia.tipo)
+                historia.etapa = sigEtapa
+                historia.save()
+
+            proyecto.estado = "Ejecución"
+            proyecto.save()
+        
     miembros = [miembro for miembro in proyecto.usuario.all() if UsuarioTiempoEnSprint.objects.filter(sprint=sprint, usuario=miembro).exists()]
     capacidad_total = 0
     capacidad_asignada = 0
@@ -837,53 +881,11 @@ def backlog_sprint(request, proyecto_id, sprint_id):
         miembro.capacidad_total = miembro.capacidad * sprint.duracion
         capacidad_total += miembro.capacidad_total
         miembro.historias_count = len([historia for historia in sprint.historias.filter(estado='A') if historia.usuarioAsignado == miembro])
+    
+
     request.session['cancelar_volver_a'] = request.path
 
     return render(request, 'sprints/base.html', {'proyecto': proyecto, 'capacidad_asignada': capacidad_asignada, 'capacidad_total':capacidad_total, 'miembros': miembros, 'sprint': sprint, 'historias': sprint.historias.filter(estado=HistoriaUsuario.Estado.ACTIVO), 'titulo': "Sprint Backlog "+sprint.nombre}, status=200)
-
-@never_cache
-def agregar_historias(request, proyecto_id, sprint_id):
-    """
-    Agrega una historia al backlog del sprint
-
-    :param request: Peticion HTTP donde se recibe la informacion de la historia a agregar
-    :type request: HttpRequest
-
-    :param proyecto_id: ID del proyecto al que se le agregara la historia
-    :type proyecto_id: int
-
-    :param sprint_id: ID del sprint al que se le agregara la historia
-    :type sprint_id: int
-
-    :return: Renderiza la pagina para agregar una historia al backlog del sprint
-    :rtype: HttpResponse
-    """
-
-    request_user = request.user
-
-    if not request_user.is_authenticated:
-        return render(request, '401.html', status=401)
-
-    try:
-        proyecto = Proyecto.objects.get(id=proyecto_id)
-        sprint = Sprint.objects.get(id=sprint_id)
-    except Proyecto.DoesNotExist:
-        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
-
-    if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
-        return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
-
-    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0 and x.sprint == None]
-    status = 200
-    error = None
-    if request.method == 'POST':
-        historia = HistoriaUsuario.objects.get(id=request.POST.get('historia_id'))
-        historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
-        historia.sprint = sprint
-        historia.save()
-        return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
-
-    return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
 
 @never_cache
 def editar_miembros_sprint(request, proyecto_id, sprint_id):
@@ -936,7 +938,6 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
     else:
         for d in desarrolladores:
             try:
-                print(UsuarioTiempoEnSprint.objects.get(usuario=d, sprint=sprint).horas)
                 d.horas = UsuarioTiempoEnSprint.objects.get(usuario=d, sprint=sprint).horas
                 d.horas_total = 0
                 for historia in sprint.historias.filter(usuarioAsignado=d):
@@ -978,8 +979,7 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
 
-    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad()) if x.getPrioridad() >= 0]
-    desarrolladores = proyecto.usuario.all()
+    historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad(), reverse=True) if x.getPrioridad() >= 0]
     status = 200
     error = None
     if request.method == 'POST':
@@ -992,6 +992,186 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
         return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
 
     return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
+
+
+def calcularHorasDiarias(sprint, cantDiasSprint, fechaInicial, feriados):
+    fechaActual = fechaInicial
+    totalHorasDiario = []
+    feriadosFecha = []
+
+    if feriados:
+        for feriado in feriados:
+            feriadosFecha.append(feriado.fecha.date())
+
+    while cantDiasSprint:
+        if not (fechaActual.weekday() >= 5 or feriados and fechaActual.date() in feriadosFecha):
+            cantDiasSprint -= 1
+            tareasDiarias = Tarea.objects.filter(sprint=sprint, fecha=fechaActual)
+            sumaHoras = 0
+            
+            for tarea in tareasDiarias:
+                sumaHoras += tarea.horas
+
+            totalHorasDiario.append(sumaHoras)
+
+        if cantDiasSprint > 0:
+            fechaActual += datetime.timedelta(days=1)
+
+    return totalHorasDiario
+
+
+def calcularHorasSprint(sprint):
+    usList = HistoriaUsuario.objects.filter(sprint=sprint, estado__in=["S","T"])
+    totalHoras = 0
+
+    for us in usList:
+        totalHoras += us.horasAsignadas
+    
+    return totalHoras
+
+
+def generarGraficoBurndown(x, yTeorico, yReal):
+    fig, ax = plt.subplots()
+    ax.set_xlabel("Días")
+    ax.set_ylabel("Horas")
+    line1, = ax.plot(x, yTeorico, label="Tareas Ideales", linestyle='-', marker='o', color='b')
+    line2, = ax.plot(x, yReal, label="Tareas Reales", linestyle='-', marker='o', color='r')
+    ax.legend(handler_map={line1: HandlerLine2D()})
+    plt.title("Burndown Chart")
+    
+
+def generarBurndownChart(sprintId):
+    if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
+        return
+
+    # Datos para realizar los cálculos
+    sprint = Sprint.objects.get(id=sprintId)
+    cantDiasSprint = sprint.duracion
+    inicioSprint = sprint.fecha_inicio
+    feriados = Feriado.objects.filter(proyecto=sprint.proyecto)
+    horasUsDiario = calcularHorasDiarias(sprint, cantDiasSprint, inicioSprint, feriados)
+    horasTotalSprint = calcularHorasSprint(sprint)
+
+    # Inicio de los cálculos
+    x = [dias for dias in range(cantDiasSprint + 1)]
+    yTeorico = [horasTotalSprint]
+    yReal = [horasTotalSprint]
+
+    # Para el horario ideal
+    horasRestanteSprint = horasTotalSprint
+    horasIdealDiario = int(horasTotalSprint / cantDiasSprint)
+
+    for _ in range(cantDiasSprint):
+        horasRestanteSprint -= horasIdealDiario
+        yTeorico.append(horasRestanteSprint)
+
+    # Para el horario real
+    horasRestanteSprint = horasTotalSprint
+
+    for horasUs in horasUsDiario:
+        horasRestanteSprint = horasRestanteSprint - horasUs
+        yReal.append(horasRestanteSprint)
+
+    generarGraficoBurndown(x, yTeorico, yReal)
+    if not isdir('app/staticfiles'):
+        makedirs("app/staticfiles")
+    plt.savefig(f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+    rutaImg = Path(f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+    
+    archivoBurndown = ArchivoBurndown()
+    archivoBurndown.nombre = f"bdChart_{sprint.proyecto.id}_{sprint.id}"
+    with rutaImg.open(mode='rb') as archivo:
+        archivoBurndown.archivo = File(archivo, name=rutaImg.name)
+        archivoBurndown.save()
+        sprint.burndownChart = archivoBurndown
+        sprint.save()
+
+
+def generarVelocityChart(proyectoId):
+    velChart = None
+    if ArchivoVelocity.objects.filter(proyecto__id=proyectoId).exists():
+        velChart = ArchivoVelocity.objects.get(proyecto__id=proyectoId)
+    else:
+        velChart = ArchivoVelocity()
+        velChart.nombre = f"velocityChart_{proyectoId}"
+
+    # Datos para realizar los cálculos
+    proyecto = Proyecto.objects.get(id=proyectoId)
+    sprints = Sprint.objects.filter(proyecto__id=proyectoId, estado="Terminado")
+    horasTotalSprintList = []
+    horasUsSprintList = []
+    sprintNombreList = []
+
+    for sprint in sprints:
+        cantDiasSprint = sprint.duracion
+        inicioSprint = sprint.fecha_inicio
+        feriados = Feriado.objects.filter(proyecto=sprint.proyecto)
+        sprintNombreList.append(sprint.nombre)
+        horasUsDiario = calcularHorasDiarias(sprint, cantDiasSprint, inicioSprint, feriados)
+        horasTotalSprintList.append(calcularHorasSprint(sprint))
+        
+        tempUsTotal = 0
+
+        for horaUs in horasUsDiario:
+            tempUsTotal += horaUs
+        
+        horasUsSprintList.append(tempUsTotal)
+    
+    generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList)
+    plt.savefig(f"app/staticfiles/velocityChart_{proyecto.nombre}{proyecto.id}.png")
+    rutaImg = Path(f"app/staticfiles/velocityChart_{proyecto.nombre}{proyecto.id}.png")
+    
+    with rutaImg.open(mode='rb') as archivo:
+        velChart.archivo = File(archivo, name=rutaImg.name)
+        velChart.save()
+        velChart.proyecto = proyecto
+        velChart.save()
+
+
+def generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList):
+    cantBarras = len(horasTotalSprintList)
+    barraIzq = horasTotalSprintList
+    barrDer = horasUsSprintList
+    ind = np.arange(cantBarras)
+    ancho = 0.3
+
+    plt.figure(figsize=(10,5))
+
+    plt.bar(ind, barraIzq , ancho, label='Trabajo propuesto')
+    plt.bar(ind + ancho, barrDer, ancho, label='Trabajo realizado')
+
+    plt.ylabel('Horas')
+    plt.title('Velocity Chart')
+    plt.xticks(ind + ancho / 2, sprintNombreList)
+
+    plt.legend(loc='best')
+    plt.show()
+
+
+@never_cache
+def descargarReporte(request, id):
+    """
+    Permite descargar un archivo.
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param id: Id del sprint o del proyecto al que pertenece el reporte
+    :type id: int
+    :rtype: HttpResponse
+    """
+    if 'descargarBurndown' in request.POST:
+        try:
+            archivo = ArchivoBurndown.objects.get(sprint__id=id)
+        except ArchivoBurndown.DoesNotExist:
+            return render(request, '404.html', {'info_adicional': "No se encontró este archivo."}, status=404)
+    else:
+        try:
+            archivo = ArchivoVelocity.objects.get(proyecto__id=id)
+        except ArchivoVelocity.DoesNotExist:
+            return render(request, '404.html', {'info_adicional': "No se encontró este archivo."}, status=404)
+
+    return FileResponse(open(archivo.archivo.path, 'rb'), content_type='application/force-download')
+
 
 @never_cache
 def sprint_list(request, proyecto_id):
@@ -1021,4 +1201,15 @@ def sprint_list(request, proyecto_id):
     if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
 
+    if request.method == 'POST':
+        if 'descargarBurndown' in request.POST:
+            sprintId = request.POST['descargarBurndown']
+            generarBurndownChart(sprintId)
+            return descargarReporte(request, sprintId)
+        else:
+            proyectoId = request.POST['descargarVelocity']
+            generarVelocityChart(proyectoId)
+            return descargarReporte(request, proyecto_id)
+
+            
     return render(request, 'sprints/sprintList.html', {'proyecto': proyecto}, status=200)

@@ -2,12 +2,14 @@ import datetime
 from django.shortcuts import render, redirect
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
+from django.db import models
+import pytz
 
 
 from proyectos.models import Feriado, Proyecto
 from .models import *
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
-from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, SubirArchivoForm, TipoHistoriaUsuarioForm
+from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, SubirArchivoForm, TareaForm, TipoHistoriaUsuarioForm
 
 
 @never_cache
@@ -311,6 +313,10 @@ def moverEtapa(request, proyecto_id, historia_id):
     if request.method == 'POST':
         historia.guardarConHistorial()
         if 'siguiente' in request.POST:
+
+            if historia.tareas.filter(etapa=historia.etapa).count() <= 0:
+                return render(request, '422.html', {'info_adicional': "No se puede pasar a la siguiente etapa porque no existen tareas en esta etapa."}, status=422)
+
             sigOrden = historia.etapa.orden + 1 if historia.etapa else 0
             if sigOrden == historia.tipo.etapas.count():
                 historia.estado = HistoriaUsuario.Estado.TERMINADO
@@ -323,7 +329,11 @@ def moverEtapa(request, proyecto_id, historia_id):
 
             antEtapa = EtapaHistoriaUsuario.objects.get(
                 orden=antOrden, TipoHistoriaUsusario=historia.tipo)
-            historia.etapa = antEtapa
+            if historia.etapa != antEtapa:
+                for trabajo in historia.tareas.all():
+                    trabajo.considerado = True
+                    trabajo.save()
+                historia.etapa = antEtapa
     
         historia.save()
 
@@ -641,6 +651,66 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
     return render(request, 'historias/comentarios.html', {'form': form, 'proyecto': proyecto, 'historia': historia, 'comentarios': historia.comentarios.all(), "volver_a": volver_a}, status=status)
 
 @never_cache
+def tareas(request, proyecto_id, historia_id):
+    """Obtener vista de ver y guardar trabajos de una historia de usuario
+
+    :param request: HttpRequest
+    :type request: HttpRequest
+    :param proyecto_id: Id del proyecto del cual se quiere leer comentarios o crear un comentario
+    :type proyecto_id: int
+    :param historia_id: Id de la historia de usuario que se quiere tener acceso a sus comentarios
+    :type historia_id: int
+    :return: 401 si no esta logueado, 404 si no existe el proyecto, 403 si no tiene permisos, 422 con información adicional si el formulario no fue creado correctamente, 200 con la lista de los comentarios y un formulario para crear un comentario si todo esta bien
+    :rtype: HttpResponse
+    """
+    if not request.user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    try:
+        historia = HistoriaUsuario.objects.get(id=historia_id)
+    except HistoriaUsuario.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
+
+    status = 200
+    if request.method == 'POST':
+        form = TareaForm(request.POST)
+        if form.is_valid():
+
+            tarea = Tarea()
+            tarea.historia = historia
+            tarea.usuario = request.user
+            tarea.descripcion = form.cleaned_data['descripcion']
+            tarea.horas = form.cleaned_data['horas']
+            tarea.etapa = historia.etapa
+            tarea.sprint = historia.sprint
+            tarea.save()
+
+            return redirect('tareas', proyecto_id=proyecto_id, historia_id=historia.id)
+        else:
+            form.add_error(None, "Hay errores en el formulario.")
+            status = 422
+    else:
+        form = TareaForm()
+
+    all_tareas = Tarea.objects.filter(historia=historia).order_by('-sprint__fecha_inicio', 'etapa__orden', '-fecha')
+    sprints_tareas = {}
+    for tarea in all_tareas:
+        if tarea.sprint not in sprints_tareas:
+            tarea.sprint.nombre_pantalla = ("actual" if tarea.sprint == historia.sprint else 
+                tarea.sprint.nombre + " (" + tarea.sprint.fecha_inicio.strftime("%d/%m/%Y") + " - " + tarea.sprint.fecha_fin.strftime("%d/%m/%Y") + ")")
+            tarea.sprint.tareaslist = []
+            sprints_tareas[tarea.sprint] = tarea.sprint
+        sprints_tareas[tarea.sprint].tareaslist.append(tarea)
+
+    volver_a = request.session['cancelar_volver_a']
+    return render(request, 'historias/tareas.html', {'form': form, 'proyecto': proyecto, 'historia': historia, 'sprints_tareas': sprints_tareas, "volver_a": volver_a}, status=status)
+
+@never_cache
 def restaurar_historia_historial(request, proyecto_id, historia_id):
     """
     Permite ver y restaurar versiones anteriores de una historia de usuario. La acción de restaurar a su vez se guarda otra vez en el historial.
@@ -777,6 +847,7 @@ def verTablero(request, proyecto_id, tipo_id):
         if request.POST.get('terminar'):
             sprintTerminar = proyecto.sprints.get(estado="Desarrollo")
             sprintTerminar.estado = "Terminado"
+            sprintTerminar.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
             sprintTerminar.save()
 
             usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintTerminar,estado=HistoriaUsuario.Estado.ACTIVO)
@@ -799,7 +870,13 @@ def verTablero(request, proyecto_id, tipo_id):
                 sprintInfo.sprint = sprintTerminar
                 sprintInfo.historia = usFinalizar
                 sprintInfo.versionEnHistorial = copiaUs
+                sprintInfo.horasAsignadas = copiaUs.horasAsignadas
+                sprintInfo.horasUsadas = sum([tarea.horas for tarea in Tarea.objects.filter(historia=id_ori, sprint=sprintTerminar)])
                 sprintInfo.save()
+
+            
+            proyecto.estado = "Planificación"
+            proyecto.save()
             
     else:
         for etapa in tipo.etapas.all().order_by('orden'):

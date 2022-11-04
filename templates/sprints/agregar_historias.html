@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Agregar Historias de Usuario al Sprint{% endblock %}
+{% load gpa_tags %}
 {% block contenido %}
 <div class="row">
     <div class="col-md-12">
@@ -15,12 +16,27 @@
                 <div role="alert" class="alert alert-dark" id="aviso_horas_planeadas">
                     <span id="horas_total_planeadas">0</span> horas total
                 </div>
+                <h4>Historias de Usuario</h4>
+                <div class="row ">
+                    <div class="col-md-1 align-self-center d-flex justify-content-center">
+                        <h4>Incluir</h4>
+                    </div>
+                    <div class="col-md-1 align-self-center d-flex justify-content-center">
+                        <h4>Prioridad</h4>
+                    </div>
+                    <div class="col-md-10">
+                        <h4>Historia</h4>
+                    </div>
+                </div>
                 {% for historia in historias %}
                 <div class="row ">
                     <div class="col-md-1 align-self-center d-flex justify-content-center">
                         <input type="checkbox" class="incluir_checkbox" name="historia_seleccionado_{{historia.id}}" value="{{historia.id}}">
                     </div>
-                    <div class="col-md-11">
+                    <div class="col-md-1 align-self-center d-flex justify-content-center">
+                        <span>{{historia.getPrioridad}}</span>
+                    </div>
+                    <div class="col-md-10">
                         <div class="card bg-light">
                             <div class="card-body">
                                 <div class="card shadow-sm" id="cd1">
@@ -28,7 +44,10 @@
                                         <div class="card-title">
                                             <div>
                                                 <label style="display: none;" for="historia_{{historia.id}}_horas" id="label_historia_horas_{{historia.id}}">Horas</label>
-                                                <input style="display: none;" type="number" class="historia_horas_list" min="1" id="historia_horas_input_{{historia.id}}" name="historia_horas_{{historia.id}}" value="1">
+                                                {% horas_restantes_de_ultimo_sprint historia as horas_restantes %}
+                                                <input style="display: none;" type="number" class="historia_horas_list" min="1"
+                                                    id="historia_horas_input_{{historia.id}}" name="historia_horas_{{historia.id}}"
+                                                    value="{% if horas_restantes > 0 %}{{horas_restantes}}{% else %}1{% endif %}">
                                             </div>
                                             <span class="lead font-weight-light fw-bold">{{ historia.id }}</span>
                                             <span class="lead font-weight-light">{{ historia.nombre }}</span>
@@ -41,14 +60,16 @@
                                         <div>
                                             <p>
                                                 {{ historia.descripcion }}
+                                                <a class="btn btn-link" data-bs-toggle="modal"
+                                                    data-bs-target="#modalVer{{ historia.id }}"><span class="material-icons"
+                                                    data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span>
+                                                </a>
                                             </p>
                                             <p>
                                                 <select style="display: none;" class="form-control desarrollador_asignado_list" name="desarrollador_asignado_{{historia.id}}" id="desarrollador_asignado_{{historia.id}}">
                                                     <option value="">Usuario asignado:</option>
                                                     {% for desarrollador in proyecto.usuario.all %}
-                                                    <option value="{{ desarrollador.id }}">
-                                                        <img src="{{ desarrollador.avatar_url }}" alt="{{ desarrollador.get_full_name }} foto perfil" width="30" height="30"
-                                                            class="rounded-circle" style="margin-right: 10px;" />
+                                                    <option class="depende_miembro_equipo_{{desarrollador.id}}" value="{{ desarrollador.id }}">
                                                         {{ desarrollador.get_full_name }}
                                                     </option>
                                                     {% endfor %}
@@ -61,6 +82,7 @@
                         </div>
                     </div>
                 </div>
+                {% include "modals/modalUSInfo.html" with historia=historia %}
                 {% endfor %}
             </div>
             <br>

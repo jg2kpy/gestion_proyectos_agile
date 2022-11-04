@@ -27,8 +27,9 @@
                 {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                 {% if master and not sprint.fecha_inicio %}
                 <a href="#modalSprintIni" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#modalSprintIni" data-toggle="tooltip" data-placement="top"
-                    title="Empezar sprint">Empezar Sprint</a>&nbsp;&nbsp;
+                    data-bs-target="#modalSprintIni">Empezar Sprint</a>&nbsp;&nbsp;
+                    <a href="#modalSprintCan" class="btn btn-secondary" data-bs-toggle="modal"
+                    data-bs-target="#modalSprintCan">Cancelar Sprint</a>&nbsp;&nbsp;
                 {% endif %}
                 <!-- Modal -->
                 <div class="modal fade" id="modalSprintIni" tabindex="-1" aria-labelledby="sprintModal"
@@ -62,7 +63,48 @@
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
                                 <form method="post" action=".">
                                     {% csrf_token %}
-                                    <input type="submit" class="btn btn-primary" name="comenzar" value="comenzar">
+                                    <input type="submit" class="btn btn-primary" name="comenzar" value="Comenzar">
+                                </form>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End Modal -->
+                <!-- Modal -->
+                <div class="modal fade" id="modalSprintCan" tabindex="-1" aria-labelledby="sprintModal"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            {% check_sprint_activo proyecto as existe_sprint_activo %}
+                            {% if existe_sprint_activo %}
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="sprintModal">ERROR</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>¡No se puede empezar nuevo sprint porque ya existe un sprint en desarrollo!</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                            </div>
+                            {% else %}
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="sprintModal">¿Está seguro que desea cancelar el sprint?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>¿Está seguro que desea cancelar '{{sprint.nombre}}'?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
+                                <form method="post" action=".">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-danger" name="cancelar" value="Cancelar">
                                 </form>
                             </div>
                             {% endif %}
@@ -76,9 +118,19 @@
     </div>
     <br>
     <div class="row">
-        <h4>
-           Capacidad: {{capacidad_asignada}} de {{capacidad_total}} horas asignadas 
-        </h4>
+        <h5>
+            &nbsp;&nbsp;Capacidad del equipo: {{capacidad_total}} hs
+        </h5>
+        <h5>
+            &nbsp;&nbsp;Horas necesarias de trabajo: {{capacidad_asignada}} hs
+        </h5>
+        <h5>
+            {% horas_trabajadas_en_sprint_total sprint as horas_t %}
+            &nbsp;&nbsp;Horas trabajadas: {{horas_t}} hs
+        </h5>
+        <h5>
+            &nbsp;&nbsp;Horas faltantes: {{ capacidad_asignada|restar:horas_t }} hs
+        </h5>
     </div>
     <div class="row">
         <table class="table table-striped" id="tablaMiembros" style="width:100%">
@@ -88,7 +140,8 @@
                     <th>Capacidad por día</th>
                     <th>Capacidad total</th>
                     <th>Historias asignadas</th>
-                    <th>Horas total de historias</th>
+                    <th>Horas asignadas</th>
+                    <th>Horas trabajadas</th>
                 </tr>
             </thead>
             <tbody>
@@ -112,6 +165,10 @@
                         <td>
                             {{ miembro.historias_total }}
                         </td>
+                        <td>
+                            {% horas_trabajadas_en_sprint miembro sprint as horas_trabajadas %}
+                            {{ horas_trabajadas }}
+                        </td>
                     </tr>
                     {% endif %}
                 {% endfor %}
@@ -129,7 +186,8 @@
                     <th>User Points</th>
                     <th>Business Value</th>
                     <th>Encargado</th>
-                    <th>Horas</th>
+                    <th>Horas Asignadas</th>
+                    <th>Horas Usadas</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -153,6 +211,10 @@
                         {{historia.horasAsignadas}}
                     </td>
                     <td>
+                        {% trabajo_realizado_en_sprint historia as horas_usadas %}
+                        {{horas_usadas}}
+                    </td>
+                    <td>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal"
                             data-bs-target="#modalVer{{ historia.id }}"><span class="material-icons"
                                 data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span>
@@ -173,15 +235,6 @@
                                 class="material-icons">cancel</span></button>
                         {% endif %}
 
-                        {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
-                        {% if master or historia.usuarioAsignado == user %}
-                        {% if not historia.etapa and historia.usuarioAsignado %}
-                        <button href="#modalEtapa{{ historia.id }}" class="btn btn-link" data-bs-toggle="modal"
-                            data-bs-target="#modalEtapa{{ historia.id }}" data-toggle="tooltip" data-placement="top"
-                            title="Mover a la siguiente etapa"><span
-                                class="material-icons">arrow_forward</span></button>
-                        {% endif %}
-                        {% endif %}
                         {% endif %}
                         <a class="btn btn-link" data-toggle="tooltip" data-placement="top" title="Ver historial"
                             href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span
@@ -194,104 +247,8 @@
     </div>
 </div>
 {% for historia in historias %}
-<!-- Modal -->
-<div class="modal fade" id="modal{{ historia.id }}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="cancelarModal">Cancelar Historia '{{ historia.nombre }}'</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Esta a punto de sacar la historia de usuario '{{ historia.nombre }}' del Sprint, ¿quiere continuar?
-                </p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
-                <form method="post">
-                    {% csrf_token %}
-                    <input type="submit" class="btn btn-danger" value="Cancelar Historia">
-                    <input type="hidden" name="historia_id" value="{{historia.id}}">
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Modal -->
-<div class="modal fade" id="modalVer{{ historia.id }}" tabindex="-1" aria-labelledby="verModal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="verModal">{{ historia.nombre }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>{{ historia.descripcion }}</p>
-                {% if historia.fecha_modificacion %}
-                <p>Modificado: {{ historia.fecha_modificacion|date:'Y-m-d H:i:s'}}</p>
-                {% endif %}
-                <p>Tipo: {{ historia.tipo }}</p>
-                {% if historia.etapa %}
-                <p>Etapa: {{ historia.etapa }}</p>
-                {% else %}
-                <p>Planificado</p>
-                {% endif %}
-                {% if historia.sprint %}
-                <p>Horas: {{historia.horasAsignadas}}</p>
-                {% endif %}
-                <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
-                <p>
-                    {% if historia.comentarios.count > 0 %}
-                    {{ historia.comentarios.count}} comentarios
-                    {% else %}
-                    No hay comentarios
-                    {% endif %}
-                <p>
-                    {% if historia.archivos.count > 0 %}
-                    {{ historia.archivos.count}} archivos
-                    {% else %}
-                    No hay archivos
-                    {% endif %}
-                </p>
-                {% for info in historia.sprintInfo.all %}
-                <hr>
-                <p>Sprint: {{info.sprint.nombre}}</p>
-                <p>Horas: {{info.versionEnHistorial.horasAsignadas}}</p>
-                <p>Asignado: {{info.versionEnHistorial.usuarioAsignado.get_full_name}}</p>
-                <p>Etapa: {{info.versionEnHistorial.etapa}}</p>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
-<!-- End Modal -->
-
-<!-- Modal -->
-<div class="modal fade" id="modalEtapa{{ historia.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="etapaModal">Estas seguro que desea mover a la siguente etapa?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Esta seguro que desea mover '{{ historia.nombre }}' a la etapa {% siguente_etapa historia %}?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
-                <form method="post" action="{% url 'mover_historias_usuario' proyecto.id historia.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="url" value="{{ request.path }}">
-                    <input type="submit" class="btn btn-primary" value="Mover">
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div>
+    {% include "modals/modalUSCancelar.html" with historia=historia %}
+    {% include "modals/modalUSInfo.html" with historia=historia %}
 {% endfor %}
 
 <script>

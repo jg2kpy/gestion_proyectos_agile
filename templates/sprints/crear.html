@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Crear Sprint{% endblock %}
+{% load gpa_tags %}
 {% block contenido %}
 <div class="row">
     <div class="col-md-12">
@@ -61,7 +62,7 @@
                     <div class="col-md-8">
                         {% for desarrollador in proyecto.usuario.all %}
                         <p class=" depende_miembro_equipo_{{desarrollador.id}}">
-                            <span class="horas_calculadas_{{desarrollador.id}}">0</span> de <span class="horas_dias_{{desarrollador.id}}">0</span> horas asignadas
+                            <span class="horas_calculadas_list horas_calculadas_{{desarrollador.id}}">0</span> de <span class="horas_dias_{{desarrollador.id}}">0</span> horas asignadas
                             <br>
                             <span style="color:red;" id="aviso_horas_desarrollador_{{desarrollador.id}}">
                                 Horas ingresadas difieren significativamente con horas calculadas de las historias de usuario!
@@ -98,7 +99,10 @@
                                         <div class="card-title">
                                             <div>
                                                 <label style="display: none;" for="historia_{{historia.id}}_horas" id="label_historia_horas_{{historia.id}}">Horas</label>
-                                                <input style="display: none;" type="number" class="historia_horas_list" min="1" id="historia_horas_input_{{historia.id}}" name="historia_horas_{{historia.id}}" value="1">
+                                                {% horas_restantes_de_ultimo_sprint historia as horas_restantes %}
+                                                <input style="display: none;" type="number" class="historia_horas_list" min="1"
+                                                    id="historia_horas_input_{{historia.id}}" name="historia_horas_{{historia.id}}"
+                                                    value="{% if horas_restantes > 0 %}{{horas_restantes}}{% else %}1{% endif %}">
                                             </div>
                                             <span class="lead font-weight-light fw-bold">{{ historia.id }}</span>
                                             <span class="lead font-weight-light">{{ historia.nombre }}</span>
@@ -111,6 +115,10 @@
                                         <div>
                                             <p>
                                                 {{ historia.descripcion }}
+                                                <a class="btn btn-link" data-bs-toggle="modal"
+                                                    data-bs-target="#modalVer{{ historia.id }}"><span class="material-icons"
+                                                    data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span>
+                                                </a>
                                             </p>
                                             <p>
                                                 <select style="display: none;" class="form-control desarrollador_asignado_list" name="desarrollador_asignado_{{historia.id}}" id="desarrollador_asignado_{{historia.id}}">
@@ -129,6 +137,7 @@
                         </div>
                     </div>
                 </div>
+                {% include "modals/modalUSInfo.html" with historia=historia %}
                 {% endfor %}
             </div>
             
@@ -316,18 +325,23 @@ function ocultarOpciones() {
 
 function calcularHoras() {
     var horas = $('.historia_horas_list')
+    $('.horas_calculadas_list').text(0)
 
     for (var i = 0; i < horas.length; i++) {
         var horas_calculadas = $('.horas_calculadas_' + horas[i].name.replace('historia_horas_', ''));
         horas_calculadas.text('0');
     }
     
+    var total = {};
     for(var i = 0; i < horas.length; i++) {
         if ($(horas[i]).is(":hidden")) {
             continue;
         }
-        var horas_calculadas = $('.horas_calculadas_' + $('#desarrollador_asignado_' + horas[i].name.replace('historia_horas_', '')).find(":selected").val());
-        horas_calculadas.text(parseInt(horas_calculadas.first().text()) + parseInt($(horas[i]).val()));
+        var dev = $('#desarrollador_asignado_' + horas[i].name.replace('historia_horas_', '')).find(":selected").val();
+        var horas_calculadas = $('.horas_calculadas_' + dev);
+        console.log(horas_calculadas)
+        total[dev] = (total[dev] || 0) + parseInt($(horas[i]).val());
+        horas_calculadas.text(parseInt(total[dev]));
     }
 }
 

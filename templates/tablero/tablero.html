@@ -97,6 +97,10 @@
                                 </div>
                                 <div>
                                     <p>
+                                        {% trabajo_realizado_en_sprint us as horas_usadas %}
+                                        {{ horas_usadas }} de {{ us.horasAsignadas }} horas usadas
+                                    </p>
+                                    <p>
                                         {{ us.descripcion }}
                                     </p>
                                     {% if us.usuarioAsignado %}
@@ -109,12 +113,14 @@
                                     {%check_sprint_desarrollo request.COOKIES proyecto sprints as esta_en_desarrollo %}
                                     {% if esta_en_desarrollo %}
                                         <div class="d-flex justify-content-evenly">
-                                            {% tiene_permiso_en_proyecto user 'pro_modificarUS' us.proyecto as pro_modificarUS %}
-                                            {% if pro_modificarUS %}
-                                                <a href="{% url 'editar_historiaUsuario' us.proyecto.id us.id %}"><span 
-                                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar historia">create</span></a>
+                                            <a href="#modalVer{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modalVer{{ us.id }}"><span class="material-icons"
+                                                data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span>
+                                            </a>
+                                            {% es_scrum_master user proyecto as es_scrum %}
+                                            {% if us.usuarioAsignado == user or es_scrum %}
+                                                <a href="{% url 'tareas' proyecto.id us.id %}"><span 
+                                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Agregar trabajo">engineering</span></a>
                                             {% endif %}
-                
                                             {% tiene_permiso_en_proyecto user 'pro_cancelarUS' us.proyecto as pro_cancelarUS %}
                                             {% if pro_cancelarUS %}
                                                 <a href="#modal{{ us.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ us.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Cancelar historia">cancel</span></a>
@@ -136,12 +142,15 @@
                                                         <a href="javascript:{}" onclick="document.getElementById('form_anterior{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa anterior">arrow_back</span></a>
                                                     </form>
                                                 {% endif %}
+                                                {% cantidad_tareas_en_etapa us as tareas_en_etapa %}
+                                                {% if tareas_en_etapa > 0 %}
                                                 <form method="post" action="{% url 'mover_historias_usuario' us.proyecto.id us.id %}" id="form_siguiente{{us.id}}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="url" value="{{ request.path }}">
                                                     <input type="hidden" name="siguiente" value="siguiente">
                                                     <a href="javascript:{}" onclick="document.getElementById('form_siguiente{{us.id}}').submit(); return false;"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Mover a la etapa siguiente">arrow_forward</span></a>
                                                 </form>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     {% endif %}
@@ -154,27 +163,8 @@
                         </div>
                         <div class="dropzone rounded"> &nbsp; </div>
 
-                        <div class="modal fade" id="modal{{ us.id }}" tabindex="-1" aria-labelledby="cancelarModal" aria-hidden="true">
-                            <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 class="modal-title" id="cancelarModal">Cancelar Historia '{{ us.nombre }}'</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Esta a punto de cancelar la historia de usuario '{{ us.nombre }}', ¿quiere continuar?</p>
-                                </div>
-                                <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abortar</button>
-                                <form method="post" action="{% url 'borrar_historiaUsuario' us.proyecto.id us.id %}">
-                                    {% csrf_token %}
-                                    <input type="submit" class="btn btn-danger" value="Cancelar Historia">
-                                    <input type="hidden" name="url" value="{{ request.path }}">
-                                </form>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
+                        {% include "modals/modalUSCancelar.html" with historia=us %}
+                        {% include "modals/modalUSInfo.html" with historia=us %}
 
                         <div class="modal fade" id="modalEtapaAnterior{{ us.id }}" tabindex="-1" aria-labelledby="etapaModal" aria-hidden="true">
                             <div class="modal-dialog">
