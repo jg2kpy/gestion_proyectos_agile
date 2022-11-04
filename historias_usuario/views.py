@@ -4,6 +4,7 @@ from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
 from django.db import models
 import pytz
+from gestion_proyectos_agile.views import crearNotificacion
 
 
 from proyectos.models import Feriado, Proyecto
@@ -320,10 +321,21 @@ def moverEtapa(request, proyecto_id, historia_id):
             sigOrden = historia.etapa.orden + 1 if historia.etapa else 0
             if sigOrden == historia.tipo.etapas.count():
                 historia.estado = HistoriaUsuario.Estado.TERMINADO
+
+                crearNotificacion(
+                    historia.usuarioAsignado,
+                    f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} pasa a estado Terminado"
+                )
+
             else:
                 sigEtapa = EtapaHistoriaUsuario.objects.get(
                     orden=sigOrden, TipoHistoriaUsusario=historia.tipo)
                 historia.etapa = sigEtapa
+            
+                crearNotificacion(
+                    historia.usuarioAsignado,
+                    f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} pasó a etapa {historia.etapa.nombre}"
+                )
         else:
             antOrden = historia.etapa.orden - 1 if historia.etapa and historia.etapa.orden > 1 else 0
 
@@ -334,6 +346,11 @@ def moverEtapa(request, proyecto_id, historia_id):
                     trabajo.considerado = True
                     trabajo.save()
                 historia.etapa = antEtapa
+
+                crearNotificacion(
+                    historia.usuarioAsignado,
+                    f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} volvió a etapa {historia.etapa.nombre}"
+                )
     
         historia.save()
 
@@ -544,6 +561,11 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
         try:
             historia.estado = HistoriaUsuario.Estado.CANCELADO
             historia.save()
+
+            crearNotificacion(
+                historia.usuarioAsignado,
+                f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} pasa a estado Cancelado"
+            )
         except HistoriaUsuario.DoesNotExist:
             pass
         status = 200
@@ -590,6 +612,11 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
             historia.up = form.cleaned_data['up']
 
             historia.save()
+
+            crearNotificacion(
+                historia.usuarioAsignado,
+                f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} fué editada"
+            )
 
             return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', proyecto_id=proyecto_id)
         else:
@@ -640,6 +667,10 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
             comentario.save()
             historia.comentarios.add(comentario)
 
+            crearNotificacion(
+                historia.usuarioAsignado,
+                f"El usuario {request.user.email} ha hecho un comentario en la historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre}"
+            )
             return redirect('comentarios_historiaUsuario', proyecto_id=proyecto_id, historia_id=historia.id)
         else:
             form.add_error(None, "Hay errores en el formulario.")
@@ -689,6 +720,11 @@ def tareas(request, proyecto_id, historia_id):
             tarea.etapa = historia.etapa
             tarea.sprint = historia.sprint
             tarea.save()
+
+            crearNotificacion(
+                historia.usuarioAsignado,
+                f"El usuario {request.user.email} ha marcado {tarea.horas} horas de trabajo en la historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre}"
+            )
 
             return redirect('tareas', proyecto_id=proyecto_id, historia_id=historia.id)
         else:
@@ -742,6 +778,12 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
             versionPrevia = HistoriaUsuario.objects.get(id=request.POST.get('version'))
         except HistoriaUsuario.DoesNotExist:
             return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
+
+        crearNotificacion(
+            historia.usuarioAsignado,
+            f"El usuario {request.user.email} ha restaurado la historia de usuario {historia.nombre} a la versión registrada \
+                en la fecha {versionPrevia.fecha_modificacion.strftime('%m/%d/%Y, %H:%M:%S')} perteneciente al sprint {historia.sprint.nombre}"
+        )
 
         historia.restaurarDelHistorial(versionPrevia)
 
