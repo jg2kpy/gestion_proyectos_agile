@@ -52,7 +52,7 @@ class ArchivoBurndown(models.Model):
     :param fecha_subida: Fecha de subida del archivo.
     :type fecha_subida: datetime
     :param archivo: Archivo perteneciente al Burndown Chart.
-    :type archivo: ImageField
+    :type archivo: FileField
     """
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
@@ -68,8 +68,10 @@ class ArchivoVelocity(models.Model):
     :type nombre: str
     :param fecha_subida: Fecha de subida del archivo.
     :type fecha_subida: datetime
+    :param proyecto: Proyecto perteneciente al Velocity Chart.
+    :type proyecto: Proyecto
     :param archivo: Archivo perteneciente al Velocity Chart.
-    :type archivo: ImageField
+    :type archivo: FileField
     """
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
@@ -92,6 +94,12 @@ class Sprint(models.Model):
     :type estado: str
     :param duracion: Duración del sprint en días.
     :type duracion: int
+    :param nombre: Nombre del sprint.
+    :type nombre: str
+    :param descripcion: Descripción del sprint.
+    :type descripcion: str
+    :param burndownChart: Archivo referente al burndown chart.
+    :type burndownChart: ArchivoBurndown
     """
     fecha_inicio = models.DateTimeField(blank=True, null=True)
     fecha_fin = models.DateTimeField(blank=True, null=True)

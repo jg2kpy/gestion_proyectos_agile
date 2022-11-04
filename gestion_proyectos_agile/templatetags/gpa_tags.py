@@ -365,6 +365,9 @@ def restar(value, arg):
 def cantidad_notif_no_leido(usuario):
     """Funcion ver la cantidad de notificaciones no leídas
 
+    :param usuario: Usuario que recibe la notificación
+    :type usuario: Usuario
+
     :return: Retorna 0 si no hay notificaciones sin leer o la cantidad de notificaciones correspondiente
     :rtype: int
     """
@@ -372,7 +375,10 @@ def cantidad_notif_no_leido(usuario):
 
 @register.simple_tag
 def existe_sprint_terminado(proyecto):
-    """Verifica si existe un sprint terminado
+    """Verifica si existe un sprint terminado en el proyecto
+
+    :param proyecto: Proyecto que se quiere analizar
+    :type proyecto: Proyecto
 
     :return: Retorna True si hay por lo menos un sprint terminado, caso contrario False
     :rtype: bool
