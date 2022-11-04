@@ -315,7 +315,7 @@ def moverEtapa(request, proyecto_id, historia_id):
         if 'siguiente' in request.POST:
 
             if historia.tareas.filter(etapa=historia.etapa).count() <= 0:
-                return render(request, '422.html', {'info_adicional': "No se puede pasar a la siguiente etapa porque no existen tareas en esta etapa."}, status=422)
+                return render(request, '404.html', {'info_adicional': "No se puede pasar a la siguiente etapa porque no existen tareas en esta etapa."}, status=422)
 
             sigOrden = historia.etapa.orden + 1 if historia.etapa else 0
             if sigOrden == historia.tipo.etapas.count():
