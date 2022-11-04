@@ -973,7 +973,7 @@
     "model": "proyectos.sprint",
     "pk": 1,
     "fields": {
-      "fecha_inicio": "2022-11-04T14:42:19.752Z",
+      "fecha_inicio": "2022-10-21T14:42:19.752Z",
       "fecha_fin": "2022-11-04T14:47:57.779Z",
       "proyecto": 1,
       "estado": "Terminado",
@@ -1001,7 +1001,7 @@
     "model": "proyectos.sprint",
     "pk": 3,
     "fields": {
-      "fecha_inicio": "2022-11-04T14:55:57.211Z",
+      "fecha_inicio": "2022-10-21T14:55:57.211Z",
       "fecha_fin": "2022-11-04T14:58:05.421Z",
       "proyecto": 2,
       "estado": "Terminado",
@@ -1015,7 +1015,7 @@
     "model": "proyectos.sprint",
     "pk": 4,
     "fields": {
-      "fecha_inicio": "2022-11-04T14:59:30.600Z",
+      "fecha_inicio": "2022-10-21T14:59:30.600Z",
       "fecha_fin": "2022-11-24T14:59:30.600Z",
       "proyecto": 2,
       "estado": "Desarrollo",
@@ -1895,7 +1895,7 @@
     "model": "historias_usuario.tarea",
     "pk": 1,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-10-21",
       "historia": 3,
       "sprint": 1,
       "usuario": 1,
@@ -1909,7 +1909,7 @@
     "model": "historias_usuario.tarea",
     "pk": 2,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-10-24",
       "historia": 2,
       "sprint": 1,
       "usuario": 1,
@@ -1923,7 +1923,7 @@
     "model": "historias_usuario.tarea",
     "pk": 3,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-10-24",
       "historia": 4,
       "sprint": 1,
       "usuario": 1,
@@ -1937,7 +1937,7 @@
     "model": "historias_usuario.tarea",
     "pk": 4,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-10-25",
       "historia": 3,
       "sprint": 1,
       "usuario": 1,
@@ -1951,7 +1951,7 @@
     "model": "historias_usuario.tarea",
     "pk": 5,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-10-26",
       "historia": 2,
       "sprint": 1,
       "usuario": 1,
@@ -1965,7 +1965,7 @@
     "model": "historias_usuario.tarea",
     "pk": 6,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-10-27",
       "historia": 4,
       "sprint": 1,
       "usuario": 1,
@@ -1979,7 +1979,7 @@
     "model": "historias_usuario.tarea",
     "pk": 7,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-10-28",
       "historia": 3,
       "sprint": 1,
       "usuario": 1,
@@ -2007,7 +2007,7 @@
     "model": "historias_usuario.tarea",
     "pk": 9,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-10-21",
       "historia": 4,
       "sprint": 1,
       "usuario": 1,
@@ -2021,7 +2021,7 @@
     "model": "historias_usuario.tarea",
     "pk": 10,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-11-03",
       "historia": 15,
       "sprint": 3,
       "usuario": 2,
@@ -2035,7 +2035,7 @@
     "model": "historias_usuario.tarea",
     "pk": 11,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-10-27",
       "historia": 14,
       "sprint": 3,
       "usuario": 2,
@@ -2049,7 +2049,7 @@
     "model": "historias_usuario.tarea",
     "pk": 12,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-11-01",
       "historia": 15,
       "sprint": 3,
       "usuario": 2,
@@ -2063,7 +2063,7 @@
     "model": "historias_usuario.tarea",
     "pk": 13,
     "fields": {
-      "fecha": "2022-11-04",
+      "fecha": "2022-10-25",
       "historia": 16,
       "sprint": 4,
       "usuario": 2,
