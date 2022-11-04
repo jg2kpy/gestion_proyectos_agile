@@ -993,6 +993,47 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
 
     return render(request, 'sprints/agregar_historias.html', {'proyecto': proyecto, 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
 
+@never_cache
+def reasignar_us(request, proyecto_id, historia_id):
+    """
+    Permite reasignar una historia de usuario
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto al que pertenece el sprint
+    :type proyecto_id: int
+
+    :param historia_id: ID de la historia de usuario a reasignar
+    :type historia_id: int
+
+    :return: Renderiza la pagina para reasignar
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        historia = HistoriaUsuario.objects.get(id=historia_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_permiso_en_proyecto(request_user, 'pro_crearTipoUS', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para reasignar'}, status=403)
+
+    status = 200
+    error = None
+    if request.method == 'POST':
+        historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
+        historia.save()
+        return redirect('backlog_sprint', proyecto.id, historia.sprint.id)
+
+    return render(request, 'sprints/reasignar_historia.html', {'proyecto': proyecto, 'historia': historia, 'error': error}, status=status)
+
 
 def calcularHorasDiarias(sprint, cantDiasSprint, fechaInicial, feriados):
     fechaActual = fechaInicial
