@@ -1,5 +1,5 @@
 from django.contrib import admin
-from usuarios.models import RolSistema
+from usuarios.models import Notificacion, RolSistema
 
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 
@@ -8,6 +8,7 @@ from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 admin.site.register(Usuario)
 admin.site.register(RolProyecto)
 admin.site.register(PermisoProyecto)
+admin.site.register(Notificacion)
 
 # personalizar el admin y mostrar los campos que queremos
 class UsuarioAdmin(admin.ModelAdmin):

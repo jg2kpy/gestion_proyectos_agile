@@ -84,49 +84,7 @@
             </div>
         </div>
         
-        <!-- Modal -->
-        <div class="modal fade" id="modalVer{{ historia.id }}" tabindex="-1" aria-labelledby="verModal"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="verModal">{{ historia.nombre }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>{{ historia.descripcion }}</p>
-                    {% if historia.fecha_modificacion %}
-                    <p>Modificado: {{ historia.fecha_modificacion|date:'Y-m-d H:i:s'}}</p>
-                    {% endif %}
-                    {% if historia.etapa %}
-                        <p>Etapa: {{ historia.etapa }}</p>
-                    {% else %}
-                        <p>Planificado</p>
-                    {% endif %}
-                    {% if historia.usuarioAsignado %}
-                        <p>Encargado: {{ historia.usuarioAsignado.get_full_name }}</p>
-                    {% else %}
-                        <p>AUN NO TIENE ENCARGADO</p>
-                    {% endif %}
-                    <p>
-                        {% if historia.comentarios.count > 0 %}
-                            {{ historia.comentarios.count}} comentarios
-                        {% else %}
-                            No hay comentarios
-                        {% endif %}
-                    <p>
-                        {% if historia.archivos.count > 0 %}
-                            {{ historia.archivos.count}} archivos
-                        {% else %}
-                            No hay archivos
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- End Modal -->
+        {% include "modals/modalUSInfo.html" with historia=historia %}
     {% endfor %}
 </div>
 {% endblock %}

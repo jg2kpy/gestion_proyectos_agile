@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Tareas de {{ historia.nombre }}{% endblock %}
+{% block contenido %}
+{% load gpa_tags %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Tareas de '{{ historia.nombre }}'</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            {% trabajo_realizado_en_sprint historia as horas_usadas %}
+            <h5>{{ horas_usadas }} de {{ historia.horasAsignadas }} horas usadas</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form method="post">
+                <span>Etapa: {{ historia.etapa }}</span>
+                {% csrf_token %}
+                {{ form.non_form_errors }}
+                {{ form.as_p }}
+                <input type="submit" class="btn btn-primary" value="Guardar trabajo">
+                <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
+            </form>
+        </div>
+    </div>
+    <hr>
+    {% for sprint in sprints_tareas %}
+    <div class="row">
+        <h2>
+            Trabajo en Sprint {{ sprint.nombre_pantalla }}
+        </h2>
+    </div>
+    <div class="row">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Horas</th>
+                    <th>Etapa</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tarea in sprint.tareaslist %}
+                <tr>
+                    <td>{{ tarea.descripcion }}</td>
+                    <td>{{ tarea.horas }}</td>
+                    <td>{{ tarea.etapa }}</td>
+                    <td>{{ tarea.fecha }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

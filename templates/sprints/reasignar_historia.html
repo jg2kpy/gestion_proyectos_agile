@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Agregar Historias de Usuario al Sprint{% endblock %}
+{% load gpa_tags %}
+{% block contenido %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="container">
+            <h1>
+                Reasignar Historia de Usuario
+            </h1>
+        </div>
+        <form id="sprintForm" action="." method="POST">
+            {% csrf_token %}
+            <div class="container">
+                <div class="row ">
+                    <div class="col-md-10">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="card shadow-sm" id="cd1">
+                                    <div class="card-body p-2">
+                                        <div class="card-title">
+                                            <span class="lead font-weight-light fw-bold">{{ historia.id }}</span>
+                                            <span class="lead font-weight-light">{{ historia.nombre }}</span>
+                                            <br>
+                                            <span class="badge bg-secondary">UP {{ historia.up }}</span>
+                                            <span class="badge bg-secondary">BV {{ historia.bv }}</span>
+                                            <br>
+                                            <span>{{historia.fecha_modificacion|date:"Y/m/d"}}</span>
+                                        </div>
+                                        <div>
+                                            <p>
+                                                {{ historia.descripcion }}
+                                                <a class="btn btn-link" data-bs-toggle="modal"
+                                                    data-bs-target="#modalVer{{ historia.id }}"><span class="material-icons"
+                                                    data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span>
+                                                </a>
+                                            </p>
+                                            <p>
+                                                <select class="form-control desarrollador_asignado_list" name="desarrollador_asignado_{{historia.id}}" id="desarrollador_asignado_{{historia.id}}">
+                                                    <option value="">Usuario asignado:</option>
+                                                    {% for desarrollador in proyecto.usuario.all %}
+                                                    <option class="depende_miembro_equipo_{{desarrollador.id}}" value="{{ desarrollador.id }}">
+                                                        {{ desarrollador.get_full_name }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <input type="submit" class="btn btn-primary" value="Reasignar">
+                {% include "modals/modalUSInfo.html" with historia=historia %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

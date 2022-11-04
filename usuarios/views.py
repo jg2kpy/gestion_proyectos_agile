@@ -4,9 +4,10 @@ from django.forms import ModelForm
 from django.views.decorators.cache import never_cache
 
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
+from gestion_proyectos_agile.views import crearNotificacion
 from proyectos.models import Proyecto
 from usuarios.models import RolProyecto, Usuario
-from .models import PermisoSistema, Usuario
+from .models import Notificacion, PermisoSistema, Usuario
 
 from usuarios.models import RolSistema, Usuario
 from django.shortcuts import redirect
@@ -273,6 +274,10 @@ def eliminar_miembro_proyecto(form, request_user, proyecto):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
+    crearNotificacion(
+            Usuario.objects.get(email=usuario_email),
+            f"Usted ha sido removido del proyecto: {proyecto.nombre}")
+
     return redirect('vista_equipo', proyecto_id=proyecto.id)
 
 
@@ -310,6 +315,10 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto):
         rol_proyecto = RolProyecto.objects.get(id=rol_id)
         usuario_a_agregar_miembro_proyecto.roles_proyecto.add(rol_proyecto)
 
+        crearNotificacion(
+            Usuario.objects.get(email=usuario_email),
+            f"Usted ha sido añadido al proyecto {proyecto.nombre} con el rol {rol_proyecto.nombre}")
+
     except Usuario.DoesNotExist:
         return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario no existe', 'proyecto': proyecto}, status=422)
 
@@ -343,6 +352,10 @@ def eliminar_rol_proyecto(form, request_user, proyecto):
         rol = RolProyecto.objects.get(id=rol_id)
         usuario_a_eliminar_rol.roles_proyecto.remove(rol)
 
+        crearNotificacion(
+            Usuario.objects.get(email=usuario_email),
+            f"Se le ha removiodo el rol {rol.nombre} dentro del proyecto {proyecto.nombre}")
+
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
@@ -374,7 +387,17 @@ def asignar_rol_proyecto(form, request_user, proyecto):
         rol_id = form.get(f'roles{usuario_email}')
         usuario_a_agregar_rol = Usuario.objects.get(email=usuario_email)
         rol = RolProyecto.objects.get(id=rol_id)
+        if rol.nombre == "Scrum Master":
+            anteriorMaster = proyecto.scrumMaster
+            anteriorMaster.roles_proyecto.remove(rol)
+            proyecto.scrumMaster = usuario_a_agregar_rol
+            proyecto.save()
+
         usuario_a_agregar_rol.roles_proyecto.add(rol)
+
+        crearNotificacion(
+            Usuario.objects.get(email=usuario_email),
+            f"Se le ha agregado el rol {rol.nombre} dentro del proyecto {proyecto.nombre}")
 
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)

@@ -1,7 +1,8 @@
 from django import forms
+import django
 from django.forms.utils import ErrorList
 
-from historias_usuario.models import Comentario, EtapaHistoriaUsuario, HistoriaUsuario, SubirArchivo, TipoHistoriaUsusario
+from historias_usuario.models import Comentario, EtapaHistoriaUsuario, HistoriaUsuario, SubirArchivo, Tarea, TipoHistoriaUsusario
 
 class DivErrorList(ErrorList):
     """ Lista de errores de un form estilizados
@@ -163,6 +164,32 @@ class ComentarioForm(forms.ModelForm):
         }
         labels = {
             "contenido": "Comentario"
+        }
+
+class TareaForm(forms.ModelForm):
+    """ Formulario para crear una tarea
+    """
+    class Meta:
+        """ Meta
+
+        :param model: Tarea
+        :type model: Tarea
+        :param fields: ['descripcion', 'horas']
+        :type fields: list
+        :param widgets: TextArea
+        :type widgets: dict
+        """
+        model = Tarea
+        fields = ('descripcion', 'horas', 'fecha')
+        widgets = {
+            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
+            'horas': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
+        labels = {
+            "descripcion": "Descripción",
+            "horas": "Horas trabajadas",
+            "fecha": "Fecha",
         }
 
 class SubirArchivoForm(forms.ModelForm):

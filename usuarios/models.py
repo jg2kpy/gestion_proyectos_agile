@@ -1,3 +1,4 @@
+from xmlrpc.client import Boolean
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Group
@@ -205,3 +206,34 @@ def populate_profile(sociallogin, user, **kwargs):
         user.direccion = sociallogin.account.extra_data['location']
 
     user.save()
+
+
+class Notificacion(models.Model):
+    """
+    Notificación que posee el usuario
+
+    :param fecha: Fecha de envío de la notificación
+    :type fecha: datetime
+
+    :param usuario: Usuarios que tienen la notificación
+    :type usuario: Usuario
+    
+    :param descripcion: Descripción del la notificación
+    :type descripcion: str
+
+    :param leido: Si la notificación fue leída
+    :type leido: bool
+    """
+
+    fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING, related_name="notificaciones")
+    descripcion = models.TextField(null=False)
+    leido = models.BooleanField(default=False)
+
+    def __str__(self):
+        """Representación en string de la notificación.
+
+        Returns:
+            str: Descripción de la notificación.
+        """
+        return self.descripcion
