@@ -317,7 +317,7 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto):
 
         crearNotificacion(
             Usuario.objects.get(email=usuario_email),
-            f"Usted ha sido añadido al proyecto: {proyecto.nombre}")
+            f"Usted ha sido añadido al proyecto {proyecto.nombre} con el rol {rol_proyecto.nombre}")
 
     except Usuario.DoesNotExist:
         return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario no existe', 'proyecto': proyecto}, status=422)
@@ -351,6 +351,10 @@ def eliminar_rol_proyecto(form, request_user, proyecto):
         usuario_a_eliminar_rol = Usuario.objects.get(email=usuario_email)
         rol = RolProyecto.objects.get(id=rol_id)
         usuario_a_eliminar_rol.roles_proyecto.remove(rol)
+
+        crearNotificacion(
+            Usuario.objects.get(email=usuario_email),
+            f"Se le ha removiodo el rol {rol.nombre} dentro del proyecto {proyecto.nombre}")
 
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
@@ -390,6 +394,10 @@ def asignar_rol_proyecto(form, request_user, proyecto):
             proyecto.save()
 
         usuario_a_agregar_rol.roles_proyecto.add(rol)
+
+        crearNotificacion(
+            Usuario.objects.get(email=usuario_email),
+            f"Se le ha agregado el rol {rol.nombre} dentro del proyecto {proyecto.nombre}")
 
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
