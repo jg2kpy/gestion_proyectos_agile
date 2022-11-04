@@ -12,7 +12,7 @@ from historias_usuario.views import tiposHistoriaUsuario
 from usuarios.models import RolProyecto, Usuario
 from proyectos.models import Proyecto, Sprint
 from usuarios.models import RolSistema
-from .models import HistoriaUsuario, TipoHistoriaUsusario
+from .models import EtapaHistoriaUsuario, HistoriaUsuario, Tarea, TipoHistoriaUsusario
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth import get_user_model
 from django.test.client import RequestFactory
@@ -234,13 +234,30 @@ class HistoriasUsuarioTest(TestCase):
                 'tipo': TipoHistoriaUsusario.objects.get(nombre='Test tipo 1').id,
                 'usuarioAsignado': Usuario.objects.get(email='testemail@example.com').id
             }, follow=True)
+        
+        creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        creado.etapa = EtapaHistoriaUsuario.objects.get(TipoHistoriaUsusario=TipoHistoriaUsusario.objects.get(nombre='Test tipo 1'), orden=1)
+        creado.sprint = Sprint(proyecto=self.proyecto, fecha_inicio=datetime.datetime.now(tz=get_current_timezone()), fecha_fin=datetime.datetime.now(tz=get_current_timezone()) + datetime.timedelta(days=7), duracion=7)
+        creado.usuarioAsignado = Usuario.objects.get(email='testemail@example.com')
+        creado.sprint.save()
+        creado.save()
 
         for _ in range(4):
-            actual = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
-            res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{actual.id}/", {'siguiente':'siguiente'} ,follow=True)
+            tarea = Tarea()
+            tarea.descripcion = 'Test tarea 1'
+            tarea.sprint = creado.sprint
+            tarea.etapa = creado.etapa
+            tarea.historia = creado
+            tarea.sprint = creado.sprint
+            tarea.usuario = creado.usuarioAsignado
+            tarea.horas = 1
+            tarea.save()
+            creado.tareas.add(tarea)
+            creado.save()
+            res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", {'siguiente':'siguiente'} ,follow=True)
             self.assertEqual(res.status_code, 200)
 
-        terminado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='T')
+        terminado = HistoriaUsuario.objects.all().count()
         self.assertIsNotNone(terminado)
 
     def test_moverHistoriaSigEtapa(self):
@@ -255,18 +272,46 @@ class HistoriasUsuarioTest(TestCase):
             }, follow=True)
 
         creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        creado.etapa = EtapaHistoriaUsuario.objects.get(TipoHistoriaUsusario=TipoHistoriaUsusario.objects.get(nombre='Test tipo 1'), orden=1)
+        creado.sprint = Sprint(proyecto=self.proyecto, fecha_inicio=datetime.datetime.now(tz=get_current_timezone()), fecha_fin=datetime.datetime.now(tz=get_current_timezone()) + datetime.timedelta(days=7), duracion=7)
+        creado.usuarioAsignado = Usuario.objects.get(email='testemail@example.com')
+        creado.sprint.save()
+        tarea = Tarea()
+        tarea.descripcion = 'Test tarea 1'
+        tarea.sprint = creado.sprint
+        tarea.etapa = creado.etapa
+        tarea.historia = creado
+        tarea.sprint = creado.sprint
+        tarea.usuario = creado.usuarioAsignado
+        tarea.horas = 1
+        tarea.save()
+        creado.tareas.add(tarea)
+        creado.save()
+
+        self.assertGreater(creado.tareas.filter(etapa=creado.etapa).count(), 0, 'No se pudo crear la tarea')
         res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", {'siguiente':'siguiente'}, follow=True)
         self.assertEqual(res.status_code, 200)
+        tarea = Tarea()
+        tarea.descripcion = 'Test tarea 1'
+        tarea.sprint = creado.sprint
+        tarea.etapa = creado.etapa
+        tarea.historia = creado
+        tarea.sprint = creado.sprint
+        tarea.usuario = creado.usuarioAsignado
+        tarea.horas = 1
+        tarea.save()
+        creado.tareas.add(tarea)
+        creado.save()
         res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", {'siguiente':'siguiente'}, follow=True)
 
         movidoSig = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
-        self.assertEqual(movidoSig.etapa.nombre, 'Etapa 2', f'La historia de usuario no se movió. Está en etapa: {movidoSig.etapa.nombre}')
+        self.assertEqual(movidoSig.etapa.nombre, 'Etapa 3', 'La historia de usuario no se movió.')
 
         res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", {'anterior':'anterior'}, follow=True)
         self.assertEqual(res.status_code, 200)
 
         movidoAnt = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
-        self.assertEqual(movidoAnt.etapa.nombre, 'Etapa 1', f'La historia de usuario no se movió. Está en etapa: {movidoAnt.etapa.nombre}')
+        self.assertEqual(movidoAnt.etapa.nombre, 'Etapa 2', f'La historia de usuario no se movió. Está en etapa: {movidoAnt.etapa.nombre}')
 
     def test_visualizarHistoriaUsuarioAsignada(self):
         """
