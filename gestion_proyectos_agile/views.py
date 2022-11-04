@@ -80,3 +80,20 @@ def notificaciones(request):
     notifNoLeido = Notificacion.objects.filter(usuario=request.user, leido=False)
     
     return render(request, 'notificaciones/notificaciones.html', {'notifLeido' : notifLeido, 'notifNoLeido': notifNoLeido}, status=200)
+
+
+def crearNotificacion(usuario, descripcion):
+    """
+    Crea una notificación con el usuario y la descripción
+
+    :param usuario: Usuario a recibir la notificación
+    :type usuario: Usuario
+    
+    :param descripcion: Descripción de la notificación
+    :type descripcion: str
+    """
+
+    nuevaNotif = Notificacion()
+    nuevaNotif.usuario = usuario
+    nuevaNotif.descripcion = descripcion
+    nuevaNotif.save()
