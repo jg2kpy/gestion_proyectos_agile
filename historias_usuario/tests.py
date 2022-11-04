@@ -312,6 +312,43 @@ class HistoriasUsuarioTest(TestCase):
 
         movidoAnt = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
         self.assertEqual(movidoAnt.etapa.nombre, 'Etapa 2', f'La historia de usuario no se movió. Está en etapa: {movidoAnt.etapa.nombre}')
+    
+    def test_moverSinTareaBloqueado(self):
+        """
+        Prueba de mover una historia de usuario a su siguiente etapa.
+        """
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historia-usuario/crear/", 
+            {
+                'nombre': 'Test US 1', 'descripcion': 'Des de Test US 1', 'bv': '10', 'up': '10',
+                'tipo': TipoHistoriaUsusario.objects.get(nombre='Test tipo 1').id,
+                'usuarioAsignado': Usuario.objects.get(email='testemail@example.com').id
+            }, follow=True)
+
+        creado = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        creado.etapa = EtapaHistoriaUsuario.objects.get(TipoHistoriaUsusario=TipoHistoriaUsusario.objects.get(nombre='Test tipo 1'), orden=1)
+        creado.sprint = Sprint(proyecto=self.proyecto, fecha_inicio=datetime.datetime.now(tz=get_current_timezone()), fecha_fin=datetime.datetime.now(tz=get_current_timezone()) + datetime.timedelta(days=7), duracion=7)
+        creado.usuarioAsignado = Usuario.objects.get(email='testemail@example.com')
+        creado.sprint.save()
+        tarea = Tarea()
+        tarea.descripcion = 'Test tarea 1'
+        tarea.sprint = creado.sprint
+        tarea.etapa = creado.etapa
+        tarea.historia = creado
+        tarea.sprint = creado.sprint
+        tarea.usuario = creado.usuarioAsignado
+        tarea.horas = 1
+        tarea.save()
+        creado.tareas.add(tarea)
+        creado.save()
+
+        self.assertGreater(creado.tareas.filter(etapa=creado.etapa).count(), 0, 'No se pudo crear la tarea')
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", {'siguiente':'siguiente'}, follow=True)
+        self.assertEqual(res.status_code, 200)
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/historias/{creado.id}/", {'siguiente':'siguiente'}, follow=True)
+        self.assertNotEquals(res.status_code, 200)
+
+        movidoAnt = HistoriaUsuario.objects.get(nombre='Test US 1', estado='A')
+        self.assertEqual(movidoAnt.etapa.nombre, 'Etapa 3', f'La historia de usuario no se movió.')
 
     def test_visualizarHistoriaUsuarioAsignada(self):
         """
