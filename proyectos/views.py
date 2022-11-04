@@ -782,13 +782,14 @@ def crear_sprint(request, proyecto_id):
             if request.POST.get('historia_seleccionado_'+str(historia.id)):
                 historia.sprint = sprint
                 historia.horasAsignadas = request.POST.get('historia_horas_'+str(historia.id))
-                historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
+                historia.usuarioAsignado = Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
                 historia.save()
             
-            crearNotificacion(
-                historia.usuarioAsignado,
-                f"Se le ha asignado la historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre}"
-            )
+            if historia.usuarioAsignado:
+                crearNotificacion(
+                    historia.usuarioAsignado,
+                    f"Se le ha asignado la historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre}"
+                )
         
         for usuario in proyecto.usuario.all():
             horas = request.POST.get('horas_trabajadas_'+str(usuario.id))
@@ -1006,10 +1007,11 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
                 historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
                 historia.save()
 
-                crearNotificacion(
-                    historia.usuarioAsignado,
-                    f"Se le ha asignado la historia {historia.nombre} perteneciente al sprint {historia.sprint} dentro del proyecto {proyecto.nombre} dentro del proyecto {historia.proyecto.nombre}"
-                )
+                if historia.usuarioAsignado:
+                    crearNotificacion(
+                        historia.usuarioAsignado,
+                        f"Se le ha asignado la historia {historia.nombre} perteneciente al sprint {historia.sprint} dentro del proyecto {proyecto.nombre} dentro del proyecto {historia.proyecto.nombre}"
+                    )
 
         return redirect('backlog_sprint', sprint.proyecto.id, sprint.id)
 
@@ -1050,17 +1052,19 @@ def reasignar_us(request, proyecto_id, historia_id):
     status = 200
     error = None
     if request.method == 'POST':
-        crearNotificacion(
-            historia.usuarioAsignado,
-            f"Usted ha sido desasignado de la historia de usuario {historia.nombre} dentro del sprint {historia.sprint.nombre} perteneciente al proyecto {historia.proyecto.nombre}"
-        )
+
+        if historia.usuarioAsignado:
+            crearNotificacion(
+                historia.usuarioAsignado,
+                f"Usted ha sido desasignado de la historia de usuario {historia.nombre} perteneciente al proyecto {historia.proyecto.nombre}"
+            )
 
         historia.usuarioAsignado =  Usuario.objects.get(id=request.POST.get('desarrollador_asignado_'+str(historia.id)))
         historia.save()
 
         crearNotificacion(
             historia.usuarioAsignado,
-            f"Usted ha sido asignado a la historia de usuario {historia.nombre} dentro del sprint {historia.sprint.nombre} perteneciente al proyecto {historia.proyecto.nombre}"
+            f"Usted ha sido asignado a la historia de usuario {historia.nombre} perteneciente al proyecto {historia.proyecto.nombre}"
         )
 
         return redirect('backlog_sprint', proyecto.id, historia.sprint.id)
