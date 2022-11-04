@@ -78,7 +78,7 @@ if [ $entorno -eq 1 ];then
     echo "Le gustaria cargar los datos de prueba?[s/n]"
     read opcion
     if [ $entorno = "s" ];then
-        docker exec gpa-dev python3 manage.py loaddata databasedump_junior.json
+        docker exec gpa-dev python3 manage.py loaddata databasedump_prueba.json
     fi
     while [ true ]
     do
