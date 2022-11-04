@@ -3,6 +3,8 @@ import email
 import os
 from django.utils.timezone import get_current_timezone
 from django import setup
+
+from gestion_proyectos_agile.templatetags.gpa_tags import cantidad_tareas_en_etapa, horas_trabajadas_en_sprint, horas_trabajadas_en_sprint_total, trabajo_realizado_en_sprint
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_proyectos_agile.settings")
 setup()
 
@@ -545,3 +547,196 @@ class HistorialTest(TestCase):
         self.historiaTest.restaurarDelHistorial(historiaHistorial)
         self.assertEqual(HistoriaUsuario.objects.filter(tipo=self.tipoTest).count(), 3, 'Restaurar la historia de usuario a su vez se guarda en el historial')
         self.assertEqual(self.historiaTest.nombre, historiaHistorial.nombre, 'El nombre de la historia de usuario es igual al historial restaurado')
+
+class TareasTest(TestCase):
+    """
+    Pruebas de la clase Tarea.
+    """
+    def setUp(self):
+        """
+        Configuracion inicial de las pruebas.
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+                                                        
+        get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738041'))
+
+
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD", "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
+        self.assertTrue(self.proyecto.roles.filter(usuario=self.user, nombre="Scrum Master").exists())
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tipo-historia-usuario/crear/", {'nombre': 'Test tipo 1', 'descripcion': 'Des de Test tipo 1', 'etapas-TOTAL_FORMS': '3', 'etapas-INITIAL_FORMS': '0',
+                        'etapas-MIN_NUM_FORMS': '0', 'etapas-MAX_NUM_FORMS': '1000', 'etapas-0-nombre': 'Etapa 1', 'etapas-0-descripcion': "descripcion1", 'etapas-1-nombre': 'Etapa 2', 'etapas-1-descripcion': "descripcion2", 'etapas-2-nombre': 'Etapa 3', 'etapas-2-descripcion': "descripcion3"}, follow=True)
+        self.assertEqual(res.status_code, 200)
+
+        self.tipoTest = TipoHistoriaUsusario.objects.get(nombre='Test tipo 1')
+        self.assertIsNotNone(self.tipoTest, 'El tipo de historia de usuario no existe')
+        self.assertEqual(self.tipoTest.nombre, 'Test tipo 1', 'El tipo de historia de usuario no tiene el nombre correspondiente')
+        self.assertEqual(self.tipoTest.descripcion, 'Des de Test tipo 1', 'El tipo de historia de usuario no tiene la descripcion correspondiente')
+        self.historiaTest = HistoriaUsuario.objects.create(tipo=self.tipoTest, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1, usuarioAsignado=self.user, horasAsignadas=10)
+        self.historiaTest.sprint = Sprint(proyecto=self.proyecto, fecha_inicio=datetime.datetime.now(tz=get_current_timezone()), fecha_fin=datetime.datetime.now(tz=get_current_timezone()) + datetime.timedelta(days=7), duracion=7)
+        self.historiaTest.sprint.save()
+        self.historiaTest.etapa = EtapaHistoriaUsuario.objects.get(TipoHistoriaUsusario=TipoHistoriaUsusario.objects.get(nombre='Test tipo 1'), orden=1)
+        self.historiaTest.save()
+        self.assertEqual(HistoriaUsuario.objects.filter(tipo=self.tipoTest).count(), 1, 'Se creo la historia de usuario')
+
+    fixtures = [
+       "databasedump.json",
+    ]
+
+    def test_crearTarea(self):
+        """
+        Prueba de crear una tarea.
+        """
+        self.assertEqual(Tarea.objects.filter(historia=self.historiaTest).count(), 0, 'No hay tareas')
+        tarea1 = Tarea()
+        tarea1.descripcion = 'Test tarea 1'
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.etapa = self.historiaTest.etapa
+        tarea1.historia = self.historiaTest
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.usuario = self.historiaTest.usuarioAsignado
+        tarea1.horas = 1
+        tarea1.save()
+        self.assertIsNotNone(tarea1, 'Se creo la tarea')
+        self.assertEqual(Tarea.objects.filter(historia=self.historiaTest).count(), 1, 'Se creo la tarea')
+    
+    def test_trabajoRealizadoEnSprintVacio(self):
+        """
+        Prueba calcular horas de trabajo realizado en Sprint vacio
+        """
+        self.assertEqual(horas_trabajadas_en_sprint_total(self.historiaTest.sprint), 0, 'No hay horas de trabajo en el sprint')
+
+    def test_trabajoRealizadoEnSprintVacio(self):
+        """
+        Prueba calcular horas de trabajo realizado en Sprint
+        """
+        tarea1 = Tarea()
+        tarea1.descripcion = 'Test tarea 1'
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.etapa = self.historiaTest.etapa
+        tarea1.historia = self.historiaTest
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.usuario = self.historiaTest.usuarioAsignado
+        tarea1.horas = 1
+        tarea1.save()
+        tarea2 = Tarea()
+        tarea2.descripcion = 'Test tarea 2'
+        tarea2.sprint = self.historiaTest.sprint
+        tarea2.etapa = self.historiaTest.etapa
+        tarea2.historia = self.historiaTest
+        tarea2.sprint = self.historiaTest.sprint
+        tarea2.usuario = self.historiaTest.usuarioAsignado
+        tarea2.horas = 4
+        tarea2.save()
+        self.assertEqual(horas_trabajadas_en_sprint_total(self.historiaTest.sprint), 5, 'No hay horas de trabajo en el sprint')
+
+    def test_trabajoRealizadoEnSprintVacio(self):
+        """
+        Prueba calcular horas de trabajo realizado en Sprint
+        """
+        self.user2 = get_user_model().objects.create_user(email='testemail3@example.com', password='A123B456c.2',
+                                                         avatar_url='avatar3@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0984 738040'))
+        self.user2.save()
+        tarea1 = Tarea()
+        tarea1.descripcion = 'Test tarea 1'
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.etapa = self.historiaTest.etapa
+        tarea1.historia = self.historiaTest
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.usuario = self.user2
+        tarea1.horas = 1
+        tarea1.save()
+        tarea2 = Tarea()
+        tarea2.descripcion = 'Test tarea 2'
+        tarea2.sprint = self.historiaTest.sprint
+        tarea2.etapa = self.historiaTest.etapa
+        tarea2.historia = self.historiaTest
+        tarea2.sprint = self.historiaTest.sprint
+        tarea2.usuario = self.historiaTest.usuarioAsignado
+        tarea2.horas = 4
+        tarea2.save()
+        self.assertEqual(horas_trabajadas_en_sprint_total(self.historiaTest.sprint), 5, 'Se suman todas las tareas')
+
+    def test_trabajoRealizadoEnSprintPorUsuario(self):
+        """
+        Prueba calcular horas de trabajo realizado en Sprint por usuario
+        """
+        self.user2 = get_user_model().objects.create_user(email='testemail3@example.com', password='A123B456c.2',
+                                                         avatar_url='avatar3@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0984 738040'))
+        self.user2.save()
+        tarea1 = Tarea()
+        tarea1.descripcion = 'Test tarea 1'
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.etapa = self.historiaTest.etapa
+        tarea1.historia = self.historiaTest
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.usuario = self.user2
+        tarea1.horas = 1
+        tarea1.save()
+        tarea2 = Tarea()
+        tarea2.descripcion = 'Test tarea 2'
+        tarea2.sprint = self.historiaTest.sprint
+        tarea2.etapa = self.historiaTest.etapa
+        tarea2.historia = self.historiaTest
+        tarea2.sprint = self.historiaTest.sprint
+        tarea2.usuario = self.historiaTest.usuarioAsignado
+        tarea2.horas = 4
+        tarea2.save()
+        self.assertEqual(horas_trabajadas_en_sprint(self.user2, self.historiaTest.sprint), 1, 'Horas trabajadas son del usuario correcto')
+        self.assertEqual(horas_trabajadas_en_sprint(self.user, self.historiaTest.sprint), 4, 'Horas trabajadas son del usuario correcto')
+
+    def test_tareasNoConsideradasEnEtapa(self):
+        """
+        Prueba contar las tareas en una etapa que no se consideran para mover la historia
+        """
+        tarea1 = Tarea()
+        tarea1.descripcion = 'Test tarea 1'
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.etapa = self.historiaTest.etapa
+        tarea1.historia = self.historiaTest
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.usuario = self.user2
+        tarea1.horas = 1
+        tarea1.considerado = True
+        tarea1.save()
+        tarea2 = Tarea()
+        tarea2.descripcion = 'Test tarea 2'
+        tarea2.sprint = self.historiaTest.sprint
+        tarea2.etapa = self.historiaTest.etapa
+        tarea2.historia = self.historiaTest
+        tarea2.sprint = self.historiaTest.sprint
+        tarea2.usuario = self.historiaTest.usuarioAsignado
+        tarea2.horas = 4
+        tarea2.save()
+        self.assertEqual(cantidad_tareas_en_etapa(self.historiaTest), 1, 'Se conto la tarea no considerada y no se conto la tarea ya considerada, por defecto')
+        self.assertEqual(cantidad_tareas_en_etapa(self.historiaTest, False), 1, 'Se conto la tarea no considerada y no se conto la tarea ya considerada')
+
+    def test_tareasNoConsideradasEnEtapa(self):
+        """
+        Prueba contar las tareas en una etapa que no se consideran para mover la historia
+        """
+        tarea1 = Tarea()
+        tarea1.descripcion = 'Test tarea 1'
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.etapa = self.historiaTest.etapa
+        tarea1.historia = self.historiaTest
+        tarea1.sprint = self.historiaTest.sprint
+        tarea1.usuario = self.user
+        tarea1.horas = 1
+        tarea1.considerado = True
+        tarea1.save()
+        tarea2 = Tarea()
+        tarea2.descripcion = 'Test tarea 2'
+        tarea2.sprint = self.historiaTest.sprint
+        tarea2.etapa = self.historiaTest.etapa
+        tarea2.historia = self.historiaTest
+        tarea2.sprint = self.historiaTest.sprint
+        tarea2.usuario = self.historiaTest.usuarioAsignado
+        tarea2.horas = 4
+        tarea2.save()
+        self.assertEqual(cantidad_tareas_en_etapa(self.historiaTest, True), 2, 'Se contaron todas las tareas')
