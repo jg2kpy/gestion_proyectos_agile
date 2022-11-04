@@ -892,6 +892,14 @@ def verTablero(request, proyecto_id, tipo_id):
             sprintTerminar.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
             sprintTerminar.save()
 
+            usuariosSprint = Usuario.objects.filter(equipo__id=sprintTerminar.proyecto.id)
+            
+            for usuario in usuariosSprint:
+                crearNotificacion(
+                    usuario,
+                    f"El sprint {sprintTerminar.nombre} perteneciente al proyecto {sprintTerminar.proyecto} pasa a estado Terminado"
+                )
+
             usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprintTerminar,estado=HistoriaUsuario.Estado.ACTIVO)
             
             for usFinalizar in usListFinalizar:
