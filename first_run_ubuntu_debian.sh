@@ -11,6 +11,3 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
 git clone https://github.com/jg2kpy/gestion_proyectos_agile.git
-cd gestion_proyectos_agile
-chmod +x run.sh
-sudo ./run.sh
