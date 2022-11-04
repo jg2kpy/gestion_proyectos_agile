@@ -4,6 +4,7 @@ from django.forms import ModelForm
 from django.views.decorators.cache import never_cache
 
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
+from gestion_proyectos_agile.views import crearNotificacion
 from proyectos.models import Proyecto
 from usuarios.models import RolProyecto, Usuario
 from .models import Notificacion, PermisoSistema, Usuario
@@ -273,6 +274,10 @@ def eliminar_miembro_proyecto(form, request_user, proyecto):
     except Usuario.DoesNotExist:
         return HttpResponse('Usuario no existe', status=422)
 
+    crearNotificacion(
+            Usuario.objects.get(email=usuario_email),
+            f"Usted ha sido removido del proyecto: {proyecto.nombre}")
+
     return redirect('vista_equipo', proyecto_id=proyecto.id)
 
 
@@ -310,8 +315,9 @@ def agregar_miembro_proyecto(request, form, request_user, proyecto):
         rol_proyecto = RolProyecto.objects.get(id=rol_id)
         usuario_a_agregar_miembro_proyecto.roles_proyecto.add(rol_proyecto)
 
-        notifUserAgregado = Notificacion(usuario=Usuario.objects.get(email=usuario_email))
-        notifUserAgregado.save()
+        crearNotificacion(
+            Usuario.objects.get(email=usuario_email),
+            f"Usted ha sido añadido al proyecto: {proyecto.nombre}")
 
     except Usuario.DoesNotExist:
         return render(request, 'usuarios_equipos/equiporoles.html', {'mensaje': 'El usuario no existe', 'proyecto': proyecto}, status=422)
