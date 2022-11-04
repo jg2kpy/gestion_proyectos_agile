@@ -76,16 +76,20 @@ read entorno
 if [ $entorno -eq 1 ];then
     echo "Ejecutando en entorno de producción..."
     $docker -f "docker-compose.produccion.yaml" up --build -d
-    echo "Le gustaria cargar los datos de prueba?[s/n]"
-    read opcion
-    if [ $entorno = "s" ];then
-        docker exec gpa-dev python3 manage.py loaddata databasedump_prueba.json
+    if [ $tag = "Iteracion-5" ];then
+        echo "Le gustaria cargar los datos de prueba?[s/n]"
+        read opcion
+        if [ $opcion = "s" ];then
+            echo "Cargando datos de prueba..."
+            docker exec gpa-pro python3 manage.py loaddata databasedump_prueba.json
+        fi
     fi
     while [ true ]
     do
     echo "Le gustaria terminar con la ejecución en el entorno de producción?[s/n]"
     read opcion
     if [ $opcion = "s" ];then
+        echo "Terminando la ejecución en entorno de producción..."
         $docker -f "docker-compose.produccion.yaml" stop
         exit
     fi
@@ -93,10 +97,13 @@ if [ $entorno -eq 1 ];then
 else
     echo "Ejecutando en entorno de desarrollo..."
     $docker -f "docker-compose.desarrollo.yaml" up --build -d
-    echo "Le gustaria cargar los datos de prueba?[s/n]"
-    read opcion
-    if [ $entorno = "s" ];then
-        docker exec gpa-dev python3 manage.py loaddata databasedump_junior.json
+    if [ $tag = "Iteracion-5" ];then
+        echo "Le gustaria cargar los datos de prueba?[s/n]"
+        read opcion
+        if [ $opcion = "s" ];then
+            echo "Cargando datos de prueba..."
+            docker exec gpa-dev python3 manage.py loaddata databasedump_junior.json
+        fi
     fi
     while [ true ]
     do
@@ -109,10 +116,10 @@ else
             echo "Ejecutando las pruebas unitarias..."
             docker exec gpa-dev python3 manage.py test
         elif [ $opcion -eq 2 ];then
-            echo "Ejecutando las documentación autogenerada... (accesible desde http://localhost:8081)"
+            echo "Ejecutando las documentación autogenerada... (accesible desde http://localhost:8081/)"
             docker exec gpa-dev ./docs/generar_doc_html.sh
         else
-            echo "Terminando la ejecución..."
+            echo "Terminando la ejecución en entorno de desarrollo..."
             $docker -f "docker-compose.desarrollo.yaml" stop
             exit
         fi
