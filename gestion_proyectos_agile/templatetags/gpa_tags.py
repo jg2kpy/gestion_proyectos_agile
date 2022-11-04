@@ -1,6 +1,11 @@
 from django import template
+<<<<<<< HEAD
 from historias_usuario.models import HistoriaUsuario, Tarea
 from usuarios.models import RolSistema, RolProyecto, Usuario
+=======
+from historias_usuario.models import HistoriaUsuario
+from usuarios.models import Notificacion, RolSistema, RolProyecto, Usuario
+>>>>>>> feature/notificaciones-&-informe
 from proyectos.models import Proyecto, Sprint
 
 """
@@ -358,3 +363,22 @@ def restar(value, arg):
     :rtype: int
     """
     return value - arg
+
+def cantidad_notif_no_leido(usuario):
+    """Funcion ver la cantidad de notificaciones no leídas
+
+    :return: Retorna 0 si no hay notificaciones sin leer o la cantidad de notificaciones correspondiente
+    :rtype: int
+    """
+    return len(Notificacion.objects.filter(usuario=usuario, leido=False))
+
+@register.simple_tag
+def existe_sprint_terminado(proyecto):
+    """Verifica si existe un sprint terminado
+
+    :return: Retorna True si hay por lo menos un sprint terminado, caso contrario False
+    :rtype: bool
+    """
+    sprintTerminado = Sprint.objects.filter(proyecto=proyecto, estado="Terminado")
+
+    return True if sprintTerminado else False

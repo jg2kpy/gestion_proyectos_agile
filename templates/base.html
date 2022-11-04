@@ -175,6 +175,18 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="/notificaciones/" class="link-dark rounded position-relative">
+                                    <i class="material-icons  align-text-bottom">person</i>
+                                    Notificaciones
+                                    {% cantidad_notif_no_leido user as cant_notif %}
+                                    {% if cant_notif %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            {{ cant_notif }}
+                                        </span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li>
                                 <a href="/accounts/logout/" class="link-dark rounded">
                                     <i class="material-icons  align-text-bottom">logout</i>
                                     Cerrar sesión
@@ -256,6 +268,18 @@
                                 <a href="/perfil/" class="link-dark rounded">
                                     <i class="material-icons  align-text-bottom">person</i>
                                     Perfil
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/notificaciones/" class="link-dark rounded position-relative">
+                                    <i class="material-icons  align-text-bottom">person</i>
+                                    Notificaciones
+                                    {% cantidad_notif_no_leido user as cant_notif %}
+                                    {% if cant_notif %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            {{ cant_notif }}
+                                        </span>
+                                    {% endif %}
                                 </a>
                             </li>
                             <li>
