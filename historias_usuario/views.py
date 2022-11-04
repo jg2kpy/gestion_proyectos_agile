@@ -324,7 +324,7 @@ def moverEtapa(request, proyecto_id, historia_id):
 
                 crearNotificacion(
                     historia.usuarioAsignado,
-                    f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} pasa a estado Terminado"
+                    f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre} pasa a estado Terminado"
                 )
 
             else:
@@ -334,7 +334,7 @@ def moverEtapa(request, proyecto_id, historia_id):
             
                 crearNotificacion(
                     historia.usuarioAsignado,
-                    f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} pasó a etapa {historia.etapa.nombre}"
+                    f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre} pasó a etapa {historia.etapa.nombre}"
                 )
         else:
             antOrden = historia.etapa.orden - 1 if historia.etapa and historia.etapa.orden > 1 else 0
@@ -349,7 +349,7 @@ def moverEtapa(request, proyecto_id, historia_id):
 
                 crearNotificacion(
                     historia.usuarioAsignado,
-                    f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} volvió a etapa {historia.etapa.nombre}"
+                    f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre} volvió a etapa {historia.etapa.nombre}"
                 )
     
         historia.save()
@@ -564,7 +564,7 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
 
             crearNotificacion(
                 historia.usuarioAsignado,
-                f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} pasa a estado Cancelado"
+                f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre} pasa a estado Cancelado"
             )
         except HistoriaUsuario.DoesNotExist:
             pass
@@ -615,7 +615,7 @@ def editar_historiaUsuario(request, proyecto_id, historia_id):
 
             crearNotificacion(
                 historia.usuarioAsignado,
-                f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} fué editada"
+                f"La historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre} fué editada"
             )
 
             return redirect(request.session['cancelar_volver_a'] or 'historiaUsuarioBacklog', proyecto_id=proyecto_id)
@@ -669,7 +669,7 @@ def comentarios_historiaUsuario(request, proyecto_id, historia_id):
 
             crearNotificacion(
                 historia.usuarioAsignado,
-                f"El usuario {request.user.email} ha hecho un comentario en la historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre}"
+                f"El usuario {request.user.email} ha hecho un comentario en la historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre}"
             )
             return redirect('comentarios_historiaUsuario', proyecto_id=proyecto_id, historia_id=historia.id)
         else:
@@ -723,7 +723,7 @@ def tareas(request, proyecto_id, historia_id):
 
             crearNotificacion(
                 historia.usuarioAsignado,
-                f"El usuario {request.user.email} ha marcado {tarea.horas} horas de trabajo en la historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre}"
+                f"El usuario {request.user.email} ha marcado {tarea.horas} horas de trabajo en la historia de usuario {historia.nombre} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre}"
             )
 
             return redirect('tareas', proyecto_id=proyecto_id, historia_id=historia.id)
@@ -782,7 +782,7 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
         crearNotificacion(
             historia.usuarioAsignado,
             f"El usuario {request.user.email} ha restaurado la historia de usuario {historia.nombre} a la versión registrada \
-                en la fecha {versionPrevia.fecha_modificacion.strftime('%m/%d/%Y, %H:%M:%S')} perteneciente al sprint {historia.sprint.nombre}"
+                en la fecha {versionPrevia.fecha_modificacion.strftime('%m/%d/%Y, %H:%M:%S')} perteneciente al sprint {historia.sprint.nombre} dentro del proyecto {historia.proyecto.nombre}"
         )
 
         historia.restaurarDelHistorial(versionPrevia)
