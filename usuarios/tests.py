@@ -73,6 +73,18 @@ class UsuariosTests(TestCase):
         rol_admin, _ = RolSistema.objects.get_or_create(nombre='gpa_admin')
         self.assertEqual(Usuario.objects.filter(roles_sistema__id=rol_admin.id).count(), 1)
 
+    def test_notificacion(self):
+        """
+        Prueba que el usuario reciba la notifiación
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.', username='test')
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        nuevaNotif = Notificacion()
+        nuevaNotif.usuario = self.user
+        nuevaNotif.descripcion = "Esto es un test"
+        nuevaNotif.save()
+        res = self.client.get("/notificaciones/")
+        self.assertContains(res, 'Esto es un test', 1, 200, 'No recibe la notificacion')
 
 class RolesGlobalesTests(TestCase):
     """
