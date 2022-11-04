@@ -57,6 +57,24 @@ class ArchivoBurndown(models.Model):
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
     archivo = models.FileField(upload_to=f"app/staticfiles/", null=True)
+
+class ArchivoVelocity(models.Model):
+    """
+    Archivos pertenecientes al Velocity Chart de cada Sprint terminado.
+    El nombre del archivo en el servidor es la concatenación del nombre de Proyecto y nombre de Sprint
+    con su respectivo id.
+
+    :param nombre: Nombre del archivo.
+    :type nombre: str
+    :param fecha_subida: Fecha de subida del archivo.
+    :type fecha_subida: datetime
+    :param archivo: Archivo perteneciente al Velocity Chart.
+    :type archivo: ImageField
+    """
+    nombre = models.CharField(max_length=255)
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+    proyecto = models.OneToOneField(Proyecto, related_name="velocityChart", on_delete=models.PROTECT, null=True)
+    archivo = models.FileField(upload_to=f"app/staticfiles/", null=True)
     
 
 class Sprint(models.Model):

@@ -12,7 +12,7 @@ import numpy as np
 from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, Tarea, TipoHistoriaUsusario
 from historias_usuario.views import calcularFechaSprint
 
-from .models import ArchivoBurndown, Feriado, Proyecto, Sprint, UsuarioTiempoEnSprint
+from .models import *
 from .forms import ProyectoConfigurarForm, ProyectoFeriadosForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
 from usuarios.models import Usuario, RolProyecto, PermisoProyecto
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_permiso_en_sistema, tiene_rol_en_proyecto, tiene_rol_en_sistema
@@ -22,7 +22,6 @@ from matplotlib.legend_handler import HandlerLine2D
 
 from pathlib import Path
 from django.core.files import File
-from PIL import Image
 
 """
     Enumerador de estados de Proyecto
@@ -1097,6 +1096,13 @@ def generarBurndownChart(sprintId):
 
 
 def generarVelocityChart(proyectoId):
+    velChart = None
+    if ArchivoVelocity.objects.filter(proyecto__id=proyectoId).exists():
+        velChart = ArchivoVelocity.objects.get(proyecto__id=proyectoId)
+    else:
+        velChart = ArchivoVelocity()
+        velChart.nombre = f"velocityChart_{proyectoId}"
+
     # Datos para realizar los cálculos
     proyecto = Proyecto.objects.get(id=proyectoId)
     sprints = Sprint.objects.filter(proyecto__id=proyectoId, estado="Terminado")
@@ -1120,8 +1126,14 @@ def generarVelocityChart(proyectoId):
         horasUsSprintList.append(tempUsTotal)
     
     generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList)
-    # plt.savefig(f"app/staticfiles/velChart_{proyecto.nombre}{proyecto.id}.png")
-    plt.savefig(f"velChart_{proyecto.nombre}{proyecto.id}.png")
+    plt.savefig(f"app/staticfiles/velocityChart_{proyecto.nombre}{proyecto.id}.png")
+    rutaImg = Path(f"app/staticfiles/velocityChart_{proyecto.nombre}{proyecto.id}.png")
+    
+    with rutaImg.open(mode='rb') as archivo:
+        velChart.archivo = File(archivo, name=rutaImg.name)
+        velChart.save()
+        velChart.proyecto = proyecto
+        velChart.save()
 
 
 def generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList):
@@ -1156,18 +1168,14 @@ def descargarReporte(request, id):
     :rtype: HttpResponse
     """
     if 'descargarBurndown' in request.POST:
-        # sprint = Sprint.objects.get(id=id)
-        # archivo = ArchivoBurndown.objects.get(sprint=sprint)
-
         try:
             archivo = ArchivoBurndown.objects.get(sprint__id=id)
         except ArchivoBurndown.DoesNotExist:
             return render(request, '404.html', {'info_adicional': "No se encontró este archivo."}, status=404)
     else:
         try:
-            # TODO Cambiar a modelo para velocity
-            archivo = ArchivoBurndown.objects.get(sprint__id=id)
-        except ArchivoBurndown.DoesNotExist:
+            archivo = ArchivoVelocity.objects.get(proyecto__id=id)
+        except ArchivoVelocity.DoesNotExist:
             return render(request, '404.html', {'info_adicional': "No se encontró este archivo."}, status=404)
 
     return FileResponse(open(archivo.archivo.path, 'rb'), content_type='application/force-download')
@@ -1209,6 +1217,7 @@ def sprint_list(request, proyecto_id):
         else:
             proyectoId = request.POST['descargarVelocity']
             generarVelocityChart(proyectoId)
+            return descargarReporte(request, proyecto_id)
 
             
     return render(request, 'sprints/sprintList.html', {'proyecto': proyecto}, status=200)
