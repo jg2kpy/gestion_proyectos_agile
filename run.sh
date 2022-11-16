@@ -15,6 +15,7 @@ iteraciones["Iteracion-2"]="Iteracion-2"
 iteraciones["Iteracion-3"]="Iteracion-3"
 iteraciones["Iteracion-4"]="Iteracion-4"
 iteraciones["Iteracion-5"]="Iteracion-5"
+iteraciones["Iteracion-6"]="Iteracion-6"
 
 tag=""
 
@@ -28,6 +29,7 @@ printHelp(){
     echo "  Iteracion-3"
     echo "  Iteracion-4"
     echo "  Iteracion-5"
+    echo "  Iteracion-6"
     exit
 }
 
@@ -55,9 +57,10 @@ if [ -z "$tag" ];then
     echo "3) Iteracion-3"
     echo "4) Iteracion-4"
     echo "5) Iteracion-5"
+    echo "6) Iteracion-6"
     echo "Ctrl-C para salir"
     read opcion
-    if [[ $opcion -ge 6 || $opcion -le 0 ]]; then
+    if [[ $opcion -ge 7 || $opcion -le 0 ]]; then
         echo "Opcion no valida"
         exit
     fi
