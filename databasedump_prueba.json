@@ -1221,24 +1221,6 @@
     }
   },
   {
-    "model": "proyectos.archivoburndown",
-    "pk": 1,
-    "fields": {
-      "nombre": "bdChart_2_2",
-      "fecha_subida": "2022-11-09T19:15:40.560Z",
-      "archivo": "app/staticfiles/bdChart_2_2_78S89Ch.png"
-    }
-  },
-  {
-    "model": "proyectos.archivoburndown",
-    "pk": 2,
-    "fields": {
-      "nombre": "bdChart_1_1",
-      "fecha_subida": "2022-11-16T19:26:43.688Z",
-      "archivo": "app/staticfiles/bdChart_1_1_2tuEsQy.png"
-    }
-  },
-  {
     "model": "proyectos.sprint",
     "pk": 1,
     "fields": {
@@ -1249,7 +1231,7 @@
       "duracion": 12,
       "nombre": "Sprint 1",
       "descripcion": "Sprint 1",
-      "burndownChart": 2
+      "burndownChart": null
     }
   },
   {
@@ -1263,7 +1245,7 @@
       "duracion": 7,
       "nombre": "Sprint 1 en proyecto 2",
       "descripcion": "Sprint 1 en proyecto 2",
-      "burndownChart": 1
+      "burndownChart": null
     }
   },
   {
