@@ -3,8 +3,8 @@
     "model": "usuarios.usuario",
     "pk": 1,
     "fields": {
-      "password": "!sV2UjHZKz02NFWPAqfMwlJNa0Br9bycKlWxleWfv",
-      "last_login": "2022-11-04T14:36:54.752Z",
+      "password": "!3tI00cujfdSJLildtMkjMYDEISKncAtgHaXcw1Ha",
+      "last_login": "2022-11-01T18:58:41.611Z",
       "is_superuser": false,
       "email": "jlgutierrez2000@hotmail.com",
       "username": "",
@@ -12,7 +12,7 @@
       "telefono": "",
       "is_staff": false,
       "is_active": true,
-      "date_joined": "2022-11-04T14:36:54.694Z",
+      "date_joined": "2022-11-01T18:58:41.518Z",
       "avatar_url": "https://avatars.githubusercontent.com/u/46907456?v=4",
       "first_name": "José",
       "last_name": "Luis Junior Gutiérrez Agüero",
@@ -24,8 +24,8 @@
     "model": "usuarios.usuario",
     "pk": 2,
     "fields": {
-      "password": "!hAjaiZ6DAep7veSSEldyeFlmtQ3WDcxCADQF4Yyy",
-      "last_login": "2022-11-04T14:37:03.149Z",
+      "password": "!DK7FTZ5hMd7rxN58CEspH7aaPXXQEfYcfCFvvpHW",
+      "last_login": "2022-11-01T18:58:51.655Z",
       "is_superuser": false,
       "email": "dummygpais2test@gmail.com",
       "username": "",
@@ -33,7 +33,7 @@
       "telefono": "",
       "is_staff": false,
       "is_active": true,
-      "date_joined": "2022-11-04T14:37:03.110Z",
+      "date_joined": "2022-11-01T18:58:51.615Z",
       "avatar_url": "https://avatars.githubusercontent.com/u/113201839?v=4",
       "first_name": "Cuenta",
       "last_name": "Secundaria",
@@ -135,35 +135,15 @@
     "model": "usuarios.rolproyecto",
     "pk": 10,
     "fields": {
-      "nombre": "Scrum Master",
-      "descripcion": "Un Scrum Master es un facilitador para un equipo de desarrollo Agile.",
-      "proyecto": 3,
-      "usuario": [2]
-    }
-  },
-  {
-    "model": "usuarios.rolproyecto",
-    "pk": 11,
-    "fields": {
-      "nombre": "Product Owner",
-      "descripcion": "Propietario del proyecto",
-      "proyecto": 3,
+      "nombre": "Rol para cancelar US",
+      "descripcion": "Rol para cancelar US",
+      "proyecto": 2,
       "usuario": []
     }
   },
   {
     "model": "usuarios.rolproyecto",
-    "pk": 12,
-    "fields": {
-      "nombre": "Member",
-      "descripcion": "Miembro del proyecto",
-      "proyecto": 3,
-      "usuario": [1]
-    }
-  },
-  {
-    "model": "usuarios.rolproyecto",
-    "pk": 13,
+    "pk": 11,
     "fields": {
       "nombre": "Rol para cancelar US",
       "descripcion": "Rol para cancelar US",
@@ -173,11 +153,31 @@
   },
   {
     "model": "usuarios.rolproyecto",
+    "pk": 12,
+    "fields": {
+      "nombre": "Scrum Master",
+      "descripcion": "Un Scrum Master es un facilitador para un equipo de desarrollo Agile.",
+      "proyecto": 3,
+      "usuario": [1]
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
+    "pk": 13,
+    "fields": {
+      "nombre": "Product Owner",
+      "descripcion": "Propietario del proyecto",
+      "proyecto": 3,
+      "usuario": []
+    }
+  },
+  {
+    "model": "usuarios.rolproyecto",
     "pk": 14,
     "fields": {
-      "nombre": "Rol para cancelar US",
-      "descripcion": "Rol para cancelar US",
-      "proyecto": 2,
+      "nombre": "Member",
+      "descripcion": "Miembro del proyecto",
+      "proyecto": 3,
       "usuario": []
     }
   },
@@ -192,7 +192,7 @@
     "fields": {
       "nombre": "pro_cambiarEstadoProyecto",
       "descripcion": "Cambiar de estado al proyecto",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -201,7 +201,7 @@
     "fields": {
       "nombre": "pro_especificarFechaFinProyecto",
       "descripcion": "Especificar la fecha de fin de proyecto",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -210,7 +210,7 @@
     "fields": {
       "nombre": "pro_crearRolProyecto",
       "descripcion": "Crear rol de proyecto",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -219,7 +219,7 @@
     "fields": {
       "nombre": "pro_asignarRolProyecto",
       "descripcion": "Asignar rol de proyecto",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -228,7 +228,7 @@
     "fields": {
       "nombre": "pro_editarRolProyecto",
       "descripcion": "Editar rol de proyecto",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -237,7 +237,7 @@
     "fields": {
       "nombre": "pro_importarRol",
       "descripcion": "Importar rol de proyecto custom entre proyectos",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -246,7 +246,7 @@
     "fields": {
       "nombre": "pro_asignarMiembros",
       "descripcion": "Agregar miembros al equipo durante la planificacion/ejecucion del Proyecto",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -255,7 +255,7 @@
     "fields": {
       "nombre": "pro_iniciarSprint",
       "descripcion": "Iniciar sprint",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -264,7 +264,7 @@
     "fields": {
       "nombre": "pro_especificarTiempoDeSprint",
       "descripcion": "Especificar el tiempo del Sprint",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -273,7 +273,7 @@
     "fields": {
       "nombre": "pro_crearTipoUS",
       "descripcion": "Crear un tipo de US",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -282,7 +282,7 @@
     "fields": {
       "nombre": "pro_eliminarTipoUS",
       "descripcion": "Eliminar un tipo de US",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -291,7 +291,7 @@
     "fields": {
       "nombre": "pro_importarTipoUS",
       "descripcion": "Importar tipos de US entre proyectos",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -300,7 +300,7 @@
     "fields": {
       "nombre": "pro_cambiarEstadoSprint",
       "descripcion": "Cambiar de estado al Sprint",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -309,7 +309,7 @@
     "fields": {
       "nombre": "pro_asignarUS",
       "descripcion": "Asignar US a un miembro",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -318,7 +318,7 @@
     "fields": {
       "nombre": "pro_cambiarUsuarioAsignadoUS",
       "descripcion": "Cambiar a quien esta asignado un US",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -327,7 +327,7 @@
     "fields": {
       "nombre": "pro_modificarUS",
       "descripcion": "Modificar una historia de Usuario",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -336,7 +336,7 @@
     "fields": {
       "nombre": "pro_cargarUSalBacklog",
       "descripcion": "Cargar US al product backlog",
-      "rol": [1, 2, 4, 5, 7, 8, 10, 11]
+      "rol": [1, 2, 4, 5, 7, 8, 12, 13]
     }
   },
   {
@@ -345,7 +345,7 @@
     "fields": {
       "nombre": "pro_asignarBVaUS",
       "descripcion": "Asignar BV a un US que esta en product backlog",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -354,7 +354,7 @@
     "fields": {
       "nombre": "pro_cancelarUS",
       "descripcion": "Cancelar una historia de Usuario",
-      "rol": [1, 4, 7, 10, 13, 14]
+      "rol": [1, 4, 7, 10, 11, 12]
     }
   },
   {
@@ -363,7 +363,7 @@
     "fields": {
       "nombre": "pro_cancelarSprint",
       "descripcion": "Cancelar Sprint",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -372,7 +372,7 @@
     "fields": {
       "nombre": "pro_eliminarMiembros",
       "descripcion": "Eliminar miembros",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -381,7 +381,7 @@
     "fields": {
       "nombre": "pro_generarReportes",
       "descripcion": "Generar los reportes",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -390,7 +390,7 @@
     "fields": {
       "nombre": "pro_verproyecto",
       "descripcion": "Ver el proyecto, pero no modificar nada",
-      "rol": [2, 5, 8, 11]
+      "rol": [2, 5, 8, 13]
     }
   },
   {
@@ -399,7 +399,7 @@
     "fields": {
       "nombre": "pro_cambiarEstadoUS",
       "descripcion": "Cambiar estado del US que tiene asignado",
-      "rol": [3, 6, 9, 12]
+      "rol": [3, 6, 9, 14]
     }
   },
   {
@@ -408,7 +408,7 @@
     "fields": {
       "nombre": "pro_asignarUPaUS",
       "descripcion": "Asignar UP a un US que esta en product backlog",
-      "rol": [3, 6, 9, 12]
+      "rol": [3, 6, 9, 14]
     }
   },
   {
@@ -417,7 +417,7 @@
     "fields": {
       "nombre": "pro_agregarRetroespectiva",
       "descripcion": "Agregar retroespectiva",
-      "rol": [1, 4, 7, 10]
+      "rol": [1, 4, 7, 12]
     }
   },
   {
@@ -469,7 +469,7 @@
     "model": "usuarios.notificacion",
     "pk": 1,
     "fields": {
-      "fecha": "2022-11-04T14:38:41.283Z",
+      "fecha": "2022-11-01T19:02:25.183Z",
       "usuario": 2,
       "descripcion": "Usted ha sido añadido al proyecto Proyecto 1 con el rol Member",
       "leido": false
@@ -479,237 +479,7 @@
     "model": "usuarios.notificacion",
     "pk": 2,
     "fields": {
-      "fecha": "2022-11-04T14:41:31.305Z",
-      "usuario": 1,
-      "descripcion": "Se le ha asignado la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": true
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 3,
-    "fields": {
-      "fecha": "2022-11-04T14:41:31.312Z",
-      "usuario": 2,
-      "descripcion": "Se le ha asignado la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 4,
-    "fields": {
-      "fecha": "2022-11-04T14:41:31.317Z",
-      "usuario": 2,
-      "descripcion": "Se le ha asignado la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 5,
-    "fields": {
-      "fecha": "2022-11-04T14:42:40.820Z",
-      "usuario": 1,
-      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 30 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": true
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 6,
-    "fields": {
-      "fecha": "2022-11-04T14:42:55.242Z",
-      "usuario": 1,
-      "descripcion": "La historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DOING",
-      "leido": true
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 7,
-    "fields": {
-      "fecha": "2022-11-04T14:44:12.256Z",
-      "usuario": 2,
-      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 15 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 8,
-    "fields": {
-      "fecha": "2022-11-04T14:44:15.235Z",
-      "usuario": 2,
-      "descripcion": "La historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DOING",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 9,
-    "fields": {
-      "fecha": "2022-11-04T14:45:27.080Z",
-      "usuario": 2,
-      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 15 horas de trabajo en la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 10,
-    "fields": {
-      "fecha": "2022-11-04T14:45:29.475Z",
-      "usuario": 2,
-      "descripcion": "La historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DOING",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 11,
-    "fields": {
-      "fecha": "2022-11-04T14:45:51.001Z",
-      "usuario": 1,
-      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 30 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": true
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 12,
-    "fields": {
-      "fecha": "2022-11-04T14:45:53.990Z",
-      "usuario": 1,
-      "descripcion": "La historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DONE",
-      "leido": true
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 13,
-    "fields": {
-      "fecha": "2022-11-04T14:46:03.029Z",
-      "usuario": 2,
-      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 15 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 14,
-    "fields": {
-      "fecha": "2022-11-04T14:46:08.572Z",
-      "usuario": 2,
-      "descripcion": "La historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DONE",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 15,
-    "fields": {
-      "fecha": "2022-11-04T14:46:16.686Z",
-      "usuario": 2,
-      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 30 horas de trabajo en la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 16,
-    "fields": {
-      "fecha": "2022-11-04T14:46:22.491Z",
-      "usuario": 2,
-      "descripcion": "La historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DONE",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 17,
-    "fields": {
-      "fecha": "2022-11-04T14:47:16.286Z",
-      "usuario": 1,
-      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 30 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 18,
-    "fields": {
-      "fecha": "2022-11-04T14:47:19.140Z",
-      "usuario": 1,
-      "descripcion": "La historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasa a estado Terminado",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 19,
-    "fields": {
-      "fecha": "2022-11-04T14:47:27.343Z",
-      "usuario": 2,
-      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 30 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 20,
-    "fields": {
-      "fecha": "2022-11-04T14:47:37.551Z",
-      "usuario": 2,
-      "descripcion": "La historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasa a estado Terminado",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 21,
-    "fields": {
-      "fecha": "2022-11-04T14:47:52.793Z",
-      "usuario": 2,
-      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 15 horas de trabajo en la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 22,
-    "fields": {
-      "fecha": "2022-11-04T14:47:55.629Z",
-      "usuario": 2,
-      "descripcion": "La historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasa a estado Terminado",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 23,
-    "fields": {
-      "fecha": "2022-11-04T14:47:57.789Z",
-      "usuario": 1,
-      "descripcion": "El sprint Sprint 1 perteneciente al proyecto Proyecto 1 pasa a estado Terminado",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 24,
-    "fields": {
-      "fecha": "2022-11-04T14:47:57.791Z",
-      "usuario": 2,
-      "descripcion": "El sprint Sprint 1 perteneciente al proyecto Proyecto 1 pasa a estado Terminado",
-      "leido": false
-    }
-  },
-  {
-    "model": "usuarios.notificacion",
-    "pk": 25,
-    "fields": {
-      "fecha": "2022-11-04T14:53:47.566Z",
+      "fecha": "2022-11-01T19:02:34.125Z",
       "usuario": 1,
       "descripcion": "Usted ha sido añadido al proyecto Proyecto 2 con el rol Member",
       "leido": false
@@ -717,11 +487,241 @@
   },
   {
     "model": "usuarios.notificacion",
+    "pk": 3,
+    "fields": {
+      "fecha": "2022-11-01T19:03:27.991Z",
+      "usuario": 1,
+      "descripcion": "Se le ha asignado la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 4,
+    "fields": {
+      "fecha": "2022-11-01T19:03:27.995Z",
+      "usuario": 2,
+      "descripcion": "Se le ha asignado la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 5,
+    "fields": {
+      "fecha": "2022-11-01T19:03:27.998Z",
+      "usuario": 2,
+      "descripcion": "Se le ha asignado la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 6,
+    "fields": {
+      "fecha": "2022-11-01T19:05:10.184Z",
+      "usuario": 2,
+      "descripcion": "Se le ha asignado la historia de usuario US 5 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 7,
+    "fields": {
+      "fecha": "2022-11-01T19:05:10.190Z",
+      "usuario": 1,
+      "descripcion": "Se le ha asignado la historia de usuario US 4 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 8,
+    "fields": {
+      "fecha": "2022-11-01T19:05:10.202Z",
+      "usuario": 1,
+      "descripcion": "Se le ha asignado la historia de usuario US 6 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 9,
+    "fields": {
+      "fecha": "2022-11-02T19:07:30.579Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 1 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 10,
+    "fields": {
+      "fecha": "2022-11-02T19:07:34.520Z",
+      "usuario": 2,
+      "descripcion": "La historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DOING",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 11,
+    "fields": {
+      "fecha": "2022-11-02T19:07:48.695Z",
+      "usuario": 2,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 2 horas de trabajo en la historia de usuario US 5 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 12,
+    "fields": {
+      "fecha": "2022-11-02T19:07:53.395Z",
+      "usuario": 1,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 2 horas de trabajo en la historia de usuario US 4 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 13,
+    "fields": {
+      "fecha": "2022-11-02T19:08:00.058Z",
+      "usuario": 2,
+      "descripcion": "La historia de usuario US 5 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2 pasó a etapa DOING",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 14,
+    "fields": {
+      "fecha": "2022-11-02T19:08:01.234Z",
+      "usuario": 1,
+      "descripcion": "La historia de usuario US 4 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2 pasó a etapa DOING",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 15,
+    "fields": {
+      "fecha": "2022-11-03T19:09:38.925Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 9 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 16,
+    "fields": {
+      "fecha": "2022-11-03T19:09:49.333Z",
+      "usuario": 1,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 4 horas de trabajo en la historia de usuario US 6 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 17,
+    "fields": {
+      "fecha": "2022-11-04T19:10:19.428Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 5 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 18,
+    "fields": {
+      "fecha": "2022-11-07T19:11:06.690Z",
+      "usuario": 1,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 1 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 19,
+    "fields": {
+      "fecha": "2022-11-07T19:11:15.848Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 8 horas de trabajo en la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 20,
+    "fields": {
+      "fecha": "2022-11-07T19:11:18.342Z",
+      "usuario": 1,
+      "descripcion": "La historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DOING",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 21,
+    "fields": {
+      "fecha": "2022-11-07T19:11:19.584Z",
+      "usuario": 2,
+      "descripcion": "La historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DOING",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 22,
+    "fields": {
+      "fecha": "2022-11-07T19:11:34.394Z",
+      "usuario": 1,
+      "descripcion": "La historia de usuario US 6 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2 pasó a etapa DOING",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 23,
+    "fields": {
+      "fecha": "2022-11-07T19:11:44.592Z",
+      "usuario": 2,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 6 horas de trabajo en la historia de usuario US 5 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 24,
+    "fields": {
+      "fecha": "2022-11-07T19:11:51.984Z",
+      "usuario": 1,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 6 horas de trabajo en la historia de usuario US 4 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 25,
+    "fields": {
+      "fecha": "2022-11-07T19:11:55.942Z",
+      "usuario": 1,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 6 horas de trabajo en la historia de usuario US 6 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
     "pk": 26,
     "fields": {
-      "fecha": "2022-11-04T14:55:43.622Z",
+      "fecha": "2022-11-08T19:12:44.521Z",
       "usuario": 1,
-      "descripcion": "Se le ha asignado la historia de usuario US 5 perteneciente al sprint Sprint 2 dentro del proyecto Proyecto 2",
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 10 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
       "leido": false
     }
   },
@@ -729,9 +729,9 @@
     "model": "usuarios.notificacion",
     "pk": 27,
     "fields": {
-      "fecha": "2022-11-04T14:55:43.628Z",
-      "usuario": 1,
-      "descripcion": "Se le ha asignado la historia de usuario US 4 perteneciente al sprint Sprint 2 dentro del proyecto Proyecto 2",
+      "fecha": "2022-11-08T19:12:51.164Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 8 horas de trabajo en la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
       "leido": false
     }
   },
@@ -739,9 +739,9 @@
     "model": "usuarios.notificacion",
     "pk": 28,
     "fields": {
-      "fecha": "2022-11-04T14:55:43.632Z",
+      "fecha": "2022-11-08T19:13:22.994Z",
       "usuario": 2,
-      "descripcion": "Se le ha asignado la historia de usuario US 6 perteneciente al sprint Sprint 2 dentro del proyecto Proyecto 2",
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 7 horas de trabajo en la historia de usuario US 5 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
       "leido": false
     }
   },
@@ -749,9 +749,9 @@
     "model": "usuarios.notificacion",
     "pk": 29,
     "fields": {
-      "fecha": "2022-11-04T14:56:50.960Z",
+      "fecha": "2022-11-08T19:13:27.768Z",
       "usuario": 1,
-      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 15 horas de trabajo en la historia de usuario US 5 perteneciente al sprint Sprint 2 dentro del proyecto Proyecto 2",
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 7 horas de trabajo en la historia de usuario US 4 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
       "leido": false
     }
   },
@@ -759,9 +759,9 @@
     "model": "usuarios.notificacion",
     "pk": 30,
     "fields": {
-      "fecha": "2022-11-04T14:56:55.395Z",
+      "fecha": "2022-11-08T19:13:34.619Z",
       "usuario": 1,
-      "descripcion": "La historia de usuario US 5 perteneciente al sprint Sprint 2 dentro del proyecto Proyecto 2 pasó a etapa DOING",
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 5 horas de trabajo en la historia de usuario US 6 perteneciente al sprint Sprint 1 en proyecto 2 dentro del proyecto Proyecto 2",
       "leido": false
     }
   },
@@ -769,9 +769,9 @@
     "model": "usuarios.notificacion",
     "pk": 31,
     "fields": {
-      "fecha": "2022-11-04T14:57:21.212Z",
-      "usuario": 1,
-      "descripcion": "Usted ha sido desasignado de la historia de usuario US 5 perteneciente al proyecto Proyecto 2",
+      "fecha": "2022-11-09T19:15:13.231Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 7 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
       "leido": false
     }
   },
@@ -779,9 +779,9 @@
     "model": "usuarios.notificacion",
     "pk": 32,
     "fields": {
-      "fecha": "2022-11-04T14:57:21.222Z",
-      "usuario": 2,
-      "descripcion": "Usted ha sido asignado a la historia de usuario US 5 perteneciente al proyecto Proyecto 2",
+      "fecha": "2022-11-09T19:15:18.668Z",
+      "usuario": 1,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 10 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
       "leido": false
     }
   },
@@ -789,9 +789,9 @@
     "model": "usuarios.notificacion",
     "pk": 33,
     "fields": {
-      "fecha": "2022-11-04T14:57:34.551Z",
+      "fecha": "2022-11-09T19:15:36.540Z",
       "usuario": 1,
-      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 150 horas de trabajo en la historia de usuario US 4 perteneciente al sprint Sprint 2 dentro del proyecto Proyecto 2",
+      "descripcion": "El sprint Sprint 1 en proyecto 2 perteneciente al proyecto Proyecto 2 pasa a estado Terminado",
       "leido": false
     }
   },
@@ -799,9 +799,9 @@
     "model": "usuarios.notificacion",
     "pk": 34,
     "fields": {
-      "fecha": "2022-11-04T14:57:39.870Z",
-      "usuario": 1,
-      "descripcion": "La historia de usuario US 4 perteneciente al sprint Sprint 2 dentro del proyecto Proyecto 2 pasó a etapa DOING",
+      "fecha": "2022-11-09T19:15:36.542Z",
+      "usuario": 2,
+      "descripcion": "El sprint Sprint 1 en proyecto 2 perteneciente al proyecto Proyecto 2 pasa a estado Terminado",
       "leido": false
     }
   },
@@ -809,9 +809,9 @@
     "model": "usuarios.notificacion",
     "pk": 35,
     "fields": {
-      "fecha": "2022-11-04T14:57:54.515Z",
+      "fecha": "2022-11-10T19:17:42.543Z",
       "usuario": 2,
-      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 15 horas de trabajo en la historia de usuario US 5 perteneciente al sprint Sprint 2 dentro del proyecto Proyecto 2",
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 3 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
       "leido": false
     }
   },
@@ -819,9 +819,9 @@
     "model": "usuarios.notificacion",
     "pk": 36,
     "fields": {
-      "fecha": "2022-11-04T14:57:58.199Z",
-      "usuario": 2,
-      "descripcion": "La historia de usuario US 5 perteneciente al sprint Sprint 2 dentro del proyecto Proyecto 2 pasó a etapa DONE",
+      "fecha": "2022-11-10T19:17:46.630Z",
+      "usuario": 1,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 12 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
       "leido": false
     }
   },
@@ -829,9 +829,9 @@
     "model": "usuarios.notificacion",
     "pk": 37,
     "fields": {
-      "fecha": "2022-11-04T14:58:05.424Z",
-      "usuario": 1,
-      "descripcion": "El sprint Sprint 2 perteneciente al proyecto Proyecto 2 pasa a estado Terminado",
+      "fecha": "2022-11-10T19:17:50.654Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 3 horas de trabajo en la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
       "leido": false
     }
   },
@@ -839,9 +839,9 @@
     "model": "usuarios.notificacion",
     "pk": 38,
     "fields": {
-      "fecha": "2022-11-04T14:58:05.427Z",
-      "usuario": 2,
-      "descripcion": "El sprint Sprint 2 perteneciente al proyecto Proyecto 2 pasa a estado Terminado",
+      "fecha": "2022-11-10T19:19:47.881Z",
+      "usuario": 1,
+      "descripcion": "Se le ha asignado la historia de usuario US 5 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
       "leido": false
     }
   },
@@ -849,9 +849,9 @@
     "model": "usuarios.notificacion",
     "pk": 39,
     "fields": {
-      "fecha": "2022-11-04T14:59:23.635Z",
-      "usuario": 1,
-      "descripcion": "Se le ha asignado la historia de usuario US 5 perteneciente al sprint Sprint 3 en proyecto 2 dentro del proyecto Proyecto 2",
+      "fecha": "2022-11-10T19:19:47.888Z",
+      "usuario": 2,
+      "descripcion": "Se le ha asignado la historia de usuario US 4 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
       "leido": false
     }
   },
@@ -859,9 +859,9 @@
     "model": "usuarios.notificacion",
     "pk": 40,
     "fields": {
-      "fecha": "2022-11-04T14:59:23.640Z",
+      "fecha": "2022-11-10T19:19:47.893Z",
       "usuario": 2,
-      "descripcion": "Se le ha asignado la historia de usuario US 4 perteneciente al sprint Sprint 3 en proyecto 2 dentro del proyecto Proyecto 2",
+      "descripcion": "Se le ha asignado la historia de usuario US 6 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
       "leido": false
     }
   },
@@ -869,9 +869,9 @@
     "model": "usuarios.notificacion",
     "pk": 41,
     "fields": {
-      "fecha": "2022-11-04T14:59:23.645Z",
+      "fecha": "2022-11-10T19:20:12.661Z",
       "usuario": 1,
-      "descripcion": "Se le ha asignado la historia de usuario US 6 perteneciente al sprint Sprint 3 en proyecto 2 dentro del proyecto Proyecto 2",
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 8 horas de trabajo en la historia de usuario US 5 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
       "leido": false
     }
   },
@@ -879,9 +879,9 @@
     "model": "usuarios.notificacion",
     "pk": 42,
     "fields": {
-      "fecha": "2022-11-04T14:59:44.215Z",
-      "usuario": 1,
-      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 45 horas de trabajo en la historia de usuario US 6 perteneciente al sprint Sprint 3 en proyecto 2 dentro del proyecto Proyecto 2",
+      "fecha": "2022-11-10T19:20:19.734Z",
+      "usuario": 2,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 8 horas de trabajo en la historia de usuario US 4 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
       "leido": false
     }
   },
@@ -889,9 +889,9 @@
     "model": "usuarios.notificacion",
     "pk": 43,
     "fields": {
-      "fecha": "2022-11-04T14:59:46.346Z",
-      "usuario": 1,
-      "descripcion": "La historia de usuario US 6 perteneciente al sprint Sprint 3 en proyecto 2 dentro del proyecto Proyecto 2 pasó a etapa DOING",
+      "fecha": "2022-11-10T19:20:25.490Z",
+      "usuario": 2,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 8 horas de trabajo en la historia de usuario US 6 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
       "leido": false
     }
   },
@@ -899,9 +899,279 @@
     "model": "usuarios.notificacion",
     "pk": 44,
     "fields": {
-      "fecha": "2022-11-04T15:00:08.470Z",
+      "fecha": "2022-11-11T19:21:00.578Z",
       "usuario": 1,
-      "descripcion": "Usted ha sido añadido al proyecto Proyecto 3 con el rol Member",
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 12 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 45,
+    "fields": {
+      "fecha": "2022-11-11T19:21:06.053Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 7 horas de trabajo en la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 46,
+    "fields": {
+      "fecha": "2022-11-11T19:21:17.400Z",
+      "usuario": 1,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 9 horas de trabajo en la historia de usuario US 5 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 47,
+    "fields": {
+      "fecha": "2022-11-11T19:21:23.261Z",
+      "usuario": 2,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 9 horas de trabajo en la historia de usuario US 4 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 48,
+    "fields": {
+      "fecha": "2022-11-11T19:21:27.684Z",
+      "usuario": 2,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 9 horas de trabajo en la historia de usuario US 6 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 49,
+    "fields": {
+      "fecha": "2022-11-14T19:22:46.646Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 5 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 50,
+    "fields": {
+      "fecha": "2022-11-14T19:22:51.001Z",
+      "usuario": 1,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 12 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 51,
+    "fields": {
+      "fecha": "2022-11-14T19:22:57.093Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 5 horas de trabajo en la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 52,
+    "fields": {
+      "fecha": "2022-11-14T19:23:13.764Z",
+      "usuario": 1,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 10 horas de trabajo en la historia de usuario US 5 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 53,
+    "fields": {
+      "fecha": "2022-11-14T19:23:18.022Z",
+      "usuario": 2,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 10 horas de trabajo en la historia de usuario US 4 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 54,
+    "fields": {
+      "fecha": "2022-11-14T19:23:21.984Z",
+      "usuario": 2,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 10 horas de trabajo en la historia de usuario US 6 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 55,
+    "fields": {
+      "fecha": "2022-11-15T19:24:13.558Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 5 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 56,
+    "fields": {
+      "fecha": "2022-11-15T19:24:18.384Z",
+      "usuario": 1,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 15 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 57,
+    "fields": {
+      "fecha": "2022-11-15T19:24:23.627Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 5 horas de trabajo en la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 58,
+    "fields": {
+      "fecha": "2022-11-15T19:24:31.687Z",
+      "usuario": 2,
+      "descripcion": "La historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DONE",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 59,
+    "fields": {
+      "fecha": "2022-11-15T19:24:32.518Z",
+      "usuario": 1,
+      "descripcion": "La historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DONE",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 60,
+    "fields": {
+      "fecha": "2022-11-15T19:24:33.305Z",
+      "usuario": 2,
+      "descripcion": "La historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasó a etapa DONE",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 61,
+    "fields": {
+      "fecha": "2022-11-15T19:24:39.749Z",
+      "usuario": 1,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 11 horas de trabajo en la historia de usuario US 5 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 62,
+    "fields": {
+      "fecha": "2022-11-15T19:24:43.503Z",
+      "usuario": 2,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 11 horas de trabajo en la historia de usuario US 4 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 63,
+    "fields": {
+      "fecha": "2022-11-15T19:24:47.493Z",
+      "usuario": 2,
+      "descripcion": "El usuario dummygpais2test@gmail.com ha marcado 11 horas de trabajo en la historia de usuario US 6 perteneciente al sprint Sprint 2 en proyecto 2 dentro del proyecto Proyecto 2",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 64,
+    "fields": {
+      "fecha": "2022-11-16T19:25:57.617Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 9 horas de trabajo en la historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 65,
+    "fields": {
+      "fecha": "2022-11-16T19:26:05.929Z",
+      "usuario": 1,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 14 horas de trabajo en la historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 66,
+    "fields": {
+      "fecha": "2022-11-16T19:26:11.585Z",
+      "usuario": 2,
+      "descripcion": "El usuario jlgutierrez2000@hotmail.com ha marcado 9 horas de trabajo en la historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 67,
+    "fields": {
+      "fecha": "2022-11-16T19:26:34.561Z",
+      "usuario": 2,
+      "descripcion": "La historia de usuario US 1 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasa a estado Terminado",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 68,
+    "fields": {
+      "fecha": "2022-11-16T19:26:35.733Z",
+      "usuario": 1,
+      "descripcion": "La historia de usuario US 2 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasa a estado Terminado",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 69,
+    "fields": {
+      "fecha": "2022-11-16T19:26:37.102Z",
+      "usuario": 2,
+      "descripcion": "La historia de usuario US 3 perteneciente al sprint Sprint 1 dentro del proyecto Proyecto 1 pasa a estado Terminado",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 70,
+    "fields": {
+      "fecha": "2022-11-16T19:26:39.538Z",
+      "usuario": 1,
+      "descripcion": "El sprint Sprint 1 perteneciente al proyecto Proyecto 1 pasa a estado Terminado",
+      "leido": false
+    }
+  },
+  {
+    "model": "usuarios.notificacion",
+    "pk": 71,
+    "fields": {
+      "fecha": "2022-11-16T19:26:39.540Z",
+      "usuario": 2,
+      "descripcion": "El sprint Sprint 1 perteneciente al proyecto Proyecto 1 pasa a estado Terminado",
       "leido": false
     }
   },
@@ -910,9 +1180,9 @@
     "pk": 1,
     "fields": {
       "nombre": "Proyecto 1",
-      "descripcion": "Proyecto 1",
-      "fecha_creacion": "2022-11-04T14:37:26.082Z",
-      "fecha_modificacion": "2022-11-04T14:50:58.199Z",
+      "descripcion": "Descripción de Proyecto 1",
+      "fecha_creacion": "2022-11-01T18:59:16.712Z",
+      "fecha_modificacion": "2022-11-16T19:26:39.545Z",
       "scrumMaster": 1,
       "estado": "Planificación",
       "minimo_dias_sprint": 15,
@@ -925,9 +1195,9 @@
     "pk": 2,
     "fields": {
       "nombre": "Proyecto 2",
-      "descripcion": "Proyecto 2",
-      "fecha_creacion": "2022-11-04T14:37:34.556Z",
-      "fecha_modificacion": "2022-11-04T14:59:30.622Z",
+      "descripcion": "Descripción de Proyecto 2",
+      "fecha_creacion": "2022-11-01T18:59:35.687Z",
+      "fecha_modificacion": "2022-11-10T19:20:01.046Z",
       "scrumMaster": 2,
       "estado": "Ejecución",
       "minimo_dias_sprint": 15,
@@ -940,55 +1210,68 @@
     "pk": 3,
     "fields": {
       "nombre": "Proyecto 3",
-      "descripcion": "Proyecto 3",
-      "fecha_creacion": "2022-11-04T14:37:41.258Z",
-      "fecha_modificacion": "2022-11-04T14:37:41.258Z",
-      "scrumMaster": 2,
+      "descripcion": "Descripción de Proyecto 3",
+      "fecha_creacion": "2022-11-16T19:28:02.113Z",
+      "fecha_modificacion": "2022-11-16T19:28:02.113Z",
+      "scrumMaster": 1,
       "estado": "Planificacion",
       "minimo_dias_sprint": 15,
       "maximo_dias_sprint": 30,
-      "usuario": [2, 1]
+      "usuario": [1]
     }
   },
   {
     "model": "proyectos.archivoburndown",
     "pk": 1,
     "fields": {
-      "nombre": "bdChart_1_1",
-      "fecha_subida": "2022-11-04T14:48:22.774Z",
-      "archivo": "app/staticfiles/bdChart_1_1_h39scyE.png"
+      "nombre": "bdChart_2_2",
+      "fecha_subida": "2022-11-09T19:15:40.560Z",
+      "archivo": "app/staticfiles/bdChart_2_2_78S89Ch.png"
     }
   },
   {
-    "model": "proyectos.archivovelocity",
-    "pk": 1,
+    "model": "proyectos.archivoburndown",
+    "pk": 2,
     "fields": {
-      "nombre": "velocityChart_1",
-      "fecha_subida": "2022-11-04T14:48:25.717Z",
-      "proyecto": 1,
-      "archivo": "app/staticfiles/velocityChart_Proyecto_11.png"
+      "nombre": "bdChart_1_1",
+      "fecha_subida": "2022-11-16T19:26:43.688Z",
+      "archivo": "app/staticfiles/bdChart_1_1_2tuEsQy.png"
     }
   },
   {
     "model": "proyectos.sprint",
     "pk": 1,
     "fields": {
-      "fecha_inicio": "2022-10-21T14:42:19.752Z",
-      "fecha_fin": "2022-11-04T14:47:57.779Z",
+      "fecha_inicio": "2022-11-01T19:05:50.152Z",
+      "fecha_fin": "2022-11-16T19:26:39.520Z",
       "proyecto": 1,
       "estado": "Terminado",
-      "duracion": 15,
+      "duracion": 12,
       "nombre": "Sprint 1",
       "descripcion": "Sprint 1",
-      "burndownChart": 1
+      "burndownChart": 2
     }
   },
   {
     "model": "proyectos.sprint",
     "pk": 2,
     "fields": {
+      "fecha_inicio": "2022-11-01T19:05:53.621Z",
+      "fecha_fin": "2022-11-09T19:15:36.525Z",
+      "proyecto": 2,
+      "estado": "Terminado",
+      "duracion": 7,
+      "nombre": "Sprint 1 en proyecto 2",
+      "descripcion": "Sprint 1 en proyecto 2",
+      "burndownChart": 1
+    }
+  },
+  {
+    "model": "proyectos.sprint",
+    "pk": 3,
+    "fields": {
       "fecha_inicio": null,
-      "fecha_fin": "2022-11-04T14:50:58.188Z",
+      "fecha_fin": "2022-11-01T19:05:37.944Z",
       "proyecto": 1,
       "estado": "Cancelado",
       "duracion": 15,
@@ -999,29 +1282,15 @@
   },
   {
     "model": "proyectos.sprint",
-    "pk": 3,
-    "fields": {
-      "fecha_inicio": "2022-10-21T14:55:57.211Z",
-      "fecha_fin": "2022-11-04T14:58:05.421Z",
-      "proyecto": 2,
-      "estado": "Terminado",
-      "duracion": 15,
-      "nombre": "Sprint 2",
-      "descripcion": "Sprint 2",
-      "burndownChart": null
-    }
-  },
-  {
-    "model": "proyectos.sprint",
     "pk": 4,
     "fields": {
-      "fecha_inicio": "2022-10-21T14:59:30.600Z",
-      "fecha_fin": "2022-11-24T14:59:30.600Z",
+      "fecha_inicio": "2022-11-10T19:20:01.035Z",
+      "fecha_fin": "2022-11-30T19:20:01.035Z",
       "proyecto": 2,
       "estado": "Desarrollo",
       "duracion": 15,
-      "nombre": "Sprint 3 en proyecto 2",
-      "descripcion": "Sprint 3 en proyecto 2",
+      "nombre": "Sprint 2 en proyecto 2",
+      "descripcion": "Sprint 2 en proyecto 2",
       "burndownChart": null
     }
   },
@@ -1038,49 +1307,40 @@
   {
     "model": "proyectos.usuariotiempoensprint",
     "pk": 3,
-    "fields": { "sprint": 2, "usuario": 1, "horas": 0 }
+    "fields": { "sprint": 2, "usuario": 1, "horas": 5 }
   },
   {
     "model": "proyectos.usuariotiempoensprint",
     "pk": 4,
-    "fields": { "sprint": 2, "usuario": 2, "horas": 0 }
+    "fields": { "sprint": 2, "usuario": 2, "horas": 8 }
   },
   {
     "model": "proyectos.usuariotiempoensprint",
     "pk": 5,
-    "fields": { "sprint": 3, "usuario": 1, "horas": 6 }
+    "fields": { "sprint": 3, "usuario": 1, "horas": 0 }
   },
   {
     "model": "proyectos.usuariotiempoensprint",
     "pk": 6,
-    "fields": { "sprint": 3, "usuario": 2, "horas": 6 }
+    "fields": { "sprint": 3, "usuario": 2, "horas": 0 }
   },
   {
     "model": "proyectos.usuariotiempoensprint",
     "pk": 7,
-    "fields": { "sprint": 4, "usuario": 1, "horas": 6 }
+    "fields": { "sprint": 4, "usuario": 1, "horas": 10 }
   },
   {
     "model": "proyectos.usuariotiempoensprint",
     "pk": 8,
-    "fields": { "sprint": 4, "usuario": 2, "horas": 6 }
+    "fields": { "sprint": 4, "usuario": 2, "horas": 10 }
   },
   {
     "model": "proyectos.feriado",
     "pk": 1,
     "fields": {
-      "proyecto": 1,
+      "proyecto": 2,
       "descripcion": "Feriado 1",
-      "fecha": "2022-11-09T03:00:00Z"
-    }
-  },
-  {
-    "model": "proyectos.feriado",
-    "pk": 2,
-    "fields": {
-      "proyecto": 1,
-      "descripcion": "Feriado 2",
-      "fecha": "2022-11-11T03:00:00Z"
+      "fecha": "2022-11-04T03:00:00Z"
     }
   },
   {
@@ -1113,11 +1373,7 @@
   {
     "model": "historias_usuario.tipohistoriaususario",
     "pk": 4,
-    "fields": {
-      "nombre": "Default",
-      "descripcion": "Tipo de historia de usuario por defecto en el sistema",
-      "proyecto": 3
-    }
+    "fields": { "nombre": "Tipo ABC", "descripcion": "Tipo ABC", "proyecto": 2 }
   },
   {
     "model": "historias_usuario.tipohistoriaususario",
@@ -1127,7 +1383,11 @@
   {
     "model": "historias_usuario.tipohistoriaususario",
     "pk": 6,
-    "fields": { "nombre": "Tipo ABC", "descripcion": "Tipo ABC", "proyecto": 2 }
+    "fields": {
+      "nombre": "Default",
+      "descripcion": "Tipo de historia de usuario por defecto en el sistema",
+      "proyecto": 3
+    }
   },
   {
     "model": "historias_usuario.etapahistoriausuario",
@@ -1223,8 +1483,8 @@
     "model": "historias_usuario.etapahistoriausuario",
     "pk": 12,
     "fields": {
-      "nombre": "TO DO",
-      "descripcion": "TO DO",
+      "nombre": "Etapa A",
+      "descripcion": "",
       "orden": 0,
       "TipoHistoriaUsusario": 4
     }
@@ -1233,8 +1493,8 @@
     "model": "historias_usuario.etapahistoriausuario",
     "pk": 13,
     "fields": {
-      "nombre": "DOING",
-      "descripcion": "DOING",
+      "nombre": "Etapa B",
+      "descripcion": "",
       "orden": 1,
       "TipoHistoriaUsusario": 4
     }
@@ -1243,8 +1503,8 @@
     "model": "historias_usuario.etapahistoriausuario",
     "pk": 14,
     "fields": {
-      "nombre": "DONE",
-      "descripcion": "DONE",
+      "nombre": "Etapa C",
+      "descripcion": "",
       "orden": 2,
       "TipoHistoriaUsusario": 4
     }
@@ -1283,8 +1543,8 @@
     "model": "historias_usuario.etapahistoriausuario",
     "pk": 18,
     "fields": {
-      "nombre": "Etapa A",
-      "descripcion": "",
+      "nombre": "TO DO",
+      "descripcion": "TO DO",
       "orden": 0,
       "TipoHistoriaUsusario": 6
     }
@@ -1293,8 +1553,8 @@
     "model": "historias_usuario.etapahistoriausuario",
     "pk": 19,
     "fields": {
-      "nombre": "Etapa B",
-      "descripcion": "",
+      "nombre": "DOING",
+      "descripcion": "DOING",
       "orden": 1,
       "TipoHistoriaUsusario": 6
     }
@@ -1303,8 +1563,8 @@
     "model": "historias_usuario.etapahistoriausuario",
     "pk": 20,
     "fields": {
-      "nombre": "Etapa C",
-      "descripcion": "",
+      "nombre": "DONE",
+      "descripcion": "DONE",
       "orden": 2,
       "TipoHistoriaUsusario": 6
     }
@@ -1313,20 +1573,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 1,
     "fields": {
-      "nombre": "US para cancelar",
-      "descripcion": "US para cancelar",
-      "fecha_creacion": "2022-11-04T14:39:25.764Z",
-      "fecha_modificacion": "2022-11-04T14:39:29.372Z",
-      "sprint": null,
-      "etapa": null,
+      "nombre": "US 1",
+      "descripcion": "US 1",
+      "fecha_creacion": "2022-11-16T19:26:34.522Z",
+      "fecha_modificacion": "2022-11-16T19:26:34.564Z",
+      "sprint": 1,
+      "etapa": 8,
       "tipo": 2,
-      "versionPrevia": null,
+      "versionPrevia": 19,
       "up": 50,
       "bv": 50,
-      "usuarioAsignado": null,
-      "horasAsignadas": 0,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
       "proyecto": 1,
-      "estado": "C",
+      "estado": "T",
       "archivos": []
     }
   },
@@ -1334,18 +1594,18 @@
     "model": "historias_usuario.historiausuario",
     "pk": 2,
     "fields": {
-      "nombre": "US 1",
-      "descripcion": "US 1",
-      "fecha_creacion": "2022-11-04T14:47:37.538Z",
-      "fecha_modificacion": "2022-11-04T14:47:37.553Z",
+      "nombre": "US 2",
+      "descripcion": "US 2",
+      "fecha_creacion": "2022-11-16T19:26:35.726Z",
+      "fecha_modificacion": "2022-11-16T19:26:35.735Z",
       "sprint": 1,
       "etapa": 8,
       "tipo": 2,
-      "versionPrevia": 12,
-      "up": 50,
-      "bv": 50,
-      "usuarioAsignado": 2,
-      "horasAsignadas": 45,
+      "versionPrevia": 20,
+      "up": 15,
+      "bv": 85,
+      "usuarioAsignado": 1,
+      "horasAsignadas": 90,
       "proyecto": 1,
       "estado": "T",
       "archivos": []
@@ -1355,18 +1615,18 @@
     "model": "historias_usuario.historiausuario",
     "pk": 3,
     "fields": {
-      "nombre": "US 2",
-      "descripcion": "US 2",
-      "fecha_creacion": "2022-11-04T14:47:19.128Z",
-      "fecha_modificacion": "2022-11-04T14:47:19.143Z",
+      "nombre": "US 3",
+      "descripcion": "US 3",
+      "fecha_creacion": "2022-11-16T19:26:37.094Z",
+      "fecha_modificacion": "2022-11-16T19:26:37.104Z",
       "sprint": 1,
       "etapa": 8,
       "tipo": 2,
-      "versionPrevia": 11,
-      "up": 25,
-      "bv": 75,
-      "usuarioAsignado": 1,
-      "horasAsignadas": 90,
+      "versionPrevia": 21,
+      "up": 85,
+      "bv": 15,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
       "proyecto": 1,
       "estado": "T",
       "archivos": []
@@ -1376,20 +1636,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 4,
     "fields": {
-      "nombre": "US 3",
-      "descripcion": "US 3",
-      "fecha_creacion": "2022-11-04T14:47:55.615Z",
-      "fecha_modificacion": "2022-11-04T14:47:55.631Z",
-      "sprint": 1,
-      "etapa": 8,
-      "tipo": 2,
-      "versionPrevia": 13,
-      "up": 75,
-      "bv": 25,
+      "nombre": "US 4",
+      "descripcion": "US 4",
+      "fecha_creacion": "2022-11-02T19:08:01.219Z",
+      "fecha_modificacion": "2022-11-10T19:19:47.885Z",
+      "sprint": 4,
+      "etapa": 10,
+      "tipo": 3,
+      "versionPrevia": 9,
+      "up": 50,
+      "bv": 50,
       "usuarioAsignado": 2,
-      "horasAsignadas": 45,
-      "proyecto": 1,
-      "estado": "T",
+      "horasAsignadas": 60,
+      "proyecto": 2,
+      "estado": "A",
       "archivos": []
     }
   },
@@ -1397,20 +1657,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 5,
     "fields": {
-      "nombre": "US 2",
-      "descripcion": "US 2",
-      "fecha_creacion": "2022-11-04T14:40:31.136Z",
-      "fecha_modificacion": "2022-11-04T14:42:55.221Z",
-      "sprint": 1,
-      "etapa": 6,
-      "tipo": 2,
-      "versionPrevia": null,
-      "up": 25,
-      "bv": 75,
+      "nombre": "US 5",
+      "descripcion": "US 5",
+      "fecha_creacion": "2022-11-02T19:08:00.049Z",
+      "fecha_modificacion": "2022-11-10T19:19:47.868Z",
+      "sprint": 4,
+      "etapa": 10,
+      "tipo": 3,
+      "versionPrevia": 8,
+      "up": 15,
+      "bv": 85,
       "usuarioAsignado": 1,
-      "horasAsignadas": 90,
-      "proyecto": 1,
-      "estado": "H",
+      "horasAsignadas": 60,
+      "proyecto": 2,
+      "estado": "A",
       "archivos": []
     }
   },
@@ -1418,20 +1678,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 6,
     "fields": {
-      "nombre": "US 1",
-      "descripcion": "US 1",
-      "fecha_creacion": "2022-11-04T14:40:22.255Z",
-      "fecha_modificacion": "2022-11-04T14:44:15.210Z",
-      "sprint": 1,
-      "etapa": 6,
-      "tipo": 2,
-      "versionPrevia": null,
-      "up": 50,
-      "bv": 50,
+      "nombre": "US 6",
+      "descripcion": "US 6",
+      "fecha_creacion": "2022-11-07T19:11:34.381Z",
+      "fecha_modificacion": "2022-11-10T19:19:47.891Z",
+      "sprint": 4,
+      "etapa": 10,
+      "tipo": 3,
+      "versionPrevia": 12,
+      "up": 85,
+      "bv": 15,
       "usuarioAsignado": 2,
-      "horasAsignadas": 45,
-      "proyecto": 1,
-      "estado": "H",
+      "horasAsignadas": 60,
+      "proyecto": 2,
+      "estado": "A",
       "archivos": []
     }
   },
@@ -1439,16 +1699,16 @@
     "model": "historias_usuario.historiausuario",
     "pk": 7,
     "fields": {
-      "nombre": "US 3",
-      "descripcion": "US 3",
-      "fecha_creacion": "2022-11-04T14:40:40.815Z",
-      "fecha_modificacion": "2022-11-04T14:45:29.455Z",
+      "nombre": "US 1",
+      "descripcion": "US 1",
+      "fecha_creacion": "2022-11-01T19:00:57.625Z",
+      "fecha_modificacion": "2022-11-02T19:07:34.498Z",
       "sprint": 1,
       "etapa": 6,
       "tipo": 2,
       "versionPrevia": null,
-      "up": 75,
-      "bv": 25,
+      "up": 50,
+      "bv": 50,
       "usuarioAsignado": 2,
       "horasAsignadas": 45,
       "proyecto": 1,
@@ -1460,19 +1720,19 @@
     "model": "historias_usuario.historiausuario",
     "pk": 8,
     "fields": {
-      "nombre": "US 2",
-      "descripcion": "US 2",
-      "fecha_creacion": "2022-11-04T14:42:55.230Z",
-      "fecha_modificacion": "2022-11-04T14:45:53.968Z",
-      "sprint": 1,
-      "etapa": 7,
-      "tipo": 2,
-      "versionPrevia": 5,
-      "up": 25,
-      "bv": 75,
-      "usuarioAsignado": 1,
-      "horasAsignadas": 90,
-      "proyecto": 1,
+      "nombre": "US 5",
+      "descripcion": "US 5",
+      "fecha_creacion": "2022-11-01T19:01:42.326Z",
+      "fecha_modificacion": "2022-11-02T19:08:00.041Z",
+      "sprint": 2,
+      "etapa": 9,
+      "tipo": 3,
+      "versionPrevia": null,
+      "up": 15,
+      "bv": 85,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 120,
+      "proyecto": 2,
       "estado": "H",
       "archivos": []
     }
@@ -1481,19 +1741,19 @@
     "model": "historias_usuario.historiausuario",
     "pk": 9,
     "fields": {
-      "nombre": "US 1",
-      "descripcion": "US 1",
-      "fecha_creacion": "2022-11-04T14:44:15.220Z",
-      "fecha_modificacion": "2022-11-04T14:46:08.551Z",
-      "sprint": 1,
-      "etapa": 7,
-      "tipo": 2,
-      "versionPrevia": 6,
+      "nombre": "US 4",
+      "descripcion": "US 4",
+      "fecha_creacion": "2022-11-01T19:01:32.638Z",
+      "fecha_modificacion": "2022-11-02T19:08:01.202Z",
+      "sprint": 2,
+      "etapa": 9,
+      "tipo": 3,
+      "versionPrevia": null,
       "up": 50,
       "bv": 50,
-      "usuarioAsignado": 2,
-      "horasAsignadas": 45,
-      "proyecto": 1,
+      "usuarioAsignado": 1,
+      "horasAsignadas": 50,
+      "proyecto": 2,
       "estado": "H",
       "archivos": []
     }
@@ -1502,18 +1762,18 @@
     "model": "historias_usuario.historiausuario",
     "pk": 10,
     "fields": {
-      "nombre": "US 3",
-      "descripcion": "US 3",
-      "fecha_creacion": "2022-11-04T14:45:29.464Z",
-      "fecha_modificacion": "2022-11-04T14:46:22.475Z",
+      "nombre": "US 2",
+      "descripcion": "US 2",
+      "fecha_creacion": "2022-11-01T19:01:08.227Z",
+      "fecha_modificacion": "2022-11-07T19:11:18.325Z",
       "sprint": 1,
-      "etapa": 7,
+      "etapa": 6,
       "tipo": 2,
-      "versionPrevia": 7,
-      "up": 75,
-      "bv": 25,
-      "usuarioAsignado": 2,
-      "horasAsignadas": 45,
+      "versionPrevia": null,
+      "up": 15,
+      "bv": 85,
+      "usuarioAsignado": 1,
+      "horasAsignadas": 90,
       "proyecto": 1,
       "estado": "H",
       "archivos": []
@@ -1523,18 +1783,18 @@
     "model": "historias_usuario.historiausuario",
     "pk": 11,
     "fields": {
-      "nombre": "US 2",
-      "descripcion": "US 2",
-      "fecha_creacion": "2022-11-04T14:45:53.980Z",
-      "fecha_modificacion": "2022-11-04T14:47:19.120Z",
+      "nombre": "US 3",
+      "descripcion": "US 3",
+      "fecha_creacion": "2022-11-01T19:01:17.752Z",
+      "fecha_modificacion": "2022-11-07T19:11:19.566Z",
       "sprint": 1,
-      "etapa": 8,
+      "etapa": 6,
       "tipo": 2,
-      "versionPrevia": 8,
-      "up": 25,
-      "bv": 75,
-      "usuarioAsignado": 1,
-      "horasAsignadas": 90,
+      "versionPrevia": null,
+      "up": 85,
+      "bv": 15,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
       "proyecto": 1,
       "estado": "H",
       "archivos": []
@@ -1544,19 +1804,19 @@
     "model": "historias_usuario.historiausuario",
     "pk": 12,
     "fields": {
-      "nombre": "US 1",
-      "descripcion": "US 1",
-      "fecha_creacion": "2022-11-04T14:46:08.560Z",
-      "fecha_modificacion": "2022-11-04T14:47:37.527Z",
-      "sprint": 1,
-      "etapa": 8,
-      "tipo": 2,
-      "versionPrevia": 9,
-      "up": 50,
-      "bv": 50,
-      "usuarioAsignado": 2,
-      "horasAsignadas": 45,
-      "proyecto": 1,
+      "nombre": "US 6",
+      "descripcion": "US 6",
+      "fecha_creacion": "2022-11-01T19:01:52.469Z",
+      "fecha_modificacion": "2022-11-07T19:11:34.365Z",
+      "sprint": 2,
+      "etapa": 9,
+      "tipo": 3,
+      "versionPrevia": null,
+      "up": 85,
+      "bv": 15,
+      "usuarioAsignado": 1,
+      "horasAsignadas": 25,
+      "proyecto": 2,
       "estado": "H",
       "archivos": []
     }
@@ -1565,20 +1825,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 13,
     "fields": {
-      "nombre": "US 3",
-      "descripcion": "US 3",
-      "fecha_creacion": "2022-11-04T14:46:22.482Z",
-      "fecha_modificacion": "2022-11-04T14:47:55.599Z",
-      "sprint": 1,
-      "etapa": 8,
-      "tipo": 2,
-      "versionPrevia": 10,
-      "up": 75,
-      "bv": 25,
+      "nombre": "US 5",
+      "descripcion": "US 5",
+      "fecha_creacion": "2022-11-02T19:08:00.049Z",
+      "fecha_modificacion": "2022-11-09T19:15:36.549Z",
+      "sprint": 2,
+      "etapa": 10,
+      "tipo": 3,
+      "versionPrevia": 8,
+      "up": 15,
+      "bv": 85,
       "usuarioAsignado": 2,
-      "horasAsignadas": 45,
-      "proyecto": 1,
-      "estado": "H",
+      "horasAsignadas": 120,
+      "proyecto": 2,
+      "estado": "S",
       "archivos": []
     }
   },
@@ -1588,18 +1848,18 @@
     "fields": {
       "nombre": "US 4",
       "descripcion": "US 4",
-      "fecha_creacion": "2022-11-04T14:57:39.853Z",
-      "fecha_modificacion": "2022-11-04T14:59:23.638Z",
-      "sprint": 4,
+      "fecha_creacion": "2022-11-02T19:08:01.219Z",
+      "fecha_modificacion": "2022-11-09T19:15:36.562Z",
+      "sprint": 2,
       "etapa": 10,
       "tipo": 3,
-      "versionPrevia": 18,
+      "versionPrevia": 9,
       "up": 50,
       "bv": 50,
-      "usuarioAsignado": 2,
-      "horasAsignadas": 45,
+      "usuarioAsignado": 1,
+      "horasAsignadas": 50,
       "proyecto": 2,
-      "estado": "A",
+      "estado": "S",
       "archivos": []
     }
   },
@@ -1607,20 +1867,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 15,
     "fields": {
-      "nombre": "US 5",
-      "descripcion": "US 5",
-      "fecha_creacion": "2022-11-04T14:57:58.189Z",
-      "fecha_modificacion": "2022-11-04T14:59:23.633Z",
-      "sprint": 4,
-      "etapa": 11,
+      "nombre": "US 6",
+      "descripcion": "US 6",
+      "fecha_creacion": "2022-11-07T19:11:34.381Z",
+      "fecha_modificacion": "2022-11-09T19:15:36.571Z",
+      "sprint": 2,
+      "etapa": 10,
       "tipo": 3,
-      "versionPrevia": 19,
-      "up": 25,
-      "bv": 75,
+      "versionPrevia": 12,
+      "up": 85,
+      "bv": 15,
       "usuarioAsignado": 1,
-      "horasAsignadas": 15,
+      "horasAsignadas": 25,
       "proyecto": 2,
-      "estado": "A",
+      "estado": "S",
       "archivos": []
     }
   },
@@ -1628,20 +1888,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 16,
     "fields": {
-      "nombre": "US 6",
-      "descripcion": "US 6",
-      "fecha_creacion": "2022-11-04T14:59:46.333Z",
-      "fecha_modificacion": "2022-11-04T14:59:46.348Z",
-      "sprint": 4,
-      "etapa": 10,
-      "tipo": 3,
-      "versionPrevia": 23,
-      "up": 75,
-      "bv": 25,
-      "usuarioAsignado": 1,
-      "horasAsignadas": 90,
-      "proyecto": 2,
-      "estado": "A",
+      "nombre": "US 1",
+      "descripcion": "US 1",
+      "fecha_creacion": "2022-11-02T19:07:34.511Z",
+      "fecha_modificacion": "2022-11-15T19:24:31.668Z",
+      "sprint": 1,
+      "etapa": 7,
+      "tipo": 2,
+      "versionPrevia": 7,
+      "up": 50,
+      "bv": 50,
+      "usuarioAsignado": 2,
+      "horasAsignadas": 45,
+      "proyecto": 1,
+      "estado": "H",
       "archivos": []
     }
   },
@@ -1649,19 +1909,19 @@
     "model": "historias_usuario.historiausuario",
     "pk": 17,
     "fields": {
-      "nombre": "US 5",
-      "descripcion": "US 5",
-      "fecha_creacion": "2022-11-04T14:54:43.973Z",
-      "fecha_modificacion": "2022-11-04T14:56:55.339Z",
-      "sprint": 3,
-      "etapa": 9,
-      "tipo": 3,
-      "versionPrevia": null,
-      "up": 25,
-      "bv": 75,
+      "nombre": "US 2",
+      "descripcion": "US 2",
+      "fecha_creacion": "2022-11-07T19:11:18.332Z",
+      "fecha_modificacion": "2022-11-15T19:24:32.504Z",
+      "sprint": 1,
+      "etapa": 7,
+      "tipo": 2,
+      "versionPrevia": 10,
+      "up": 15,
+      "bv": 85,
       "usuarioAsignado": 1,
-      "horasAsignadas": 45,
-      "proyecto": 2,
+      "horasAsignadas": 90,
+      "proyecto": 1,
       "estado": "H",
       "archivos": []
     }
@@ -1670,19 +1930,19 @@
     "model": "historias_usuario.historiausuario",
     "pk": 18,
     "fields": {
-      "nombre": "US 4",
-      "descripcion": "US 4",
-      "fecha_creacion": "2022-11-04T14:54:34.180Z",
-      "fecha_modificacion": "2022-11-04T14:57:39.825Z",
-      "sprint": 3,
-      "etapa": 9,
-      "tipo": 3,
-      "versionPrevia": null,
-      "up": 50,
-      "bv": 50,
-      "usuarioAsignado": 1,
+      "nombre": "US 3",
+      "descripcion": "US 3",
+      "fecha_creacion": "2022-11-07T19:11:19.575Z",
+      "fecha_modificacion": "2022-11-15T19:24:33.277Z",
+      "sprint": 1,
+      "etapa": 7,
+      "tipo": 2,
+      "versionPrevia": 11,
+      "up": 85,
+      "bv": 15,
+      "usuarioAsignado": 2,
       "horasAsignadas": 45,
-      "proyecto": 2,
+      "proyecto": 1,
       "estado": "H",
       "archivos": []
     }
@@ -1691,19 +1951,19 @@
     "model": "historias_usuario.historiausuario",
     "pk": 19,
     "fields": {
-      "nombre": "US 5",
-      "descripcion": "US 5",
-      "fecha_creacion": "2022-11-04T14:56:55.373Z",
-      "fecha_modificacion": "2022-11-04T14:57:58.180Z",
-      "sprint": 3,
-      "etapa": 10,
-      "tipo": 3,
-      "versionPrevia": 17,
-      "up": 25,
-      "bv": 75,
+      "nombre": "US 1",
+      "descripcion": "US 1",
+      "fecha_creacion": "2022-11-15T19:24:31.677Z",
+      "fecha_modificacion": "2022-11-16T19:26:34.484Z",
+      "sprint": 1,
+      "etapa": 8,
+      "tipo": 2,
+      "versionPrevia": 16,
+      "up": 50,
+      "bv": 50,
       "usuarioAsignado": 2,
       "horasAsignadas": 45,
-      "proyecto": 2,
+      "proyecto": 1,
       "estado": "H",
       "archivos": []
     }
@@ -1712,20 +1972,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 20,
     "fields": {
-      "nombre": "US 6",
-      "descripcion": "US 6",
-      "fecha_creacion": "2022-11-04T14:54:54.040Z",
-      "fecha_modificacion": "2022-11-04T14:58:05.433Z",
-      "sprint": 3,
-      "etapa": 9,
-      "tipo": 3,
-      "versionPrevia": null,
-      "up": 75,
-      "bv": 25,
-      "usuarioAsignado": 2,
+      "nombre": "US 2",
+      "descripcion": "US 2",
+      "fecha_creacion": "2022-11-15T19:24:32.510Z",
+      "fecha_modificacion": "2022-11-16T19:26:35.719Z",
+      "sprint": 1,
+      "etapa": 8,
+      "tipo": 2,
+      "versionPrevia": 17,
+      "up": 15,
+      "bv": 85,
+      "usuarioAsignado": 1,
       "horasAsignadas": 90,
-      "proyecto": 2,
-      "estado": "S",
+      "proyecto": 1,
+      "estado": "H",
       "archivos": []
     }
   },
@@ -1733,20 +1993,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 21,
     "fields": {
-      "nombre": "US 4",
-      "descripcion": "US 4",
-      "fecha_creacion": "2022-11-04T14:57:39.853Z",
-      "fecha_modificacion": "2022-11-04T14:58:05.447Z",
-      "sprint": 3,
-      "etapa": 10,
-      "tipo": 3,
+      "nombre": "US 3",
+      "descripcion": "US 3",
+      "fecha_creacion": "2022-11-15T19:24:33.283Z",
+      "fecha_modificacion": "2022-11-16T19:26:37.088Z",
+      "sprint": 1,
+      "etapa": 8,
+      "tipo": 2,
       "versionPrevia": 18,
-      "up": 50,
-      "bv": 50,
-      "usuarioAsignado": 1,
+      "up": 85,
+      "bv": 15,
+      "usuarioAsignado": 2,
       "horasAsignadas": 45,
-      "proyecto": 2,
-      "estado": "S",
+      "proyecto": 1,
+      "estado": "H",
       "archivos": []
     }
   },
@@ -1754,20 +2014,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 22,
     "fields": {
-      "nombre": "US 5",
-      "descripcion": "US 5",
-      "fecha_creacion": "2022-11-04T14:57:58.189Z",
-      "fecha_modificacion": "2022-11-04T14:58:05.457Z",
-      "sprint": 3,
-      "etapa": 11,
-      "tipo": 3,
-      "versionPrevia": 19,
-      "up": 25,
-      "bv": 75,
-      "usuarioAsignado": 2,
-      "horasAsignadas": 45,
-      "proyecto": 2,
-      "estado": "S",
+      "nombre": "US 1 de proyecto 3",
+      "descripcion": "US 1 de proyecto 3",
+      "fecha_creacion": "2022-11-16T19:28:18.552Z",
+      "fecha_modificacion": "2022-11-16T19:28:18.558Z",
+      "sprint": null,
+      "etapa": null,
+      "tipo": 6,
+      "versionPrevia": null,
+      "up": 50,
+      "bv": 50,
+      "usuarioAsignado": null,
+      "horasAsignadas": 0,
+      "proyecto": 3,
+      "estado": "A",
       "archivos": []
     }
   },
@@ -1775,20 +2035,20 @@
     "model": "historias_usuario.historiausuario",
     "pk": 23,
     "fields": {
-      "nombre": "US 6",
-      "descripcion": "US 6",
-      "fecha_creacion": "2022-11-04T14:54:54.040Z",
-      "fecha_modificacion": "2022-11-04T14:59:46.312Z",
-      "sprint": 4,
-      "etapa": 9,
-      "tipo": 3,
+      "nombre": "US 2 de proyecto 3",
+      "descripcion": "US 2 de proyecto 3",
+      "fecha_creacion": "2022-11-16T19:28:26.948Z",
+      "fecha_modificacion": "2022-11-16T19:28:26.954Z",
+      "sprint": null,
+      "etapa": null,
+      "tipo": 6,
       "versionPrevia": null,
-      "up": 75,
-      "bv": 25,
-      "usuarioAsignado": 1,
-      "horasAsignadas": 90,
-      "proyecto": 2,
-      "estado": "H",
+      "up": 15,
+      "bv": 85,
+      "usuarioAsignado": null,
+      "horasAsignadas": 0,
+      "proyecto": 3,
+      "estado": "A",
       "archivos": []
     }
   },
@@ -1796,58 +2056,16 @@
     "model": "historias_usuario.historiausuario",
     "pk": 24,
     "fields": {
-      "nombre": "US 1 de proyecto 3",
-      "descripcion": "US 1 de proyecto 3",
-      "fecha_creacion": "2022-11-04T15:00:28.378Z",
-      "fecha_modificacion": "2022-11-04T15:00:28.384Z",
-      "sprint": null,
-      "etapa": null,
-      "tipo": 4,
-      "versionPrevia": null,
-      "up": 25,
-      "bv": 75,
-      "usuarioAsignado": null,
-      "horasAsignadas": 0,
-      "proyecto": 3,
-      "estado": "A",
-      "archivos": []
-    }
-  },
-  {
-    "model": "historias_usuario.historiausuario",
-    "pk": 25,
-    "fields": {
-      "nombre": "US 2 de proyecto 3",
-      "descripcion": "US 2 de proyecto 3",
-      "fecha_creacion": "2022-11-04T15:00:39.292Z",
-      "fecha_modificacion": "2022-11-04T15:00:39.297Z",
-      "sprint": null,
-      "etapa": null,
-      "tipo": 4,
-      "versionPrevia": null,
-      "up": 75,
-      "bv": 25,
-      "usuarioAsignado": null,
-      "horasAsignadas": 0,
-      "proyecto": 3,
-      "estado": "A",
-      "archivos": []
-    }
-  },
-  {
-    "model": "historias_usuario.historiausuario",
-    "pk": 26,
-    "fields": {
       "nombre": "US 3 de proyecto 3",
       "descripcion": "US 3 de proyecto 3",
-      "fecha_creacion": "2022-11-04T15:00:48.976Z",
-      "fecha_modificacion": "2022-11-04T15:00:48.982Z",
+      "fecha_creacion": "2022-11-16T19:28:36.378Z",
+      "fecha_modificacion": "2022-11-16T19:28:36.383Z",
       "sprint": null,
       "etapa": null,
-      "tipo": 4,
+      "tipo": 6,
       "versionPrevia": null,
-      "up": 25,
-      "bv": 75,
+      "up": 85,
+      "bv": 15,
       "usuarioAsignado": null,
       "horasAsignadas": 0,
       "proyecto": 3,
@@ -1859,49 +2077,49 @@
     "model": "historias_usuario.sprintinfo",
     "pk": 1,
     "fields": {
-      "versionEnHistorial": 20,
-      "historia": 16,
-      "sprint": 3,
-      "fechaCreacion": "2022-11-04T14:58:05.438Z",
-      "horasAsignadas": 90,
-      "horasUsadas": 0
+      "versionEnHistorial": 13,
+      "historia": 5,
+      "sprint": 2,
+      "fechaCreacion": "2022-11-09T19:15:36.555Z",
+      "horasAsignadas": 120,
+      "horasUsadas": 15
     }
   },
   {
     "model": "historias_usuario.sprintinfo",
     "pk": 2,
     "fields": {
-      "versionEnHistorial": 21,
-      "historia": 14,
-      "sprint": 3,
-      "fechaCreacion": "2022-11-04T14:58:05.452Z",
-      "horasAsignadas": 45,
-      "horasUsadas": 150
+      "versionEnHistorial": 14,
+      "historia": 4,
+      "sprint": 2,
+      "fechaCreacion": "2022-11-09T19:15:36.567Z",
+      "horasAsignadas": 50,
+      "horasUsadas": 15
     }
   },
   {
     "model": "historias_usuario.sprintinfo",
     "pk": 3,
     "fields": {
-      "versionEnHistorial": 22,
-      "historia": 15,
-      "sprint": 3,
-      "fechaCreacion": "2022-11-04T14:58:05.462Z",
-      "horasAsignadas": 45,
-      "horasUsadas": 30
+      "versionEnHistorial": 15,
+      "historia": 6,
+      "sprint": 2,
+      "fechaCreacion": "2022-11-09T19:15:36.575Z",
+      "horasAsignadas": 25,
+      "horasUsadas": 15
     }
   },
   {
     "model": "historias_usuario.tarea",
     "pk": 1,
     "fields": {
-      "fecha": "2022-10-21",
-      "historia": 3,
+      "fecha": "2022-11-02",
+      "historia": 1,
       "sprint": 1,
       "usuario": 1,
-      "descripcion": "Trabajo 1 en US 2",
+      "descripcion": "Trabajo",
       "etapa": 6,
-      "horas": 30,
+      "horas": 1,
       "considerado": false
     }
   },
@@ -1909,13 +2127,13 @@
     "model": "historias_usuario.tarea",
     "pk": 2,
     "fields": {
-      "fecha": "2022-10-24",
-      "historia": 2,
-      "sprint": 1,
-      "usuario": 1,
-      "descripcion": "Trabajo 1 en US 1",
-      "etapa": 6,
-      "horas": 15,
+      "fecha": "2022-11-02",
+      "historia": 5,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "Trabajo",
+      "etapa": 9,
+      "horas": 2,
       "considerado": false
     }
   },
@@ -1923,13 +2141,13 @@
     "model": "historias_usuario.tarea",
     "pk": 3,
     "fields": {
-      "fecha": "2022-10-24",
+      "fecha": "2022-11-02",
       "historia": 4,
-      "sprint": 1,
-      "usuario": 1,
-      "descripcion": "Trabajo 1 en US 3",
-      "etapa": 6,
-      "horas": 15,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 9,
+      "horas": 2,
       "considerado": false
     }
   },
@@ -1937,13 +2155,13 @@
     "model": "historias_usuario.tarea",
     "pk": 4,
     "fields": {
-      "fecha": "2022-10-25",
-      "historia": 3,
+      "fecha": "2022-11-03",
+      "historia": 1,
       "sprint": 1,
       "usuario": 1,
-      "descripcion": "Trabajo 2 en US 2",
+      "descripcion": "",
       "etapa": 7,
-      "horas": 30,
+      "horas": 9,
       "considerado": false
     }
   },
@@ -1951,13 +2169,13 @@
     "model": "historias_usuario.tarea",
     "pk": 5,
     "fields": {
-      "fecha": "2022-10-26",
-      "historia": 2,
-      "sprint": 1,
-      "usuario": 1,
-      "descripcion": "Trabajo 2 en US 1",
-      "etapa": 7,
-      "horas": 15,
+      "fecha": "2022-11-03",
+      "historia": 6,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 9,
+      "horas": 4,
       "considerado": false
     }
   },
@@ -1965,13 +2183,13 @@
     "model": "historias_usuario.tarea",
     "pk": 6,
     "fields": {
-      "fecha": "2022-10-27",
-      "historia": 4,
+      "fecha": "2022-11-04",
+      "historia": 1,
       "sprint": 1,
       "usuario": 1,
-      "descripcion": "Trabajo 2 en US 3",
+      "descripcion": "",
       "etapa": 7,
-      "horas": 30,
+      "horas": 5,
       "considerado": false
     }
   },
@@ -1979,13 +2197,13 @@
     "model": "historias_usuario.tarea",
     "pk": 7,
     "fields": {
-      "fecha": "2022-10-28",
-      "historia": 3,
+      "fecha": "2022-11-07",
+      "historia": 2,
       "sprint": 1,
       "usuario": 1,
-      "descripcion": "Trabajo 3 en US 2",
-      "etapa": 8,
-      "horas": 30,
+      "descripcion": "",
+      "etapa": 6,
+      "horas": 1,
       "considerado": false
     }
   },
@@ -1993,13 +2211,13 @@
     "model": "historias_usuario.tarea",
     "pk": 8,
     "fields": {
-      "fecha": "2022-11-04",
-      "historia": 2,
+      "fecha": "2022-11-07",
+      "historia": 3,
       "sprint": 1,
       "usuario": 1,
-      "descripcion": "Trabajo 3 en US 1",
-      "etapa": 8,
-      "horas": 30,
+      "descripcion": "",
+      "etapa": 6,
+      "horas": 8,
       "considerado": false
     }
   },
@@ -2007,13 +2225,13 @@
     "model": "historias_usuario.tarea",
     "pk": 9,
     "fields": {
-      "fecha": "2022-10-21",
-      "historia": 4,
-      "sprint": 1,
-      "usuario": 1,
-      "descripcion": "Trabajo 3 en US 3",
-      "etapa": 8,
-      "horas": 15,
+      "fecha": "2022-11-07",
+      "historia": 5,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 6,
       "considerado": false
     }
   },
@@ -2021,13 +2239,13 @@
     "model": "historias_usuario.tarea",
     "pk": 10,
     "fields": {
-      "fecha": "2022-11-03",
-      "historia": 15,
-      "sprint": 3,
+      "fecha": "2022-11-07",
+      "historia": 4,
+      "sprint": 2,
       "usuario": 2,
-      "descripcion": "Trabajo 1 en US 5",
-      "etapa": 9,
-      "horas": 15,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 6,
       "considerado": false
     }
   },
@@ -2035,13 +2253,13 @@
     "model": "historias_usuario.tarea",
     "pk": 11,
     "fields": {
-      "fecha": "2022-10-27",
-      "historia": 14,
-      "sprint": 3,
+      "fecha": "2022-11-07",
+      "historia": 6,
+      "sprint": 2,
       "usuario": 2,
-      "descripcion": "Trabajo 1 en US 4",
-      "etapa": 9,
-      "horas": 150,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 6,
       "considerado": false
     }
   },
@@ -2049,13 +2267,13 @@
     "model": "historias_usuario.tarea",
     "pk": 12,
     "fields": {
-      "fecha": "2022-11-01",
-      "historia": 15,
-      "sprint": 3,
-      "usuario": 2,
-      "descripcion": "Trabajo 2 en US 5",
-      "etapa": 10,
-      "horas": 15,
+      "fecha": "2022-11-08",
+      "historia": 2,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 10,
       "considerado": false
     }
   },
@@ -2063,13 +2281,447 @@
     "model": "historias_usuario.tarea",
     "pk": 13,
     "fields": {
-      "fecha": "2022-10-25",
-      "historia": 16,
+      "fecha": "2022-11-08",
+      "historia": 3,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 8,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 14,
+    "fields": {
+      "fecha": "2022-11-08",
+      "historia": 5,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 7,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 15,
+    "fields": {
+      "fecha": "2022-11-08",
+      "historia": 4,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 7,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 16,
+    "fields": {
+      "fecha": "2022-11-08",
+      "historia": 6,
+      "sprint": 2,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 5,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 17,
+    "fields": {
+      "fecha": "2022-11-09",
+      "historia": 1,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 7,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 18,
+    "fields": {
+      "fecha": "2022-11-09",
+      "historia": 2,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 10,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 19,
+    "fields": {
+      "fecha": "2022-11-10",
+      "historia": 1,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 3,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 20,
+    "fields": {
+      "fecha": "2022-11-10",
+      "historia": 2,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 12,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 21,
+    "fields": {
+      "fecha": "2022-11-10",
+      "historia": 3,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 3,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 22,
+    "fields": {
+      "fecha": "2022-11-10",
+      "historia": 5,
       "sprint": 4,
       "usuario": 2,
-      "descripcion": "Trabajo en US 6",
-      "etapa": 9,
-      "horas": 45,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 8,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 23,
+    "fields": {
+      "fecha": "2022-11-10",
+      "historia": 4,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 8,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 24,
+    "fields": {
+      "fecha": "2022-11-10",
+      "historia": 6,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 8,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 25,
+    "fields": {
+      "fecha": "2022-11-11",
+      "historia": 2,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 12,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 26,
+    "fields": {
+      "fecha": "2022-11-11",
+      "historia": 3,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 7,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 27,
+    "fields": {
+      "fecha": "2022-11-11",
+      "historia": 5,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 9,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 28,
+    "fields": {
+      "fecha": "2022-11-11",
+      "historia": 4,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 9,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 29,
+    "fields": {
+      "fecha": "2022-11-11",
+      "historia": 6,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 9,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 30,
+    "fields": {
+      "fecha": "2022-11-14",
+      "historia": 1,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 5,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 31,
+    "fields": {
+      "fecha": "2022-11-14",
+      "historia": 2,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 12,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 32,
+    "fields": {
+      "fecha": "2022-11-14",
+      "historia": 3,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 5,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 33,
+    "fields": {
+      "fecha": "2022-11-14",
+      "historia": 5,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 10,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 34,
+    "fields": {
+      "fecha": "2022-11-14",
+      "historia": 4,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 10,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 35,
+    "fields": {
+      "fecha": "2022-11-14",
+      "historia": 6,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 10,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 36,
+    "fields": {
+      "fecha": "2022-11-15",
+      "historia": 1,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 5,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 37,
+    "fields": {
+      "fecha": "2022-11-15",
+      "historia": 2,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 15,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 38,
+    "fields": {
+      "fecha": "2022-11-15",
+      "historia": 3,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 7,
+      "horas": 5,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 39,
+    "fields": {
+      "fecha": "2022-11-15",
+      "historia": 5,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 11,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 40,
+    "fields": {
+      "fecha": "2022-11-15",
+      "historia": 4,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 11,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 41,
+    "fields": {
+      "fecha": "2022-11-15",
+      "historia": 6,
+      "sprint": 4,
+      "usuario": 2,
+      "descripcion": "",
+      "etapa": 10,
+      "horas": 11,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 42,
+    "fields": {
+      "fecha": "2022-11-16",
+      "historia": 1,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 8,
+      "horas": 9,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 43,
+    "fields": {
+      "fecha": "2022-11-16",
+      "historia": 2,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 8,
+      "horas": 14,
+      "considerado": false
+    }
+  },
+  {
+    "model": "historias_usuario.tarea",
+    "pk": 44,
+    "fields": {
+      "fecha": "2022-11-16",
+      "historia": 3,
+      "sprint": 1,
+      "usuario": 1,
+      "descripcion": "",
+      "etapa": 8,
+      "horas": 9,
       "considerado": false
     }
   },
@@ -2100,9 +2752,9 @@
       "user": 1,
       "provider": "github",
       "uid": "46907456",
-      "last_login": "2022-11-04T14:36:54.734Z",
-      "date_joined": "2022-11-04T14:36:54.734Z",
-      "extra_data": "{\"login\": \"jg2kpy\", \"id\": 46907456, \"node_id\": \"MDQ6VXNlcjQ2OTA3NDU2\", \"avatar_url\": \"https://avatars.githubusercontent.com/u/46907456?v=4\", \"gravatar_id\": \"\", \"url\": \"https://api.github.com/users/jg2kpy\", \"html_url\": \"https://github.com/jg2kpy\", \"followers_url\": \"https://api.github.com/users/jg2kpy/followers\", \"following_url\": \"https://api.github.com/users/jg2kpy/following{/other_user}\", \"gists_url\": \"https://api.github.com/users/jg2kpy/gists{/gist_id}\", \"starred_url\": \"https://api.github.com/users/jg2kpy/starred{/owner}{/repo}\", \"subscriptions_url\": \"https://api.github.com/users/jg2kpy/subscriptions\", \"organizations_url\": \"https://api.github.com/users/jg2kpy/orgs\", \"repos_url\": \"https://api.github.com/users/jg2kpy/repos\", \"events_url\": \"https://api.github.com/users/jg2kpy/events{/privacy}\", \"received_events_url\": \"https://api.github.com/users/jg2kpy/received_events\", \"type\": \"User\", \"site_admin\": false, \"name\": \"Jos\\u00e9 Luis Junior Guti\\u00e9rrez Ag\\u00fcero\", \"company\": \"Facultad Polit\\u00e9cnica - Universidad Nacional de Asunci\\u00f3n\", \"blog\": \"https://juniorgutierrez.com/\", \"location\": \"Asunci\\u00f3n, Paraguay\", \"email\": \"jlgutierrez2000@hotmail.com\", \"hireable\": null, \"bio\": \"Computer Science & Engineering student\", \"twitter_username\": \"jg2kpy\", \"public_repos\": 16, \"public_gists\": 0, \"followers\": 22, \"following\": 45, \"created_at\": \"2019-01-21T21:56:19Z\", \"updated_at\": \"2022-11-01T12:32:31Z\"}"
+      "last_login": "2022-11-01T18:58:41.597Z",
+      "date_joined": "2022-11-01T18:58:41.597Z",
+      "extra_data": "{\"login\": \"jg2kpy\", \"id\": 46907456, \"node_id\": \"MDQ6VXNlcjQ2OTA3NDU2\", \"avatar_url\": \"https://avatars.githubusercontent.com/u/46907456?v=4\", \"gravatar_id\": \"\", \"url\": \"https://api.github.com/users/jg2kpy\", \"html_url\": \"https://github.com/jg2kpy\", \"followers_url\": \"https://api.github.com/users/jg2kpy/followers\", \"following_url\": \"https://api.github.com/users/jg2kpy/following{/other_user}\", \"gists_url\": \"https://api.github.com/users/jg2kpy/gists{/gist_id}\", \"starred_url\": \"https://api.github.com/users/jg2kpy/starred{/owner}{/repo}\", \"subscriptions_url\": \"https://api.github.com/users/jg2kpy/subscriptions\", \"organizations_url\": \"https://api.github.com/users/jg2kpy/orgs\", \"repos_url\": \"https://api.github.com/users/jg2kpy/repos\", \"events_url\": \"https://api.github.com/users/jg2kpy/events{/privacy}\", \"received_events_url\": \"https://api.github.com/users/jg2kpy/received_events\", \"type\": \"User\", \"site_admin\": false, \"name\": \"Jos\\u00e9 Luis Junior Guti\\u00e9rrez Ag\\u00fcero\", \"company\": \"Facultad Polit\\u00e9cnica - Universidad Nacional de Asunci\\u00f3n\", \"blog\": \"https://juniorgutierrez.com/\", \"location\": \"Asunci\\u00f3n, Paraguay\", \"email\": \"jlgutierrez2000@hotmail.com\", \"hireable\": null, \"bio\": \"Computer Science & Engineering student\", \"twitter_username\": \"jg2kpy\", \"public_repos\": 16, \"public_gists\": 0, \"followers\": 22, \"following\": 45, \"created_at\": \"2019-01-21T21:56:19Z\", \"updated_at\": \"2022-11-05T15:02:33Z\"}"
     }
   },
   {
@@ -2112,9 +2764,9 @@
       "user": 2,
       "provider": "github",
       "uid": "113201839",
-      "last_login": "2022-11-04T14:37:03.136Z",
-      "date_joined": "2022-11-04T14:37:03.136Z",
-      "extra_data": "{\"login\": \"17gpais2test\", \"id\": 113201839, \"node_id\": \"U_kgDOBr9Srw\", \"avatar_url\": \"https://avatars.githubusercontent.com/u/113201839?v=4\", \"gravatar_id\": \"\", \"url\": \"https://api.github.com/users/17gpais2test\", \"html_url\": \"https://github.com/17gpais2test\", \"followers_url\": \"https://api.github.com/users/17gpais2test/followers\", \"following_url\": \"https://api.github.com/users/17gpais2test/following{/other_user}\", \"gists_url\": \"https://api.github.com/users/17gpais2test/gists{/gist_id}\", \"starred_url\": \"https://api.github.com/users/17gpais2test/starred{/owner}{/repo}\", \"subscriptions_url\": \"https://api.github.com/users/17gpais2test/subscriptions\", \"organizations_url\": \"https://api.github.com/users/17gpais2test/orgs\", \"repos_url\": \"https://api.github.com/users/17gpais2test/repos\", \"events_url\": \"https://api.github.com/users/17gpais2test/events{/privacy}\", \"received_events_url\": \"https://api.github.com/users/17gpais2test/received_events\", \"type\": \"User\", \"site_admin\": false, \"name\": \"Cuenta Secundaria\", \"company\": null, \"blog\": \"\", \"location\": null, \"email\": \"dummygpais2test@gmail.com\", \"hireable\": null, \"bio\": null, \"twitter_username\": null, \"public_repos\": 0, \"public_gists\": 0, \"followers\": 0, \"following\": 0, \"created_at\": \"2022-09-09T17:01:19Z\", \"updated_at\": \"2022-11-03T01:18:42Z\"}"
+      "last_login": "2022-11-01T18:58:51.642Z",
+      "date_joined": "2022-11-01T18:58:51.642Z",
+      "extra_data": "{\"login\": \"17gpais2test\", \"id\": 113201839, \"node_id\": \"U_kgDOBr9Srw\", \"avatar_url\": \"https://avatars.githubusercontent.com/u/113201839?v=4\", \"gravatar_id\": \"\", \"url\": \"https://api.github.com/users/17gpais2test\", \"html_url\": \"https://github.com/17gpais2test\", \"followers_url\": \"https://api.github.com/users/17gpais2test/followers\", \"following_url\": \"https://api.github.com/users/17gpais2test/following{/other_user}\", \"gists_url\": \"https://api.github.com/users/17gpais2test/gists{/gist_id}\", \"starred_url\": \"https://api.github.com/users/17gpais2test/starred{/owner}{/repo}\", \"subscriptions_url\": \"https://api.github.com/users/17gpais2test/subscriptions\", \"organizations_url\": \"https://api.github.com/users/17gpais2test/orgs\", \"repos_url\": \"https://api.github.com/users/17gpais2test/repos\", \"events_url\": \"https://api.github.com/users/17gpais2test/events{/privacy}\", \"received_events_url\": \"https://api.github.com/users/17gpais2test/received_events\", \"type\": \"User\", \"site_admin\": false, \"name\": \"Cuenta Secundaria\", \"company\": null, \"blog\": \"\", \"location\": null, \"email\": \"dummygpais2test@gmail.com\", \"hireable\": null, \"bio\": null, \"twitter_username\": null, \"public_repos\": 0, \"public_gists\": 0, \"followers\": 0, \"following\": 0, \"created_at\": \"2022-09-09T17:01:19Z\", \"updated_at\": \"2022-11-04T16:47:09Z\"}"
     }
   }
 ]
