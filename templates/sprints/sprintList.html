@@ -16,7 +16,9 @@
         <div class="d-flex justify-content-between">
             <div>
                 <h1>Sprints</h1>
+                {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
                 <a href="{% url 'crear_sprint' proyecto.id %}" class="btn btn-primary">Agregar</a>
+                {% endif %}
                 <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
                 {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                 {% existe_sprint_terminado proyecto as existe_sprint_terminado %}
@@ -57,7 +59,7 @@
                     {% endif %}
                     <td>{{sprint.estado}}</td>
                     <td>
-                        {% if sprint.estado == 'Desarrollo' or sprint.estado == 'Planificado' %}
+                        {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' and sprint.estado == 'Desarrollo' or sprint.estado == 'Planificado' %}
                         <a href="{% url 'backlog_sprint' proyecto.id sprint.id %}" data-toggle="tooltip" data-placement="top"
                         title="Backlog del Sprint"><i class="material-icons  align-text-bottom">visibility</i></a>
                         {% if sprint.estado == 'Planificado' %}
