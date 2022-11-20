@@ -25,18 +25,22 @@
             {% if pro_asignarMiembros %}
                 <form action="{% url 'vista_equipo' proyecto.id %}" method="POST">
                     {% csrf_token %}
-                    <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
-                    <input name="hidden_action" id="hidden_action" hidden value="agregar_miembro_proyecto">
-                    <label for="usuario_a_agregar" class="align-middle">EMAIL:</label>&nbsp<input class="align-middle" type="text" name="usuario_a_agregar"
-                        id="usuario_a_agregar" required="">
-                    <select name="roles_agregar" id="roles_agregar" class="align-middle">
-                        {% for rol in proyecto.roles.all %}
-                        {% if rol.nombre != "Scrum Master" %}
-                        <option value="{{ rol.id }}" name="rol" id="rol">{{ rol.nombre }}</option>
-                        {% endif %}
-                        {% endfor %}
-                    </select>
-                    <button type="submit" class="btn btn-primary">Agregar usuario al proyecto</button>
+                    {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
+                        <input name="proyecto" id="proyecto" hidden value="{{ proyecto.id }}">
+                        <input name="hidden_action" id="hidden_action" hidden value="agregar_miembro_proyecto">
+                        <label for="usuario_a_agregar" class="align-middle">EMAIL:</label>&nbsp<input class="align-middle" type="text" name="usuario_a_agregar"
+                            id="usuario_a_agregar" required="">
+                        <select name="roles_agregar" id="roles_agregar" class="align-middle">
+                            {% for rol in proyecto.roles.all %}
+                            {% if rol.nombre != "Scrum Master" %}
+                            <option value="{{ rol.id }}" name="rol" id="rol">{{ rol.nombre }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    
+                        <button type="submit" class="btn btn-primary">Agregar usuario al proyecto</button>
+                    {% endif %}
+
                     <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
                 </form>
             {% else %}
@@ -127,7 +131,7 @@
                         <p> - {{ r.nombre }}</p>
                     </div>
                     {% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
-                    {% if pro_editarRolProyecto %}
+                    {% if pro_editarRolProyecto  and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                     <div class="col-6">
                         <form action="{% url 'vista_equipo' proyecto.id %}" method="POST">
                             {% csrf_token %}
@@ -148,7 +152,7 @@
                 {% if tiene_todo %}
                 <div class="row mt-2">
                     {% tiene_permiso_en_proyecto user 'pro_asignarRolProyecto' proyecto as pro_asignarRolProyecto %}
-                    {% if pro_asignarRolProyecto %}
+                    {% if pro_asignarRolProyecto and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
                     <div class="col-5">
                         <form action="{% url 'vista_equipo' proyecto.id %}" method="POST">
 

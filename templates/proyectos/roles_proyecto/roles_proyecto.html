@@ -12,11 +12,11 @@
         <div>
             {% if proyecto %}
                 {% tiene_permiso_en_proyecto user 'pro_crearRolProyecto' proyecto as pro_crearRolProyecto %}
-                {% if pro_crearRolProyecto %}
+                {% if pro_crearRolProyecto and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                     <a href="{% url 'crear_rol_a_proyecto' proyecto.id %}" class="btn btn-primary">Crear rol de proyecto</a>
                 {% endif %}
                 {% tiene_permiso_en_proyecto user 'pro_importarRol' proyecto as pro_importarRol %}
-                {% if pro_importarRol %}
+                {% if pro_importarRol and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                     <a href="{% url 'importar_rol' proyecto.id %}" class="btn btn-primary">Importar de otros proyectos </a>
                 {% endif %}
             {% endif %}
@@ -44,7 +44,7 @@
                         <a class="btn btn-link" href="#modalDetalles{{ rol_proyecto.id }}" data-bs-toggle="modal" data-bs-target="#modalDetalles{{ rol_proyecto.id }}"><span
                             class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span></a>
                         {% tiene_permiso_en_proyecto user 'pro_editarRolProyecto' proyecto as pro_editarRolProyecto %}
-                        {% if pro_editarRolProyecto %}
+                        {% if pro_editarRolProyecto and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                         <a href="{% url 'modificar_rol_proyecto' proyecto.id rol_proyecto.id %}" class="btn btn-link"><span
                             class="material-icons" data-toggle="tooltip" data-placement="top" title="Modificar rol de proyecto">create</span></a>
                         {% if not rol_proyecto.nombre == 'Scrum Master' and not rol_proyecto.nombre == 'Member' and rol_proyecto.usuario.count == 0 %}
