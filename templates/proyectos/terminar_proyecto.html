@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Terminar proyecto {{ proyecto.nombre }}{% endblock %}
+{% block contenido %}
+
+<!-- Formulario para terminar proyecto Django forms -->
+<!-- Para terminar un proyecto tiene que ingresar el nombre del proyecto para confirmar -->
+<!-- El usuario tiene que ser o Scrum Master o moderador del Proyecto -->
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Estas a punto de terminar un proyecto</h3>
+        </div>
+    </div>
+    <div class="row">
+        <p>¿Estas seguro que deseas terminar el proyecto? Introduce el nombre del proyecto</p>
+        <div class="col-md-12">
+            <form action="." method="POST">
+                {% csrf_token %}
+                {{ form.as_div }}
+                <br>
+                <button type="submit" class="btn btn-danger">Terminar proyecto</button>
+                <a href="{% url 'proyectos' %}" class="btn btn-secondary">Volver</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
