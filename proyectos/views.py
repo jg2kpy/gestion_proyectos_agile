@@ -311,6 +311,19 @@ def cancelar_proyecto(request, proyecto_id):
             # verificamos que el nombre del proyecto sea correcto
             if form.cleaned_data['nombre'] == proyecto.nombre:
                 proyecto.estado = 'Cancelado'
+                
+                sprintsCancelar = Sprint.objects.filter(proyecto=proyecto).exclude(estado="Terminado").exclude(estado="Cancelado")
+                
+                for sprint in sprintsCancelar:
+                    sprint.estado = "Cancelado"
+                    sprint.save()
+
+                historiasActivas = HistoriaUsuario.objects.filter(proyecto=proyecto, estado='A')
+                
+                for historia in historiasActivas:
+                    historia.estado = HistoriaUsuario.Estado.CANCELADO
+                    historia.save()
+
                 proyecto.save()
 
                 usuariosProyecto = Usuario.objects.filter(equipo__id=proyecto.id)
@@ -334,6 +347,75 @@ def cancelar_proyecto(request, proyecto_id):
         return redirect('proyectos')
 
     return render(request, 'proyectos/cancelar_proyecto.html', {'form': form})
+
+
+@never_cache
+def terminar_proyecto(request, proyecto_id):
+    """Terminar Proyecto
+    Cambia el estado del proyecto a finalizado, se recibe el nombre del proyecto a cancelar, se verifica que el proyecto coincida con
+    el nombre introducido y se cambia el estado a finalizado.
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto a cancelar
+    :type proyecto_id: int
+
+    :return: Renderiza la pagina de proyectos
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    # Verificar que solo con el permiso de cambiar estado de proyecto
+    if not tiene_permiso_en_proyecto(request_user, 'pro_cambiarEstadoProyecto', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para cancelar este proyecto'}, status=403)
+
+    if request.method == 'POST':
+        form = ProyectoCancelForm(request.POST)
+        if form.is_valid():
+            # Cancelamos el proyecto
+            # verificamos que el nombre del proyecto sea correcto
+            if form.cleaned_data['nombre'] == proyecto.nombre:
+                proyecto.estado = 'Finalizado'
+                
+                historiasPlanificacion = HistoriaUsuario.objects.filter(proyecto=proyecto, etapa__isnull=True)
+                
+                for historia in historiasPlanificacion:
+                    historia.estado = HistoriaUsuario.Estado.CANCELADO
+                    historia.save()
+
+                proyecto.save()
+
+                usuariosProyecto = Usuario.objects.filter(equipo__id=proyecto.id)
+            
+                for usuario in usuariosProyecto:
+                    crearNotificacion(
+                        usuario,
+                        f"El proyecto {proyecto.nombre} pasa a estado Finalizado"
+                    )
+                
+                return redirect('proyectos')
+            else:
+                return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()}, status=422)
+        else:
+            return HttpResponse('Formulario invalido', status=422)
+    else:
+        form = ProyectoCancelForm()
+
+    # Si el proyecto ya esta finalizado no se puede finalizar de nuevo
+    if Proyecto.objects.get(id=proyecto_id).estado == ESTADOS_PROYECTO.__getitem__(2)[0]:
+        return redirect('proyectos')
+
+    return render(request, 'proyectos/terminar_proyecto.html', {'form': form})
 
 
 # Creamos un rol en un proyecto
