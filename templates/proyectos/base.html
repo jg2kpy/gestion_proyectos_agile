@@ -42,7 +42,7 @@
                             class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver proyecto">visibility</span></a>
                         {% endif %}
                         {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
-                        {% if proyecto.estado != 'Cancelado' %}
+                        {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
                             {% if pro_cambiarEstadoProyecto %}
                                 {% tiene_permiso_en_proyecto user 'pro_cambiarEstadoProyecto' proyecto as pro_cambiarEstadoProyecto %}
                                 {% if pro_cambiarEstadoProyecto %}
@@ -50,6 +50,47 @@
                                         class="material-icons" data-toggle="tooltip" data-placement="top" title="Configuración de proyecto">build</span></a>
                                 <a href="{% url 'cancelar_proyecto' proyecto.id %}" class="btn btn-link"><span
                                         class="material-icons" data-toggle="tooltip" data-placement="top" title="Cancelar proyecto">cancel</span></a>
+                                
+                                {% check_sprint_activo proyecto as existe_sprint_activo %}
+                                {% check_historia_planificacion proyecto as existe_historia_planificacion %}
+                                {% if existe_sprint_activo  or existe_historia_planificacion %}
+                                    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalTerminarProyecto{{proyecto.id}}">
+                                    <span class="material-icons" data-toggle="tooltip" data-placement="top" title="Terminar proyecto">stop_circle</span>
+                                    </button>
+                                {% else %}
+                                    <a href="{% url 'terminar_proyecto' proyecto.id %}" class="btn btn-link"><span
+                                    class="material-icons" data-toggle="tooltip" data-placement="top" title="Terminar proyecto">stop_circle</span></a>
+                                {% endif %}
+                                
+                                
+                                <!-- Modal -->
+                                <div class="modal fade" id="modalTerminarProyecto{{proyecto.id}}" tabindex="-1" aria-labelledby="modalTerminarProyectoLabel{{proyecto.id}}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="modalTerminarProyectoLabel{{proyecto.id}}">¡ADVERTENCIA!</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                        {% if existe_sprint_activo %}
+                                            Se han detectado Sprints activos, debe finalizar todos los Sprints para poder terminar el proyecto.
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                            </div>
+                                        {% elif existe_historia_planificacion %}
+                                            Se han detectado Historias de Usuario en planificación, al terminar el proyecto estas Historias pasarán a estado
+                                            cancelado. Presione Aceptar para continuar.
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <a href="{% url 'terminar_proyecto' proyecto.id %}" type="button" class="btn btn-primary">Aceptar</a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    </div>
+                                </div>
+
                                 {% endif %}
                             {% endif %}
                         {% endif %}
