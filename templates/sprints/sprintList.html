@@ -2,6 +2,24 @@
 {% block title %}Sprints {{sprint.nombre}}{% endblock %}
 {% block contenido %}
 {% load gpa_tags %}
+{% load static %}
+
+<style>
+    .default {
+      width: 9999px;
+    }
+    .element {
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        background: #eee;
+    }
+</style>
 
 <div>
     <style>
@@ -23,10 +41,43 @@
                 {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                 {% existe_sprint_terminado proyecto as existe_sprint_terminado %}
                 {% if master and existe_sprint_terminado %}
-                <form method="post" action=".">
-                    {% csrf_token %}
-                    <button class="btn btn-light" type="submit" class="btn btn-link" name="descargarVelocity" value={{ proyecto.id }}>Descargar Velocity</button>
-                </form>
+                <div class="d-flex align-content-start flex-wrap">
+                    <div class="bd-highlight align-self-center">
+                        <form method="post" action=".">
+                            {% csrf_token %}
+                            <button class="btn btn-light" type="submit" class="btn btn-link" name="descargarVelocity" value={{ proyecto.id }}>Descargar Velocity</button>
+                        </form>
+                    </div>
+                        <div class="bd-highlight align-self-center">
+                        <a class="btn btn-light" href="#modalVelocity{{proyecto.id}}" data-bs-toggle="modal"
+                            data-bs-target="#modalVelocity{{proyecto.id}}">Ver Velocity
+                        </a>
+                    </div>
+                </div>
+                    <!-- Modal -->
+                    <div class="d-flex justify-content-center">
+                        <div class="modal fade" id="modalVelocity{{proyecto.id}}" tabindex="-1" aria-labelledby="proyectoModal"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered content">
+                                <div class="modal-content default">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="proyectoModal">Proyecto: {{proyecto.nombre}}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="d-flex align-items-center justify-content-center element">
+                                            <img src="{% static "" %}vlChart_{{proyecto.id}}.png" alt="Velocity Chart"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Modal -->
+                
+
+
                 {% endif %}
             </div>
         </div>
@@ -115,12 +166,45 @@
                         {% endif %}
                         {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                         {% if master and sprint.estado == "Terminado" %}
-                        <form method="post" action=".">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-link" name="descargarBurndown" value={{ sprint.id }}><span
-                                class="material-icons" data-toggle="tooltip" data-placement="top" title="Descargar Burndown Chart">ssid_chart</span></button>
-                        </form>
+                        <div class="d-flex align-content-start flex-wrap">
+                            <div class="bd-highlight align-self-center">
+                                <form method="post" action=".">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-link" name="descargarBurndown" value={{ sprint.id }}><span
+                                        class="material-icons" data-toggle="tooltip" data-placement="top" title="Descargar Burndown Chart">download</span></button>
+                                </form>
+                            </div>
+                                <div class="bd-highlight align-self-center">
+                                <a href="#modalBurndown{{sprint.id}}" data-bs-toggle="modal"
+                                    data-bs-target="#modalBurndown{{sprint.id}}" data-toggle="tooltip" data-placement="top"
+                                    title="Ver Burndown Chart"><i class="material-icons  align-text-bottom">ssid_chart</i>
+                                </a>
+                            </div>
+                        </div>
+                        <!-- Modal -->
+                        <div class="d-flex justify-content-center">
+                            <div class="modal fade" id="modalBurndown{{sprint.id}}" tabindex="-1" aria-labelledby="sprintModal"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content default">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="sprintModal">Sprint: {{sprint.nombre}}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="d-flex align-items-center justify-content-center element">
+                                                <img src="{% static "" %}bdChart_{{proyecto.id}}_{{sprint.id}}.png" alt="Burndown Chart"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Modal -->
+                        
                         {% endif %}
+                        
                     </td>
                 </tr>
                 {% endfor %}
