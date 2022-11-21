@@ -8,6 +8,7 @@ from gestion_proyectos_agile.views import crearNotificacion
 
 
 from proyectos.models import Feriado, Proyecto
+from proyectos.views import generarBurndownChart, generarVelocityChart
 from .models import *
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
 from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, SubirArchivoForm, TareaForm, TipoHistoriaUsuarioForm
@@ -799,42 +800,6 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
     return render(request, 'historias/historial.html', {"volver_a": volver_a, 'proyecto': proyecto, 'version_ori': historia, 'versiones': historia.obtenerVersiones()}, status=200)
 
 
-def calcularFechaSprint(fechaInicio, dias, proyecto):
-    """
-        Realiza el cálculo de la fecha final del sprint.
-
-        :param fechaInicio: Fecha inicial del sprint
-        :type fechaInicio: datetime
-
-        :param dias: Total de duración del sprint en días
-        :type dias: int
-
-        :param proyecto: Proyecto en el que se encuentra el sprint
-        :type proyecto: int
-
-        :return: Retorna la fecha de final del sprint
-        :rtype: datetime
-    """
-    diasParaAgregar = dias
-    fechaActual = fechaInicio
-    feriadosFecha = []
-    feriados = Feriado.objects.filter(proyecto=proyecto)
-
-    if feriados:
-        for feriado in feriados:
-            feriadosFecha.append(feriado.fecha.date())
-    
-    while diasParaAgregar > 0:
-        
-        if not (fechaActual.weekday() >= 5 or fechaActual.date() in feriadosFecha):
-            diasParaAgregar -= 1
-
-        if diasParaAgregar > 0:
-            fechaActual += datetime.timedelta(days=1)
-
-    
-    return fechaActual
-
 @ never_cache
 def verTablero(request, proyecto_id, tipo_id):
     """
@@ -939,6 +904,8 @@ def verTablero(request, proyecto_id, tipo_id):
                 sprintInfo.horasUsadas = sum([tarea.horas for tarea in Tarea.objects.filter(historia=id_ori, sprint=sprintTerminar)])
                 sprintInfo.save()
 
+                generarBurndownChart(sprintTerminar.id)
+                generarVelocityChart(proyecto.id)
             
             proyecto.estado = "Planificación"
             proyecto.save()
