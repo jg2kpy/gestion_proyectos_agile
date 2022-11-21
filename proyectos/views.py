@@ -14,7 +14,6 @@ from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, Spri
 import numpy as np
 
 from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, Tarea, TipoHistoriaUsusario
-from historias_usuario.views import calcularFechaSprint
 
 from .models import *
 from .forms import ProyectoConfigurarForm, ProyectoFeriadosForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
@@ -891,6 +890,42 @@ def crear_sprint(request, proyecto_id):
 
     return render(request, 'sprints/crear.html', {'proyecto': proyecto, 'desarrolladores': list(proyecto.usuario.all().values_list('id', flat=True)), 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
 
+def calcularFechaSprint(fechaInicio, dias, proyecto):
+    """
+        Realiza el cálculo de la fecha final del sprint.
+
+        :param fechaInicio: Fecha inicial del sprint
+        :type fechaInicio: datetime
+
+        :param dias: Total de duración del sprint en días
+        :type dias: int
+
+        :param proyecto: Proyecto en el que se encuentra el sprint
+        :type proyecto: int
+
+        :return: Retorna la fecha de final del sprint
+        :rtype: datetime
+    """
+    diasParaAgregar = dias
+    fechaActual = fechaInicio
+    feriadosFecha = []
+    feriados = Feriado.objects.filter(proyecto=proyecto)
+
+    if feriados:
+        for feriado in feriados:
+            feriadosFecha.append(feriado.fecha.date())
+    
+    while diasParaAgregar > 0:
+        
+        if not (fechaActual.weekday() >= 5 or fechaActual.date() in feriadosFecha):
+            diasParaAgregar -= 1
+
+        if diasParaAgregar > 0:
+            fechaActual += datetime.timedelta(days=1)
+
+    
+    return fechaActual
+
 @never_cache
 def backlog_sprint(request, proyecto_id, sprint_id):
     """Crear sprint
@@ -1329,12 +1364,11 @@ def generarVelocityChart(proyectoId):
         horasUsSprintList.append(tempUsTotal)
     
     generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList)
-    plt.savefig(f"app/staticfiles/velocityChart_{proyecto.nombre}{proyecto.id}.png")
-    rutaImg = Path(f"app/staticfiles/velocityChart_{proyecto.nombre}{proyecto.id}.png")
+    plt.savefig(f"app/staticfiles/vlChart_{proyecto.id}.png")
+    rutaImg = Path(f"app/staticfiles/vlChart_{proyecto.id}.png")
     
     with rutaImg.open(mode='rb') as archivo:
         velChart.archivo = File(archivo, name=rutaImg.name)
-        velChart.save()
         velChart.proyecto = proyecto
         velChart.save()
 
@@ -1429,11 +1463,9 @@ def sprint_list(request, proyecto_id):
     if request.method == 'POST':
         if 'descargarBurndown' in request.POST:
             sprintId = request.POST['descargarBurndown']
-            generarBurndownChart(sprintId)
             return descargarReporte(request, sprintId)
         else:
             proyectoId = request.POST['descargarVelocity']
-            generarVelocityChart(proyectoId)
             return descargarReporte(request, proyecto_id)
 
             
