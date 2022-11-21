@@ -224,6 +224,9 @@ class HistoriaUsuario(models.Model):
             self.archivos.remove(archivo)
         for archivo in versionPrevia.archivos.all():
             self.archivos.add(archivo)
+        
+        if self.sprint is not None and self.sprint.estado != "Desarrollo" and self.sprint.estado != "Planificado":
+            self.sprint = None
 
         self.save()
     
