@@ -56,7 +56,7 @@ class ArchivoBurndown(models.Model):
     """
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
-    archivo = models.FileField(upload_to=f"app/staticfiles/", null=True)
+    archivo = models.FileField(null=True)
 
 class ArchivoVelocity(models.Model):
     """
@@ -76,7 +76,7 @@ class ArchivoVelocity(models.Model):
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
     proyecto = models.OneToOneField(Proyecto, related_name="velocityChart", on_delete=models.PROTECT, null=True)
-    archivo = models.FileField(upload_to=f"app/staticfiles/", null=True)
+    archivo = models.FileField(null=True)
     
 
 class Sprint(models.Model):
