@@ -1358,7 +1358,7 @@ def sprint_list(request, proyecto_id):
     return render(request, 'sprints/sprintList.html', {'proyecto': proyecto}, status=200)
 
 @never_cache
-def sprint_reemplazar_miembro(request, sprint_id):
+def sprint_reemplazar_miembro(request, proyecto_id, sprint_id):
     """
     Permite reemplazar un miembro de un sprint
 
@@ -1390,12 +1390,11 @@ def sprint_reemplazar_miembro(request, sprint_id):
         usuario_sale = request.POST.get('usuario_sale')
         usuario_entra = request.POST.get('usuario_entra')
 
-        if not sprint.reemplazar_miembro(usuario_sale, usuario_entra):
-            error = "No se pudo reemplazar el miembro"
-        else:
+        (res, error) = sprint.reemplazar_miembro(Usuario.objects.get(id=usuario_sale), Usuario.objects.get(id=usuario_entra))
+        if res:
             return redirect('backlog_sprint', proyecto_id=sprint.proyecto.id, sprint_id=sprint.id)
     
-    activos = [usuario for usuario in sprint.historias.all().values_list('usuario', flat=True)]
-    suplentes = [usuario for usuario in sprint.proyecto.usuario.all() if usuario not in activos]
+    activos = [ Usuario.objects.get(id=usuario) for usuario in sprint.participantes.all().values_list('usuario', flat=True) if sprint.proyecto.scrumMaster != Usuario.objects.get(id=usuario) ]
+    suplentes = [usuario for usuario in sprint.proyecto.usuario.all() if usuario not in activos and usuario != sprint.proyecto.scrumMaster]
 
-    return render(request, 'sprints/reemplazar_miembro.html', {'sprint': sprint, 'activos': activos, 'suplentes': suplentes}, status=200)
+    return render(request, 'sprints/reemplazar_miembro.html', {'proyecto': sprint.proyecto, 'sprint': sprint, 'activos': activos, 'suplentes': suplentes, 'error': error}, status=200)

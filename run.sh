@@ -18,50 +18,50 @@ iteraciones["Iteracion-3"]="Iteracion-3"
 iteraciones["Iteracion-4"]="Iteracion-4"
 iteraciones["Iteracion-5"]="Iteracion-5"
 
-tag=""
+# tag=""
 
-if [ $# -eq 1 ];then
-    if [ -v iteraciones[$1] ]; then
-        tag=$1
-    else
-        echo "Este tag no existe, por favor seleccione uno correcto"
-    fi
-elif [ $# -gt 1 ];then
-    echo "USO:"
-    echo "  ./run.sh [arguments]"
-    echo "Comandos habilitados:"
-    echo "  help"
-    echo "  Iteracion-1"
-    echo "  Iteracion-2"
-    echo "  Iteracion-3"
-    echo "  Iteracion-4"
-    echo "  Iteracion-5"
-    exit
-fi
+# if [ $# -eq 1 ];then
+#     if [ -v iteraciones[$1] ]; then
+#         tag=$1
+#     else
+#         echo "Este tag no existe, por favor seleccione uno correcto"
+#     fi
+# elif [ $# -gt 1 ];then
+#     echo "USO:"
+#     echo "  ./run.sh [arguments]"
+#     echo "Comandos habilitados:"
+#     echo "  help"
+#     echo "  Iteracion-1"
+#     echo "  Iteracion-2"
+#     echo "  Iteracion-3"
+#     echo "  Iteracion-4"
+#     echo "  Iteracion-5"
+#     exit
+# fi
 
-if [ -z "$tag" ];then
-    printf "\nSeleccione un tag\n"
-    echo "1) Iteracion-1"
-    echo "2) Iteracion-2"
-    echo "3) Iteracion-3"
-    echo "4) Iteracion-4"
-    echo "5) Iteracion-5"
-    echo "Ctrl-C para salir"
-    read opcion
-    if [[ $opcion -ge 6 || $opcion -le 0 ]]; then
-        echo "Opcion no valida"
-        exit
-    fi
-    tag="Iteracion-${opcion}"
-    if [ $opcion -eq 1 ];then
-        tag="Iteracion_1"
-    fi
-fi
+# if [ -z "$tag" ];then
+#     printf "\nSeleccione un tag\n"
+#     echo "1) Iteracion-1"
+#     echo "2) Iteracion-2"
+#     echo "3) Iteracion-3"
+#     echo "4) Iteracion-4"
+#     echo "5) Iteracion-5"
+#     echo "Ctrl-C para salir"
+#     read opcion
+#     if [[ $opcion -ge 6 || $opcion -le 0 ]]; then
+#         echo "Opcion no valida"
+#         exit
+#     fi
+#     tag="Iteracion-${opcion}"
+#     if [ $opcion -eq 1 ];then
+#         tag="Iteracion_1"
+#     fi
+# fi
 
-if [ ! -v iteraciones[$tag] ]; then
-    echo "Iteracion no valida"
-    exit
-fi
+# if [ ! -v iteraciones[$tag] ]; then
+#     echo "Iteracion no valida"
+#     exit
+# fi
 
 echo "El tag seleccionado es ${tag}"
 git checkout $tag
@@ -98,14 +98,14 @@ else
     printf "\nEjecutando en entorno de desarrollo...\n"
     $docker -f "docker-compose.desarrollo.yaml" up --build -d
     sleep 4
-    if [ $tag = "Iteracion-5" ];then
+    # if [ $tag = "Iteracion-5" ];then
         printf "\nLe gustaria cargar los datos de prueba?[s/n]\n"
         read opcion
         if [ $opcion = "s" ];then
             echo "Cargando datos de prueba..."
             docker exec gpa-dev python3 manage.py loaddata databasedump_prueba.json
         fi
-    fi
+    # fi
     while [ true ]
     do
         printf "\n\nMenu de desarrollo\n"

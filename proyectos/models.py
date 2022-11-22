@@ -130,19 +130,25 @@ class Sprint(models.Model):
 
         :return: True si el reemplazo se realizó con éxito, False en caso contrario.
         """
-        if usuario not in self.proyecto.equipo.all():
-            return False
-        if nuevo_usuario not in self.proyecto.equipo.all():
-            return False
+        if not self.proyecto.usuario.all().filter(id=usuario.id).exists():
+            return (False, "El usuario a reemplazar no pertenece al proyecto")
+        if not self.proyecto.usuario.all().filter(id=nuevo_usuario.id).exists():
+            return (False, "El nuevo usuario no pertenece al proyecto")
         if usuario == self.proyecto.scrumMaster:
-            return False
-        if self.historias.filter(usuario=nuevo_usuario).exists():
-            return False
-        if self.historias.filter(usuario=usuario).exists():
-            self.historias.filter(usuario=usuario).update(usuario=nuevo_usuario)
-            return True
+            return (False, "El usuario a reemplazar es el Scrum Master")
+        if self.participantes.filter(usuario=nuevo_usuario).exists():
+            return (False, "El nuevo usuario ya es parte del Sprint")
+        if self.participantes.filter(usuario=usuario).exists():
+            historias = self.historias.filter(usuarioAsignado=usuario)
+            for historia in historias:
+                historia.usuarioAsignado = nuevo_usuario
+                historia.save()
+            tiempoEnSprint = self.participantes.get(usuario=usuario)
+            tiempoEnSprint.usuario = nuevo_usuario
+            tiempoEnSprint.save()
+            return (True, "El reemplazo se realizó con éxito")
         else:
-            return False
+            return (False, "El usuario a reemplazar no forma parte del Sprint")
 
 class UsuarioTiempoEnSprint(models.Model):
     sprint = models.ForeignKey(Sprint, related_name="participantes", on_delete=models.PROTECT)
