@@ -935,6 +935,8 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
 
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+    if sprint.estado != "Planificado":
+        return render(request, '403.html', {'info_adicional': 'No puede editar miembros de un Sprint que no se encuentra en planificación.'}, status=403)
 
     desarrolladores = proyecto.usuario.all()
     status = 200
@@ -995,6 +997,9 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
 
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+    
+    if sprint.estado != "Planificado":
+        return render(request, '403.html', {'info_adicional': 'No puede agregar historias a un Sprint que no se encuentra en planificación.'}, status=403)
 
     historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad(), reverse=True) if x.getPrioridad() >= 0]
     status = 200
