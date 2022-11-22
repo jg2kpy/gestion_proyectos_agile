@@ -4,10 +4,8 @@ if [ $(which docker-compose) ] ; then
 else
     docker="docker compose"
 fi
+
 printf "\nScript de ejecución automatica\n\n"
-echo "El script necesita de permisos de super usuario para poder realizar limpiza de BD y migraciones"
-sudo rm -rf ./postgre-data
-sudo rm -rf ./*/migrations
 
 declare -A iteraciones
 iteraciones["v0.1-entorno"]="v0.1-entorno"
@@ -17,16 +15,11 @@ iteraciones["Iteracion-2"]="Iteracion-2"
 iteraciones["Iteracion-3"]="Iteracion-3"
 iteraciones["Iteracion-4"]="Iteracion-4"
 iteraciones["Iteracion-5"]="Iteracion-5"
+iteraciones["Iteracion-6"]="Iteracion-6"
 
 tag=""
 
-if [ $# -eq 1 ];then
-    if [ -v iteraciones[$1] ]; then
-        tag=$1
-    else
-        echo "Este tag no existe, por favor seleccione uno correcto"
-    fi
-elif [ $# -gt 1 ];then
+printHelp(){
     echo "USO:"
     echo "  ./run.sh [arguments]"
     echo "Comandos habilitados:"
@@ -36,8 +29,26 @@ elif [ $# -gt 1 ];then
     echo "  Iteracion-3"
     echo "  Iteracion-4"
     echo "  Iteracion-5"
+    echo "  Iteracion-6"
     exit
+}
+
+if [ $# -eq 1 ];then
+    if [ $1 == 'help' ];then
+        printHelp
+    fi
+    if [ -v iteraciones[$1] ]; then
+        tag=$1
+    else
+        echo "Este tag no existe, por favor seleccione uno correcto"
+    fi
+elif [ $# -gt 1 ];then
+    printHelp
 fi
+
+echo "El script necesita de permisos de super usuario para poder realizar limpiza de BD y migraciones"
+sudo rm -rf ./postgre-data
+sudo rm -rf ./*/migrations
 
 if [ -z "$tag" ];then
     printf "\nSeleccione un tag\n"
@@ -46,9 +57,10 @@ if [ -z "$tag" ];then
     echo "3) Iteracion-3"
     echo "4) Iteracion-4"
     echo "5) Iteracion-5"
+    echo "6) Iteracion-6"
     echo "Ctrl-C para salir"
     read opcion
-    if [[ $opcion -ge 6 || $opcion -le 0 ]]; then
+    if [[ $opcion -ge 7 || $opcion -le 0 ]]; then
         echo "Opcion no valida"
         exit
     fi
