@@ -899,12 +899,12 @@ def verTablero(request, proyecto_id, tipo_id):
             sprintTerminar.estado = "Terminado"
 
             sprintTerminar.duracion = 0
+            sprintTerminar.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
             fecha_aux = sprintTerminar.fecha_inicio
             while fecha_aux <= sprintTerminar.fecha_fin:
                 if not (fecha_aux.weekday() >= 5 or fecha_aux.date() in Feriado.objects.filter(proyecto=proyecto)):
                     sprintTerminar.duracion += 1
                 fecha_aux += datetime.timedelta(days=1)
-            sprintTerminar.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
             sprintTerminar.save()
 
             usuariosSprint = Usuario.objects.filter(equipo__id=sprintTerminar.proyecto.id)
