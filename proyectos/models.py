@@ -119,6 +119,31 @@ class Sprint(models.Model):
     def __str__(self):
         return self.nombre
 
+    def reemplazar_miembro(self, usuario, nuevo_usuario):
+        """
+        Reemplaza un miembro del equipo de un sprint por otro.
+
+        :param usuario: Miembro a reemplazar.
+        :type usuario: Usuario
+        :param nuevo_usuario: Nuevo miembro.
+        :type nuevo_usuario: Usuario
+
+        :return: True si el reemplazo se realizó con éxito, False en caso contrario.
+        """
+        if usuario not in self.proyecto.equipo.all():
+            return False
+        if nuevo_usuario not in self.proyecto.equipo.all():
+            return False
+        if usuario == self.proyecto.scrumMaster:
+            return False
+        if self.historias.filter(usuario=nuevo_usuario).exists():
+            return False
+        if self.historias.filter(usuario=usuario).exists():
+            self.historias.filter(usuario=usuario).update(usuario=nuevo_usuario)
+            return True
+        else:
+            return False
+
 class UsuarioTiempoEnSprint(models.Model):
     sprint = models.ForeignKey(Sprint, related_name="participantes", on_delete=models.PROTECT)
     usuario = models.ForeignKey('usuarios.Usuario', related_name='sprints', on_delete=models.PROTECT)
