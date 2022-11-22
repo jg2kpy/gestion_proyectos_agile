@@ -19,8 +19,11 @@
                     miembros</a>
                     <a href="{% url 'agregar_historias_sprint' proyecto.id  sprint.id %}" class="btn btn-primary">Agregar
                         historias</a>
+                    {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+                    {% if master %}
                     <a href="{% url 'sprint_reemplazar_miembro' proyecto.id  sprint.id %}" class="btn btn-primary">Reemplazar
                         miembro</a>
+                    {% endif %}
                 <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del
                     proyecto</a>
 

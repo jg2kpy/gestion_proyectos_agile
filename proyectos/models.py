@@ -134,8 +134,6 @@ class Sprint(models.Model):
             return (False, "El usuario a reemplazar no pertenece al proyecto")
         if not self.proyecto.usuario.all().filter(id=nuevo_usuario.id).exists():
             return (False, "El nuevo usuario no pertenece al proyecto")
-        if usuario == self.proyecto.scrumMaster:
-            return (False, "El usuario a reemplazar es el Scrum Master")
         if self.participantes.filter(usuario=nuevo_usuario).exists():
             return (False, "El nuevo usuario ya es parte del Sprint")
         if self.participantes.filter(usuario=usuario).exists():

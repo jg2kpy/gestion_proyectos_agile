@@ -1394,7 +1394,7 @@ def sprint_reemplazar_miembro(request, proyecto_id, sprint_id):
         if res:
             return redirect('backlog_sprint', proyecto_id=sprint.proyecto.id, sprint_id=sprint.id)
     
-    activos = [ Usuario.objects.get(id=usuario) for usuario in sprint.participantes.all().values_list('usuario', flat=True) if sprint.proyecto.scrumMaster != Usuario.objects.get(id=usuario) ]
-    suplentes = [usuario for usuario in sprint.proyecto.usuario.all() if usuario not in activos and usuario != sprint.proyecto.scrumMaster]
+    activos = [Usuario.objects.get(id=usuario) for usuario in sprint.participantes.all().values_list('usuario', flat=True)]
+    suplentes = [usuario for usuario in sprint.proyecto.usuario.all() if usuario not in activos]
 
     return render(request, 'sprints/reemplazar_miembro.html', {'proyecto': sprint.proyecto, 'sprint': sprint, 'activos': activos, 'suplentes': suplentes, 'error': error}, status=200)
