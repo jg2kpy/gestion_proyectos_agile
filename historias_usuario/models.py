@@ -212,7 +212,6 @@ class HistoriaUsuario(models.Model):
         self.descripcion = versionPrevia.descripcion
         self.bv = versionPrevia.bv
         self.up = versionPrevia.up
-        self.usuarioAsignado = versionPrevia.usuarioAsignado
         self.etapa = versionPrevia.etapa
 
         for comentario in self.comentarios.all():
