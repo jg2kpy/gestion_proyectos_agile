@@ -63,8 +63,8 @@ iteraciones["Iteracion-5"]="Iteracion-5"
 #     exit
 # fi
 
-# echo "El tag seleccionado es ${tag}"
-# git checkout $tag
+echo "El tag seleccionado es ${tag}"
+git checkout $tag
 
 printf "\nEn que entorno le gustaria ejecutar?\n"
 echo "1) Producción"
@@ -98,14 +98,14 @@ else
     printf "\nEjecutando en entorno de desarrollo...\n"
     $docker -f "docker-compose.desarrollo.yaml" up --build -d
     sleep 4
-    if [ $tag = "Iteracion-5" ];then
+    # if [ $tag = "Iteracion-5" ];then
         printf "\nLe gustaria cargar los datos de prueba?[s/n]\n"
         read opcion
         if [ $opcion = "s" ];then
             echo "Cargando datos de prueba..."
             docker exec gpa-dev python3 manage.py loaddata databasedump_prueba.json
         fi
-    fi
+    # fi
     while [ true ]
     do
         printf "\n\nMenu de desarrollo\n"
