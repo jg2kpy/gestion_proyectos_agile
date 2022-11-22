@@ -1,6 +1,7 @@
 import datetime
 from genericpath import isdir
 from os import makedirs
+import os
 import django
 from django.forms import inlineformset_factory
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
@@ -1280,8 +1281,8 @@ def generarBurndownChart(sprintId):
     :type sprintId: int
     """
 
-    if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
-        return
+    # if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
+    #     return
 
     # Datos para realizar los cálculos
     sprint = Sprint.objects.get(id=sprintId)
@@ -1317,7 +1318,11 @@ def generarBurndownChart(sprintId):
     plt.savefig(f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
     rutaImg = Path(f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
     
-    archivoBurndown = ArchivoBurndown()
+    if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
+        archivoBurndown = ArchivoBurndown.objects.get(sprint__id=sprintId)
+    else:
+        archivoBurndown = ArchivoBurndown()
+    
     archivoBurndown.nombre = f"bdChart_{sprint.proyecto.id}_{sprint.id}"
     with rutaImg.open(mode='rb') as archivo:
         archivoBurndown.archivo = File(archivo, name=rutaImg.name)
@@ -1459,6 +1464,18 @@ def sprint_list(request, proyecto_id):
 
     if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+
+    hayCambio = False
+
+    sprints = Sprint.objects.filter(proyecto=proyecto)
+
+    for sprint in sprints:
+        if sprint.estado == "Terminado" and not os.path.isfile(f"app/staticfiles/bdChart_{proyecto.id}_{sprint.id}.png"):
+            hayCambio = True
+            generarBurndownChart(sprint.id) 
+
+    if hayCambio:
+        generarVelocityChart(proyecto.id)
 
     if request.method == 'POST':
         if 'descargarBurndown' in request.POST:

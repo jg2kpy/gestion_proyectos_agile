@@ -914,7 +914,7 @@ class SprintTests(TestCase):
                         
     def test_cancelar_sprint(self):
         """
-        Prueba para comenzar un sprint
+        Prueba para cancelar un sprint
         """
         
         self.sprint3 = Sprint()
@@ -985,13 +985,13 @@ class SprintTests(TestCase):
             }, follow=True)
         self.assertEqual(res.status_code, 200,
                 'La respuesta no fue un estado HTTP 200 al terminar un sprint')
-
+        
         res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/list/",
             {
                 'descargarBurndown' : self.sprint.id
             }, follow=True)
         self.assertEqual(res.status_code, 200,
-                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+                'La respuesta no fue un estado HTTP 200 al descargar el burndown chart')
     
     def test_descargar_velocity_chart(self):
         """
