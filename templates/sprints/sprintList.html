@@ -4,6 +4,11 @@
 {% load gpa_tags %}
 {% load static %}
 
+{% comment %} Para que no haga guarde en cache las imágenes {% endcomment %}
+<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+
 <style>
     .default {
       width: 9999px;
@@ -48,7 +53,7 @@
                             <button class="btn btn-light" type="submit" class="btn btn-link" name="descargarVelocity" value={{ proyecto.id }}>Descargar Velocity</button>
                         </form>
                     </div>
-                        <div class="bd-highlight align-self-center">
+                    <div class="bd-highlight align-self-center">
                         <a class="btn btn-light" href="#modalVelocity{{proyecto.id}}" data-bs-toggle="modal"
                             data-bs-target="#modalVelocity{{proyecto.id}}">Ver Velocity
                         </a>
