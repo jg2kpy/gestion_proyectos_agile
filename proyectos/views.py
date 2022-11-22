@@ -1356,3 +1356,46 @@ def sprint_list(request, proyecto_id):
 
             
     return render(request, 'sprints/sprintList.html', {'proyecto': proyecto}, status=200)
+
+@never_cache
+def sprint_reemplazar_miembro(request, sprint_id):
+    """
+    Permite reemplazar un miembro de un sprint
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param sprint_id: ID del sprint al que pertenece el miembro
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para ver el formulario de reemplazo de miembro
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        sprint = Sprint.objects.get(id=sprint_id)
+    except Sprint.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_rol_en_proyecto(request.user, "Scrum Master", sprint.proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para reemplazar un miembro'}, status=403)
+
+    error = None
+    if request.method == 'POST':
+        usuario_sale = request.POST.get('usuario_sale')
+        usuario_entra = request.POST.get('usuario_entra')
+
+        if not sprint.reemplazar_miembro(usuario_sale, usuario_entra):
+            error = "No se pudo reemplazar el miembro"
+        else:
+            return redirect('backlog_sprint', proyecto_id=sprint.proyecto.id, sprint_id=sprint.id)
+    
+    activos = [usuario for usuario in sprint.historias.all().values_list('usuario', flat=True)]
+    suplentes = [usuario for usuario in sprint.proyecto.usuario.all() if usuario not in activos]
+
+    return render(request, 'sprints/reemplazar_miembro.html', {'sprint': sprint, 'activos': activos, 'suplentes': suplentes}, status=200)

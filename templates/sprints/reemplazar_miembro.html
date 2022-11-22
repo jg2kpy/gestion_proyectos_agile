@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Editar miembros{% endblock %}
+{% block contenido %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="container">
+            <h1>
+                Reemplazar miembro de Sprint
+            </h1>
+        </div>
+        <form id="sprintForm" action="." method="POST">
+            {% csrf_token %}
+            <select name="usuario_sale">
+                {% for usuario in activos %}
+                <option value="">Seleccione quien sale</option>
+                <option value="{{usuario.id}}">{{ usuario.get_full_name }}</option>
+                {% endfor %}
+            </select>
+            <select name="usuario_entra">
+                {% for usuario in suplentes %}
+                <option value="">Seleccione quien entra</option>
+                <option value="{{usuario.id}}">{{ usuario.get_full_name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -17,8 +17,10 @@
             <div>
                 <a href="{% url 'editar_miembros_sprint' proyecto.id sprint.id %}" class="btn btn-primary">Editar
                     miembros</a>
-                <a href="{% url 'agregar_historias_sprint' proyecto.id  sprint.id %}" class="btn btn-primary">Agregar
-                    historias</a>
+                    <a href="{% url 'agregar_historias_sprint' proyecto.id  sprint.id %}" class="btn btn-primary">Agregar
+                        historias</a>
+                    <a href="{% url 'sprint_reemplazar_miembro' proyecto.id  sprint.id %}" class="btn btn-primary">Reemplazar
+                        miembro</a>
                 <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del
                     proyecto</a>
 
