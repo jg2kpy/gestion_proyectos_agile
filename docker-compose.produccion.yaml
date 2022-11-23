@@ -19,7 +19,7 @@ services:
     env_file:
       - .env.produccion
     volumes:
-      - static_volume:/app/staticfiles
+      - static_volume:/django/app/staticfiles
     expose:
       - 8000
   nginx:
