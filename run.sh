@@ -80,6 +80,8 @@ if [ $opcion -ne 7 ]; then
 
     echo "El tag seleccionado es ${tag}"
     git checkout $tag
+else
+    tag="actual"
 fi
 
 printf "\nEn que entorno le gustaria ejecutar?\n"
@@ -91,8 +93,8 @@ read entorno
 if [ $entorno -eq 1 ];then
     printf "\nEjecutando en entorno de producción...\n"
     $docker -f "docker-compose.produccion.yaml" up --build -d
-    sleep 4
-    if [ $tag = "Iteracion-5" ];then
+    sleep 6
+    if [ $tag = "Iteracion-5" ] || [ $tag = "Iteracion-6" ] || [ $tag = "actual" ];then
         printf "\nLe gustaria cargar los datos de prueba?[s/n]\n"
         read opcion
         if [ $opcion = "s" ];then
@@ -115,7 +117,7 @@ else
     $docker -f "docker-compose.desarrollo.yaml" up --build -d
     echo "Ya casi está, espere unos segundos mas..."
     sleep 6
-    if [ $tag = "Iteracion-5" ];then
+    if [ $tag = "Iteracion-5" ] || [ $tag = "Iteracion-6" ] || [ $tag = "actual" ];then
         printf "\nLe gustaria cargar los datos de prueba?[s/n]\n"
         read opcion
         if [ $opcion = "s" ];then
