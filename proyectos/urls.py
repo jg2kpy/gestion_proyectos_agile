@@ -9,6 +9,7 @@ urlpatterns = [
     path('<int:proyecto_id>/', proyecto_home, name='proyecto_home'),
     path('<int:proyecto_id>/editar/', editar_proyecto, name='editar_proyecto'),
     path('<int:proyecto_id>/cancelar/', cancelar_proyecto, name='cancelar_proyecto'),
+    path('<int:proyecto_id>/terminar/', terminar_proyecto, name='terminar_proyecto'),
 
     path('<int:proyecto_id>/roles/', roles_de_proyecto, name='roles_de_proyecto'),
     path('<int:proyecto_id>/roles/crear/', crear_rol_a_proyecto, name='crear_rol_a_proyecto'),

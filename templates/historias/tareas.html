@@ -15,6 +15,7 @@
             <h5>{{ horas_usadas }} de {{ historia.horasAsignadas }} horas usadas</h5>
         </div>
     </div>
+    {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
     <div class="row">
         <div class="col-md-12">
             <form method="post">
@@ -27,6 +28,7 @@
             </form>
         </div>
     </div>
+    {% endif %}
     <hr>
     {% for sprint in sprints_tareas %}
     <div class="row">

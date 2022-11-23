@@ -28,11 +28,10 @@
                 {% endif %}
                 <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del
                     proyecto</a>
-
             </div>
             <div>
                 {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
-                {% if master and not sprint.fecha_inicio %}
+                {% if master and not sprint.fecha_inicio and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                 <a href="#modalSprintIni" class="btn btn-primary" data-bs-toggle="modal"
                     data-bs-target="#modalSprintIni">Empezar Sprint</a>&nbsp;&nbsp;
                     <a href="#modalSprintCan" class="btn btn-secondary" data-bs-toggle="modal"
@@ -229,14 +228,14 @@
                         {% if historia.estado == historia.Estado.ACTIVO %}
 
                         {% tiene_permiso_en_proyecto user 'pro_modificarUS' proyecto as pro_modificarUS %}
-                        {% if pro_modificarUS %}
+                        {% if pro_modificarUS and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                         <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span
                                 class="material-icons" data-toggle="tooltip" data-placement="top"
                                 title="Editar historia">create</span></a>
                         {% endif %}
 
                         {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
-                        {% if pro_crearTipoUS %}
+                        {% if pro_crearTipoUS and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                         <a href="{% url 'reasignar_us' proyecto.id historia.id %}" class="btn btn-link"><span
                                 class="material-icons" data-toggle="tooltip" data-placement="top"
                                 title="Reasignar historia">people</span></a>

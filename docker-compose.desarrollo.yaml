@@ -19,7 +19,7 @@ services:
     env_file:
       - .env.desarrollo
     volumes:
-      - .:/app
+      - .:/django
     ports:
       - "80:8000"
       - "8081:8081"

@@ -223,7 +223,7 @@ def check_sprint_activo(proyecto):
     :rtype: bool
     """
     sprints = Sprint.objects.filter(proyecto=proyecto, estado="Desarrollo").exclude(fecha_inicio__isnull=True)
-    
+
     if sprints:
         return True
     else:
@@ -386,3 +386,20 @@ def existe_sprint_terminado(proyecto):
     sprintTerminado = Sprint.objects.filter(proyecto=proyecto, estado="Terminado")
 
     return True if sprintTerminado else False
+
+@register.simple_tag
+def check_historia_planificacion(proyecto):
+    """Funcion para determinar si existe una historia de usuario en planificacion dentro del proyecto
+
+    :param proyecto: Objeto del proyecto
+    :type proyecto: Proyecto
+
+    :return: Se retorna True si encuentra una historia de usuario en planificación
+    :rtype: bool
+    """
+    historiasPlanificacion = HistoriaUsuario.objects.filter(proyecto=proyecto, etapa__isnull=True)
+
+    if historiasPlanificacion:
+        return True
+    else:
+        return False
