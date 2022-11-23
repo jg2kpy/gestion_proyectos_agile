@@ -1332,7 +1332,7 @@ def generarBurndownChart(sprintId):
     archivoBurndown.nombre = f"bdChart_{sprint.proyecto.id}_{sprint.id}"
     
     with rutaImg.open(mode='rb') as archivo:
-        archivoBurndown.archivo = File(archivo, name=f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+        archivoBurndown.archivo = File(archivo, name=f"django/app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
         archivoBurndown.save()
         sprint.burndownChart = archivoBurndown
         sprint.save()
@@ -1381,7 +1381,7 @@ def generarVelocityChart(proyectoId):
     rutaImg = Path(f"/django/app/staticfiles/vlChart_{proyecto.id}.png")
     
     with rutaImg.open(mode='rb') as archivo:
-        velChart.archivo = File(archivo, name=f"app/staticfiles/vlChart_{proyecto.id}.png")
+        velChart.archivo = File(archivo, name=f"django/app/staticfiles/vlChart_{proyecto.id}.png")
         velChart.proyecto = proyecto
         velChart.save()
 
