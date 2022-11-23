@@ -109,7 +109,8 @@ if [ $entorno -eq 1 ];then
 else
     printf "\nEjecutando en entorno de desarrollo...\n"
     $docker -f "docker-compose.desarrollo.yaml" up --build -d
-    sleep 4
+    echo "Ya casi está, espere unos segundos mas..."
+    sleep 6
     if [ $tag = "Iteracion-5" ];then
         printf "\nLe gustaria cargar los datos de prueba?[s/n]\n"
         read opcion
