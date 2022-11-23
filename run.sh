@@ -58,9 +58,10 @@ if [ -z "$tag" ];then
     echo "4) Iteracion-4"
     echo "5) Iteracion-5"
     echo "6) Iteracion-6"
+    echo "7) Ejecutar con el codigo actual"
     echo "Ctrl-C para salir"
     read opcion
-    if [[ $opcion -ge 7 || $opcion -le 0 ]]; then
+    if [[ $opcion -ge 8 || $opcion -le 0 ]]; then
         echo "Opcion no valida"
         exit
     fi
@@ -70,13 +71,15 @@ if [ -z "$tag" ];then
     fi
 fi
 
-if [ ! -v iteraciones[$tag] ]; then
-    echo "Iteracion no valida"
-    exit
-fi
+if [ $opcion -ne 7 ]; then
+    if [ ! -v iteraciones[$tag] ]; then
+        echo "Iteracion no valida"
+        exit
+    fi
 
-echo "El tag seleccionado es ${tag}"
-git checkout $tag
+    echo "El tag seleccionado es ${tag}"
+    git checkout $tag
+fi
 
 printf "\nEn que entorno le gustaria ejecutar?\n"
 echo "1) Producción"
