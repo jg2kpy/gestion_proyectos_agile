@@ -1043,6 +1043,26 @@ class SprintTests(TestCase):
 
         limpiarStaticFiles()
 
+    def test_ver_burndown_chart(self):
+        """
+        Prueba para ver si carga el burndown chart
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+        
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/", follow=True)
+        self.assertContains(res, f'src="/static/bdChart_{self.proyecto.id}_{self.sprint.id}.png"', 1,
+                            200, "No reconoce el path correcto")
+
+        self.assertEqual(True, os.path.isfile(f"app/staticfiles/bdChart_{self.proyecto.id}_{self.sprint.id}.png"), "No existe archivo en path")
+
+        limpiarStaticFiles()
+
     def test_descargar_burndown_chart(self):
         """
         Prueba para ver si descarga el burndown chart
@@ -1061,26 +1081,6 @@ class SprintTests(TestCase):
             }, follow=True)
         self.assertEqual(res.status_code, 200,
                 'La respuesta no fue un estado HTTP 200 al descargar el burndown chart')
-
-        limpiarStaticFiles()
-
-    def test_ver_burndown_chart(self):
-        """
-        Prueba para ver si carga el burndown chart
-        """
-        
-        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
-            {
-                'terminar' : 'terminar'
-            }, follow=True)
-        self.assertEqual(res.status_code, 200,
-                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
-        
-        res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/", follow=True)
-        self.assertContains(res, 'src="/static/bdChart_1_1.png"', 1,
-                            200, "No reconoce el path correcto")
-
-        self.assertEqual(True, os.path.isfile(f"app/staticfiles/bdChart_1_1.png"), "No existe archivo en path")
 
         limpiarStaticFiles()
 
@@ -1118,10 +1118,10 @@ class SprintTests(TestCase):
                 'La respuesta no fue un estado HTTP 200 al terminar un sprint')
         
         res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/", follow=True)
-        self.assertContains(res, 'src="/static/vlChart_1.png"', 1,
+        self.assertContains(res, f'src="/static/vlChart_{self.proyecto.id}.png"', 1,
                             200, "No reconoce el path correcto")
 
-        self.assertEqual(True, os.path.isfile(f"app/staticfiles/vlChart_1.png"), "No existe archivo en path")
+        self.assertEqual(True, os.path.isfile(f"app/staticfiles/vlChart_{self.proyecto.id}.png"), "No existe archivo en path")
 
         limpiarStaticFiles()
 
