@@ -25,4 +25,5 @@ urlpatterns = [
     path('<int:proyecto_id>/sprints/<int:sprint_id>/agregar_historias/', agregar_historias_sprint, name='agregar_historias_sprint'),
     path('<int:proyecto_id>/sprints/reasignar_us/<int:historia_id>/', reasignar_us, name='reasignar_us'),
     path('<int:proyecto_id>/sprints/list/', sprint_list, name='sprint_list'),
+    path('<int:proyecto_id>/sprints/<int:sprint_id>/reemplazar_miembro/', sprint_reemplazar_miembro, name='sprint_reemplazar_miembro'),
 ]
