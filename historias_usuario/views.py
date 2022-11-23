@@ -904,8 +904,8 @@ def verTablero(request, proyecto_id, tipo_id):
                 sprintInfo.horasUsadas = sum([tarea.horas for tarea in Tarea.objects.filter(historia=id_ori, sprint=sprintTerminar)])
                 sprintInfo.save()
 
-                generarBurndownChart(sprintTerminar.id)
-                generarVelocityChart(proyecto.id)
+            generarBurndownChart(sprintTerminar.id)
+            generarVelocityChart(proyecto.id)
             
             proyecto.estado = "Planificación"
             proyecto.save()
