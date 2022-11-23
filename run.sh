@@ -49,6 +49,7 @@ fi
 echo "El script necesita de permisos de super usuario para poder realizar limpiza de BD y migraciones"
 sudo rm -rf ./postgre-data
 sudo rm -rf ./*/migrations
+sudo rm -rf ./app/stacticfiles/*
 
 if [ -z "$tag" ];then
     printf "\nSeleccione un tag\n"
