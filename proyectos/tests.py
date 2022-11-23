@@ -1012,3 +1012,65 @@ class SprintTests(TestCase):
         self.assertEqual(res.status_code, 200,
                 'La respuesta no fue un estado HTTP 200 al terminar un sprint')
     
+    def test_set_fecha_finalizacion(self):
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+        {
+            'terminar' : 'terminar'
+        }, follow=True)
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+        {
+            'nombre': 'Sprint prueba fecha fin', 'descripcion': 'Sprint 1', 'duracion': '15', f'horas_trabajadas_{self.proyecto.id}': '6',
+        }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+                
+        id = Sprint.objects.get(nombre="Sprint prueba fecha fin").id
+        self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{id}/backlog/",
+        {
+            'comenzar' : 'Comenzar'
+        }, follow=True)
+        
+        sprint_a_finalizar = Sprint.objects.get(nombre="Sprint prueba fecha fin")
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+
+        sprint_finalizado = Sprint.objects.get(nombre="Sprint prueba fecha fin")
+        
+        self.assertNotEqual(sprint_a_finalizar.fecha_fin, sprint_finalizado.fecha_fin,"La fecha finalizacion no se establecio correctamente")
+    
+    def test_estados_proyecto(self):
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+        {
+            'terminar' : 'terminar'
+        }, follow=True)
+        
+        self.assertEqual(self.proyecto.estado, "Planificacion")
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+        {
+            'nombre': 'Sprint prueba estados proyecto', 'descripcion': 'Sprint 1', 'duracion': '15', f'horas_trabajadas_{self.proyecto.id}': '6',
+        }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+        
+        id = Sprint.objects.get(nombre="Sprint prueba estados proyecto").id
+        self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{id}/backlog/",
+        {
+            'comenzar' : 'Comenzar'
+        }, follow=True)
+        
+        proyecto1 = Proyecto.objects.get(id=self.proyecto.id)
+        self.assertEqual(proyecto1.estado, "Ejecución")
+    
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+        {
+            'terminar' : 'terminar'
+        }, follow=True)
+        
+        proyecto1 = Proyecto.objects.get(id=self.proyecto.id)
+        self.assertEqual(proyecto1.estado, "Planificación")
+    
