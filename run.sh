@@ -93,7 +93,8 @@ read entorno
 if [ $entorno -eq 1 ];then
     printf "\nEjecutando en entorno de producción...\n"
     $docker -f "docker-compose.produccion.yaml" up --build -d
-    sleep 6
+    echo "Ejecutando migraciones, espere unos segundos mas..."
+    sleep 10
     if [ $tag = "Iteracion-5" ] || [ $tag = "Iteracion-6" ] || [ $tag = "actual" ];then
         printf "\nLe gustaria cargar los datos de prueba?[s/n]\n"
         read opcion
@@ -115,8 +116,8 @@ if [ $entorno -eq 1 ];then
 else
     printf "\nEjecutando en entorno de desarrollo...\n"
     $docker -f "docker-compose.desarrollo.yaml" up --build -d
-    echo "Ya casi está, espere unos segundos mas..."
-    sleep 6
+    echo "Ejecutando migraciones, espere unos segundos mas..."
+    sleep 10
     if [ $tag = "Iteracion-5" ] || [ $tag = "Iteracion-6" ] || [ $tag = "actual" ];then
         printf "\nLe gustaria cargar los datos de prueba?[s/n]\n"
         read opcion
