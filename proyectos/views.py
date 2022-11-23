@@ -935,6 +935,8 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
 
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+    if sprint.estado != "Planificado":
+        return render(request, '403.html', {'info_adicional': f'No puede editar miembros de un Sprint que no se encuentra en planificación. Este Sprint esta en estado {sprint.estado}'}, status=403)
 
     desarrolladores = proyecto.usuario.all()
     status = 200
@@ -995,6 +997,9 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
 
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+    
+    if sprint.estado != "Planificado":
+        return render(request, '403.html', {'info_adicional': 'No puede agregar historias a un Sprint que no se encuentra en planificación.'}, status=403)
 
     historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad(), reverse=True) if x.getPrioridad() >= 0]
     status = 200
@@ -1356,3 +1361,45 @@ def sprint_list(request, proyecto_id):
 
             
     return render(request, 'sprints/sprintList.html', {'proyecto': proyecto}, status=200)
+
+@never_cache
+def sprint_reemplazar_miembro(request, proyecto_id, sprint_id):
+    """
+    Permite reemplazar un miembro de un sprint
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param sprint_id: ID del sprint al que pertenece el miembro
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para ver el formulario de reemplazo de miembro
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        sprint = Sprint.objects.get(id=sprint_id)
+    except Sprint.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_rol_en_proyecto(request.user, "Scrum Master", sprint.proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para reemplazar un miembro'}, status=403)
+
+    error = None
+    if request.method == 'POST':
+        usuario_sale = request.POST.get('usuario_sale')
+        usuario_entra = request.POST.get('usuario_entra')
+
+        (res, error) = sprint.reemplazar_miembro(Usuario.objects.get(id=usuario_sale), Usuario.objects.get(id=usuario_entra))
+        if res:
+            return redirect('backlog_sprint', proyecto_id=sprint.proyecto.id, sprint_id=sprint.id)
+    
+    activos = [Usuario.objects.get(id=usuario) for usuario in sprint.participantes.all().values_list('usuario', flat=True)]
+    suplentes = [usuario for usuario in sprint.proyecto.usuario.all() if usuario not in activos]
+
+    return render(request, 'sprints/reemplazar_miembro.html', {'proyecto': sprint.proyecto, 'sprint': sprint, 'activos': activos, 'suplentes': suplentes, 'error': error}, status=200)

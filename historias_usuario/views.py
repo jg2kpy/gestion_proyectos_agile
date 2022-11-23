@@ -558,6 +558,9 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
         historia = HistoriaUsuario.objects.get(id=historia_id)
     except HistoriaUsuario.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
+    
+    if historia.sprint and historia.sprint.estado != "Planificado":
+        return render(request, '403.html', {'info_adicional': 'No puede agregar historias a un Sprint que no se encuentra en planificación.'}, status=403)
 
     status = 200
     if request.method == 'POST':

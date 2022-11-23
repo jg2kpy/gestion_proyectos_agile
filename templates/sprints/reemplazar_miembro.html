@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Editar miembros{% endblock %}
+{% block contenido %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="container">
+            <h1>
+                Reemplazar miembro de Sprint
+            </h1>
+        </div>
+        <div class="container">
+            <form id="sprintForm" action="." method="POST">
+                {% csrf_token %}
+                {% if error %}
+                <div class="row">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <h6>
+                            {{ error }}
+                        </h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar">
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4">
+                        <select name="usuario_sale" required>
+                            <option value="">Seleccione quien sale</option>
+                            {% for usuario in activos %}
+                            <option value="{{usuario.id}}">{{ usuario.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="usuario_entra" required>
+                            <option value="">Seleccione quien entra</option>
+                            {% for usuario in suplentes %}
+                            <option value="{{usuario.id}}">{{ usuario.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4">
+                        <input type="submit" class="btn btn-primary" value="Reemplazar">
+                        <a href="{% url 'backlog_sprint' proyecto.id sprint.id %}" class="btn btn-secondary">Volver</a>
+                    </div>
+                    <div class="col-md-4"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

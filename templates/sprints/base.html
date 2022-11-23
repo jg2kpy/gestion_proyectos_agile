@@ -15,10 +15,17 @@
         </div>
         <div class="d-flex justify-content-between">
             <div>
+                {% if sprint.estado == "Planificado" %}
                 <a href="{% url 'editar_miembros_sprint' proyecto.id sprint.id %}" class="btn btn-primary">Editar
                     miembros</a>
                 <a href="{% url 'agregar_historias_sprint' proyecto.id  sprint.id %}" class="btn btn-primary">Agregar
                     historias</a>
+                {% endif %}
+                {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
+                {% if master %}
+                <a href="{% url 'sprint_reemplazar_miembro' proyecto.id  sprint.id %}" class="btn btn-primary">Reemplazar
+                    miembro</a>
+                {% endif %}
                 <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del
                     proyecto</a>
 
@@ -236,7 +243,7 @@
                         {% endif %}
 
                         {% tiene_permiso_en_proyecto user 'pro_cancelarUS' proyecto as pro_cancelarUS %}
-                        {% if pro_cancelarUS %}
+                        {% if pro_cancelarUS and sprint.estado != "Planificado" %}
                         <button type="button" data-toggle="tooltip" data-placement="top" title="Cancelar historia"
                             class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span
                                 class="material-icons">cancel</span></button>
