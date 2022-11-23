@@ -1,3 +1,4 @@
+import glob
 import os
 from django import setup
 from historias_usuario.models import SprintInfo
@@ -23,6 +24,11 @@ from proyectos.views import eliminar_rol_proyecto as eliminar_rol_proyecto_view
 from phonenumber_field.modelfields import PhoneNumber
 
 # Create your tests here.
+
+def limpiarStaticFiles():
+        files = glob.glob('app/staticfiles/*')
+        for f in files:
+            os.remove(f)
 
 class ProyectoTests(TestCase):
 
@@ -901,6 +907,9 @@ class SprintTests(TestCase):
         self.assertContains(res, 'Terminado', 1,
                             200, "No se cambió a estado terminado")
 
+        limpiarStaticFiles()
+            
+
     def test_comenzar_sprint(self):
         """
         Prueba para comenzar un sprint
@@ -933,6 +942,7 @@ class SprintTests(TestCase):
         self.assertContains(res, 'Desarrollo', 1,
                             200, "No inicia el sprint correctamente")
 
+        
     def test_ver_tablero_otros_sprints(self):
         """
         Prueba visualizar sprint terminado en tablero teniendo ya un sprint empezado
@@ -998,6 +1008,7 @@ class SprintTests(TestCase):
         self.assertContains(res, 'Cancelado', 1,
                             200, "No se cancelo el sprint correctamente")
 
+        limpiarStaticFiles()
 
     def test_comenzar_sprint_mover_a_primera_etapa(self):
         """
@@ -1030,12 +1041,13 @@ class SprintTests(TestCase):
         self.assertEqual(HistoriaUsuario.objects.get(id=historiaTest3.id).etapa, self.tipoTest.etapas.get(orden=0),
                 'La historia no se fue a la primera etapa al momento de inicar el sprint')
 
+        limpiarStaticFiles()
 
     def test_descargar_burndown_chart(self):
         """
         Prueba para ver si descarga el burndown chart
         """
-        
+
         res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
             {
                 'terminar' : 'terminar'
@@ -1049,6 +1061,8 @@ class SprintTests(TestCase):
             }, follow=True)
         self.assertEqual(res.status_code, 200,
                 'La respuesta no fue un estado HTTP 200 al descargar el burndown chart')
+
+        limpiarStaticFiles()
 
     def test_ver_burndown_chart(self):
         """
@@ -1068,11 +1082,13 @@ class SprintTests(TestCase):
 
         self.assertEqual(True, os.path.isfile(f"app/staticfiles/bdChart_1_1.png"), "No existe archivo en path")
 
+        limpiarStaticFiles()
+
     def test_descargar_velocity_chart(self):
         """
         Prueba para ver si descarga el velocity chart
         """
-        
+
         res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
             {
                 'terminar' : 'terminar'
@@ -1087,6 +1103,8 @@ class SprintTests(TestCase):
         self.assertEqual(res.status_code, 200,
                 'La respuesta no fue un estado HTTP 200 al descargar el velocity chart')
     
+        limpiarStaticFiles()
+
     def test_ver_velocity_chart(self):
         """
         Prueba para ver si carga el velocity chart
@@ -1104,6 +1122,8 @@ class SprintTests(TestCase):
                             200, "No reconoce el path correcto")
 
         self.assertEqual(True, os.path.isfile(f"app/staticfiles/vlChart_1.png"), "No existe archivo en path")
+
+        limpiarStaticFiles()
 
     def test_set_fecha_finalizacion(self):
         res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
@@ -1134,7 +1154,9 @@ class SprintTests(TestCase):
         sprint_finalizado = Sprint.objects.get(nombre="Sprint prueba fecha fin")
         
         self.assertNotEqual(sprint_a_finalizar.fecha_fin, sprint_finalizado.fecha_fin,"La fecha finalizacion no se establecio correctamente")
-    
+
+        limpiarStaticFiles()
+
     def test_estados_proyecto(self):
         res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
         {
@@ -1166,4 +1188,6 @@ class SprintTests(TestCase):
         
         proyecto1 = Proyecto.objects.get(id=self.proyecto.id)
         self.assertEqual(proyecto1.estado, "Planificación")
+
+        limpiarStaticFiles()
     
