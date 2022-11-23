@@ -693,6 +693,9 @@ class SprintTests(TestCase):
         """
         Prueba de agregar un US al backlog del sprint
         """
+        self.sprint.estado = "Planificado"
+        self.sprint.save()
+
         res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/backlog/", 
             {
                 'historia_id': self.historiaTest.id
@@ -715,6 +718,9 @@ class SprintTests(TestCase):
         Prueba cambiar la capacidad de un desarrollador
         """
         
+        self.sprint.estado = "Planificado"
+        self.sprint.save()
+
         res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/editar_miembros/",
             {
                 f'horas_trabajadas_{self.user.id}': '20'
@@ -726,6 +732,9 @@ class SprintTests(TestCase):
         """
         Prueba cambiar la capacidad de un desarrollador
         """
+        
+        self.sprint.estado = "Planificado"
+        self.sprint.save()
         
         res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/editar_miembros/",
             {
@@ -754,7 +763,7 @@ class SprintTests(TestCase):
         self.assertEqual(self.historiaTest.getPrioridad(), self.historiaTest.bv*0.6+self.historiaTest.up*0.4,
                 'BV debería ser 0.6 la prioriad')
 
-    def test_prioridad_sin_previo(self):
+    def test_prioridad_con_previo(self):
         """
         Prueba calcular prioridad con un sprint previo
         """
