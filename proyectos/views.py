@@ -1318,11 +1318,11 @@ def generarBurndownChart(sprintId):
         yReal.append(horasRestanteSprint)
 
     generarGraficoBurndown(x, yTeorico, yReal)
-    if not isdir('app/staticfiles'):
-        makedirs("app/staticfiles")
-    plt.savefig(f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+    if not isdir('/django/app/staticfiles'):
+        makedirs("/django/app/staticfiles")
+    plt.savefig(f"/django/app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
     plt.close()
-    rutaImg = Path(f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+    rutaImg = Path(f"/django/app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
     
     if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
         archivoBurndown = ArchivoBurndown.objects.get(sprint__id=sprintId)
@@ -1330,8 +1330,9 @@ def generarBurndownChart(sprintId):
         archivoBurndown = ArchivoBurndown()
     
     archivoBurndown.nombre = f"bdChart_{sprint.proyecto.id}_{sprint.id}"
+    
     with rutaImg.open(mode='rb') as archivo:
-        archivoBurndown.archivo = File(archivo, name=rutaImg.name)
+        archivoBurndown.archivo = File(archivo, name=f"django/app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
         archivoBurndown.save()
         sprint.burndownChart = archivoBurndown
         sprint.save()
@@ -1375,12 +1376,12 @@ def generarVelocityChart(proyectoId):
         horasUsSprintList.append(tempUsTotal)
     
     generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList)
-    plt.savefig(f"app/staticfiles/vlChart_{proyecto.id}.png")
+    plt.savefig(f"/django/app/staticfiles/vlChart_{proyecto.id}.png")
     plt.close()
-    rutaImg = Path(f"app/staticfiles/vlChart_{proyecto.id}.png")
+    rutaImg = Path(f"/django/app/staticfiles/vlChart_{proyecto.id}.png")
     
     with rutaImg.open(mode='rb') as archivo:
-        velChart.archivo = File(archivo, name=rutaImg.name)
+        velChart.archivo = File(archivo, name=f"django/app/staticfiles/vlChart_{proyecto.id}.png")
         velChart.proyecto = proyecto
         velChart.save()
 
