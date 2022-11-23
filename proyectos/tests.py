@@ -220,6 +220,54 @@ class ProyectoTests(TestCase):
         self.assertEqual(proyecto.estado, 'Planificacion',
                          'Se cancelo el proyecto por mas que introdujo un nombre incorrecto')
 
+    def test_terminar_proyecto(self):
+        """
+        Prueba que el usuario puede terminar un proyecto
+        """
+        master = self.user
+        proyecto = self.proyecto
+
+        # Verificamos que un usuario no logueado no puede terminar un proyecto
+        request_factory = RequestFactory()
+        request = request_factory.get(f'proyecto/terminar/{proyecto.id}/')
+        request.user = AnonymousUser()
+        response = terminar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 401,
+                         'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
+
+        # Verificamos que un usuario sin permisos no puede terminar un proyecto
+        usuarioTest = Usuario(
+            username="test", email='user@user.com', password='foo')
+        usuarioTest.save()
+        request.user = usuarioTest
+        response = terminar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 403,
+                         'La respuesta no fue un estado HTTP 403 a un usuario sin permisos')
+
+        # Verificamos que un usuario con permisos puede terminar un proyecto
+        request = request_factory.post(
+            f'proyecto/{proyecto.id}/terminar', {'nombre': 'PROYECTO_STANDARD'})
+        request.user = master
+        response = terminar_proyecto(request, proyecto.id)
+        # self.assertEqual(proyecto.estado, 'Cancelado', 'El estado del proyecto al terminar no es el correcto')
+        self.assertEqual(response.status_code, 302,
+                         'La respuesta no fue un estado HTTP 302 a una petición correcta')
+
+        # Verificamos que no se puede terminar un proyecto cuando no tiene nombre correcto
+
+        proyecto = self.proyecto
+
+        request = request_factory.post(
+            f'proyecto/terminar/{proyecto.id}/', {'nombre': 'Proyecto de prueba 2'})
+        request.user = master
+        response = terminar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 422,
+                         'La respuesta no fue un estado HTTP 422 a una petición incorrecta')
+        # Verificamos que el proyecto no se cancelo
+
+        self.assertEqual(proyecto.estado, 'Planificacion',
+                         'Se cancelo el proyecto por mas que introdujo un nombre incorrecto')
+
     def test_modificar_rol_proyecto(self):
         """
         Prueba que el usuario puede modificar un rol de proyecto
@@ -1001,7 +1049,25 @@ class SprintTests(TestCase):
             }, follow=True)
         self.assertEqual(res.status_code, 200,
                 'La respuesta no fue un estado HTTP 200 al descargar el burndown chart')
-    
+
+    def test_ver_burndown_chart(self):
+        """
+        Prueba para ver si carga el burndown chart
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+        
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/", follow=True)
+        self.assertContains(res, 'src="/static/bdChart_1_1.png"', 1,
+                            200, "No reconoce el path correcto")
+
+        self.assertEqual(True, os.path.isfile(f"app/staticfiles/bdChart_1_1.png"), "No existe archivo en path")
+
     def test_descargar_velocity_chart(self):
         """
         Prueba para ver si descarga el velocity chart
@@ -1019,8 +1085,26 @@ class SprintTests(TestCase):
                 'descargarVelocity' : self.proyecto.id
             }, follow=True)
         self.assertEqual(res.status_code, 200,
-                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+                'La respuesta no fue un estado HTTP 200 al descargar el velocity chart')
     
+    def test_ver_velocity_chart(self):
+        """
+        Prueba para ver si carga el velocity chart
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+        
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/", follow=True)
+        self.assertContains(res, 'src="/static/vlChart_1.png"', 1,
+                            200, "No reconoce el path correcto")
+
+        self.assertEqual(True, os.path.isfile(f"app/staticfiles/vlChart_1.png"), "No existe archivo en path")
+
     def test_set_fecha_finalizacion(self):
         res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
         {
