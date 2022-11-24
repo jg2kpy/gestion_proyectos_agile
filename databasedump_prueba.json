@@ -1266,8 +1266,8 @@
     "model": "proyectos.sprint",
     "pk": 4,
     "fields": {
-      "fecha_inicio": "2022-11-10T19:20:01.035Z",
-      "fecha_fin": "2022-11-30T19:20:01.035Z",
+      "fecha_inicio": "2022-11-10T03:00:00.000Z",
+      "fecha_fin": "2022-11-30T03:00:00.000Z",
       "proyecto": 2,
       "estado": "Desarrollo",
       "duracion": 15,

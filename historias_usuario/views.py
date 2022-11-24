@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
 from django.db import models
+import django
 import pytz
 from gestion_proyectos_agile.views import crearNotificacion
 
@@ -867,7 +868,7 @@ def verTablero(request, proyecto_id, tipo_id):
             sprintTerminar.estado = "Terminado"
 
             sprintTerminar.duracion = 0
-            sprintTerminar.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
+            sprintTerminar.fecha_fin = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone()).replace(hour=0, minute=0, second=0, microsecond=0)
             fecha_aux = sprintTerminar.fecha_inicio
             while fecha_aux <= sprintTerminar.fecha_fin:
                 if not (fecha_aux.weekday() >= 5 or fecha_aux.date() in Feriado.objects.filter(proyecto=proyecto)):
