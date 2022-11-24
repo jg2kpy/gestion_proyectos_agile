@@ -1350,6 +1350,7 @@ def generarVelocityChart(proyectoId):
 
     velChart = None
     if ArchivoVelocity.objects.filter(proyecto__id=proyectoId).exists():
+        os.remove(f"/django/app/staticfiles/vlChart_{proyectoId}.png")
         velChart = ArchivoVelocity.objects.get(proyecto__id=proyectoId)
     else:
         velChart = ArchivoVelocity()
