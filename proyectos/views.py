@@ -971,7 +971,7 @@ def backlog_sprint(request, proyecto_id, sprint_id):
                 return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
 
             sprint.estado = "Cancelado"
-            sprint.fecha_fin = datetime.datetime.now(pytz.timezone(django.utils.timezone.get_current_timezone())).replace(hour=0, minute=0, second=0, microsecond=0)
+            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone()).replace(hour=0, minute=0, second=0, microsecond=0)
             sprint.save()
 
             usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprint,estado=HistoriaUsuario.Estado.ACTIVO)
