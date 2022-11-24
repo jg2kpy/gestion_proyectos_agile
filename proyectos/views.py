@@ -972,7 +972,7 @@ def backlog_sprint(request, proyecto_id, sprint_id):
                 return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
 
             sprint.estado = "Cancelado"
-            sprint.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
+            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone()).replace(hour=0, minute=0, second=0, microsecond=0)
             sprint.save()
 
             usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprint,estado=HistoriaUsuario.Estado.ACTIVO)
@@ -991,8 +991,8 @@ def backlog_sprint(request, proyecto_id, sprint_id):
                 return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
             if Sprint.objects.filter(estado="Desarrollo",proyecto=proyecto).count() > 0:
                 return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
-            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone())
-            sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto)
+            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone()).replace(hour=0, minute=0, second=0, microsecond=0)
+            sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto).replace(hour=0, minute=0, second=0, microsecond=0)
             sprint.estado = "Desarrollo"
             sprint.save()
 
@@ -1292,7 +1292,7 @@ def generarBurndownChart(sprintId):
 
     # Datos para realizar los cálculos
     sprint = Sprint.objects.get(id=sprintId)
-    cantDiasSprint = sprint.duracion
+    cantDiasSprint = sprint.duracionOri if sprint.duracion < sprint.duracionOri else sprint.duracion
     inicioSprint = sprint.fecha_inicio
     feriados = Feriado.objects.filter(proyecto=sprint.proyecto)
     horasUsDiario = calcularHorasDiarias(sprint, cantDiasSprint, inicioSprint, feriados)

@@ -28,6 +28,8 @@
             </form>
         </div>
     </div>
+    {% else %}
+        <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
     {% endif %}
     <hr>
     {% for sprint in sprints_tareas %}
