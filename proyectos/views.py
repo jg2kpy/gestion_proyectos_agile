@@ -1,5 +1,6 @@
 import datetime
 from genericpath import isdir
+import glob
 from os import makedirs
 import os
 import django
@@ -1318,11 +1319,12 @@ def generarBurndownChart(sprintId):
         yReal.append(horasRestanteSprint)
 
     generarGraficoBurndown(x, yTeorico, yReal)
-    if not isdir('/django/app/staticfiles'):
-        makedirs("/django/app/staticfiles")
-    plt.savefig(f"/django/app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+    if not isdir('/django/app/staticfiles/temp'):
+        makedirs("/django/app/staticfiles/temp")
+    plt.savefig(f"/django/app/staticfiles/temp/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
     plt.close()
-    rutaImg = Path(f"/django/app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+
+    rutaImg = Path(f"/django/app/staticfiles/temp/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
     
     if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
         archivoBurndown = ArchivoBurndown.objects.get(sprint__id=sprintId)
@@ -1376,9 +1378,9 @@ def generarVelocityChart(proyectoId):
         horasUsSprintList.append(tempUsTotal)
     
     generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList)
-    plt.savefig(f"/django/app/staticfiles/vlChart_{proyecto.id}.png")
+    plt.savefig(f"/django/app/staticfiles/temp/vlChart_{proyecto.id}.png")
     plt.close()
-    rutaImg = Path(f"/django/app/staticfiles/vlChart_{proyecto.id}.png")
+    rutaImg = Path(f"/django/app/staticfiles/temp/vlChart_{proyecto.id}.png")
     
     with rutaImg.open(mode='rb') as archivo:
         velChart.archivo = File(archivo, name=f"app/staticfiles/vlChart_{proyecto.id}.png")
@@ -1484,6 +1486,10 @@ def sprint_list(request, proyecto_id):
 
     if hayCambio:
         generarVelocityChart(proyecto.id)
+
+    files = glob.glob('app/staticfiles/temp/*')
+    for f in files:
+        os.remove(f)
 
     if request.method == 'POST':
         if 'descargarBurndown' in request.POST:
