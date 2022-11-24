@@ -1291,7 +1291,7 @@ def generarBurndownChart(sprintId):
 
     # Datos para realizar los cálculos
     sprint = Sprint.objects.get(id=sprintId)
-    cantDiasSprint = sprint.duracion
+    cantDiasSprint = sprint.duracionOri if sprint.duracion < sprint.duracionOri else sprint.duracion
     inicioSprint = sprint.fecha_inicio
     feriados = Feriado.objects.filter(proyecto=sprint.proyecto)
     horasUsDiario = calcularHorasDiarias(sprint, cantDiasSprint, inicioSprint, feriados)

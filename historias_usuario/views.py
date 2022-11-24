@@ -867,6 +867,7 @@ def verTablero(request, proyecto_id, tipo_id):
             sprintTerminar = proyecto.sprints.get(estado="Desarrollo")
             sprintTerminar.estado = "Terminado"
 
+            sprintTerminar.duracionOri = sprintTerminar.duracion
             sprintTerminar.duracion = 0
             sprintTerminar.fecha_fin = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone()).replace(hour=0, minute=0, second=0, microsecond=0)
             fecha_aux = sprintTerminar.fecha_inicio

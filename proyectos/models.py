@@ -107,6 +107,8 @@ class Sprint(models.Model):
     estado = models.CharField(max_length=255, blank=True, null=True)
     duracion = models.IntegerField(blank=False, null=False, validators=[
                              MaxValueValidator(365), MinValueValidator(1)])
+    duracionOri = models.IntegerField(default = 0, blank=False, null=False, validators=[
+                             MaxValueValidator(365), MinValueValidator(1)])
     nombre = models.CharField(max_length=255, blank=False, null=False)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
     burndownChart = models.OneToOneField(ArchivoBurndown, related_name='sprint', on_delete=models.DO_NOTHING, null=True)
