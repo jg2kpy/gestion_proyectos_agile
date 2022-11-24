@@ -1191,3 +1191,125 @@ class SprintTests(TestCase):
 
         limpiarStaticFiles()
     
+
+class ReemplazarTests(TestCase):
+    fixtures = [
+        "databasedump.json",
+    ]
+
+    def setUp(self):
+        """
+        Crea un usuario y un proyecto para realizar las pruebas y un proyecto.
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD",
+                               "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'La respuesta no fue un estado HTTP 200 al intentar crear un proyecto')
+        self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
+        self.sprint = Sprint()
+        self.sprint.nombre = 'Sprint 1'
+        self.sprint.proyecto = self.proyecto
+        self.sprint.duracion = 3
+        self.sprint.fecha_inicio = datetime.datetime.now(tz=get_current_timezone())
+        self.sprint.fecha_fin = datetime.datetime.now(tz=get_current_timezone()) + datetime.timedelta(days=7)
+        self.sprint.estado = "Desarrollo"
+        self.sprint.save()
+        self.tiempoEnSprint = UsuarioTiempoEnSprint()
+        self.tiempoEnSprint.usuario = self.user
+        self.tiempoEnSprint.sprint = self.sprint
+        self.tiempoEnSprint.horas = 10
+        self.tiempoEnSprint.save()
+        self.tipoTest = TipoHistoriaUsusario.objects.get(proyecto=self.proyecto, nombre="Default")
+        self.historiaTest = HistoriaUsuario.objects.create(tipo=self.tipoTest, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1)
+        self.historiaTest.tipo = self.tipoTest
+        self.historiaTest.usuarioAsignado = self.user
+        self.historiaTest.save()
+        self.sprint.historias.add(self.historiaTest)
+        self.sprint.save()
+        self.assertEqual(self.historiaTest.usuarioAsignado, self.user)
+    
+    def test_reemplazar_no_miembro_proyecto_ui(self):
+        """
+        Prueba que un usuario que no es miembro del proyecto no puede ser reemplazado.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": self.user.id, "usuario_entra": user.id}, follow=True)
+        self.assertEqual(res.status_code, 422, 'Operacion prohibida retorna un estado HTTP 422')
+    
+    def test_reemplazar_no_miembro_sprint_ui(self):
+        """
+        Prueba que un usuario que no es miembro del sprint no puede ser reemplazado.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        self.proyecto.usuario.add(user)
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": user.id, "usuario_entra": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 422, 'Operacion prohibida retorna un estado HTTP 422')
+    
+    def test_reemplazar_con_no_miembro_proyecto_ui(self):
+        """
+        Prueba que un usuario no se puede reemplazar con uno que no es miembro del proyecto no puede ser reemplazado.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": user.id, "usuario_entra": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 422, 'Operacion prohibida retorna un estado HTTP 422')
+    
+    def test_reemplazar_con_miembro_sprint_ui(self):
+        """
+        Prueba que un usuario no se puede reemplazar con uno que no es miembro del sprint no puede ser reemplazado.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        self.proyecto.usuario.add(user)
+        nuevoTiempo = UsuarioTiempoEnSprint()
+        nuevoTiempo.usuario = user
+        nuevoTiempo.sprint = self.sprint
+        nuevoTiempo.horas = 10
+        nuevoTiempo.save()
+
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": self.user.id, "usuario_entra": user.id}, follow=True)
+        self.assertEqual(res.status_code, 422, 'Operacion prohibida retorna un estado HTTP 422')
+
+    def test_reemplazar_miembro_ui(self):
+        """
+        Prueba que un usuario se puede reemplazar por otro.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        
+        self.proyecto.usuario.add(user)
+
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": self.user.id, "usuario_entra": user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'Se reemplazo exitosamente al usuario')
+        self.historiaTest.refresh_from_db()
+        self.assertEqual(self.historiaTest.usuarioAsignado, user)
+    
+    def test_reemplazar_miembro_proyecto_planeado_ui(self):
+        """
+        Prueba que un usuario que es miembro del proyecto y sprint puede ser reemplazado en un Sprint en planificacion.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+
+        self.proyecto.usuario.add(user)
+        self.proyecto.estado = "Planificado"
+
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": self.user.id, "usuario_entra": user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'Se reemplazo exitosamente al usuario')
+
+    def test_reemplazar_miembro_proyecto_desarrollado_ui(self):
+        """
+        Prueba que un usuario que es miembro del proyecto y sprint puede ser reemplazado en un Sprint en desarrollo.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        
+        self.proyecto.usuario.add(user)
+
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": self.user.id, "usuario_entra": user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'Se reemplazo exitosamente al usuario')
