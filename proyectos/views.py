@@ -1525,6 +1525,7 @@ def sprint_reemplazar_miembro(request, proyecto_id, sprint_id):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para reemplazar un miembro'}, status=403)
 
     error = None
+    status = 200
     if request.method == 'POST':
         usuario_sale = request.POST.get('usuario_sale')
         usuario_entra = request.POST.get('usuario_entra')
@@ -1532,8 +1533,9 @@ def sprint_reemplazar_miembro(request, proyecto_id, sprint_id):
         (res, error) = sprint.reemplazar_miembro(Usuario.objects.get(id=usuario_sale), Usuario.objects.get(id=usuario_entra))
         if res:
             return redirect('backlog_sprint', proyecto_id=sprint.proyecto.id, sprint_id=sprint.id)
+        status = 422
     
     activos = [Usuario.objects.get(id=usuario) for usuario in sprint.participantes.all().values_list('usuario', flat=True)]
     suplentes = [usuario for usuario in sprint.proyecto.usuario.all() if usuario not in activos]
 
-    return render(request, 'sprints/reemplazar_miembro.html', {'proyecto': sprint.proyecto, 'sprint': sprint, 'activos': activos, 'suplentes': suplentes, 'error': error}, status=200)
+    return render(request, 'sprints/reemplazar_miembro.html', {'proyecto': sprint.proyecto, 'sprint': sprint, 'activos': activos, 'suplentes': suplentes, 'error': error}, status=status)
