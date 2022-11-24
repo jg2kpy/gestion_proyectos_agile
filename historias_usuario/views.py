@@ -1,4 +1,6 @@
 import datetime
+import glob
+import os
 from django.shortcuts import render, redirect
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
@@ -909,6 +911,10 @@ def verTablero(request, proyecto_id, tipo_id):
 
             generarBurndownChart(sprintTerminar.id)
             generarVelocityChart(proyecto.id)
+
+            files = glob.glob('app/staticfiles/temp/*')
+            for f in files:
+                os.remove(f)
             
             proyecto.estado = "Planificación"
             proyecto.save()
