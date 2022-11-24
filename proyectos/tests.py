@@ -26,7 +26,7 @@ from phonenumber_field.modelfields import PhoneNumber
 # Create your tests here.
 
 def limpiarStaticFiles():
-        files = glob.glob('app/staticfiles/*')
+        files = glob.glob('app/staticfiles/temp/*')
         for f in files:
             os.remove(f)
 

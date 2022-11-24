@@ -1229,6 +1229,7 @@
       "proyecto": 1,
       "estado": "Terminado",
       "duracion": 12,
+      "duracionOri": 15,
       "nombre": "Sprint 1",
       "descripcion": "Sprint 1",
       "burndownChart": null
@@ -1243,6 +1244,7 @@
       "proyecto": 2,
       "estado": "Terminado",
       "duracion": 7,
+      "duracionOri": 15,
       "nombre": "Sprint 1 en proyecto 2",
       "descripcion": "Sprint 1 en proyecto 2",
       "burndownChart": null
@@ -1257,6 +1259,7 @@
       "proyecto": 1,
       "estado": "Cancelado",
       "duracion": 15,
+      "duracionOri": 15,
       "nombre": "Sprint para cancelar",
       "descripcion": "Sprint para cancelar",
       "burndownChart": null
@@ -1266,11 +1269,12 @@
     "model": "proyectos.sprint",
     "pk": 4,
     "fields": {
-      "fecha_inicio": "2022-11-10T19:20:01.035Z",
-      "fecha_fin": "2022-11-30T19:20:01.035Z",
+      "fecha_inicio": "2022-11-10T03:00:00.000Z",
+      "fecha_fin": "2022-11-30T03:00:00.000Z",
       "proyecto": 2,
       "estado": "Desarrollo",
       "duracion": 15,
+      "duracionOri": 15,
       "nombre": "Sprint 2 en proyecto 2",
       "descripcion": "Sprint 2 en proyecto 2",
       "burndownChart": null

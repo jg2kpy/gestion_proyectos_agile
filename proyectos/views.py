@@ -1,5 +1,6 @@
 import datetime
 from genericpath import isdir
+import glob
 from os import makedirs
 import os
 import django
@@ -971,7 +972,7 @@ def backlog_sprint(request, proyecto_id, sprint_id):
                 return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
 
             sprint.estado = "Cancelado"
-            sprint.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
+            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone()).replace(hour=0, minute=0, second=0, microsecond=0)
             sprint.save()
 
             usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprint,estado=HistoriaUsuario.Estado.ACTIVO)
@@ -990,8 +991,8 @@ def backlog_sprint(request, proyecto_id, sprint_id):
                 return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
             if Sprint.objects.filter(estado="Desarrollo",proyecto=proyecto).count() > 0:
                 return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
-            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone())
-            sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto)
+            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone()).replace(hour=0, minute=0, second=0, microsecond=0)
+            sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto).replace(hour=0, minute=0, second=0, microsecond=0)
             sprint.estado = "Desarrollo"
             sprint.save()
 
@@ -1291,7 +1292,7 @@ def generarBurndownChart(sprintId):
 
     # Datos para realizar los cálculos
     sprint = Sprint.objects.get(id=sprintId)
-    cantDiasSprint = sprint.duracion
+    cantDiasSprint = sprint.duracionOri if sprint.duracion < sprint.duracionOri else sprint.duracion
     inicioSprint = sprint.fecha_inicio
     feriados = Feriado.objects.filter(proyecto=sprint.proyecto)
     horasUsDiario = calcularHorasDiarias(sprint, cantDiasSprint, inicioSprint, feriados)
@@ -1318,11 +1319,12 @@ def generarBurndownChart(sprintId):
         yReal.append(horasRestanteSprint)
 
     generarGraficoBurndown(x, yTeorico, yReal)
-    if not isdir('/django/app/staticfiles'):
-        makedirs("/django/app/staticfiles")
-    plt.savefig(f"/django/app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+    if not isdir('/django/app/staticfiles/temp'):
+        makedirs("/django/app/staticfiles/temp")
+    plt.savefig(f"/django/app/staticfiles/temp/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
     plt.close()
-    rutaImg = Path(f"/django/app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+
+    rutaImg = Path(f"/django/app/staticfiles/temp/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
     
     if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
         archivoBurndown = ArchivoBurndown.objects.get(sprint__id=sprintId)
@@ -1348,6 +1350,7 @@ def generarVelocityChart(proyectoId):
 
     velChart = None
     if ArchivoVelocity.objects.filter(proyecto__id=proyectoId).exists():
+        os.remove(f"/django/app/staticfiles/vlChart_{proyectoId}.png")
         velChart = ArchivoVelocity.objects.get(proyecto__id=proyectoId)
     else:
         velChart = ArchivoVelocity()
@@ -1376,9 +1379,9 @@ def generarVelocityChart(proyectoId):
         horasUsSprintList.append(tempUsTotal)
     
     generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList)
-    plt.savefig(f"/django/app/staticfiles/vlChart_{proyecto.id}.png")
+    plt.savefig(f"/django/app/staticfiles/temp/vlChart_{proyecto.id}.png")
     plt.close()
-    rutaImg = Path(f"/django/app/staticfiles/vlChart_{proyecto.id}.png")
+    rutaImg = Path(f"/django/app/staticfiles/temp/vlChart_{proyecto.id}.png")
     
     with rutaImg.open(mode='rb') as archivo:
         velChart.archivo = File(archivo, name=f"app/staticfiles/vlChart_{proyecto.id}.png")
@@ -1484,6 +1487,10 @@ def sprint_list(request, proyecto_id):
 
     if hayCambio:
         generarVelocityChart(proyecto.id)
+
+    files = glob.glob('app/staticfiles/temp/*')
+    for f in files:
+        os.remove(f)
 
     if request.method == 'POST':
         if 'descargarBurndown' in request.POST:

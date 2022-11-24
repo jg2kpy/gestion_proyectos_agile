@@ -88,6 +88,13 @@
                                     title="Mover a la siguiente etapa"><span class="material-icons">arrow_forward</span></button>
                                 {% endif %}
                             {% endif %}
+                        {% else %}
+                        <a class="btn btn-link" href="{% url 'tareas' proyecto.id historia.id %}"><span 
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver trabajo">engineering</span></a>
+                        <a class="btn btn-link" href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}"><span 
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver comentarios">comment</span></a>
+                        <a class="btn btn-link" href="{% url 'ver_archivos' proyecto.id historia.id %}"><span 
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver archivos">description</span></a>
                         {% endif %}
                         <a class="btn btn-link" data-toggle="tooltip" data-placement="top" title="Ver historial" href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span 
                             class="material-icons">history</span></a>
