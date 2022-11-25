@@ -9,12 +9,12 @@
         </div>
         <div>
             {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
-            {% if pro_crearTipoUS %}
+            {% if pro_crearTipoUS and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
             <a href="{% url 'crearTipoHistoriaUsuario' proyecto.id %}" class="btn btn-primary">Crear Tipo de Historia de
                 Usuario</a>
             {% endif %}
             {% tiene_permiso_en_proyecto user 'pro_importarTipoUS' proyecto as pro_importarTipoUS %}
-            {% if pro_importarTipoUS %}
+            {% if pro_importarTipoUS and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
             <a href="{% url 'importarTipoHistoriaUsuario' proyecto.id %}" class="btn btn-primary">Importar Tipo de Historia de
                 Usuario</a>
             {% endif %}
@@ -39,12 +39,12 @@
                         <a class="btn btn-link" href="#modalDetalles{{ tipo.id }}" data-bs-toggle="modal" data-bs-target="#modalDetalles{{ tipo.id }}"><span
                             class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver detalles">info</span></a>
                         {% tiene_permiso_en_proyecto user 'pro_crearTipoUS' proyecto as pro_crearTipoUS %}
-                        {% if pro_crearTipoUS and tipo.historias.count == 0 %}
+                        {% if pro_crearTipoUS and tipo.historias.count == 0 and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                         <a href="{% url 'editarTipoHistoriaUsuario' proyecto.id tipo.id %}" class="btn btn-link"><span
                                 class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar tipo de historia">create</span></a>
                         {% endif %}
                         {% tiene_permiso_en_proyecto user 'pro_eliminarTipoUS' proyecto as pro_eliminarTipoUS %}
-                        {% if pro_eliminarTipoUS and tipo.historias.count == 0 %}
+                        {% if pro_eliminarTipoUS and tipo.historias.count == 0 and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                         <a class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ tipo.id }}"><span 
                             class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar tipo de historia">
                             delete</span></a>

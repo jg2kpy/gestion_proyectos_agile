@@ -21,6 +21,7 @@
                             <table class='no_error'>
                                 {{ form.as_table }}
                             </table>
+                            {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
                             <button class="btn-dark mt-3 mb-3" id="delete-{{ form.prefix }}" type="button">
                                 <span class="material-icons">
                                     delete
@@ -36,17 +37,22 @@
                                     });
                                 </script>
                             </button>
+                            {% endif %}
                         {% endfor %}
                     </div>
+                    {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
                     <button class="btn-dark mt-3" id="add_more" type="button">
                         <span class="material-icons" data-toggle="tooltip" data-placement="top" title="Agregar feriado">
                             add
                         </span>
                     </button>
+                    {% endif %}
                     <br>
                 </div>
                 <br>
+                {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
                 <button type="submit" class="btn btn-primary">Aplicar Cambios</button>
+                {% endif %}
                 <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
             </form>
             <div id="empty_form" style="display:none">

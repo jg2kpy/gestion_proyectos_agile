@@ -1,6 +1,8 @@
 import datetime
 from genericpath import isdir
+import glob
 from os import makedirs
+import os
 import django
 from django.forms import inlineformset_factory
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
@@ -14,7 +16,6 @@ from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, Spri
 import numpy as np
 
 from historias_usuario.models import EtapaHistoriaUsuario, HistoriaUsuario, Tarea, TipoHistoriaUsusario
-from historias_usuario.views import calcularFechaSprint
 
 from .models import *
 from .forms import ProyectoConfigurarForm, ProyectoFeriadosForm, ProyectoForm, ProyectoCancelForm, RolProyectoForm
@@ -311,6 +312,19 @@ def cancelar_proyecto(request, proyecto_id):
             # verificamos que el nombre del proyecto sea correcto
             if form.cleaned_data['nombre'] == proyecto.nombre:
                 proyecto.estado = 'Cancelado'
+                
+                sprintsCancelar = Sprint.objects.filter(proyecto=proyecto).exclude(estado="Terminado").exclude(estado="Cancelado")
+                
+                for sprint in sprintsCancelar:
+                    sprint.estado = "Cancelado"
+                    sprint.save()
+
+                historiasActivas = HistoriaUsuario.objects.filter(proyecto=proyecto, estado='A')
+                
+                for historia in historiasActivas:
+                    historia.estado = HistoriaUsuario.Estado.CANCELADO
+                    historia.save()
+
                 proyecto.save()
 
                 usuariosProyecto = Usuario.objects.filter(equipo__id=proyecto.id)
@@ -334,6 +348,75 @@ def cancelar_proyecto(request, proyecto_id):
         return redirect('proyectos')
 
     return render(request, 'proyectos/cancelar_proyecto.html', {'form': form})
+
+
+@never_cache
+def terminar_proyecto(request, proyecto_id):
+    """Terminar Proyecto
+    Cambia el estado del proyecto a finalizado, se recibe el nombre del proyecto a cancelar, se verifica que el proyecto coincida con
+    el nombre introducido y se cambia el estado a finalizado.
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param proyecto_id: ID del proyecto a cancelar
+    :type proyecto_id: int
+
+    :return: Renderiza la pagina de proyectos
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+    except Proyecto.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto."}, status=404)
+
+    # Verificar que solo con el permiso de cambiar estado de proyecto
+    if not tiene_permiso_en_proyecto(request_user, 'pro_cambiarEstadoProyecto', proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para cancelar este proyecto'}, status=403)
+
+    if request.method == 'POST':
+        form = ProyectoCancelForm(request.POST)
+        if form.is_valid():
+            # Cancelamos el proyecto
+            # verificamos que el nombre del proyecto sea correcto
+            if form.cleaned_data['nombre'] == proyecto.nombre:
+                proyecto.estado = 'Finalizado'
+                
+                historiasPlanificacion = HistoriaUsuario.objects.filter(proyecto=proyecto, etapa__isnull=True)
+                
+                for historia in historiasPlanificacion:
+                    historia.estado = HistoriaUsuario.Estado.CANCELADO
+                    historia.save()
+
+                proyecto.save()
+
+                usuariosProyecto = Usuario.objects.filter(equipo__id=proyecto.id)
+            
+                for usuario in usuariosProyecto:
+                    crearNotificacion(
+                        usuario,
+                        f"El proyecto {proyecto.nombre} pasa a estado Finalizado"
+                    )
+                
+                return redirect('proyectos')
+            else:
+                return render(request, 'proyectos/base.html', {'proyectos': Proyecto.objects.all()}, status=422)
+        else:
+            return HttpResponse('Formulario invalido', status=422)
+    else:
+        form = ProyectoCancelForm()
+
+    # Si el proyecto ya esta finalizado no se puede finalizar de nuevo
+    if Proyecto.objects.get(id=proyecto_id).estado == ESTADOS_PROYECTO.__getitem__(2)[0]:
+        return redirect('proyectos')
+
+    return render(request, 'proyectos/terminar_proyecto.html', {'form': form})
 
 
 # Creamos un rol en un proyecto
@@ -809,6 +892,42 @@ def crear_sprint(request, proyecto_id):
 
     return render(request, 'sprints/crear.html', {'proyecto': proyecto, 'desarrolladores': list(proyecto.usuario.all().values_list('id', flat=True)), 'historias': historias, 'error': error, 'sprint': sprint}, status=status)
 
+def calcularFechaSprint(fechaInicio, dias, proyecto):
+    """
+        Realiza el cálculo de la fecha final del sprint.
+
+        :param fechaInicio: Fecha inicial del sprint
+        :type fechaInicio: datetime
+
+        :param dias: Total de duración del sprint en días
+        :type dias: int
+
+        :param proyecto: Proyecto en el que se encuentra el sprint
+        :type proyecto: int
+
+        :return: Retorna la fecha de final del sprint
+        :rtype: datetime
+    """
+    diasParaAgregar = dias
+    fechaActual = fechaInicio
+    feriadosFecha = []
+    feriados = Feriado.objects.filter(proyecto=proyecto)
+
+    if feriados:
+        for feriado in feriados:
+            feriadosFecha.append(feriado.fecha.date())
+    
+    while diasParaAgregar > 0:
+        
+        if not (fechaActual.weekday() >= 5 or fechaActual.date() in feriadosFecha):
+            diasParaAgregar -= 1
+
+        if diasParaAgregar > 0:
+            fechaActual += datetime.timedelta(days=1)
+
+    
+    return fechaActual
+
 @never_cache
 def backlog_sprint(request, proyecto_id, sprint_id):
     """Crear sprint
@@ -853,7 +972,7 @@ def backlog_sprint(request, proyecto_id, sprint_id):
                 return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
 
             sprint.estado = "Cancelado"
-            sprint.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
+            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone()).replace(hour=0, minute=0, second=0, microsecond=0)
             sprint.save()
 
             usListFinalizar = HistoriaUsuario.objects.filter(proyecto=proyecto, sprint=sprint,estado=HistoriaUsuario.Estado.ACTIVO)
@@ -872,8 +991,8 @@ def backlog_sprint(request, proyecto_id, sprint_id):
                 return render(request, '403.html', {'info_adicional': 'Sprint ya iniciado'}, status=422)
             if Sprint.objects.filter(estado="Desarrollo",proyecto=proyecto).count() > 0:
                 return render(request, '403.html', {'info_adicional': 'Ya existe un sprint activo'}, status=422)
-            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone())
-            sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto)
+            sprint.fecha_inicio = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone()).replace(hour=0, minute=0, second=0, microsecond=0)
+            sprint.fecha_fin = calcularFechaSprint(sprint.fecha_inicio, sprint.duracion, proyecto).replace(hour=0, minute=0, second=0, microsecond=0)
             sprint.estado = "Desarrollo"
             sprint.save()
 
@@ -935,6 +1054,8 @@ def editar_miembros_sprint(request, proyecto_id, sprint_id):
 
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+    if sprint.estado != "Planificado":
+        return render(request, '403.html', {'info_adicional': f'No puede editar miembros de un Sprint que no se encuentra en planificación. Este Sprint esta en estado {sprint.estado}'}, status=403)
 
     desarrolladores = proyecto.usuario.all()
     status = 200
@@ -995,6 +1116,9 @@ def agregar_historias_sprint(request, proyecto_id, sprint_id):
 
     if not tiene_permiso_en_proyecto(request_user, 'pro_especificarTiempoDeSprint', proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
+    
+    if sprint.estado != "Planificado":
+        return render(request, '403.html', {'info_adicional': 'No puede agregar historias a un Sprint que no se encuentra en planificación.'}, status=403)
 
     historias = [x for x in sorted(proyecto.backlog.all(), key=lambda x: x.getPrioridad(), reverse=True) if x.getPrioridad() >= 0]
     status = 200
@@ -1163,12 +1287,12 @@ def generarBurndownChart(sprintId):
     :type sprintId: int
     """
 
-    if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
-        return
+    # if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
+    #     return
 
     # Datos para realizar los cálculos
     sprint = Sprint.objects.get(id=sprintId)
-    cantDiasSprint = sprint.duracion
+    cantDiasSprint = sprint.duracionOri if sprint.duracion < sprint.duracionOri else sprint.duracion
     inicioSprint = sprint.fecha_inicio
     feriados = Feriado.objects.filter(proyecto=sprint.proyecto)
     horasUsDiario = calcularHorasDiarias(sprint, cantDiasSprint, inicioSprint, feriados)
@@ -1195,15 +1319,22 @@ def generarBurndownChart(sprintId):
         yReal.append(horasRestanteSprint)
 
     generarGraficoBurndown(x, yTeorico, yReal)
-    if not isdir('app/staticfiles'):
-        makedirs("app/staticfiles")
-    plt.savefig(f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
-    rutaImg = Path(f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+    if not isdir('/django/app/staticfiles/temp'):
+        makedirs("/django/app/staticfiles/temp")
+    plt.savefig(f"/django/app/staticfiles/temp/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
+    plt.close()
+
+    rutaImg = Path(f"/django/app/staticfiles/temp/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
     
-    archivoBurndown = ArchivoBurndown()
+    if ArchivoBurndown.objects.filter(sprint__id=sprintId).exists():
+        archivoBurndown = ArchivoBurndown.objects.get(sprint__id=sprintId)
+    else:
+        archivoBurndown = ArchivoBurndown()
+    
     archivoBurndown.nombre = f"bdChart_{sprint.proyecto.id}_{sprint.id}"
+    
     with rutaImg.open(mode='rb') as archivo:
-        archivoBurndown.archivo = File(archivo, name=rutaImg.name)
+        archivoBurndown.archivo = File(archivo, name=f"app/staticfiles/bdChart_{sprint.proyecto.id}_{sprint.id}.png")
         archivoBurndown.save()
         sprint.burndownChart = archivoBurndown
         sprint.save()
@@ -1219,6 +1350,7 @@ def generarVelocityChart(proyectoId):
 
     velChart = None
     if ArchivoVelocity.objects.filter(proyecto__id=proyectoId).exists():
+        os.remove(f"/django/app/staticfiles/vlChart_{proyectoId}.png")
         velChart = ArchivoVelocity.objects.get(proyecto__id=proyectoId)
     else:
         velChart = ArchivoVelocity()
@@ -1247,12 +1379,12 @@ def generarVelocityChart(proyectoId):
         horasUsSprintList.append(tempUsTotal)
     
     generarGraficoVelocity(horasTotalSprintList, horasUsSprintList, sprintNombreList)
-    plt.savefig(f"app/staticfiles/velocityChart_{proyecto.nombre}{proyecto.id}.png")
-    rutaImg = Path(f"app/staticfiles/velocityChart_{proyecto.nombre}{proyecto.id}.png")
+    plt.savefig(f"/django/app/staticfiles/temp/vlChart_{proyecto.id}.png")
+    plt.close()
+    rutaImg = Path(f"/django/app/staticfiles/temp/vlChart_{proyecto.id}.png")
     
     with rutaImg.open(mode='rb') as archivo:
-        velChart.archivo = File(archivo, name=rutaImg.name)
-        velChart.save()
+        velChart.archivo = File(archivo, name=f"app/staticfiles/vlChart_{proyecto.id}.png")
         velChart.proyecto = proyecto
         velChart.save()
 
@@ -1344,15 +1476,73 @@ def sprint_list(request, proyecto_id):
     if not tiene_rol_en_proyecto(request.user, "Scrum Master", proyecto):
         return render(request, '403.html', {'info_adicional': 'No tiene permisos para crear sprints'}, status=403)
 
+    hayCambio = False
+
+    sprints = Sprint.objects.filter(proyecto=proyecto)
+
+    for sprint in sprints:
+        if sprint.estado == "Terminado" and not os.path.isfile(f"app/staticfiles/bdChart_{proyecto.id}_{sprint.id}.png"):
+            hayCambio = True
+            generarBurndownChart(sprint.id) 
+
+    if hayCambio:
+        generarVelocityChart(proyecto.id)
+
+    files = glob.glob('app/staticfiles/temp/*')
+    for f in files:
+        os.remove(f)
+
     if request.method == 'POST':
         if 'descargarBurndown' in request.POST:
             sprintId = request.POST['descargarBurndown']
-            generarBurndownChart(sprintId)
             return descargarReporte(request, sprintId)
         else:
             proyectoId = request.POST['descargarVelocity']
-            generarVelocityChart(proyectoId)
             return descargarReporte(request, proyecto_id)
 
             
     return render(request, 'sprints/sprintList.html', {'proyecto': proyecto}, status=200)
+
+@never_cache
+def sprint_reemplazar_miembro(request, proyecto_id, sprint_id):
+    """
+    Permite reemplazar un miembro de un sprint
+
+    :param request: Peticion HTTP
+    :type request: HttpRequest
+
+    :param sprint_id: ID del sprint al que pertenece el miembro
+    :type sprint_id: int
+
+    :return: Renderiza la pagina para ver el formulario de reemplazo de miembro
+    :rtype: HttpResponse
+    """
+
+    request_user = request.user
+
+    if not request_user.is_authenticated:
+        return render(request, '401.html', status=401)
+
+    try:
+        sprint = Sprint.objects.get(id=sprint_id)
+    except Sprint.DoesNotExist:
+        return render(request, '404.html', {'info_adicional': "No se encontró este proyecto o sprint."}, status=404)
+
+    if not tiene_rol_en_proyecto(request.user, "Scrum Master", sprint.proyecto):
+        return render(request, '403.html', {'info_adicional': 'No tiene permisos para reemplazar un miembro'}, status=403)
+
+    error = None
+    status = 200
+    if request.method == 'POST':
+        usuario_sale = request.POST.get('usuario_sale')
+        usuario_entra = request.POST.get('usuario_entra')
+
+        (res, error) = sprint.reemplazar_miembro(Usuario.objects.get(id=usuario_sale), Usuario.objects.get(id=usuario_entra))
+        if res:
+            return redirect('backlog_sprint', proyecto_id=sprint.proyecto.id, sprint_id=sprint.id)
+        status = 422
+    
+    activos = [Usuario.objects.get(id=usuario) for usuario in sprint.participantes.all().values_list('usuario', flat=True)]
+    suplentes = [usuario for usuario in sprint.proyecto.usuario.all() if usuario not in activos]
+
+    return render(request, 'sprints/reemplazar_miembro.html', {'proyecto': sprint.proyecto, 'sprint': sprint, 'activos': activos, 'suplentes': suplentes, 'error': error}, status=status)

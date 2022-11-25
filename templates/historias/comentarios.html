@@ -9,6 +9,7 @@
             <h1>Comentarios de '{{ historia.nombre }}'</h1>
         </div>
     </div>
+    {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
     <div class="row">
         <div class="col-md-12">
             <form method="post">
@@ -20,6 +21,9 @@
             </form>
         </div>
     </div>
+    {% else %}
+        <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
+    {% endif %}
     <div class="row">
         <table class="table table-striped">
             <thead>

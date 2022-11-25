@@ -56,7 +56,7 @@ class ArchivoBurndown(models.Model):
     """
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
-    archivo = models.FileField(upload_to=f"app/staticfiles/", null=True)
+    archivo = models.FileField(null=True)
 
 class ArchivoVelocity(models.Model):
     """
@@ -76,7 +76,7 @@ class ArchivoVelocity(models.Model):
     nombre = models.CharField(max_length=255)
     fecha_subida = models.DateTimeField(auto_now_add=True)
     proyecto = models.OneToOneField(Proyecto, related_name="velocityChart", on_delete=models.PROTECT, null=True)
-    archivo = models.FileField(upload_to=f"app/staticfiles/", null=True)
+    archivo = models.FileField(null=True)
     
 
 class Sprint(models.Model):
@@ -107,6 +107,8 @@ class Sprint(models.Model):
     estado = models.CharField(max_length=255, blank=True, null=True)
     duracion = models.IntegerField(blank=False, null=False, validators=[
                              MaxValueValidator(365), MinValueValidator(1)])
+    duracionOri = models.IntegerField(default = 0, blank=False, null=False, validators=[
+                             MaxValueValidator(365), MinValueValidator(1)])
     nombre = models.CharField(max_length=255, blank=False, null=False)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
     burndownChart = models.OneToOneField(ArchivoBurndown, related_name='sprint', on_delete=models.DO_NOTHING, null=True)
@@ -118,6 +120,35 @@ class Sprint(models.Model):
 
     def __str__(self):
         return self.nombre
+
+    def reemplazar_miembro(self, usuario, nuevo_usuario):
+        """
+        Reemplaza un miembro del equipo de un sprint por otro.
+
+        :param usuario: Miembro a reemplazar.
+        :type usuario: Usuario
+        :param nuevo_usuario: Nuevo miembro.
+        :type nuevo_usuario: Usuario
+
+        :return: True si el reemplazo se realizó con éxito, False en caso contrario.
+        """
+        if not self.proyecto.usuario.all().filter(id=usuario.id).exists():
+            return (False, "El usuario a reemplazar no pertenece al proyecto")
+        if not self.proyecto.usuario.all().filter(id=nuevo_usuario.id).exists():
+            return (False, "El nuevo usuario no pertenece al proyecto")
+        if self.participantes.filter(usuario=nuevo_usuario).exists():
+            return (False, "El nuevo usuario ya es parte del Sprint")
+        if self.participantes.filter(usuario=usuario).exists():
+            historias = self.historias.filter(usuarioAsignado=usuario)
+            for historia in historias:
+                historia.usuarioAsignado = nuevo_usuario
+                historia.save()
+            tiempoEnSprint = self.participantes.get(usuario=usuario)
+            tiempoEnSprint.usuario = nuevo_usuario
+            tiempoEnSprint.save()
+            return (True, "El reemplazo se realizó con éxito")
+        else:
+            return (False, "El usuario a reemplazar no forma parte del Sprint")
 
 class UsuarioTiempoEnSprint(models.Model):
     sprint = models.ForeignKey(Sprint, related_name="participantes", on_delete=models.PROTECT)

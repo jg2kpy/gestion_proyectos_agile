@@ -1,13 +1,17 @@
 import datetime
+import glob
+import os
 from django.shortcuts import render, redirect
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import never_cache
 from django.db import models
+import django
 import pytz
 from gestion_proyectos_agile.views import crearNotificacion
 
 
 from proyectos.models import Feriado, Proyecto
+from proyectos.views import generarBurndownChart, generarVelocityChart
 from .models import *
 from gestion_proyectos_agile.templatetags.gpa_tags import tiene_permiso_en_proyecto, tiene_rol_en_proyecto
 from .forms import ComentarioForm, EtapaHistoriaUsuarioForm, HistoriaUsuarioEditarForm, HistoriaUsuarioForm, SubirArchivoForm, TareaForm, TipoHistoriaUsuarioForm
@@ -558,6 +562,9 @@ def borrar_historiaUsuario(request, proyecto_id, historia_id):
         historia = HistoriaUsuario.objects.get(id=historia_id)
     except HistoriaUsuario.DoesNotExist:
         return render(request, '404.html', {'info_adicional': "No se encontró esta historia de usuario."}, status=404)
+    
+    if historia.sprint and historia.sprint.estado != "Planificado":
+        return render(request, '403.html', {'info_adicional': 'No puede agregar historias a un Sprint que no se encuentra en planificación.'}, status=403)
 
     status = 200
     if request.method == 'POST':
@@ -799,42 +806,6 @@ def restaurar_historia_historial(request, proyecto_id, historia_id):
     return render(request, 'historias/historial.html', {"volver_a": volver_a, 'proyecto': proyecto, 'version_ori': historia, 'versiones': historia.obtenerVersiones()}, status=200)
 
 
-def calcularFechaSprint(fechaInicio, dias, proyecto):
-    """
-        Realiza el cálculo de la fecha final del sprint.
-
-        :param fechaInicio: Fecha inicial del sprint
-        :type fechaInicio: datetime
-
-        :param dias: Total de duración del sprint en días
-        :type dias: int
-
-        :param proyecto: Proyecto en el que se encuentra el sprint
-        :type proyecto: int
-
-        :return: Retorna la fecha de final del sprint
-        :rtype: datetime
-    """
-    diasParaAgregar = dias
-    fechaActual = fechaInicio
-    feriadosFecha = []
-    feriados = Feriado.objects.filter(proyecto=proyecto)
-
-    if feriados:
-        for feriado in feriados:
-            feriadosFecha.append(feriado.fecha.date())
-    
-    while diasParaAgregar > 0:
-        
-        if not (fechaActual.weekday() >= 5 or fechaActual.date() in feriadosFecha):
-            diasParaAgregar -= 1
-
-        if diasParaAgregar > 0:
-            fechaActual += datetime.timedelta(days=1)
-
-    
-    return fechaActual
-
 @ never_cache
 def verTablero(request, proyecto_id, tipo_id):
     """
@@ -898,13 +869,14 @@ def verTablero(request, proyecto_id, tipo_id):
             sprintTerminar = proyecto.sprints.get(estado="Desarrollo")
             sprintTerminar.estado = "Terminado"
 
+            sprintTerminar.duracionOri = sprintTerminar.duracion
             sprintTerminar.duracion = 0
+            sprintTerminar.fecha_fin = datetime.datetime.now(tz=django.utils.timezone.get_current_timezone()).replace(hour=0, minute=0, second=0, microsecond=0)
             fecha_aux = sprintTerminar.fecha_inicio
             while fecha_aux <= sprintTerminar.fecha_fin:
                 if not (fecha_aux.weekday() >= 5 or fecha_aux.date() in Feriado.objects.filter(proyecto=proyecto)):
                     sprintTerminar.duracion += 1
                 fecha_aux += datetime.timedelta(days=1)
-            sprintTerminar.fecha_fin = datetime.datetime.now(pytz.timezone('America/Asuncion'))
             sprintTerminar.save()
 
             usuariosSprint = Usuario.objects.filter(equipo__id=sprintTerminar.proyecto.id)
@@ -939,6 +911,12 @@ def verTablero(request, proyecto_id, tipo_id):
                 sprintInfo.horasUsadas = sum([tarea.horas for tarea in Tarea.objects.filter(historia=id_ori, sprint=sprintTerminar)])
                 sprintInfo.save()
 
+            generarBurndownChart(sprintTerminar.id)
+            generarVelocityChart(proyecto.id)
+
+            files = glob.glob('app/staticfiles/temp/*')
+            for f in files:
+                os.remove(f)
             
             proyecto.estado = "Planificación"
             proyecto.save()

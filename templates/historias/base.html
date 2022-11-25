@@ -15,7 +15,7 @@
         </div>
         <div>
             {% tiene_permiso_en_proyecto user 'pro_cargarUSalBacklog' proyecto as pro_cargarUSalBacklog %}
-            {% if pro_cargarUSalBacklog and esBacklog %}
+            {% if pro_cargarUSalBacklog and esBacklog and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                 <a href="{% url 'crearhistoriaUsuario' proyecto.id %}" class="btn btn-primary">Agregar US al Product Backlog</a>
             {% endif %}
             <a href="{% url 'proyecto_home' proyecto.id %}" class="btn btn-secondary">Volver al menu del proyecto</a>
@@ -69,25 +69,32 @@
                         {% if historia.estado == historia.Estado.ACTIVO %}
 
                             {% tiene_permiso_en_proyecto user 'pro_modificarUS' proyecto as pro_modificarUS %}
-                            {% if pro_modificarUS %}
+                            {% if pro_modificarUS and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                                 <a href="{% url 'editar_historiaUsuario' proyecto.id historia.id %}" class="btn btn-link"><span 
                                 class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar historia">create</span></a>
                             {% endif %}
 
                             {% tiene_permiso_en_proyecto user 'pro_cancelarUS' proyecto as pro_cancelarUS %}
-                            {% if pro_cancelarUS %}
+                            {% if pro_cancelarUS and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                                 <button type="button" data-toggle="tooltip" data-placement="top" title="Cancelar historia" 
                                 class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons">cancel</span></button>
                             {% endif %}
 
                             {% tiene_rol_en_proyecto user 'Scrum Master' proyecto as master %}
                             {% if master or historia.usuarioAsignado == user %}
-                                {% if not historia.etapa and historia.usuarioAsignado %}
+                                {% if not historia.etapa and historia.usuarioAsignado and proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado' %}
                                     <button href="#modalEtapa{{ historia.id }}" class="btn btn-link" data-bs-toggle="modal" 
                                     data-bs-target="#modalEtapa{{ historia.id }}" data-toggle="tooltip" data-placement="top" 
                                     title="Mover a la siguiente etapa"><span class="material-icons">arrow_forward</span></button>
                                 {% endif %}
                             {% endif %}
+                        {% else %}
+                        <a class="btn btn-link" href="{% url 'tareas' proyecto.id historia.id %}"><span 
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver trabajo">engineering</span></a>
+                        <a class="btn btn-link" href="{% url 'comentarios_historiaUsuario' proyecto.id historia.id %}"><span 
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver comentarios">comment</span></a>
+                        <a class="btn btn-link" href="{% url 'ver_archivos' proyecto.id historia.id %}"><span 
+                            class="material-icons" data-toggle="tooltip" data-placement="top" title="Ver archivos">description</span></a>
                         {% endif %}
                         <a class="btn btn-link" data-toggle="tooltip" data-placement="top" title="Ver historial" href="{% url 'restaurar_historia_historial' proyecto.id historia.id %}"><span 
                             class="material-icons">history</span></a>

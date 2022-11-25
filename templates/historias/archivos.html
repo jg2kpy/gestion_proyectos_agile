@@ -9,6 +9,7 @@
             <h1>{{ titulo }}</h1>
         </div>
     </div>
+    {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
     <h4>
         Subir nuevos archivos
     </h4>
@@ -20,6 +21,9 @@
         <input type="submit" class="btn btn-primary" value="Subir">
         <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
     </form>
+    {% else %}
+        <a href="{{ volver_a }}" class="btn btn-secondary">Volver</a>
+    {% endif %}
     <div class="row">
         <table class="table table-striped">
             <thead>
@@ -38,7 +42,9 @@
                     <td>{{ archivo.subido_por }}</td>
                     <td>
                         <a href="{% url 'descargar' archivo.id %}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Descargar archivo">download</span></a>
+                        {% if proyecto.estado != 'Cancelado' and proyecto.estado != 'Finalizado'%}
                         <a href="#modal{{ historia.id }}" data-bs-toggle="modal" data-bs-target="#modal{{ historia.id }}"><span class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar archivo">delete</span></a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

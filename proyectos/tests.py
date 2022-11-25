@@ -1,3 +1,4 @@
+import glob
 import os
 from django import setup
 from historias_usuario.models import SprintInfo
@@ -23,6 +24,11 @@ from proyectos.views import eliminar_rol_proyecto as eliminar_rol_proyecto_view
 from phonenumber_field.modelfields import PhoneNumber
 
 # Create your tests here.
+
+def limpiarStaticFiles():
+        files = glob.glob('app/staticfiles/temp/*')
+        for f in files:
+            os.remove(f)
 
 class ProyectoTests(TestCase):
 
@@ -213,6 +219,54 @@ class ProyectoTests(TestCase):
             f'proyecto/cancelar/{proyecto.id}/', {'nombre': 'Proyecto de prueba 2'})
         request.user = master
         response = cancelar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 422,
+                         'La respuesta no fue un estado HTTP 422 a una petición incorrecta')
+        # Verificamos que el proyecto no se cancelo
+
+        self.assertEqual(proyecto.estado, 'Planificacion',
+                         'Se cancelo el proyecto por mas que introdujo un nombre incorrecto')
+
+    def test_terminar_proyecto(self):
+        """
+        Prueba que el usuario puede terminar un proyecto
+        """
+        master = self.user
+        proyecto = self.proyecto
+
+        # Verificamos que un usuario no logueado no puede terminar un proyecto
+        request_factory = RequestFactory()
+        request = request_factory.get(f'proyecto/terminar/{proyecto.id}/')
+        request.user = AnonymousUser()
+        response = terminar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 401,
+                         'La respuesta no fue un estado HTTP 401 a un usuario no autenticado')
+
+        # Verificamos que un usuario sin permisos no puede terminar un proyecto
+        usuarioTest = Usuario(
+            username="test", email='user@user.com', password='foo')
+        usuarioTest.save()
+        request.user = usuarioTest
+        response = terminar_proyecto(request, proyecto.id)
+        self.assertEqual(response.status_code, 403,
+                         'La respuesta no fue un estado HTTP 403 a un usuario sin permisos')
+
+        # Verificamos que un usuario con permisos puede terminar un proyecto
+        request = request_factory.post(
+            f'proyecto/{proyecto.id}/terminar', {'nombre': 'PROYECTO_STANDARD'})
+        request.user = master
+        response = terminar_proyecto(request, proyecto.id)
+        # self.assertEqual(proyecto.estado, 'Cancelado', 'El estado del proyecto al terminar no es el correcto')
+        self.assertEqual(response.status_code, 302,
+                         'La respuesta no fue un estado HTTP 302 a una petición correcta')
+
+        # Verificamos que no se puede terminar un proyecto cuando no tiene nombre correcto
+
+        proyecto = self.proyecto
+
+        request = request_factory.post(
+            f'proyecto/terminar/{proyecto.id}/', {'nombre': 'Proyecto de prueba 2'})
+        request.user = master
+        response = terminar_proyecto(request, proyecto.id)
         self.assertEqual(response.status_code, 422,
                          'La respuesta no fue un estado HTTP 422 a una petición incorrecta')
         # Verificamos que el proyecto no se cancelo
@@ -693,6 +747,9 @@ class SprintTests(TestCase):
         """
         Prueba de agregar un US al backlog del sprint
         """
+        self.sprint.estado = "Planificado"
+        self.sprint.save()
+
         res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/backlog/", 
             {
                 'historia_id': self.historiaTest.id
@@ -715,6 +772,9 @@ class SprintTests(TestCase):
         Prueba cambiar la capacidad de un desarrollador
         """
         
+        self.sprint.estado = "Planificado"
+        self.sprint.save()
+
         res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/editar_miembros/",
             {
                 f'horas_trabajadas_{self.user.id}': '20'
@@ -726,6 +786,9 @@ class SprintTests(TestCase):
         """
         Prueba cambiar la capacidad de un desarrollador
         """
+        
+        self.sprint.estado = "Planificado"
+        self.sprint.save()
         
         res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{self.sprint.id}/editar_miembros/",
             {
@@ -754,7 +817,7 @@ class SprintTests(TestCase):
         self.assertEqual(self.historiaTest.getPrioridad(), self.historiaTest.bv*0.6+self.historiaTest.up*0.4,
                 'BV debería ser 0.6 la prioriad')
 
-    def test_prioridad_sin_previo(self):
+    def test_prioridad_con_previo(self):
         """
         Prueba calcular prioridad con un sprint previo
         """
@@ -844,6 +907,9 @@ class SprintTests(TestCase):
         self.assertContains(res, 'Terminado', 1,
                             200, "No se cambió a estado terminado")
 
+        limpiarStaticFiles()
+            
+
     def test_comenzar_sprint(self):
         """
         Prueba para comenzar un sprint
@@ -876,6 +942,7 @@ class SprintTests(TestCase):
         self.assertContains(res, 'Desarrollo', 1,
                             200, "No inicia el sprint correctamente")
 
+        
     def test_ver_tablero_otros_sprints(self):
         """
         Prueba visualizar sprint terminado en tablero teniendo ya un sprint empezado
@@ -914,7 +981,7 @@ class SprintTests(TestCase):
                         
     def test_cancelar_sprint(self):
         """
-        Prueba para comenzar un sprint
+        Prueba para cancelar un sprint
         """
         
         self.sprint3 = Sprint()
@@ -941,6 +1008,7 @@ class SprintTests(TestCase):
         self.assertContains(res, 'Cancelado', 1,
                             200, "No se cancelo el sprint correctamente")
 
+        limpiarStaticFiles()
 
     def test_comenzar_sprint_mover_a_primera_etapa(self):
         """
@@ -973,10 +1041,11 @@ class SprintTests(TestCase):
         self.assertEqual(HistoriaUsuario.objects.get(id=historiaTest3.id).etapa, self.tipoTest.etapas.get(orden=0),
                 'La historia no se fue a la primera etapa al momento de inicar el sprint')
 
+        limpiarStaticFiles()
 
-    def test_descargar_burndown_chart(self):
+    def test_ver_burndown_chart(self):
         """
-        Prueba para ver si descarga el burndown chart
+        Prueba para ver si carga el burndown chart
         """
         
         res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
@@ -985,19 +1054,41 @@ class SprintTests(TestCase):
             }, follow=True)
         self.assertEqual(res.status_code, 200,
                 'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+        
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/", follow=True)
+        self.assertContains(res, f'src="/static/bdChart_{self.proyecto.id}_{self.sprint.id}.png"', 1,
+                            200, "No reconoce el path correcto")
 
+        self.assertEqual(True, os.path.isfile(f"app/staticfiles/bdChart_{self.proyecto.id}_{self.sprint.id}.png"), "No existe archivo en path")
+
+        limpiarStaticFiles()
+
+    def test_descargar_burndown_chart(self):
+        """
+        Prueba para ver si descarga el burndown chart
+        """
+
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+        
         res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/list/",
             {
                 'descargarBurndown' : self.sprint.id
             }, follow=True)
         self.assertEqual(res.status_code, 200,
-                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
-    
+                'La respuesta no fue un estado HTTP 200 al descargar el burndown chart')
+
+        limpiarStaticFiles()
+
     def test_descargar_velocity_chart(self):
         """
         Prueba para ver si descarga el velocity chart
         """
-        
+
         res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
             {
                 'terminar' : 'terminar'
@@ -1010,5 +1101,215 @@ class SprintTests(TestCase):
                 'descargarVelocity' : self.proyecto.id
             }, follow=True)
         self.assertEqual(res.status_code, 200,
-                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+                'La respuesta no fue un estado HTTP 200 al descargar el velocity chart')
     
+        limpiarStaticFiles()
+
+    def test_ver_velocity_chart(self):
+        """
+        Prueba para ver si carga el velocity chart
+        """
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 al terminar un sprint')
+        
+        res = self.client.get(f"/proyecto/{self.proyecto.id}/sprints/list/", follow=True)
+        self.assertContains(res, f'src="/static/vlChart_{self.proyecto.id}.png"', 1,
+                            200, "No reconoce el path correcto")
+
+        self.assertEqual(True, os.path.isfile(f"app/staticfiles/vlChart_{self.proyecto.id}.png"), "No existe archivo en path")
+
+        limpiarStaticFiles()
+
+    def test_set_fecha_finalizacion(self):
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+        {
+            'terminar' : 'terminar'
+        }, follow=True)
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+        {
+            'nombre': 'Sprint prueba fecha fin', 'descripcion': 'Sprint 1', 'duracion': '15', f'horas_trabajadas_{self.proyecto.id}': '6',
+        }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+                
+        id = Sprint.objects.get(nombre="Sprint prueba fecha fin").id
+        self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{id}/backlog/",
+        {
+            'comenzar' : 'Comenzar'
+        }, follow=True)
+        
+        sprint_a_finalizar = Sprint.objects.get(nombre="Sprint prueba fecha fin")
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+            {
+                'terminar' : 'terminar'
+            }, follow=True)
+
+        sprint_finalizado = Sprint.objects.get(nombre="Sprint prueba fecha fin")
+        
+        self.assertNotEqual(sprint_a_finalizar.fecha_fin, sprint_finalizado.fecha_fin,"La fecha finalizacion no se establecio correctamente")
+
+        limpiarStaticFiles()
+
+    def test_estados_proyecto(self):
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+        {
+            'terminar' : 'terminar'
+        }, follow=True)
+        
+        self.assertEqual(self.proyecto.estado, "Planificacion")
+        
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/sprints/crear/", 
+        {
+            'nombre': 'Sprint prueba estados proyecto', 'descripcion': 'Sprint 1', 'duracion': '15', f'horas_trabajadas_{self.proyecto.id}': '6',
+        }, follow=True)
+        self.assertEqual(res.status_code, 200,
+                'La respuesta no fue un estado HTTP 200 a una creacion de sprint')
+        
+        id = Sprint.objects.get(nombre="Sprint prueba estados proyecto").id
+        self.client.post(f"/proyecto/{self.proyecto.id}/sprints/{id}/backlog/",
+        {
+            'comenzar' : 'Comenzar'
+        }, follow=True)
+        
+        proyecto1 = Proyecto.objects.get(id=self.proyecto.id)
+        self.assertEqual(proyecto1.estado, "Ejecución")
+    
+        res = self.client.post(f"/proyecto/{self.proyecto.id}/tablero/{self.historiaTest.tipo.id}/",
+        {
+            'terminar' : 'terminar'
+        }, follow=True)
+        
+        proyecto1 = Proyecto.objects.get(id=self.proyecto.id)
+        self.assertEqual(proyecto1.estado, "Planificación")
+
+        limpiarStaticFiles()
+    
+
+class ReemplazarTests(TestCase):
+    fixtures = [
+        "databasedump.json",
+    ]
+
+    def setUp(self):
+        """
+        Crea un usuario y un proyecto para realizar las pruebas y un proyecto.
+        """
+        self.user = get_user_model().objects.create_user(email='testemail@example.com', password='A123B456c.',
+                                                         avatar_url='avatar@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+
+        self.client.login(email='testemail@example.com', password='A123B456c.')
+        res = self.client.post("/proyecto/crear/", {"nombre": "PROYECTO_STANDARD",
+                               "descripcion": "Existe en todas las pruebas", "scrumMaster": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'La respuesta no fue un estado HTTP 200 al intentar crear un proyecto')
+        self.proyecto = Proyecto.objects.get(nombre="PROYECTO_STANDARD")
+        self.sprint = Sprint()
+        self.sprint.nombre = 'Sprint 1'
+        self.sprint.proyecto = self.proyecto
+        self.sprint.duracion = 3
+        self.sprint.fecha_inicio = datetime.datetime.now(tz=get_current_timezone())
+        self.sprint.fecha_fin = datetime.datetime.now(tz=get_current_timezone()) + datetime.timedelta(days=7)
+        self.sprint.estado = "Desarrollo"
+        self.sprint.save()
+        self.tiempoEnSprint = UsuarioTiempoEnSprint()
+        self.tiempoEnSprint.usuario = self.user
+        self.tiempoEnSprint.sprint = self.sprint
+        self.tiempoEnSprint.horas = 10
+        self.tiempoEnSprint.save()
+        self.tipoTest = TipoHistoriaUsusario.objects.get(proyecto=self.proyecto, nombre="Default")
+        self.historiaTest = HistoriaUsuario.objects.create(tipo=self.tipoTest, nombre="Test US 1", descripcion="Test US 1", proyecto=self.proyecto, up=1, bv=1)
+        self.historiaTest.tipo = self.tipoTest
+        self.historiaTest.usuarioAsignado = self.user
+        self.historiaTest.save()
+        self.sprint.historias.add(self.historiaTest)
+        self.sprint.save()
+        self.assertEqual(self.historiaTest.usuarioAsignado, self.user)
+    
+    def test_reemplazar_no_miembro_proyecto_ui(self):
+        """
+        Prueba que un usuario que no es miembro del proyecto no puede ser reemplazado.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": self.user.id, "usuario_entra": user.id}, follow=True)
+        self.assertEqual(res.status_code, 422, 'Operacion prohibida retorna un estado HTTP 422')
+    
+    def test_reemplazar_no_miembro_sprint_ui(self):
+        """
+        Prueba que un usuario que no es miembro del sprint no puede ser reemplazado.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        self.proyecto.usuario.add(user)
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": user.id, "usuario_entra": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 422, 'Operacion prohibida retorna un estado HTTP 422')
+    
+    def test_reemplazar_con_no_miembro_proyecto_ui(self):
+        """
+        Prueba que un usuario no se puede reemplazar con uno que no es miembro del proyecto no puede ser reemplazado.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": user.id, "usuario_entra": self.user.id}, follow=True)
+        self.assertEqual(res.status_code, 422, 'Operacion prohibida retorna un estado HTTP 422')
+    
+    def test_reemplazar_con_miembro_sprint_ui(self):
+        """
+        Prueba que un usuario no se puede reemplazar con uno que no es miembro del sprint no puede ser reemplazado.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        self.proyecto.usuario.add(user)
+        nuevoTiempo = UsuarioTiempoEnSprint()
+        nuevoTiempo.usuario = user
+        nuevoTiempo.sprint = self.sprint
+        nuevoTiempo.horas = 10
+        nuevoTiempo.save()
+
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": self.user.id, "usuario_entra": user.id}, follow=True)
+        self.assertEqual(res.status_code, 422, 'Operacion prohibida retorna un estado HTTP 422')
+
+    def test_reemplazar_miembro_ui(self):
+        """
+        Prueba que un usuario se puede reemplazar por otro.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        
+        self.proyecto.usuario.add(user)
+
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": self.user.id, "usuario_entra": user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'Se reemplazo exitosamente al usuario')
+        self.historiaTest.refresh_from_db()
+        self.assertEqual(self.historiaTest.usuarioAsignado, user)
+    
+    def test_reemplazar_miembro_proyecto_planeado_ui(self):
+        """
+        Prueba que un usuario que es miembro del proyecto y sprint puede ser reemplazado en un Sprint en planificacion.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+
+        self.proyecto.usuario.add(user)
+        self.proyecto.estado = "Planificado"
+
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": self.user.id, "usuario_entra": user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'Se reemplazo exitosamente al usuario')
+
+    def test_reemplazar_miembro_proyecto_desarrollado_ui(self):
+        """
+        Prueba que un usuario que es miembro del proyecto y sprint puede ser reemplazado en un Sprint en desarrollo.
+        """
+        user = get_user_model().objects.create_user(email='testemail2@example.com', password='A123B456c.',
+                                                    avatar_url='avatar2@example.com', direccion='Calle 1 # 2 - 3', telefono=PhoneNumber.from_string('0983 738040'))
+        
+        self.proyecto.usuario.add(user)
+
+        res = self.client.post(f"/proyecto/{self.sprint.proyecto.id}/sprints/{self.sprint.id}/reemplazar_miembro/", {"usuario_sale": self.user.id, "usuario_entra": user.id}, follow=True)
+        self.assertEqual(res.status_code, 200, 'Se reemplazo exitosamente al usuario')
