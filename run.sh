@@ -51,6 +51,8 @@ sudo rm -rf ./postgre-data
 sudo rm -rf ./*/migrations
 sudo rm -rf ./app/staticfiles/*
 
+opcion=0
+
 if [ -z "$tag" ];then
     printf "\nSeleccione un tag\n"
     echo "1) Iteracion-1"
